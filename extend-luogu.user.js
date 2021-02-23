@@ -16,25 +16,25 @@ const $ = unsafeWindow.$ || jQuery, // Note: Use jQuery from LFE.
       add_style = window.GM_addStyle || window.PRO_addStyle || window.addStyle || error("`add_style` failed.")
 
 const emo = [
-    [ 62224, [ "qq" ] ],
-    [ 62225, [ "cy" ] ],
-    [ 62226, [ "kl", "kel" ] ],
-    [ 62227, [ "kk" ] ],
-    [ 62228, [ "dk" ] ],
-    [ 62230, [ "xyx", "hj" ] ],
-    [ 62234, [ "jk" ] ],
-    [ 62236, [ "up", "+", "zan" ] ],
-    [ 62238, [ "dn", "-", "cai" ] ],
-    [ 62239, [ "ts" ] ],
-    [ 62240, [ "yun" ] ],
-    [ 62243, [ "yw", "?", "yiw" ] ],
-    [ 62244, [ "se", "*" ] ],
-    [ 62246, [ "px" ] ],
-    [ 62248, [ "wq" ] ],
-    [ 62250, [ "fd", "fad" ] ],
-    [ 69020, [ "yl", "youl" ] ]
-],
-      emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${ id }.png`
+    [ "62224", [ "qq" ] ],
+    [ "62225", [ "cy" ] ],
+    [ "62226", [ "kl", "kel" ] ],
+    [ "62227", [ "kk" ] ],
+    [ "62228", [ "dk" ] ],
+    [ "62230", [ "xyx", "hj" ] ],
+    [ "62234", [ "jk" ] ],
+    [ "62236", [ "qiang", "up", "+", "zan" ] ],
+    [ "62238", [ "ruo", "dn", "-", "cai" ] ],
+    [ "62239", [ "ts" ] ],
+    [ "62240", [ "yun" ] ],
+    [ "62243", [ "yiw", "yw", "?" ] ],
+    [ "62244", [ "se", "*" ] ],
+    [ "62246", [ "px" ] ],
+    [ "62248", [ "wq" ] ],
+    [ "62250", [ "fad", "fd" ] ],
+    [ "69020", [ "youl", "yl" ] ]
+]
+var emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${ id }.png`
 
 const init = () => {
     add_style(`
