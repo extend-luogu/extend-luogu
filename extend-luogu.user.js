@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.02
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
+// @match        https://*.luogu.com.cn
+// @match        https://*.luogu.org
 // @match        https://ben-ben-spider.williamsongshy.repl.co/api/list/all
 // @grant        GM_addStyle
 // @grant        unsafeWindow
@@ -35,7 +37,7 @@ const emo = [
     [ "69020", [ "youl", "yl" ] ]
 ]
 var emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${ id }.png`
-
+/*
 function customInfoCard() {
 	var a = document.querySelectorAll(".introduction p,h1,h2,h3,h4,h5,h6");
 	var s, plc, fml;
@@ -79,7 +81,7 @@ function customInfoCard() {
 			vdo.setAttribute("style", "width:100%;height:auto;");
 			vdo.innerText = "您的浏览器不支持 video 标签。";
 			document.querySelector(".introduction").insertBefore(vdo, a[i].nextSibling);
- 
+
 		}
 		if (a[i].innerText.substr(0, 7) == "%iframe") {
 			plc = a[i].innerText.indexOf('%', 1);
@@ -92,19 +94,17 @@ function customInfoCard() {
 			ifr.setAttribute("seamless", "");
 			ifr.innerText = "您的浏览器不支持 iframe 标签。";
 			document.querySelector(".introduction").insertBefore(ifr, a[i].nextSibling);
- 
+
 		}
- 
+
 	}
 }
 
+//下个版本绕过csp 优先绕全网犇犇
+//对不住了haraki
+*/
 const init = () => {
-    var k = window.setInterval(customInfoCard, 500);
-
-    const sleep = ms =>
-        new Promise(resolve => setTimeout(() => resolve(), ms))
-    const $ = window.$
-    window.alert = () => {}
+    //var k = window.setInterval(customInfoCard, 500);
 
     add_style(`
         .mp-editor-ground.exlg-ext {
@@ -153,14 +153,20 @@ const init = () => {
     if(window.location.href === "https://www.luogu.com.cn/") {
         var msg
         addEventListener('message', e => {
+            console.dir(e.data)
             msg = e.data
         })
         const loader = document.createElement('iframe')
-        const uid = _feInstance.currentUser.uid
         loader.style = "display:none"
-        loader.src = "https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid="+uid
+        loader.src = "https://prpr.blog.luogu.org/"
         loader.className = "exlg-bbuploader"
+        loader.id = "bbuploader"
         document.body.appendChild(loader)
+
+        const uid = $("a.lg-fg-green")[0].href.slice(30)
+        setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
+        
+        console.dir(uid)
 
         var html = '<button class="am-btn am-btn-danger am-btn-sm" id="check_benben">快速同步</button>'
         var node = document.createElement('div')
@@ -170,18 +176,24 @@ const init = () => {
         document.querySelector('div.lg-index-benben > div:nth-child(3)').insertAdjacentElement('afterend', node)
 
         $("#feed-submit").click(function() {
-            if ((feedMode=="my" || feedMode == "watching")&&$('#feed-content').val())
-                $("iframe.exlg-bbuploader").attr('src', $("iframe.exlg-bbuploader").attr('src'))
+            if ((feedMode=="my" || feedMode == "watching" || feedMode == "all")&&$('#feed-content').val()) {
+                $("iframe#bbuploader").attr('src', $("iframe#bbuploader").attr('src'))
+                setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
+            }
         });
 
+        
         $("#check_benben").click(function() {
-            if (feedMode=="my" || feedMode == "watching")
-                $("iframe.exlg-bbuploader").attr('src', $("iframe.exlg-bbuploader").attr('src'))
+            if ((feedMode=="my" || feedMode == "watching" || feedMode == "all")&&$('#feed-content').val()) {
+                $("iframe#bbuploader").attr('src', $("iframe#bbuploader").attr('src'))
+                setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
+            }
         });
+        
 
         const benben = document.createElement('iframe')
         benben.style = "display:none"
-        benben.src = "https://ben-ben-spider.williamsongshy.repl.co/api/list/all"
+        benben.src = "https://www.luogu.com.cn/blog/311930/"
         benben.className = "exlg-benben"
         document.body.appendChild(benben)
 
@@ -190,9 +202,7 @@ const init = () => {
         $("li.feed-selector")
             .on("click", () => {
                 if (toggled) {
-                    //$("div#feed-more").toggle()
                     toggled = false
-                    //console.dir(toggled)
                 }
         })
 
@@ -206,14 +216,11 @@ const init = () => {
 
                 if (!toggled) {
                     toggled=true
-                    //console.dir(toggled)
                     $("div#feed-more").toggle()
                 }
                 $("li.am-comment").remove()
                 $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
 
-                //await sleep(1000)
-                
                 for (let e in msg) {
                     var bb = `
                         <li class="am-comment am-comment-primary feed-li">
@@ -244,44 +251,43 @@ const init = () => {
                             </div>
                         </li>
                     `
-                    /*
-                    bb=bb.replace("/UID/g",msg[e][1])
-                    bb=bb.replace("/USERNAME/g",msg[e][2])
-                    bb=bb.replace("/MESSAGE/h",msg[e][3])
-                    bb=bb.replace("/TIME/g",msg[e][4])
-                    */
                     $(bb).appendTo($("ul#feed"))
                 }
-                
-
-                //if ($("li.exlg-benben")[0].getAttribute("style") != "background-color : #0e90D2") $("li.feed-selector.am-active")[0].className = "feed-selector"
-                //$("li.exlg-benben")[0].setAttribute("style", "background-color : #0e90D2");
 
             }).appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
 
     }
 
-    if(window.location.href === "https://ben-ben-spider.williamsongshy.repl.co/api/list/all") {
+    if (window.location.href === "https://prpr.blog.luogu.org/") {
+        var uid
+        window.addEventListener('message', function (e) {
+            document.write(e.data)
+            
+            if (e.data == "update") {
+                document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid=`+uid+`" style="adisplay : none;"></iframe>`)
+            } else {
+                uid = e.data
+                document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid=`+uid+`" style="adisplay : none;"></iframe>`)
+            }
+            
+        })
+    }
+
+    if (window.location.href === "https://www.luogu.com.cn/blog/311930/") {
+        setTimeout(function() {
+            document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/list/all"></iframe>`)
+            window.addEventListener('message', function (e) {
+                window.parent.postMessage(e.data,'*')
+            })
+        },200)
+    }
+
+    if (window.location.href === "https://ben-ben-spider.williamsongshy.repl.co/api/list/all") {
         document.write(unescape(document.body.innerHTML.replace(/\\u/g, '%u')))
-        //console.dir(document.body.innerText)
         const message = JSON.parse(document.body.innerText)
+        alert(message)
         window.parent.postMessage(message,'*')
     }
-    /*  todo : 自定义css
-    if(window.location.href === "https://www.luogu.com.cn/paste/kg5kcuy9") {
-        const card = $("div.card.padding-default");
-        card.innerHTML=card.innerHTML.replace(/cssedit/g,`
-            <div>
-                <textarea rows="3" style="margin: 0px; width: 282px; height: 140px;" class="exlg-css" :="">
-                </textarea>
-            </div>
-            <button data-v-370e72e2="" data-v-7d0b250b="" type="button" class="lfe-form-sz-small exlg-css" data-v-796309f8="" style="width : 100;border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);">
-                确定
-            </button>
-        `)
-        console.dir(card.innerHTML)
-    }
-    */
-//})();
 }
+
 $(init)
