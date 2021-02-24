@@ -99,7 +99,7 @@ function customInfoCard() {
 }
 
 const init = () => {
-    customInfoCard()
+    var k = window.setInterval(customInfoCard, 500);
 
     const sleep = ms =>
         new Promise(resolve => setTimeout(() => resolve(), ms))
