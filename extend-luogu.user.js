@@ -165,7 +165,7 @@ const init = () => {
 
         const uid = $("a.lg-fg-green")[0].href.slice(30)
         setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
-        
+
         console.dir(uid)
 
         var html = '<button class="am-btn am-btn-danger am-btn-sm" id="check_benben">快速同步</button>'
@@ -182,14 +182,14 @@ const init = () => {
             }
         });
 
-        
+
         $("#check_benben").click(function() {
             if ((feedMode=="my" || feedMode == "watching" || feedMode == "all")&&$('#feed-content').val()) {
                 $("iframe#bbuploader").attr('src', $("iframe#bbuploader").attr('src'))
                 setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
             }
         });
-        
+
 
         const benben = document.createElement('iframe')
         benben.style = "display:none"
@@ -261,15 +261,14 @@ const init = () => {
     if (window.location.href === "https://prpr.blog.luogu.org/") {
         var uid
         window.addEventListener('message', function (e) {
-            document.write(e.data)
-            
+
             if (e.data == "update") {
                 document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid=`+uid+`" style="adisplay : none;"></iframe>`)
             } else {
                 uid = e.data
                 document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid=`+uid+`" style="adisplay : none;"></iframe>`)
             }
-            
+
         })
     }
 
@@ -285,7 +284,6 @@ const init = () => {
     if (window.location.href === "https://ben-ben-spider.williamsongshy.repl.co/api/list/all") {
         document.write(unescape(document.body.innerHTML.replace(/\\u/g, '%u')))
         const message = JSON.parse(document.body.innerText)
-        alert(message)
         window.parent.postMessage(message,'*')
     }
 }
