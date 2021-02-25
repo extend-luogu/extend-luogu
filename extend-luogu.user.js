@@ -220,41 +220,45 @@ const init = () => {
                 }
                 $("li.am-comment").remove()
                 $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
-
-                for (let e in msg) {
-                    var bb = `
-                        <li class="am-comment am-comment-primary feed-li">
-                            <div class="lg-left">
-                                <a href="/user/`+msg[e][1]+`" class="center">
-                                <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e][1]+`.png" class="am-comment-avatar">
-                                </a>
-                            </div>
-                            <div class="am-comment-main">
-                                <header class="am-comment-hd">
-                                    <div class="am-comment-meta">
-                                        <span class="feed-username">
-                                            <a class="lg-fg-purple" href="/user/`+msg[e][1]+`" target="_blank">`
-                                                +msg[e][2]+
-                                            `</a>
-                                        </span>`
-                                        +msg[e][4]+
-                                        `<a name="feed-reply" href="javascript: scrollToId('feed-content')" data-username="`+msg[e][2]+`">
-                                            回复
-                                        </a>
-                                    </div>
-                                </header>
-                                <div class="am-comment-bd">
-                                    <span class="feed-comment">
-                                        <p>`+msg[e][3]+`</p>
-                                    </span>
+                setTimeout(function () {
+                    for (let e in msg) {
+                        var date_time = new Date(msg[e][4])
+                        var utc8 = date_time.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
+                        var bb = `
+                            <li class="am-comment am-comment-primary feed-li">
+                                <div class="lg-left">
+                                    <a href="/user/`+msg[e][1]+`" class="center">
+                                    <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e][1]+`.png" class="am-comment-avatar">
+                                    </a>
                                 </div>
-                            </div>
-                        </li>
-                    `
-                    $(bb).appendTo($("ul#feed"))
-                }
+                                <div class="am-comment-main">
+                                    <header class="am-comment-hd">
+                                        <div class="am-comment-meta">
+                                            <span class="feed-username">
+                                                <a class="lg-fg-purple" href="/user/`+msg[e][1]+`" target="_blank">`
+                                                    +msg[e][2]+
+                                                `</a>
+                                            </span>`
+                                            +utc8+
+                                            `<a name="feed-reply" href="javascript: scrollToId('feed-content')" data-username="`+msg[e][2]+`">
+                                                回复
+                                            </a>
+                                        </div>
+                                    </header>
+                                    <div class="am-comment-bd">
+                                        <span class="feed-comment">
+                                            <p>`+msg[e][3]+`</p>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        `
+                        $(bb).appendTo($("ul#feed"))
+                    }
+                },2000)
 
             }).appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
+
 
     }
 
