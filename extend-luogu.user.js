@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      1.02
+// @version      1.2
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -206,6 +206,8 @@ const init = () => {
                 }
         })
 
+        
+
         $(`<li class="feed-selector" id="exlg-selector" data-mode="all"><a style="cursor: pointer">全网动态</a></li>`)
             .on("click", () => {
                 const ths=$("li#exlg-selector")
@@ -220,46 +222,45 @@ const init = () => {
                 }
                 $("li.am-comment").remove()
                 $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
-                setTimeout(function () {
-                    for (let e in msg) {
-                        var date_time = new Date(msg[e][4])
-                        var utc8 = date_time.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
-                        var bb = `
-                            <li class="am-comment am-comment-primary feed-li">
-                                <div class="lg-left">
-                                    <a href="/user/`+msg[e][1]+`" class="center">
-                                    <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e][1]+`.png" class="am-comment-avatar">
-                                    </a>
-                                </div>
-                                <div class="am-comment-main">
-                                    <header class="am-comment-hd">
-                                        <div class="am-comment-meta">
-                                            <span class="feed-username">
-                                                <a class="lg-fg-purple" href="/user/`+msg[e][1]+`" target="_blank">`
-                                                    +msg[e][2]+
-                                                `</a>
-                                            </span>`
-                                            +utc8+
-                                            `<a name="feed-reply" href="javascript: scrollToId('feed-content')" data-username="`+msg[e][2]+`">
-                                                回复
-                                            </a>
-                                        </div>
-                                    </header>
-                                    <div class="am-comment-bd">
-                                        <span class="feed-comment">
-                                            <p>`+msg[e][3]+`</p>
-                                        </span>
+                for (let e in msg) {
+                    var date_time = new Date(msg[e][4])
+                    var utc8 = date_time.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
+                    var bb = `
+                        <li class="am-comment am-comment-primary feed-li">
+                            <div class="lg-left">
+                                <a href="/user/`+msg[e][1]+`" class="center">
+                                <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e][1]+`.png" class="am-comment-avatar">
+                                </a>
+                            </div>
+                            <div class="am-comment-main">
+                                <header class="am-comment-hd">
+                                    <div class="am-comment-meta">
+                                        <span class="feed-username">
+                                            <a class="lg-fg-purple" href="/user/`+msg[e][1]+`" target="_blank">`
+                                                +msg[e][2]+
+                                            `</a>
+                                        </span>`
+                                        +utc8+
+                                        `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e][2]+` : `+msg[e][3].replace(/<.*?>/g,'')+`').trigger('input');">回复</a>
                                     </div>
+                                </header>
+                                <div class="am-comment-bd">
+                                    <span class="feed-comment">
+                                        <p>`+msg[e][3]+`</p>
+                                    </span>
                                 </div>
-                            </li>
-                        `
-                        $(bb).appendTo($("ul#feed"))
-                    }
-                },2000)
+                            </div>
+                        </li>
+                    `
+                    console.dir(msg[e][2])
+                    console.dir(msg[e][3])
+                    $(bb).appendTo($("ul#feed"))
+                }
+            })
+        .appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
+        
 
-            }).appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
-
-
+        
     }
 
     if (window.location.href === "https://prpr.blog.luogu.org/") {
