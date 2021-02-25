@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.21
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
 // @match        https://*.luogu.com.cn
 // @match        https://*.luogu.org
-// @match        https://ben-ben-spider.williamsongshy.repl.co/api/list/all
+// @match        https://ben-ben-spider.williamsongshy.repl.co/api/list/all*
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
@@ -206,7 +206,7 @@ const init = () => {
                 }
         })
 
-        
+
 
         $(`<li class="feed-selector" id="exlg-selector" data-mode="all"><a style="cursor: pointer">全网动态</a></li>`)
             .on("click", () => {
@@ -255,12 +255,18 @@ const init = () => {
                     console.dir(msg[e][2])
                     console.dir(msg[e][3])
                     $(bb).appendTo($("ul#feed"))
+                    $(`a#exlg-bb`+e)
+                        .on("click", () => { $("textarea")
+                            .trigger("focus")
+                            .val(msg[e][2])
+                            .trigger("input")
+                    })
                 }
             })
         .appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
-        
 
-        
+
+
     }
 
     if (window.location.href === "https://prpr.blog.luogu.org/") {
@@ -287,9 +293,12 @@ const init = () => {
     }
 
     if (window.location.href === "https://ben-ben-spider.williamsongshy.repl.co/api/list/all") {
-        document.write(unescape(document.body.innerHTML.replace(/\\u/g, '%u')))
-        const message = JSON.parse(document.body.innerText)
-        window.parent.postMessage(message,'*')
+        $.get("https://ben-ben-spider.williamsongshy.repl.co/api/list/all?page=2",function(data,status){
+            document.write(unescape(document.body.innerHTML.replace(/\\u/g, '%u')))
+            const thispage = JSON.parse(document.body.innerText)
+            console.dir(thispage.concat(data))
+            window.parent.postMessage(thispage.concat(data),'*')
+        });
     }
 }
 
