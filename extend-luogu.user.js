@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.22
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
