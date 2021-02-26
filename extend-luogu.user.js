@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      1.21
+// @version      1.3
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -81,7 +81,6 @@ function customInfoCard() {
 			vdo.setAttribute("style", "width:100%;height:auto;");
 			vdo.innerText = "您的浏览器不支持 video 标签。";
 			document.querySelector(".introduction").insertBefore(vdo, a[i].nextSibling);
-
 		}
 		if (a[i].innerText.substr(0, 7) == "%iframe") {
 			plc = a[i].innerText.indexOf('%', 1);
@@ -94,12 +93,9 @@ function customInfoCard() {
 			ifr.setAttribute("seamless", "");
 			ifr.innerText = "您的浏览器不支持 iframe 标签。";
 			document.querySelector(".introduction").insertBefore(ifr, a[i].nextSibling);
-
 		}
-
 	}
 }
-
 //下个版本绕过csp 优先绕全网犇犇
 //对不住了haraki
 */
@@ -241,7 +237,8 @@ const init = () => {
                                             `</a>
                                         </span>`
                                         +utc8+
-                                        `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e][2]+` : `+msg[e][3].replace(/<.*?>/g,'')+`').trigger('input');">回复</a>
+                                        `<a href="https://ben-ben-spider.williamsongshy.repl.co/deletewant/new?bid=`+msg[e][0]+`">删除</a>
+                                        <a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e][2]+` : `+msg[e][3].replace(/<.*?>/g,'')+`').trigger('input');">回复</a>
                                     </div>
                                 </header>
                                 <div class="am-comment-bd">
