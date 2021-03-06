@@ -7,7 +7,7 @@
 // @match        https://www.luogu.com.cn/*
 // @match        https://*.luogu.com.cn
 // @match        https://*.luogu.org
-// @match        https://ben-ben-spider.williamsongshy.repl.co/api/list/all*
+// @match        https://extend-luogu-benben-service.optimize2.repl.co/api/list/
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
@@ -20,7 +20,7 @@ const $ = unsafeWindow.$ || jQuery, // Note: Use jQuery from LFE.
 const emo = [
     [ "62224", [ "qq" ] ],
     [ "62225", [ "cy" ] ],
-    [ "62226", [ "kl", "kel" ] ],
+    [ "62226", [ "kel", "kl" ] ],
     [ "62227", [ "kk" ] ],
     [ "62228", [ "dk" ] ],
     [ "62230", [ "xyx", "hj" ] ],
@@ -37,71 +37,52 @@ const emo = [
     [ "69020", [ "youl", "yl" ] ]
 ]
 var emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${ id }.png`
-/*
-function customInfoCard() {
-	var a = document.querySelectorAll(".introduction p,h1,h2,h3,h4,h5,h6");
-	var s, plc, fml;
-	for (var i = 0; i < a.length; i++) {
-		if (a[i].innerText.substr(0, 7) == "%align%") {
-			a[i].innerText = a[i].innerText.substring(7, a[i].innerText.length);
-			s = a[i].getAttribute("style");
-			if (s == null) s = "";
-			a[i].setAttribute("style", s + "text-align:center;");
-		}
-		if (a[i].innerText.substr(0, 6) == "%color") {
-			var col = a[i].innerText.substr(6, 8);
-			a[i].innerText = a[i].innerText.substring(15, a[i].innerText.length);
-			s = a[i].getAttribute("style");
-			if (s == null) s = "";
-			a[i].setAttribute("style", s + "color" + col + ";");
-		}
-		if (a[i].innerText.substr(0, 12) == "%font-family") {
-			plc = a[i].innerText.indexOf('%', 1);
-			fml = a[i].innerText.substr(12, plc - 12);
-			a[i].innerText = a[i].innerText.substring(plc + 1, a[i].innerText.length);
-			s = a[i].getAttribute("style");
-			if (s == null) s = "";
-			a[i].setAttribute("style", s + "font-family" + fml + ";");
-		}
-		if (a[i].innerText.substr(0, 10) == "%font-size") {
-			plc = a[i].innerText.indexOf('%', 1);
-			fml = a[i].innerText.substr(10, plc - 10);
-			a[i].innerText = a[i].innerText.substring(plc + 1, a[i].innerText.length);
-			s = a[i].getAttribute("style");
-			if (s == null) s = "";
-			a[i].setAttribute("style", s + "font-size" + fml + ";");
-		}
-		if (a[i].innerText.substr(0, 6) == "%video") {
-			plc = a[i].innerText.indexOf('%', 1);
-			fml = a[i].innerText.substr(7, plc - 7);
-			a[i].innerText = "";
-			var vdo = document.createElement("video");
-			vdo.setAttribute("src", fml);
-			vdo.setAttribute("controls", "controls");
-			vdo.setAttribute("style", "width:100%;height:auto;");
-			vdo.innerText = "您的浏览器不支持 video 标签。";
-			document.querySelector(".introduction").insertBefore(vdo, a[i].nextSibling);
-		}
-		if (a[i].innerText.substr(0, 7) == "%iframe") {
-			plc = a[i].innerText.indexOf('%', 1);
-			fml = a[i].innerText.substr(8, plc - 8);
-			a[i].innerText = "";
-			var ifr = document.createElement("iframe");
-			ifr.setAttribute("src", fml);
-			ifr.setAttribute("width", "100%");
-			ifr.setAttribute("height", "500px");
-			ifr.setAttribute("seamless", "");
-			ifr.innerText = "您的浏览器不支持 iframe 标签。";
-			document.querySelector(".introduction").insertBefore(ifr, a[i].nextSibling);
-		}
-	}
-}
-//下个版本绕过csp 优先绕全网犇犇
-//对不住了haraki
-*/
-const init = () => {
-    //var k = window.setInterval(customInfoCard, 500);
 
+const colorMap = {
+    "Gray": "gray",
+    "Blue": "blue",
+    "Green": "green",
+    "Orange": "orange lg-bold",
+    "Red": "red lg-bold",
+    "Purple": "purple lg-bold",
+}
+
+function formatDate(value) {
+    value = value*1000
+    const date = new Date(value);
+    const y = date.getFullYear();
+    const MM = (date.getMonth() + 1).toString().padStart(2,'0');
+    const d = date.getDate().toString().padStart(2,'0');
+    const h = date.getHours().toString().padStart(2,'0');
+    const m = date.getMinutes().toString().padStart(2,'0');
+    const s = date.getSeconds().toString().padStart(2,'0');
+    return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s;
+}
+
+function parseDom(arg) {
+　　 var objE = document.createElement("div");
+　　 objE.innerHTML = arg;
+　　 return objE.childNodes;
+};
+function customInfoCard() {
+    var a = document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,a");
+    for (var i = 0; i < a.length; i++) {
+        if (a[i].innerText[0]== "<") {
+            var inserta= parseDom(a[i].innerText)[0];
+            a[i].parentNode.replaceChild(inserta,a[i]);
+        }
+    }
+}
+
+function customStyle() {
+    //gugugu
+}
+
+const init = () => {
+    //customInfoCard
+    var k = window.setInterval(customInfoCard, 500);
+
+    //emoji
     add_style(`
         .mp-editor-ground.exlg-ext {
             top: 80px !important;
@@ -146,6 +127,7 @@ const init = () => {
             )
     })
 
+    //benben
     if(window.location.href === "https://www.luogu.com.cn/") {
         var msg
         addEventListener('message', e => {
@@ -219,45 +201,43 @@ const init = () => {
                 $("li.am-comment").remove()
                 $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
                 for (let e in msg) {
-                    var date_time = new Date(msg[e][4])
-                    var utc8 = date_time.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
+                    var utc8 = formatDate(msg[e]['time'])//date_time//.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
                     var bb = `
                         <li class="am-comment am-comment-primary feed-li">
                             <div class="lg-left">
-                                <a href="/user/`+msg[e][1]+`" class="center">
-                                <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e][1]+`.png" class="am-comment-avatar">
+                                <a href="/user/`+msg[e]['user']['uid']+`" class="center">
+                                <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e]['user']['uid']+`.png" class="am-comment-avatar">
                                 </a>
                             </div>
                             <div class="am-comment-main">
                                 <header class="am-comment-hd">
                                     <div class="am-comment-meta">
                                         <span class="feed-username">
-                                            <a class="lg-fg-purple" href="/user/`+msg[e][1]+`" target="_blank">`
-                                                +msg[e][2]+
+                                            <a class="lg-fg-`+colorMap[msg[e]['user']['color']]+`" href="/user/`+msg[e]['user']['uid']+`" target="_blank">`
+                                                +msg[e]['user']['name']+
                                             `</a>
                                         </span>`
                                         +utc8+
-                                        `<a href="https://ben-ben-spider.williamsongshy.repl.co/deletewant/new?bid=`+msg[e][0]+`">删除</a>
-                                        <a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e][2]+` : `+msg[e][3].replace(/<.*?>/g,'')+`').trigger('input');">回复</a>
+                                        `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e]['user']['name']+` : `+msg[e]['content'].replace(/<.*?>/g,'')+`').trigger('input');">回复</a>
                                     </div>
                                 </header>
                                 <div class="am-comment-bd">
                                     <span class="feed-comment">
-                                        <p>`+msg[e][3]+`</p>
+                                        <p>`+msg[e]['content']+`</p>
                                     </span>
                                 </div>
                             </div>
                         </li>
                     `
-                    console.dir(msg[e][2])
-                    console.dir(msg[e][3])
                     $(bb).appendTo($("ul#feed"))
+                    /*
                     $(`a#exlg-bb`+e)
                         .on("click", () => { $("textarea")
                             .trigger("focus")
                             .val(msg[e][2])
                             .trigger("input")
                     })
+                    */
                 }
             })
         .appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
@@ -271,10 +251,10 @@ const init = () => {
         window.addEventListener('message', function (e) {
 
             if (e.data == "update") {
-                document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid=`+uid+`" style="adisplay : none;"></iframe>`)
+                document.write(`<iframe src="https://extend-luogu-benben-service.optimize2.repl.co/api/check/?uid=`+uid+`" style="adisplay : none;"></iframe>`)
             } else {
                 uid = e.data
-                document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/checkbenben?uid=`+uid+`" style="adisplay : none;"></iframe>`)
+                document.write(`<iframe src="https://extend-luogu-benben-service.optimize2.repl.co/api/check/?uid=`+uid+`" style="adisplay : none;"></iframe>`)
             }
 
         })
@@ -282,20 +262,20 @@ const init = () => {
 
     if (window.location.href === "https://www.luogu.com.cn/blog/311930/") {
         setTimeout(function() {
-            document.write(`<iframe src="https://ben-ben-spider.williamsongshy.repl.co/api/list/all"></iframe>`)
+            document.write(`<iframe src="https://extend-luogu-benben-service.optimize2.repl.co/api/list/"></iframe>`)
             window.addEventListener('message', function (e) {
                 window.parent.postMessage(e.data,'*')
             })
         },200)
     }
 
-    if (window.location.href === "https://ben-ben-spider.williamsongshy.repl.co/api/list/all") {
-        $.get("https://ben-ben-spider.williamsongshy.repl.co/api/list/all?page=2",function(data,status){
-            document.write(unescape(document.body.innerHTML.replace(/\\u/g, '%u')))
-            const thispage = JSON.parse(document.body.innerText)
-            console.dir(thispage.concat(data))
-            window.parent.postMessage(thispage.concat(data),'*')
-        });
+    if (window.location.href === "https://extend-luogu-benben-service.optimize2.repl.co/api/list/") {
+            window.parent.postMessage(JSON.parse(document.body.innerText),'*')
+    }
+
+    //style
+    if(window.location.href === "https://www.luogu.com.cn/paste/kg5kcuy9") {
+        var k2 = window.setInterval(customStyle, 500);
     }
 }
 
