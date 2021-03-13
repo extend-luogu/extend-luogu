@@ -1,17 +1,38 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      1.22
+// @version      2.0
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
 // @match        https://*.luogu.com.cn
 // @match        https://*.luogu.org
-// @match        https://extend-luogu-benben-service.optimize2.repl.co/api/list/
+// @match        https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
+
+const version = "1.0"
+
+function checkUpdate() {
+    setTimeout(function() {
+        if(window.location.href === "https://www.luogu.com.cn/")
+        $.get("https://www.luogu.com.cn/paste/ijxozv3z",function(data,status) {
+            const response = data.match(/\%5C%2F%5C%2F%5C%2F(.+?)\%5C%2F%5C%2F%5C%2F/g)[0]
+            const LATEST = response.substring(18).substring(0,response.length-36)
+            console.dir("[INFO] extend-luogu LATEST version : "  + LATEST)
+            if(LATEST != version.trim()) {
+                var wrap=document.createElement("div");
+                var first=document.body.firstChild;
+                var wraphtml=document.body.insertBefore(wrap,first);
+                wrap.innerHTML = `
+                <button type="button" class="am-btn am-btn-warning am-btn-block" onclick="window.open('/paste/fnln7ze9')">您的 extend-luogu 不是最新版本. 点我更新</button>`
+            }
+        });
+    }, 1000)
+}
+
 const $ = unsafeWindow.$ || jQuery, // Note: Use jQuery from LFE.
       mdp = unsafeWindow.markdownPalettes,
       error = s => console.error("[exlg]" + s), log = s => console.log("[exlg]" + s),
@@ -60,27 +81,66 @@ function formatDate(value) {
 }
 
 function parseDom(arg) {
-　　 var objE = document.createElement("div");
+　　 const objE = document.createElement("div");
 　　 objE.innerHTML = arg;
 　　 return objE.childNodes;
 };
 function customInfoCard() {
-    var a = document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,a");
+    const a = document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,a");
     for (var i = 0; i < a.length; i++) {
         if (a[i].innerText[0]== "<") {
-            var inserta= parseDom(a[i].innerText)[0];
+            const inserta= parseDom(a[i].innerText)[0];
             a[i].parentNode.replaceChild(inserta,a[i]);
         }
     }
 }
 
 function customStyle() {
-    //gugugu
+    add_style(`
+        .exlg-button {
+            border-top-color: currentcolor;
+            color: white;
+            border-radius: 3px;
+            border-bottom-width: 1px;
+            border-top-width: 1px;
+            border-top-color: currentcolor;
+            cursor: pointer;
+            line-height: 1.5;
+            border-bottom-style: solid;
+        }
+    `)
+
+    const card = $("div.card.padding-default")[0]
+    //console.dir(card)
+    const inputCSS = document.createElement("div")
+    inputCSS.innerHTML = `<textarea id="exlg-cssinput" class="exlg-customstyle" style="width:100%;height:300px"></textarea>`
+    card.appendChild(inputCSS)
+    $("#exlg-cssinput")[0].value = window.localStorage['exlg-CSS']
+    const applyCSS = document.createElement("div")
+    applyCSS.innerHTML = `<h2>自定义 css 主题</h2><button type="button" class="exlg-button" style="border-color: rgb(231, 76, 60);background-color: rgb(231, 76, 60);" id="applyCSS">修改</button>`
+    card.appendChild(applyCSS)
+    $("button#applyCSS")
+        .on("click", () => {
+            window.localStorage['exlg-CSS'] = $("#exlg-cssinput")[0].value
+            alert("修改成功")
+        })
+    //$(`<input id="exlg-cssinput" class="exlg-customstyle"></input>`).appentTo($card)
+}
+
+function markdown(str) {
+    if (typeof str !== "string") return null
+    const rules = [
+        /* image */ [ /!\[(.+?)\]\((.*?)\)/g, (_, info, url) => `<img src="${url}" alt="${info}" />` ],
+        /* link  */ [ /(?<!!)\[(.+?)\]\((.*?)\)/g, (_, info, url) => `<a href="${url}">${info}</a>` ],
+    ]
+    rules.forEach(r => str = str.replace(...r))
+    return str
 }
 
 const init = () => {
-    //customInfoCard
-    var k = window.setInterval(customInfoCard, 500);
+    checkUpdate()
+        //customInfoCard
+    if(window.location.href.substring(0,30) === "https://www.luogu.com.cn/user/") var k = window.setInterval(customInfoCard, 500);
 
     //emoji
     add_style(`
@@ -94,6 +154,9 @@ const init = () => {
             padding: 5px 1px;
         }
     `)
+
+    add_style(window.localStorage['exlg-CSS'])
+
     const $menu = $(".mp-editor-menu"),
           $txt = $(".CodeMirror-wrap textarea"),
           $nl = $(`<br />`).appendTo($menu),
@@ -133,9 +196,54 @@ const init = () => {
         addEventListener('message', e => {
             console.dir(e.data)
             msg = e.data
+            if (!toggled) {
+                toggled=true
+                $("div#feed-more").toggle()
+            }
+            $("li.am-comment").remove()
+            for (let e in msg) {
+                var utc8 = formatDate(msg[e]['time'])//date_time//.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
+                var bb = `
+                    <li class="am-comment am-comment-primary feed-li">
+                        <div class="lg-left">
+                            <a href="/user/`+msg[e]['user']['uid']+`" class="center">
+                            <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e]['user']['uid']+`.png" class="am-comment-avatar">
+                            </a>
+                        </div>
+                        <div class="am-comment-main">
+                            <header class="am-comment-hd">
+                                <div class="am-comment-meta">
+                                    <span class="feed-username">
+                                        <a class="lg-fg-`+colorMap[msg[e]['user']['color']]+`" href="/user/`+msg[e]['user']['uid']+`" target="_blank">`
+                                            +msg[e]['user']['name']+
+                                        `</a>
+                                    </span>`
+                                    +utc8+
+                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e]['user']['name']+` : ` + msg[e]['content'] + `').trigger('input');">回复</a>
+                                </div>
+                            </header>
+                            <div class="am-comment-bd">
+                                <span class="feed-comment">
+                                    <p>` + markdown(msg[e]['content']) + `</p>
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                `
+                $(bb).appendTo($("ul#feed"))
+                /*
+                $(`a#exlg-bb`+e)
+                    .on("click", () => { $("textarea")
+                        .trigger("focus")
+                        .val(msg[e][2])
+                        .trigger("input")
+                })
+                */
+            }
         })
+        var benbenLoaded = false
         const loader = document.createElement('iframe')
-        loader.style = "display:none"
+        //loader.style = "display:none"
         loader.src = "https://prpr.blog.luogu.org/"
         loader.className = "exlg-bbuploader"
         loader.id = "bbuploader"
@@ -146,13 +254,6 @@ const init = () => {
 
         console.dir(uid)
 
-        var html = '<button class="am-btn am-btn-danger am-btn-sm" id="check_benben">快速同步</button>'
-        var node = document.createElement('div')
-        node.className = 'lg-article'
-        node.id = 'benben-status'
-        node.innerHTML = html
-        document.querySelector('div.lg-index-benben > div:nth-child(3)').insertAdjacentElement('afterend', node)
-
         $("#feed-submit").click(function() {
             if ((feedMode=="my" || feedMode == "watching" || feedMode == "all")&&$('#feed-content').val()) {
                 $("iframe#bbuploader").attr('src', $("iframe#bbuploader").attr('src'))
@@ -161,19 +262,7 @@ const init = () => {
         });
 
 
-        $("#check_benben").click(function() {
-            if ((feedMode=="my" || feedMode == "watching" || feedMode == "all")&&$('#feed-content').val()) {
-                $("iframe#bbuploader").attr('src', $("iframe#bbuploader").attr('src'))
-                setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
-            }
-        });
 
-
-        const benben = document.createElement('iframe')
-        benben.style = "display:none"
-        benben.src = "https://www.luogu.com.cn/blog/311930/"
-        benben.className = "exlg-benben"
-        document.body.appendChild(benben)
 
         var toggled =false;
 
@@ -199,46 +288,16 @@ const init = () => {
                     $("div#feed-more").toggle()
                 }
                 $("li.am-comment").remove()
-                $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
-                for (let e in msg) {
-                    var utc8 = formatDate(msg[e]['time'])//date_time//.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
-                    var bb = `
-                        <li class="am-comment am-comment-primary feed-li">
-                            <div class="lg-left">
-                                <a href="/user/`+msg[e]['user']['uid']+`" class="center">
-                                <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e]['user']['uid']+`.png" class="am-comment-avatar">
-                                </a>
-                            </div>
-                            <div class="am-comment-main">
-                                <header class="am-comment-hd">
-                                    <div class="am-comment-meta">
-                                        <span class="feed-username">
-                                            <a class="lg-fg-`+colorMap[msg[e]['user']['color']]+`" href="/user/`+msg[e]['user']['uid']+`" target="_blank">`
-                                                +msg[e]['user']['name']+
-                                            `</a>
-                                        </span>`
-                                        +utc8+
-                                        `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e]['user']['name']+` : `+msg[e]['content'].replace(/<.*?>/g,'')+`').trigger('input');">回复</a>
-                                    </div>
-                                </header>
-                                <div class="am-comment-bd">
-                                    <span class="feed-comment">
-                                        <p>`+msg[e]['content']+`</p>
-                                    </span>
-                                </div>
-                            </div>
-                        </li>
-                    `
-                    $(bb).appendTo($("ul#feed"))
-                    /*
-                    $(`a#exlg-bb`+e)
-                        .on("click", () => { $("textarea")
-                            .trigger("focus")
-                            .val(msg[e][2])
-                            .trigger("input")
-                    })
-                    */
+                if(benbenLoaded) $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
+                else {
+                    const benben = document.createElement('iframe')
+                    //benben.style = "display:none"
+                    benben.src = "https://www.luogu.com.cn/blog/311930/"
+                    benben.className = "exlg-benben"
+                    document.body.appendChild(benben)
+                    benbenLoaded = true
                 }
+
             })
         .appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
 
@@ -248,13 +307,15 @@ const init = () => {
 
     if (window.location.href === "https://prpr.blog.luogu.org/") {
         var uid
+        //document.write("az")
+        //alert(1)
         window.addEventListener('message', function (e) {
 
             if (e.data == "update") {
-                document.write(`<iframe src="https://extend-luogu-benben-service.optimize2.repl.co/api/check/?uid=`+uid+`" style="adisplay : none;"></iframe>`)
+                document.write(`<iframe src="https://service-0lllrm89-1305163805.sh.apigw.tencentcs.com/release/check/` + uid + `/"></iframe>`)
             } else {
                 uid = e.data
-                document.write(`<iframe src="https://extend-luogu-benben-service.optimize2.repl.co/api/check/?uid=`+uid+`" style="adisplay : none;"></iframe>`)
+                document.write(`<iframe src="https://service-0lllrm89-1305163805.sh.apigw.tencentcs.com/release/check/` + uid + `/"></iframe>`)
             }
 
         })
@@ -262,20 +323,22 @@ const init = () => {
 
     if (window.location.href === "https://www.luogu.com.cn/blog/311930/") {
         setTimeout(function() {
-            document.write(`<iframe src="https://extend-luogu-benben-service.optimize2.repl.co/api/list/"></iframe>`)
+            document.write(`<iframe src="https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433"></iframe>`)
             window.addEventListener('message', function (e) {
                 window.parent.postMessage(e.data,'*')
             })
-        },200)
+        }, 100) //这个不加洛谷会转圈圈
     }
 
-    if (window.location.href === "https://extend-luogu-benben-service.optimize2.repl.co/api/list/") {
-            window.parent.postMessage(JSON.parse(document.body.innerText),'*')
+    if (window.location.href === "https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433") {
+        //console.dir(document.body.innerText)
+        window.parent.postMessage(JSON.parse(document.body.innerText),'*')
     }
 
     //style
     if(window.location.href === "https://www.luogu.com.cn/paste/kg5kcuy9") {
-        var k2 = window.setInterval(customStyle, 500);
+        //var k2 = window.setInterval(customStyle, 500);
+        setTimeout(customStyle,500)
     }
 }
 
