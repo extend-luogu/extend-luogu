@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      2.13
+// @version      2.15
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -13,7 +13,7 @@
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
 
-const version = "2.13"
+const version = "2.15"
 
 function checkUpdate() {
     setTimeout(function() {
@@ -322,6 +322,15 @@ const init = () => {
     if(window.location.href === "https://www.luogu.com.cn/paste/kg5kcuy9") {
         //var k2 = window.setInterval(customStyle, 500);
         setTimeout(customStyle,500)
+    }
+
+    if(window.location.href === "https://www.luogu.com.cn/theme/list") {
+            const link = document.createElement("div")
+            link.className = "card padding-default"
+            link.setAttribute("data-v-796309f8",0)
+            link.innerHTML = `extend-luogu 支持以 CSS 代码的形式更改主题. <a href="https://www.luogu.com.cn/paste/kg5kcuy9">点我跳转</a>`
+            var first=$("div.full-container")[0].firstChild;
+            var wraphtml=$("div.full-container")[0].insertBefore(link,first);
     }
 }
 
