@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.2.2
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -13,7 +13,7 @@
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
 
-const version = "2.2"
+const version = "2.2.2"
 
 function checkUpdate() {
     setTimeout(function() {
@@ -265,7 +265,7 @@ const init = () => {
                                         `</a>&nbsp;` + `<a class="sb_amazeui" target="_blank" href="/discuss/show/142324">` + gou(msg[e]['user']['ccfLevel']) + `</a>` + tag +
                                     `</span>&nbsp;`
                                     + utc8 +
-                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(\` || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'] + `\`).trigger('input');">回复</a>
+                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(\` || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'].replace(/\`/g, "\\\`").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,`\\\"`) + `\`).trigger('input');">回复</a>
                                 </div>
                             </header>
                             <div class="am-comment-bd">
@@ -318,10 +318,9 @@ const init = () => {
         //random jump
         //https://greasyfork.org/zh-CN/scripts/390181-%E6%B4%9B%E8%B0%B7%E6%8C%89%E9%9A%BE%E5%BA%A6%E9%9A%8F%E6%9C%BA%E8%B7%B3%E9%A2%98/code
         $('document').ready(function(){setTimeout(function () {
-            $sidebar = $('#app-old .lg-index-content .lg-right.am-u-lg-3');
-            $firstele = $($sidebar.children()[0]);
-            // console.log($firstele);
-            $finder = $(`
+            const $sidebar = $('#app-old .lg-index-content .lg-right.am-u-lg-3'),
+                  $firstele = $($sidebar.children()[0]),
+                  $finder = $(`
                 <div class="lg-article" id="rand-problem-form">
                     <h2>按难度随机跳题</h2>
                     <select class="am-form-field" style="background-color:#DDD;" name="rand-problem-rating" autocomplete="off" placeholder="选择难度">
@@ -343,6 +342,69 @@ const init = () => {
                     </select>
                     <button class="am-btn am-btn-sm am-btn-primary" style="margin-top:16px;visibility:hidden">跳转</button>
                     <button class="am-btn am-btn-sm am-btn-primary lg-right" id="rand-problem-button" style="margin-top:16px;">跳转</button>
+                </div>
+            `);
+            $finder.insertAfter($firstele);
+            $('#rand-problem-button').click(function() {
+                $('#rand-problem-button').addClass('am-disabled');
+                $.get("https://www.luogu.com.cn/problem/list?difficulty=" + $('[name=rand-problem-rating]')[0].value + "&type=" + $('[name=rand-problem-source]')[0].value + "&page=1&_contentOnly=1",
+                    function (data) {
+                        var arr = data;
+                        if (arr['code'] != 200) {
+                            $('#rand-problem-button').removeClass('am-disabled');
+                            show_alert("好像哪里有点问题", arr["message"]);
+                        } else {
+                            var problem_count = arr['currentData']['problems']['count'];
+                            var page_count = Math.ceil(problem_count / 50);
+                            var rand_page = Math.floor(Math.random()*page_count) + 1;
+                            $.get("https://www.luogu.com.cn/problem/list?difficulty=" + $('[name=rand-problem-rating]')[0].value + "&type=" + $('[name=rand-problem-source]')[0].value + "&page=" + rand_page + "&_contentOnly=1",
+                                function(data) {
+                                    var list = data['currentData']['problems']['result'];
+                                    var rand_idx = Math.floor(Math.random()*list.length);
+                                    var pid = list[rand_idx]['pid'];
+                                    location.href = "https://www.luogu.com.cn/problem/" + pid;
+                                }
+                            );
+                        }
+                    }
+                );
+            });
+          },500)});
+    }
+
+    if (window.location.href === "https://www.luogu.com.cn/blog/311930/") {
+        setTimeout(function() {
+            //document.write(`<iframe src="https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433"></iframe>`)
+            document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
+
+            window.addEventListener('message', function (e) {
+                window.parent.postMessage(e.data,'*')
+            })
+        }, 100) //这个不加洛谷会转圈圈
+    }
+
+    if (window.location.href === "https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121") {
+        //console.dir(document.body.innerText)
+        window.parent.postMessage(JSON.parse(document.body.innerText),'*')
+    }
+
+    //style
+    if(window.location.href === "https://www.luogu.com.cn/paste/kg5kcuy9") {
+        //var k2 = window.setInterval(customStyle, 500);
+        setTimeout(customStyle,500)
+    }
+
+    if(window.location.href === "https://www.luogu.com.cn/theme/list") {
+            const link = document.createElement("div")
+            link.className = "card padding-default"
+            link.setAttribute("data-v-796309f8",0)
+            link.innerHTML = `extend-luogu 支持以 CSS 代码的形式更改主题. <a href="https://www.luogu.com.cn/paste/kg5kcuy9">点我跳转</a>`
+            var first=$("div.full-container")[0].firstChild;
+            var wraphtml=$("div.full-container")[0].insertBefore(link,first);
+    }
+}
+
+$(init)" id="rand-problem-button" style="margin-top:16px;">跳转</button>
                 </div>
             `);
             $finder.insertAfter($firstele);
