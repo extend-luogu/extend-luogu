@@ -28,7 +28,8 @@ function checkUpdate() {
                 var wraphtml=document.body.insertBefore(wrap,first);
                 wrap.innerHTML = `<button type="button" class="am-btn am-btn-warning am-btn-block" onclick="window.open('/paste/fnln7ze9')">您的 extend-luogu 不是最新版本. 点我更新</button>`
 
-                show_alert("extend-luogu", "您的 extend-luogu 不是最新版本. 请尽快更新")
+                //show_alert("extend-luogu", "您的 extend-luogu 不是最新版本. 请尽快更新")
+                //o2 都受不了这个提示了
             }
         });
     }, 1000)
@@ -318,7 +319,7 @@ const init = () => {
         //https://greasyfork.org/zh-CN/scripts/390181-%E6%B4%9B%E8%B0%B7%E6%8C%89%E9%9A%BE%E5%BA%A6%E9%9A%8F%E6%9C%BA%E8%B7%B3%E9%A2%98/code
         $('document').ready(function(){setTimeout(function () {
             $sidebar = $('#app-old .lg-index-content .lg-right.am-u-lg-3');
-            $firstele = $($sidebar.children()[2]);
+            $firstele = $($sidebar.children()[0]);
             // console.log($firstele);
             $finder = $(`
                 <div class="lg-article" id="rand-problem-form">
