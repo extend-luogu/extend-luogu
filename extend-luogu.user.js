@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      2.15
+// @version      2.1.6
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -13,7 +13,7 @@
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
 
-const version = "2.15"
+const version = "2.1.6"
 
 function checkUpdate() {
     setTimeout(function() {
@@ -251,7 +251,7 @@ const init = () => {
                                          + tag +
                                     `</span>&nbsp;`
                                     + utc8 +
-                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'] + `').trigger('input');">回复</a>
+                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'].replace('\n',' ') + `').trigger('input');">回复</a>
                                 </div>
                             </header>
                             <div class="am-comment-bd">
