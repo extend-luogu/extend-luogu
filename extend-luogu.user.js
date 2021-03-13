@@ -395,12 +395,14 @@ const init = () => {
     }
 
     if(window.location.href === "https://www.luogu.com.cn/theme/list") {
+        setTimeout(function() {
             const link = document.createElement("div")
             link.className = "card padding-default"
             link.setAttribute("data-v-796309f8",0)
             link.innerHTML = `extend-luogu 支持以 CSS 代码的形式更改主题. <a href="https://www.luogu.com.cn/paste/kg5kcuy9">点我跳转</a>`
             var first=$("div.full-container")[0].firstChild;
             var wraphtml=$("div.full-container")[0].insertBefore(link,first);
+        }, 300)
     }
 }
 
