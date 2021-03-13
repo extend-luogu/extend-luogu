@@ -251,7 +251,7 @@ const init = () => {
                                          + tag +
                                     `</span>&nbsp;`
                                     + utc8 +
-                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'].replace('\n',' ') + `').trigger('input');">回复</a>
+                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(\` || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'] + `\`).trigger('input');">回复</a>
                                 </div>
                             </header>
                             <div class="am-comment-bd">
