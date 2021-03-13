@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.13
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -17,7 +17,7 @@ const version = "2.1"
 
 function checkUpdate() {
     setTimeout(function() {
-        if(window.location.href === "https://www.luogu.com.cn/")
+        if(window.location.href.substring(0,25) === "https://www.luogu.com.cn/")
         $.get("https://www.luogu.com.cn/paste/ijxozv3z",function(data,status) {
             const response = data.match(/\%5C%2F%5C%2F%5C%2F(.+?)\%5C%2F%5C%2F%5C%2F/g)[0]
             const LATEST = response.substring(18).substring(0,response.length-36)
@@ -69,15 +69,14 @@ const colorMap = {
 }
 
 function formatDate(value) {
-    value = value*1000
-    const date = new Date(value);
+    const date = new Date(value*1000);
     const y = date.getFullYear();
-    const MM = (date.getMonth() + 1).toString().padStart(2,'0');
+    const mm = (date.getMonth() + 1).toString().padStart(2,'0');
     const d = date.getDate().toString().padStart(2,'0');
     const h = date.getHours().toString().padStart(2,'0');
     const m = date.getMinutes().toString().padStart(2,'0');
     const s = date.getSeconds().toString().padStart(2,'0');
-    return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s;
+    return y + '-' + mm + '-' + d + ' ' + h + ':' + m + ':' + s;
 }
 
 function parseDom(arg) {
@@ -137,11 +136,39 @@ function markdown(str) {
     return str
 }
 
+const colors = ['rgb(191, 191, 191)', 'rgb(254, 76, 97)', 'rgb(243, 156, 17)', 'rgb(255, 193, 22)', 'rgb(82, 196, 26)', 'rgb(52, 152, 219)', 'rgb(157, 61, 207)', 'rgb(14, 29, 105)'];
+function rendColors() {
+    var problems = [];
+    for(var passed of unsafeWindow._feInjection.currentData.passedProblems) problems.push({pid: passed.pid, dif: passed.difficulty, rendered: false});
+    for(var tryed of unsafeWindow._feInjection.currentData.submittedProblems) problems.push({pid: tryed.pid, dif: tryed.difficulty, rendered: false});
+
+    setInterval(function() {
+        const url = window.location.href
+        if(url.substring(url.length-9,url.length) === '#practice') {
+            for(let i in problems) {
+                if(!problems[i].rendered) {
+                    var elements = document.querySelectorAll('a');
+                    for(let j in elements)
+                        if(elements[j].textContent == problems[i].pid) {
+                        if (elements[j].classList) elements[j].classList.remove("color-default")
+                        else elements[j].className = elements[j].className.replace('color-default', ' ')
+                        problems[i].rendered = true
+                        elements[j].style.color = colors[problems[i].dif]
+                        break
+                    }
+                }
+            }
+        } else for(let i in problems) problems[i].rendered = false;
+    }, 500);
+}
+
 const init = () => {
     checkUpdate()
     //customInfoCard
-    if(window.location.href.substring(0,30) === "https://www.luogu.com.cn/user/") var k = window.setInterval(customInfoCard, 500);
-
+    if(window.location.href.substring(0,30) === "https://www.luogu.com.cn/user/") {
+        window.setInterval(customInfoCard, 500);
+        rendColors()
+    }
     //emoji
     add_style(`
         .mp-editor-ground.exlg-ext {
@@ -202,23 +229,29 @@ const init = () => {
             $("li.am-comment").remove()
             for (let e in msg) {
                 var utc8 = formatDate(msg[e]['time'])//date_time//.getFullYear() + '-' + (date_time.getMonth() + 1).toString().padStart(2,'0') + '-' + date_time.getDate().toString().padStart(2,'0') + ' ' + date_time.getHours().toString().padStart(2,'0') + ':' + date_time.getMinutes().toString().padStart(2,'0') + ':' + date_time.getSeconds().toString().padStart(2,'0')
+                var tag = ""
+                if(msg[e]['user']['uid'] == "224978") {
+                    msg[e]['user']['color'] = 'Purple'
+                    tag = `</span>&nbsp;<span class="am-badge am-radius lg-bg-purple">exlg-DEV`
+                }
                 var bb = `
                     <li class="am-comment am-comment-primary feed-li">
                         <div class="lg-left">
-                            <a href="/user/`+msg[e]['user']['uid']+`" class="center">
-                            <img src="https://cdn.luogu.com.cn/upload/usericon/`+msg[e]['user']['uid']+`.png" class="am-comment-avatar">
+                            <a href="/user/` + msg[e]['user']['uid'] + `" class="center">
+                            <img src="https://cdn.luogu.com.cn/upload/usericon/` + msg[e]['user']['uid'] + `.png" class="am-comment-avatar">
                             </a>
                         </div>
                         <div class="am-comment-main">
                             <header class="am-comment-hd">
                                 <div class="am-comment-meta">
                                     <span class="feed-username">
-                                        <a class="lg-fg-`+colorMap[msg[e]['user']['color']]+`" href="/user/`+msg[e]['user']['uid']+`" target="_blank">`
-                                            +msg[e]['user']['name']+
-                                        `</a>
-                                    </span>`
-                                    +utc8+
-                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @`+msg[e]['user']['name']+` : ` + msg[e]['content'] + `').trigger('input');">回复</a>
+                                        <a class="lg-fg-`+colorMap[msg[e]['user']['color']]+`" href="/user/` + msg[e]['user']['uid'] + `" target="_blank">`
+                                            + msg[e]['user']['name'] +
+                                        `</a>`
+                                         + tag +
+                                    `</span>&nbsp;`
+                                    + utc8 +
+                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(' || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'] + `').trigger('input');">回复</a>
                                 </div>
                             </header>
                             <div class="am-comment-bd">
@@ -273,7 +306,7 @@ const init = () => {
         setTimeout(function() {
             //document.write(`<iframe src="https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433"></iframe>`)
             document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
-            
+
             window.addEventListener('message', function (e) {
                 window.parent.postMessage(e.data,'*')
             })
