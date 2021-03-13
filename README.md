@@ -1,4 +1,4 @@
-## extend-luogu v1.22
+## extend-luogu
 
 make the luogu more powerful.
 
