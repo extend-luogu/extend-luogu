@@ -13,7 +13,7 @@
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
 
-const version = "1.0"
+const version = "2.0"
 
 function checkUpdate() {
     setTimeout(function() {
