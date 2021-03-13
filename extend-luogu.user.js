@@ -258,7 +258,7 @@ const init = () => {
                 if(benbenLoaded) $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
                 else {
                     const benben = document.createElement('iframe')
-                    //benben.style = "display:none"
+                    benben.style = "display:none"
                     benben.src = "https://www.luogu.com.cn/blog/311930/"
                     benben.className = "exlg-benben"
                     document.body.appendChild(benben)
