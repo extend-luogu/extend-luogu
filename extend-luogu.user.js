@@ -1,19 +1,19 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
 // @match        https://*.luogu.com.cn
 // @match        https://*.luogu.org
-// @match        https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433
+// @match        https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @grant        GM_addStyle
 // @grant        unsafeWindow
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
 
-const version = "2.0"
+const version = "2.1"
 
 function checkUpdate() {
     setTimeout(function() {
@@ -61,7 +61,7 @@ var emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${ id }.png`
 
 const colorMap = {
     "Gray": "gray",
-    "Blue": "blue",
+    "Blue": "bluelight",
     "Green": "green",
     "Orange": "orange lg-bold",
     "Red": "red lg-bold",
@@ -139,7 +139,7 @@ function markdown(str) {
 
 const init = () => {
     checkUpdate()
-        //customInfoCard
+    //customInfoCard
     if(window.location.href.substring(0,30) === "https://www.luogu.com.cn/user/") var k = window.setInterval(customInfoCard, 500);
 
     //emoji
@@ -190,7 +190,6 @@ const init = () => {
             )
     })
 
-    //benben
     if(window.location.href === "https://www.luogu.com.cn/") {
         var msg
         addEventListener('message', e => {
@@ -231,39 +230,9 @@ const init = () => {
                     </li>
                 `
                 $(bb).appendTo($("ul#feed"))
-                /*
-                $(`a#exlg-bb`+e)
-                    .on("click", () => { $("textarea")
-                        .trigger("focus")
-                        .val(msg[e][2])
-                        .trigger("input")
-                })
-                */
             }
         })
         var benbenLoaded = false
-        const loader = document.createElement('iframe')
-        loader.style = "display:none"
-        loader.src = "https://prpr.blog.luogu.org/"
-        loader.className = "exlg-bbuploader"
-        loader.id = "bbuploader"
-        document.body.appendChild(loader)
-
-        const uid = $("a.lg-fg-green")[0].href.slice(30)
-        setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
-
-        console.dir(uid)
-
-        $("#feed-submit").click(function() {
-            if ((feedMode=="my" || feedMode == "watching" || feedMode == "all")&&$('#feed-content').val()) {
-                $("iframe#bbuploader").attr('src', $("iframe#bbuploader").attr('src'))
-                setTimeout(function() { $("iframe#bbuploader")[0].contentWindow.postMessage(uid,"*") },1000)
-            }
-        });
-
-
-
-
         var toggled =false;
 
         $("li.feed-selector")
@@ -272,8 +241,6 @@ const init = () => {
                     toggled = false
                 }
         })
-
-
 
         $(`<li class="feed-selector" id="exlg-selector" data-mode="all"><a style="cursor: pointer">全网动态</a></li>`)
             .on("click", () => {
@@ -291,7 +258,7 @@ const init = () => {
                 if(benbenLoaded) $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
                 else {
                     const benben = document.createElement('iframe')
-                    benben.style = "display:none"
+                    //benben.style = "display:none"
                     benben.src = "https://www.luogu.com.cn/blog/311930/"
                     benben.className = "exlg-benben"
                     document.body.appendChild(benben)
@@ -300,37 +267,20 @@ const init = () => {
 
             })
         .appendTo($("ul#home-center-nav.am-nav.am-nav-pills.am-nav-justify"))
-
-
-
-    }
-
-    if (window.location.href === "https://prpr.blog.luogu.org/") {
-        var uid
-        //document.write("az")
-        //alert(1)
-        window.addEventListener('message', function (e) {
-
-            if (e.data == "update") {
-                document.write(`<iframe src="https://service-0lllrm89-1305163805.sh.apigw.tencentcs.com/release/check/` + uid + `/"></iframe>`)
-            } else {
-                uid = e.data
-                document.write(`<iframe src="https://service-0lllrm89-1305163805.sh.apigw.tencentcs.com/release/check/` + uid + `/"></iframe>`)
-            }
-
-        })
     }
 
     if (window.location.href === "https://www.luogu.com.cn/blog/311930/") {
         setTimeout(function() {
-            document.write(`<iframe src="https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433"></iframe>`)
+            //document.write(`<iframe src="https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433"></iframe>`)
+            document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
+            
             window.addEventListener('message', function (e) {
                 window.parent.postMessage(e.data,'*')
             })
         }, 100) //这个不加洛谷会转圈圈
     }
 
-    if (window.location.href === "https://service-oxhmrkw1-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615377433") {
+    if (window.location.href === "https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121") {
         //console.dir(document.body.innerText)
         window.parent.postMessage(JSON.parse(document.body.innerText),'*')
     }
