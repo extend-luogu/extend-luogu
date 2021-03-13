@@ -1,5 +1,11 @@
 ## extend-luogu
 
-make the luogu more powerful.
+Make luogu more powerful.
 
-[link](https://www.luogu.com.cn/paste/fnln7ze9)
+[description link](https://www.luogu.com.cn/paste/fnln7ze9)
+
+Copy `extend-luogu.user.js` into Tampermonkey's `Create a new script` page, and save that.
+
+**Make sure to copy the whole code.**
+
+You will be automatically notified when there's a update.
