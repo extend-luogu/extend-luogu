@@ -113,11 +113,11 @@ function customStyle() {
     const card = $("div.card.padding-default")[0]
     //console.dir(card)
     const inputCSS = document.createElement("div")
-    inputCSS.innerHTML = `<textarea id="exlg-cssinput" class="exlg-customstyle" style="width:100%;height:300px"></textarea>`
+    inputCSS.innerHTML = `<h2>自定义 css 主题</h2><textarea id="exlg-cssinput" class="exlg-customstyle" style="width:100%;height:300px"></textarea>`
     card.appendChild(inputCSS)
     $("#exlg-cssinput")[0].value = window.localStorage['exlg-CSS']
     const applyCSS = document.createElement("div")
-    applyCSS.innerHTML = `<h2>自定义 css 主题</h2><button type="button" class="exlg-button" style="border-color: rgb(231, 76, 60);background-color: rgb(231, 76, 60);" id="applyCSS">修改</button>`
+    applyCSS.innerHTML = `<button type="button" class="exlg-button" style="border-color: rgb(231, 76, 60);background-color: rgb(231, 76, 60);" id="applyCSS">修改</button>`
     card.appendChild(applyCSS)
     $("button#applyCSS")
         .on("click", () => {
@@ -243,7 +243,7 @@ const init = () => {
         })
         var benbenLoaded = false
         const loader = document.createElement('iframe')
-        //loader.style = "display:none"
+        loader.style = "display:none"
         loader.src = "https://prpr.blog.luogu.org/"
         loader.className = "exlg-bbuploader"
         loader.id = "bbuploader"
@@ -291,7 +291,7 @@ const init = () => {
                 if(benbenLoaded) $("iframe.exlg-benben").attr('src', $("iframe.exlg-benben").attr('src'))
                 else {
                     const benben = document.createElement('iframe')
-                    //benben.style = "display:none"
+                    benben.style = "display:none"
                     benben.src = "https://www.luogu.com.cn/blog/311930/"
                     benben.className = "exlg-benben"
                     document.body.appendChild(benben)
