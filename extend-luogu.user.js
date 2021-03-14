@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         extend-luogu
 // @namespace    http://tampermonkey.net/
-// @version      2.2.2
+// @version      2.3
 // @description  make the Luogu more powerful.
 // @author       optimize_2 ForkKILLET
 // @match        https://www.luogu.com.cn/*
@@ -13,7 +13,7 @@
 // @require      https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // ==/UserScript==
 
-const version = "2.2.2"
+const version = "2.3"
 
 function checkUpdate() {
     setTimeout(function() {
@@ -81,19 +81,38 @@ function formatDate(value) {
     return y + '-' + mm + '-' + d + ' ' + h + ':' + m + ':' + s;
 }
 
-function parseDom(arg) {
-　　 const objE = document.createElement("div");
+ function parseDom(arg) {
+　　 var objE = document.createElement("div");
 　　 objE.innerHTML = arg;
 　　 return objE.childNodes;
 };
+function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+}
 function customInfoCard() {
-    const a = document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,a");
-    for (var i = 0; i < a.length; i++) {
-        if (a[i].innerText[0]== "<") {
-            const inserta= parseDom(a[i].innerText)[0];
-            a[i].parentNode.replaceChild(inserta,a[i]);
-        }
-    }
+	var a = document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,a");
+	for (var i = 0; i < a.length; i++) {
+		if (a[i].innerText[0]== "<") {
+            var inserta= parseDom(a[i].innerText)[0];
+			a[i].parentNode.replaceChild(inserta,a[i]);
+		}
+        if (a[i].innerText[0]== "%") {
+            var d=a[i].innerText.indexOf(":");
+            var beforestr=a[i].innerText.substr(1,d-1);
+            var afterstr=a[i].innerText.substr(d+1,a[i].innerText.length-d-2);
+            if(beforestr=="MYBLOG"){
+                a[i].setAttribute("style","display:none;");
+               document.querySelectorAll(".svg-inline--fa")[18].parentElement.parentElement.setAttribute("href",afterstr);
+            }
+		}
+	}
 }
 
 function customStyle() {
@@ -249,6 +268,10 @@ const init = () => {
                     msg[e]['user']['color'] = 'Purple'
                     tag = `</span>&nbsp;<span class="am-badge am-radius lg-bg-purple">exlg-DEV`
                 }
+                if(msg[e]['user']['uid'] == "125210") {
+                    msg[e]['user']['color'] = 'Purple'
+                    tag = `</span>&nbsp;<span class="am-badge am-radius lg-bg-purple">IceLava`
+                }
                 var bb = `
                     <li class="am-comment am-comment-primary feed-li">
                         <div class="lg-left">
@@ -265,7 +288,14 @@ const init = () => {
                                         `</a>&nbsp;` + `<a class="sb_amazeui" target="_blank" href="/discuss/show/142324">` + gou(msg[e]['user']['ccfLevel']) + `</a>` + tag +
                                     `</span>&nbsp;`
                                     + utc8 +
-                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(\` || @` + msg[e]['user']['name'] + ` : ` + msg[e]['content'].replace(/\`/g, "\\\`").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,`\\\"`) + `\`).trigger('input');">回复</a>
+                                    `<a name="feed-reply" onclick="$('textarea').trigger('focus').val(\` || @` + msg[e]['user']['name'] + ` : ` +
+                                        msg[e]['content']
+                                        .replace(/</g,"&lt;")
+                                        .replace(/>/g,"&gt;")
+                                        .replace(/"/g,"&#34;")
+                                        .replace(/'/g,"&#39;")
+                                        .replace(/`/g,"&#96;")
+                                     + `\`).trigger('input');">回复</a>
                                 </div>
                             </header>
                             <div class="am-comment-bd">
@@ -403,6 +433,10 @@ const init = () => {
             var first=$("div.full-container")[0].firstChild;
             var wraphtml=$("div.full-container")[0].insertBefore(link,first);
         }, 300)
+    }
+
+    if (window.location.href.substr(0,36)=="https://www.luogu.com.cn/robots.txt?") {
+        document.write('<iframe src="'+getQueryVariable("url")+'" style="height:'+getQueryVariable("height")+';width:100%;"></iframe>');
     }
 }
 
