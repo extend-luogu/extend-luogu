@@ -28,7 +28,8 @@ module.exports = {
     "no-unused-vars": 1,
     "no-extend-native": 0,
     "object-property-newline": 0,
-    "no-multiple-empty-lines": [ 1, { max: 2, maxEOF: 1, maxBOF: 0 } ]
+    "no-multiple-empty-lines": [ 1, { max: 2, maxEOF: 1, maxBOF: 0 } ],
+    "brace-style": [ 2, "stroustrup", { allowSingleLine: true } ],
   },
   globals: {
     unsafeWindow: true,
