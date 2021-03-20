@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.0
+// @version        3.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -392,6 +392,18 @@ mod.reg("rand-problem", "@/", () => {
     overflow-y: scroll;
 }
 `)
+
+mod.reg("keyboard", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
+    unsafeWindow.addEventListener("keydown", e => {
+        const $act = $(document.activeElement)
+        if ($act.is("body")) {
+            const rel = { ArrowLeft: "prev", ArrowRight: "next" }[e.code]
+            if (rel) $(`a[rel=${rel}]`)[0].click()
+        }
+        else if ($act.is("[name=captcha]") && e.code === "Enter")
+            $("#submitpost, #submit-reply")[0].click()
+    })
+})
 
 $(mod.execute)
 log("Lauching")
