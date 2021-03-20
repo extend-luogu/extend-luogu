@@ -1,0 +1,26 @@
+{
+  "name": "extend-luogu",
+  "version": "2.3.0",
+  "description": "Make luogu more powerful.",
+  "main": "extend-luogu.user.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/optimize-2/extend-luogu.git"
+  },
+  "author": "Optimize_2 ForkKILLET",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/optimize-2/extend-luogu/issues"
+  },
+  "homepage": "https://github.com/optimize-2/extend-luogu#readme",
+  "devDependencies": {
+    "eslint": "^7.22.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1"
+  }
+}
