@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.6
+// @version        4.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -21,6 +21,7 @@ const uindow = unsafeWindow
 const $ = jQuery; uindow.$$ = $
 const mdp = uindow.markdownPalettes
 const log = (...s) => uindow.console.log("%c[exlg]", "color: #0e90d2;", ...s)
+const warn = (...s) => uindow.console.warn("%c[exlg]", "color: #0e90d2;", ...s)
 const error = (...s) => {
     uindow.console.error("%c[exlg]", "color: #0e90d2;", ...s)
     throw Error(s.join(" "))
@@ -73,13 +74,14 @@ const mod = {
         styl
     }),
     find: name => mod._.find(m => m.name === name),
+    find_i: name => mod._.findIndex(m => m.name === name),
     disable: name => { mod.find(name).on = false },
     enable: name => { mod.find(name).on = true },
     execute: () => {
-        let mods_switch = GM_getValue("mods-switch")
-        const init_switch = mods_switch ? false : (mods_switch = {})
+        mod.map = GM_getValue("mod-map")
+        const map_init = mod.map ? false : (mod.map = {})
         for (const m of mod._)
-            m.on = init_switch ? (mods_switch[ m.name ] = true) : mods_switch[ m.name ]
+            m.on = map_init ? (mod.map[ m.name ] = true) : mod.map[ m.name ]
         for (const m of mod._) {
             const pn = location.pathname
             if (m.on && m.path.some((p, _, __, pr = p.replace(/^[a-z]*?@.*?(?=\/)/, "")) => (
@@ -97,7 +99,7 @@ const mod = {
             }
         }
 
-        if (init_switch) GM_setValue("mods-switch", mods_switch)
+        if (map_init) GM_setValue("mod-map", mod.map)
     }
 }
 
@@ -143,17 +145,16 @@ mod.reg("dash", "@/*", () => {
         .on("click", e => e.stopPropagation())
 
     const $mods = $("#exlg-dash-mods")
-    const mods_switch = GM_getValue("mods-switch")
     mod._.forEach(m => {
         const $m = $(`<li><input type="checkbox" /></span> ${ m.name }</li>`).appendTo($mods)
         $m.children("input")
             .prop("checked", m.on).prop("disabled", m.name === "dash")
             .on("change", () => {
-                mods_switch[ m.name ] = ! mods_switch[ m.name ]
+                mod.map[ m.name ] = ! mod.map[ m.name ]
             })
     })
     $("#exlg-dash-mods-save").on("click", () => {
-        GM_setValue("mods-switch", mods_switch)
+        GM_setValue("mod-map", mod.map)
         location.reload()
     })
 
@@ -559,7 +560,157 @@ mod.reg("rand-problem", "@/", () => {
 }
 `)
 
-mod.reg("keyboard", "@/*", () => {
+mod.reg("keyboard-and-cli", "@/*", () => {
+    const $cli = $(`<div id="exlg-cli"></div>`).appendTo($("body"))
+    const $cli_input = $(`<input id="exlg-cli-input" />`).appendTo($cli)
+
+    let cli_is_log = false
+    const cli_log = s => {
+        cli_is_log = true
+        return $cli_input.val(s)
+    }
+    const cli_error = s => {
+        cli_is_log = true
+        warn(s)
+        return $cli_input.addClass("error").val(s)
+    }
+    const cli_clean = () => {
+        cli_is_log = false
+        return $cli_input.val("").removeClass("error")
+    }
+    const cli_history = []
+    let cli_history_index = 0
+
+    const cmds = {
+        help: (cmd/*string*/) => {
+            /* get the help of <cmd>. or list all cmds. */
+            if (! cmd) cli_log("exlg cli. available commands: " + Object.keys(cmds).join(", "))
+            else {
+                const f = cmds[cmd]
+                if (! f) return cli_error(`help: unknown command "${cmd}"`)
+                cli_log(cmd + " " + f.arg.map(a => {
+                    const i = a.name + ": " + a.type
+                    return a.essential ? `<${i}>` : `[${i}]`
+                }).join(" ") + "  " + f.help)
+            }
+        },
+        cd: (path/*!string*/) => {
+            /* jump to <path>, relative path is OK. */
+            let tar
+            if (path[0] === "/") tar = path
+            else {
+                const pn = location.pathname.replace(/^\/+/, "").split("/")
+                const pr = path.split("/")
+                pr.forEach(d => {
+                    if (d === ".") return
+                    if (d === "..") pn.pop()
+                    else pn.push(d)
+                })
+                tar = pn.join("/")
+            }
+            location.href = location.origin + tar
+        },
+        cc: (name/*char*/) => {
+            /* jump to [name], "|h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I|message|notification. or jump home. */
+            name = name || "h"
+            const tar = {
+                h: "/",
+                p: "/problem/list",
+                c: "/contest/list",
+                r: "/record/list",
+                d: "/discuss/lists",
+                i: "/user/" + uindow._feInjection.currentUser.uid,
+                m: "/chat",
+                n: "/user/notification",
+            }[name]
+            if (tar) cmds.cd(tar)
+            else cli_error(`cc: unknown target "${name}"`)
+        },
+        mod: (action/*!string*/, name/*string*/) => {
+            /* for <action> "enable|disable|toggle", opearte the mod named <name>. for <action> "save", save modification. */
+            const i = mod.find_i(name)
+            switch (action) {
+            case "enable":
+            case "disable":
+            case "toggle":
+                if (i < 0) return cli_error(`mod: unknown mod "${name}"`)
+                const $mod = $($("#exlg-dash-mods").children()[i]).children()
+                $mod.prop("checked", {
+                    enable: () => true, disable: () => false, toggle: now => ! now
+                }[action]($mod.prop("checked"))).trigger("change")
+                break
+            case "save":
+                GM_setValue("mod-map", mod.map)
+                break
+            default:
+                return cli_error(`mod: unknown action "${action}"`)
+            }
+        },
+        dash: (action/*!string*/) => {
+            /* for <action> "show|hide|toggle", opearte the exlg dashboard. */
+            if (! [ "show", "hide", "toggle" ].includes(action))
+                return cli_error(`dash: unknown action "${action}"`)
+            $("#exlg-dash-window")[action]()
+        }
+    }
+    for (const f of Object.values(cmds)) {
+        [ , f.arg, f.help ] = f.toString().match(/^\((.*?)\) => {\n +\/\* (.+) \*\//)
+        f.arg = f.arg.split(", ").map(a => {
+            const [ , name, type ] = a.match(/([a-z_]+)\/\*(.+)\*\//)
+            return {
+                name, essential: type[0] === "!", type: type.replace(/^!/, "")
+            }
+        })
+    }
+    const parse = cmd => {
+        log(`Parsing command: "${cmd}"`)
+
+        const tk = cmd.trim().replace(/^\//, "").split(" ")
+        const n = tk.shift()
+        if (! n) return
+        const f = cmds[n]
+        if (! f) return cli_error(`^: unknown command "${n}"`)
+        let i = -1, a; for ([ i, a ] of tk.entries()) {
+            const t = f.arg[i].type
+            if (t === "number" || t === "integer") tk[i] = Number(a)
+            if (
+                t === "char" && a.length === 1 ||
+                t === "number" && ! isNaN(tk[i]) ||
+                t === "integer" && ! isNaN(tk[i]) && ! (tk[i] % 1) ||
+                t === "string"
+            ) ;
+            else return cli_error(`${n}: illegal param "${a}", expected type ${t}.`)
+        }
+        if (f.arg[i + 1]?.essential) return cli_error(`${n}: lost essential param "${ f.arg[i + 1].name }"`)
+        f(...tk)
+    }
+
+    $cli_input.on("keydown", e => {
+        switch (e.key) {
+        case "Enter":
+            if (cli_is_log) return cli_clean()
+            const cmd = $cli_input.val()
+            cli_history.push(cmd)
+            cli_history_index = cli_history.length
+            parse(cmd)
+            if (! cli_is_log) return cli_clean()
+            break
+        case "/":
+            if (cli_is_log) cli_clean()
+            break
+        case "Escape":
+            $cli.hide()
+            break
+        case "ArrowUp":
+        case "ArrowDown":
+            const i = cli_history_index + { ArrowUp: -1, ArrowDown: +1 }[ e.key ]
+            if (i < 0 || i >= cli_history.length) return
+            cli_history_index = i
+            $cli_input.val(cli_history[i])
+            break
+        }
+    })
+
     $(uindow).on("keydown", e => {
         const $act = $(document.activeElement)
         if ($act.is("body")) {
@@ -570,11 +721,41 @@ mod.reg("keyboard", "@/*", () => {
                 const y = { ArrowUp: 0, ArrowDown: 1e6 }[ e.key ]
                 if (y !== undefined) uindow.scrollTo(0, y)
             }
+
+            if (e.key === "/") {
+                $cli.show()
+                cli_clean().trigger("focus")
+            }
         }
         else if ($act.is("[name=captcha]") && e.key === "Enter")
             $("#submitpost, #submit-reply")[0].click()
     })
-})
+}, `
+#exlg-cli {
+    position: fixed;
+    top: 0;
+    z-index: 65536;
+
+    display: none;
+    width: 100%;
+    height: 40px;
+
+    background-color: white;
+}
+
+#exlg-cli-input {
+    display: block;
+    height: 100%;
+    width: 100%;
+
+    border: none;
+    outline: none;
+}
+
+#exlg-cli-input.error {
+    background-color: indianred;
+}
+`)
 
 $(mod.execute)
 log("Lauching")
