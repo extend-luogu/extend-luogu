@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.2
+// @version        3.3
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -94,11 +94,27 @@ const mod = {
 }
 
 mod.reg("@springboard", "@/robots.txt", () => {
-    if (location.search === "?benben") {
+    const q = new URLSearchParams(location.search)
+    if (q.has("benben")) {
         document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
         uindow.addEventListener("message", e => uindow.parent.postMessage(e.data, "*"))
     }
-})
+    else if (q.has("url")) {
+        const url = q.get("url")
+        if (confirm(`是否加载来自 ${url} 的页面？`))
+            document.body.innerHTML = `<iframe src="${url}"></iframe>`
+    }
+}, `
+iframe {
+    border: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+iframe::-webkit-scrollbar {
+    display: none;
+}
+`)
 
 mod.reg("@benben-data", "@tcs/release/APIGWHtmlDemo-1615602121", () => {
     const data = JSON.parse(document.body.innerText)
@@ -195,13 +211,17 @@ mod.reg("update", "@/*", () => {
 mod.reg_user_tab("user-intro-ins", "main", null, () => {
     $(".introduction > *").each((_, e, $e = $(e)) => {
         const t = $e.text()
-        const [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
+        let [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
         if (! ins) return
 
+        arg = arg.split(/(?<!!)%/g).map(s => s.replaceAll("!%", "%"))
         const $blog = $($(".user-action").children()[0])
         switch (ins) {
+        case "frame":
+            arg[0] = `<iframe src="/robots.txt?url=${ encodeURI(arg[0]) }"`
+                   + `style="width: ${ arg[1] }; height: ${ arg[2] };"></iframe>`
         case "html":
-            $e.replaceWith($(arg))
+            $e.replaceWith($(arg[0]))
             break
         case "blog":
             if ($blog.text().trim() !== "个人博客") return
@@ -209,7 +229,15 @@ mod.reg_user_tab("user-intro-ins", "main", null, () => {
             break
         }
     })
-})
+}, `
+iframe {
+    border: none;
+    display: block;
+}
+iframe::-webkit-scrollbar {
+    display: none;
+}
+`)
 
 mod.reg_user_tab("user-problem", "practice", () => ({
     color: [
@@ -235,8 +263,8 @@ mod.reg_user_tab("user-problem", "practice", () => ({
 
     $.get(`/user/${ uindow._feInjection.currentUser.uid }?_contentOnly=true`, res => {
         error.check_fe(res)
-        const ta = res.currentData.passedProblems
-        const my = uindow._feInjection.currentData.passedProblems
+        const my = res.currentData.passedProblems
+        const ta = uindow._feInjection.currentData.passedProblems
 
         let same = 0
 
@@ -244,7 +272,7 @@ mod.reg_user_tab("user-problem", "practice", () => ({
         $ps.find("a").each((d, p, $p = $(p)) => {
             if (my.some(m => m.pid === ta[d].pid)) {
                 same ++
-                $p.css("backgroundColor", "rgb(82, 196, 26, 0.3)")
+                $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
             }
         })
         $ps.before(`<span> <> ${ ta.length } : ${same}</span>`)
@@ -364,7 +392,7 @@ mod.reg("benben", "@/", () => {
                 .appendTo($("ul#feed"))
                 .find("a[name=feed-reply]").on("click", () =>
                     $("textarea")
-                        .trigger("focus").val(` || @${ m.user.name }: ${ marked(m.content) }`)
+                        .trigger("focus").val(` || @${ m.user.name }: ${ m.content }`)
                         .trigger("input")
                 )
         )
