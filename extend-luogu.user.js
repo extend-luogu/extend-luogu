@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.3
+// @version        3.5
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -10,6 +10,8 @@
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/1.2.7/marked.js
 // @grant          GM_addStyle
+// @grant          GM_getValue
+// @grant          GM_setValue
 // @grant          unsafeWindow
 // ==/UserScript==
 
@@ -60,7 +62,7 @@ const mod = {
         work()
     },
     reg: (name, path, func, styl) => mod._.push({
-        name, path: Array.isArray(path) ? path : [ path ], func, styl, on: true
+        name, path: Array.isArray(path) ? path : [ path ], func, styl
     }),
     reg_user_tab: (name, tab, vars, func, styl) => mod._.push({
         name, path: [ "@/user/*" ],
@@ -68,12 +70,16 @@ const mod = {
             log(`Working user tab#${tab} mod: "${name}"`)
             func(vars?.())
         }, tab),
-        styl, on: true
+        styl
     }),
     find: name => mod._.find(m => m.name === name),
     disable: name => { mod.find(name).on = false },
     enable: name => { mod.find(name).on = true },
     execute: () => {
+        let mods_switch = GM_getValue("mods-switch")
+        const init_switch = mods_switch ? false : (mods_switch = {})
+        for (const m of mod._)
+            m.on = init_switch ? (mods_switch[ m.name ] = true) : mods_switch[ m.name ]
         for (const m of mod._) {
             const pn = location.pathname
             if (m.on && m.path.some((p, _, __, pr = p.replace(/^[a-z]*?@.*?(?=\/)/, "")) => (
@@ -90,6 +96,8 @@ const mod = {
                 if (m.name[0] === "@") break
             }
         }
+
+        if (init_switch) GM_setValue("mods-switch", mods_switch)
     }
 }
 
@@ -120,6 +128,107 @@ mod.reg("@benben-data", "@tcs/release/APIGWHtmlDemo-1615602121", () => {
     const data = JSON.parse(document.body.innerText)
     uindow.parent.postMessage(data, "*")
 })
+
+mod.reg("dash", "@/*", () => {
+    const $dash = $(`<div id="exlg-dash">exlg</div>`).prependTo($(".user-nav > nav"))
+    const $win = $(`
+<span id="exlg-dash-window">
+    <p><b>版本</b> <span id="exlg-dash-verison">${ GM_info.script.version }</span></p>
+    <p><b>模块管理</b> <a id="exlg-dash-mods-save">保存刷新</a>
+    <ul id="exlg-dash-mods"></ul></p>
+	<p><a href="https://github.com/optimize-2/extend-luogu">GitHub</a></p>
+</span>
+    `)
+        .appendTo($dash)
+        .on("click", e => e.stopPropagation())
+
+    const $mods = $("#exlg-dash-mods")
+    const mods_switch = GM_getValue("mods-switch")
+    mod._.forEach(m => {
+        const $m = $(`<li><input type="checkbox" /></span> ${ m.name }</li>`).appendTo($mods)
+        $m.children("input")
+            .prop("checked", m.on).prop("disabled", m.name === "dash")
+            .on("change", () => {
+                mods_switch[ m.name ] = ! mods_switch[ m.name ]
+            })
+    })
+    $("#exlg-dash-mods-save").on("click", () => {
+        GM_setValue("mods-switch", mods_switch)
+        location.reload()
+    })
+
+    $dash.on("click", e => $win.toggle())
+}, `
+/* dash */
+
+#exlg-dash {
+    position: relative;
+    display: inline-block;
+
+    padding: 1px 10px 3px;
+
+    background-color: cornflowerblue;
+    color: white;
+    border-radius: 6px;
+    box-shadow: 0 0 7px dodgerblue;
+}
+#exlg-dash-window {
+    position: absolute;
+    top: 35px;
+    left: 0px;
+    z-index: 65536;
+    display: none;
+
+    width: 200px;
+    height: 600px;
+    padding: 5px;
+
+    background: white;
+    color: black;
+
+    border-radius: 7px;
+    box-shadow: rgb(187 227 255) 0px 0px 7px;
+}
+#exlg-dash-mods {
+    list-style: none;
+    padding: 0;
+}
+#exlg-dash-mods > li > span {
+    
+}
+
+/* global */
+
+.exlg-info::before {
+    content: "i";
+
+    display: inline-block;
+    padding: 0 10px 0 8px;
+    margin-left: 3px;
+
+    color: white;
+    background-color: deepskyblue;
+    font-style: italic;
+    font-weight: bold;
+
+    border-radius: 50%;
+}
+.exlg-info:hover::after {
+    display: inline-block;
+}
+.exlg-info::after {
+    display: none;
+    content: attr(name);
+    
+    margin-left: 5px;
+    padding: 0 3px;
+
+    background-color: white;
+    box-shadow: 0 0 7px deepskyblue;
+    
+    border-radius: 7px;
+}
+`)
 
 mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
     const emo = [
@@ -205,6 +314,7 @@ mod.reg("update", "@/*", () => {
             $alert.children().on("click", () => uindow.open("/paste/fnln7ze9"))
         }
         log(l)
+        $("#exlg-dash-verison").html(l.split(": ")[1])
     })
 })
 
@@ -256,7 +366,7 @@ mod.reg_user_tab("user-problem", "practice", () => ({
         $ps.find("a").each((d, p, $p = $(p)) =>
             $p.removeClass("color-default").css("color", color[ my[d].difficulty ])
         )
-        $ps.before($(`<span>${ my.length }</span>`))
+        $ps.before($(`<span id="exlg-problem-count-${i}">${ my.length }</span>`))
     })
 
     if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
@@ -275,7 +385,8 @@ mod.reg_user_tab("user-problem", "practice", () => ({
                 $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
             }
         })
-        $ps.before(`<span> <> ${ ta.length } : ${same}</span>`)
+        $("#exlg-problem-count-1").html(`<span>${ ta.length } <> ${ my.length } : ${same}`
+            + `<i class="exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     })
 }, `
 .main > .card > h3 {
@@ -283,18 +394,18 @@ mod.reg_user_tab("user-problem", "practice", () => ({
 }
 `)
 
-mod.reg("user-css-load", "@/*", () => {}, localStorage["exlg-css"])
+mod.reg("user-css-load", "@/*", () => {}, GM_getValue("user-css"))
 mod.reg("user-css-edit", "@/theme/list", () => {
     const $ps = $(`
 <div id="exlg-user-css">
-    <h2>自定义 CSS <a>保存并刷新</a></h2>
+    <h2>自定义 CSS <a>保存刷新</a></h2>
     <textarea/>
 </div>
 `)
         .appendTo(".full-container")
-    const $t = $ps.children("textarea").val(localStorage.getItem("exlg-css"))
+    const $t = $ps.children("textarea").val(GM_getValue("user-css"))
     $ps.find("a").on("click", () => {
-        localStorage.setItem("exlg-css", $t.val())
+        GM_setValue("user-css", $t.val())
         location.reload()
     })
 }, `

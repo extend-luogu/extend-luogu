@@ -37,6 +37,13 @@ module.exports = {
     jQuery: true,
     GM_info: true,
     GM_addStyle: true,
+<<<<<<< HEAD
     marked: true
+=======
+    GM_getValue: true,
+    GM_setValue: true,
+    marked: true,
+    filterXSS: true
+>>>>>>> 533da21 (VER 3.5)
   }
 }
