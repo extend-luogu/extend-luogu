@@ -1,14 +1,15 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.3
+// @version        3.4
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/marked/1.2.7/marked.js
+// @require        https://cdnjs.cloudflare.com/ajax/libs/js-xss/0.3.3/xss.min.js
+// @require        https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.1/marked.min.js
 // @grant          GM_addStyle
 // @grant          unsafeWindow
 // ==/UserScript==
@@ -217,11 +218,13 @@ mod.reg_user_tab("user-intro-ins", "main", null, () => {
         arg = arg.split(/(?<!!)%/g).map(s => s.replaceAll("!%", "%"))
         const $blog = $($(".user-action").children()[0])
         switch (ins) {
-        case "frame":
-            arg[0] = `<iframe src="/robots.txt?url=${ encodeURI(arg[0]) }"`
-                   + `style="width: ${ arg[1] }; height: ${ arg[2] };"></iframe>`
         case "html":
-            $e.replaceWith($(arg[0]))
+            $e.replaceWith($(`<p>${ filterXSS(arg[0]) }</p>`))
+            break
+        case "frame":
+            $e.replaceWith($(`<iframe src="/robots.txt?url=${ encodeURI(arg[0]) }"`
+                + `style="width: ${ arg[1] }; height: ${ arg[2] };"></iframe>`
+            ))
             break
         case "blog":
             if ($blog.text().trim() !== "个人博客") return
@@ -267,7 +270,6 @@ mod.reg_user_tab("user-problem", "practice", () => ({
         const ta = uindow._feInjection.currentData.passedProblems
 
         let same = 0
-
         const $ps = $($(".problems")[1])
         $ps.find("a").each((d, p, $p = $(p)) => {
             if (my.some(m => m.pid === ta[d].pid)) {

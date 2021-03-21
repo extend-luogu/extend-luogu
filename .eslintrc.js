@@ -37,6 +37,7 @@ module.exports = {
     jQuery: true,
     GM_info: true,
     GM_addStyle: true,
-    marked: true
+    marked: true,
+    filterXSS: true
   }
 }
