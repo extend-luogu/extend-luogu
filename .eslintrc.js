@@ -30,6 +30,7 @@ module.exports = {
     "object-property-newline": 0,
     "no-multiple-empty-lines": [ 1, { max: 2, maxEOF: 1, maxBOF: 0 } ],
     "brace-style": [ 2, "stroustrup", { allowSingleLine: true } ],
+    "no-fallthrough": 0
   },
   globals: {
     unsafeWindow: true,
