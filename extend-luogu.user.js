@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.5
+// @version        3.6
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -131,13 +131,13 @@ mod.reg("@benben-data", "@tcs/release/APIGWHtmlDemo-1615602121", () => {
 })
 
 mod.reg("dash", "@/*", () => {
-    const $dash = $(`<div id="exlg-dash">exlg</div>`).prependTo($(".user-nav > nav"))
+    const $dash = $(`<div id="exlg-dash">exlg</div>`).prependTo($("nav.user-nav, div.user-nav > nav"))
     const $win = $(`
 <span id="exlg-dash-window">
     <p><b>版本</b> <span id="exlg-dash-verison">${ GM_info.script.version }</span></p>
     <p><b>模块管理</b> <a id="exlg-dash-mods-save">保存刷新</a>
     <ul id="exlg-dash-mods"></ul></p>
-	<p><a href="https://github.com/optimize-2/extend-luogu">GitHub</a></p>
+    <p><a href="https://github.com/optimize-2/extend-luogu">GitHub</a></p>
 </span>
     `)
         .appendTo($dash)
@@ -269,7 +269,7 @@ mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
     })
     const $emo = $(".exlg-emo")
 
-    const $fold = $(`<li>exlg <i class="fa fa-chevron-left"></li>`)
+    const $fold = $(`<li>表情 <i class="fa fa-chevron-left"></li>`)
         .on("click", () => {
             $nl.toggle()
             $emo.toggle()
@@ -438,13 +438,11 @@ mod.reg("benben", "@/", () => {
         Red: "red lg-bold",
         Purple: "purple lg-bold",
     }
-    const check_color = [ "#3498db", "#f1c40f", "#5eb95e" ]
-    const check = lv => ~~ (lv / 3)
-        ? `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="${ check_color[ ~~ (lv / 3) - 1 ]}" style="margin-bottom: -3px;">
-        <path d="M16 8C16 6.84375 15.25 5.84375 14.1875 5.4375C14.6562 4.4375 14.4688 3.1875 13.6562 2.34375C12.8125 1.53125 11.5625 1.34375 10.5625 1.8125C10.1562 0.75 9.15625 0 8 0C6.8125 0 5.8125 0.75 5.40625 1.8125C4.40625 1.34375 3.15625 1.53125 2.34375 2.34375C1.5 3.1875 1.3125 4.4375 1.78125 5.4375C0.71875 5.84375 0 6.84375 0 8C0 9.1875 0.71875 10.1875 1.78125 10.5938C1.3125 11.5938 1.5 12.8438 2.34375 13.6562C3.15625 14.5 4.40625 14.6875 5.40625 14.2188C5.8125 15.2812 6.8125 16 8 16C9.15625 16 10.1562 15.2812 10.5625 14.2188C11.5938 14.6875 12.8125 14.5 13.6562 13.6562C14.4688 12.8438 14.6562 11.5938 14.1875 10.5938C15.25 10.1875 16 9.1875 16 8ZM11.4688 6.625L7.375 10.6875C7.21875 10.8438 7 10.8125 6.875 10.6875L4.5 8.3125C4.375 8.1875 4.375 7.96875 4.5 7.8125L5.3125 7C5.46875 6.875 5.6875 6.875 5.8125 7.03125L7.125 8.34375L10.1562 5.34375C10.3125 5.1875 10.5312 5.1875 10.6562 5.34375L11.4688 6.15625C11.5938 6.28125 11.5938 6.5 11.4688 6.625Z"></path>
-    </svg>`
-        : ""
+    const check_svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="%" style="margin-bottom: -3px;">
+    <path d="M16 8C16 6.84375 15.25 5.84375 14.1875 5.4375C14.6562 4.4375 14.4688 3.1875 13.6562 2.34375C12.8125 1.53125 11.5625 1.34375 10.5625 1.8125C10.1562 0.75 9.15625 0 8 0C6.8125 0 5.8125 0.75 5.40625 1.8125C4.40625 1.34375 3.15625 1.53125 2.34375 2.34375C1.5 3.1875 1.3125 4.4375 1.78125 5.4375C0.71875 5.84375 0 6.84375 0 8C0 9.1875 0.71875 10.1875 1.78125 10.5938C1.3125 11.5938 1.5 12.8438 2.34375 13.6562C3.15625 14.5 4.40625 14.6875 5.40625 14.2188C5.8125 15.2812 6.8125 16 8 16C9.15625 16 10.1562 15.2812 10.5625 14.2188C11.5938 14.6875 12.8125 14.5 13.6562 13.6562C14.4688 12.8438 14.6562 11.5938 14.1875 10.5938C15.25 10.1875 16 9.1875 16 8ZM11.4688 6.625L7.375 10.6875C7.21875 10.8438 7 10.8125 6.875 10.6875L4.5 8.3125C4.375 8.1875 4.375 7.96875 4.5 7.8125L5.3125 7C5.46875 6.875 5.6875 6.875 5.8125 7.03125L7.125 8.34375L10.1562 5.34375C10.3125 5.1875 10.5312 5.1875 10.6562 5.34375L11.4688 6.15625C11.5938 6.28125 11.5938 6.5 11.4688 6.625Z"></path>
+</svg>`
+    const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
 
     let loaded = false
 
@@ -563,14 +561,19 @@ mod.reg("rand-problem", "@/", () => {
 }
 `)
 
-mod.reg("keyboard", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
-    uindow.addEventListener("keydown", e => {
+mod.reg("keyboard", "@/*", () => {
+    $(uindow).on("keydown", e => {
         const $act = $(document.activeElement)
         if ($act.is("body")) {
-            const rel = { ArrowLeft: "prev", ArrowRight: "next" }[e.code]
-            if (rel) $(`a[rel=${rel}]`)[0].click()
+            const rel = { ArrowLeft: "prev", ArrowRight: "next" }[ e.key ]
+            if (rel) return $(`a[rel=${rel}]`)[0].click()
+
+            if (e.shiftKey) {
+                const y = { ArrowUp: 0, ArrowDown: 1e6 }[ e.key ]
+                if (y !== undefined) uindow.scrollTo(0, y)
+            }
         }
-        else if ($act.is("[name=captcha]") && e.code === "Enter")
+        else if ($act.is("[name=captcha]") && e.key === "Enter")
             $("#submitpost, #submit-reply")[0].click()
     })
 })
