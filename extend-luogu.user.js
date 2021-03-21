@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.1
+// @version        3.2
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -15,12 +15,17 @@
 
 // ==Utilities==
 
-const $ = jQuery; unsafeWindow.$$ = $
-const mdp = unsafeWindow.markdownPalettes
-const
-    _console = k => (...s) => unsafeWindow.console[k]("%c[exlg]", "color: #0e90d2;", ...s),
-    log = _console("log"),
-    error = _console("log")
+const uindow = unsafeWindow
+const $ = jQuery; uindow.$$ = $
+const mdp = uindow.markdownPalettes
+const log = (...s) => uindow.console.log("%c[exlg]", "color: #0e90d2;", ...s)
+const error = (...s) => {
+    uindow.console.error("%c[exlg]", "color: #0e90d2;", ...s)
+    throw Error(s.join(" "))
+}
+error.check_fe = fe => {
+    if (fe.code !== 200) error(`Requesting failure code: ${ fe.code }.`)
+}
 
 Date.prototype.format = function (f, UTC) {
     UTC = UTC ? "UTC" : ""
@@ -47,7 +52,7 @@ const mod = {
     _user_tab: (func, tab) => {
         const $tabs = $(".items")
         const work = () => {
-            if (location.hash !== "#" + tab) return
+            if ((location.hash || "#main") !== "#" + tab) return
             $tabs.off("click", work)
             func()
         }
@@ -91,13 +96,13 @@ const mod = {
 mod.reg("@springboard", "@/robots.txt", () => {
     if (location.search === "?benben") {
         document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
-        unsafeWindow.addEventListener("message", e => unsafeWindow.parent.postMessage(e.data, "*"))
+        uindow.addEventListener("message", e => uindow.parent.postMessage(e.data, "*"))
     }
 })
 
 mod.reg("@benben-data", "@tcs/release/APIGWHtmlDemo-1615602121", () => {
     const data = JSON.parse(document.body.innerText)
-    unsafeWindow.parent.postMessage(data, "*")
+    uindow.parent.postMessage(data, "*")
 })
 
 mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
@@ -175,13 +180,13 @@ mod.reg("update", "@/*", () => {
             return { nu: + nu, ex: ex ? [ "pre", "alpha", "beta" ].indexOf(ex) : -1 }
         })
         let l = `Comparing version: ${version} -- ${latest}`
-        if (v[0].nu > v[1].nu || v[0].nu === v[1].nu && v[0].ex > v[1].ex) {
+        if (v[0].nu < v[1].nu || v[0].nu === v[1].nu && v[0].ex < v[1].ex) {
             l = l.replace("--", "!!")
             const $alert = $(`<div>`
                 + `<button type="button" class="am-btn am-btn-warning am-btn-block">onclick="">extend-luogu 已有更新的版本 ${latest}. 点我更新</button>`
                 + `</div>`)
             $("#app").before($alert)
-            $alert.children().on("click", () => unsafeWindow.open("/paste/fnln7ze9"))
+            $alert.children().on("click", () => uindow.open("/paste/fnln7ze9"))
         }
         log(l)
     })
@@ -207,11 +212,6 @@ mod.reg_user_tab("user-intro-ins", "main", null, () => {
 })
 
 mod.reg_user_tab("user-problem", "practice", () => ({
-    data: [ "submittedProblems", "passedProblems" ].map((k, i) =>
-        unsafeWindow._feInjection.currentData[k].map(o => ({
-            pid: o.pid, dif: o.difficulty, passed: ! i
-        }))
-    ),
     color: [
         "rgb(191, 191, 191)",
         "rgb(254, 76, 97)",
@@ -222,25 +222,53 @@ mod.reg_user_tab("user-problem", "practice", () => ({
         "rgb(157, 61, 207)",
         "rgb(14, 29, 105)"
     ]
-}), ({ data, color }) =>
-    $(".main > .card > .problems").each((i, card, $card = $(card)) => {
-        $card.find("a").each((j, p, $p = $(p)) => {
-            $p.removeClass("color-default").css("color", color[data[i][j].dif])
-        })
+}), ({ color }) => {
+    $(".problems").each((i, ps, $ps = $(ps)) => {
+        const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
+        $ps.find("a").each((d, p, $p = $(p)) =>
+            $p.removeClass("color-default").css("color", color[ my[d].difficulty ])
+        )
+        $ps.before($(`<span>${ my.length }</span>`))
     })
-)
+
+    if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
+
+    $.get(`/user/${ uindow._feInjection.currentUser.uid }?_contentOnly=true`, res => {
+        error.check_fe(res)
+        const ta = res.currentData.passedProblems
+        const my = uindow._feInjection.currentData.passedProblems
+
+        let same = 0
+
+        const $ps = $($(".problems")[1])
+        $ps.find("a").each((d, p, $p = $(p)) => {
+            if (my.some(m => m.pid === ta[d].pid)) {
+                same ++
+                $p.css("backgroundColor", "rgb(82, 196, 26, 0.3)")
+            }
+        })
+        $ps.before(`<span> <> ${ ta.length } : ${same}</span>`)
+    })
+}, `
+.main > .card > h3 {
+    display: inline-block;
+}
+`)
 
 mod.reg("user-css-load", "@/*", () => {}, localStorage["exlg-css"])
 mod.reg("user-css-edit", "@/theme/list", () => {
-    const $card = $(`
+    const $ps = $(`
 <div id="exlg-user-css">
-    <h2>自定义 CSS <a>保存</a></h2>
+    <h2>自定义 CSS <a>保存并刷新</a></h2>
     <textarea/>
 </div>
 `)
         .appendTo(".full-container")
-    const $t = $card.children("textarea").val(localStorage.getItem("exlg-css"))
-    $card.find("a").on("click", () => localStorage.setItem("exlg-css", $t.val()))
+    const $t = $ps.children("textarea").val(localStorage.getItem("exlg-css"))
+    $ps.find("a").on("click", () => {
+        localStorage.setItem("exlg-css", $t.val())
+        location.reload()
+    })
 }, `
 #exlg-user-css {
     display: block;
@@ -299,7 +327,7 @@ mod.reg("benben", "@/", () => {
             }
         })
 
-    unsafeWindow.addEventListener("message", e => {
+    uindow.addEventListener("message", e => {
         log("Listening message:", e.data)
 
         e.data.forEach(m =>
@@ -368,20 +396,21 @@ mod.reg("rand-problem", "@/", () => {
     `)
     $("#rand-problem").click(() => {
         const rating = $("[name=rand-problem-rating]").val(), source = $("[name=rand-problem-source]").val()
-        $.get(`https://www.luogu.com.cn/problem/list?difficulty=${rating}&type=${source}&page=1&_contentOnly=1`,
+        $.get(`/problem/list?difficulty=${rating}&type=${source}&page=1&_contentOnly=1`,
             res => {
+                error.check_fe(res)
                 const
                     problem_count = res.currentData.problems.count,
                     page_count = Math.ceil(problem_count / 50),
                     rand_page = Math.floor(Math.random() * page_count) + 1
-                $.get(`https://www.luogu.com.cn/problem/list?difficulty=${rating}&type=${source}&page=${rand_page}&_contentOnly=1`,
+                $.get(`/problem/list?difficulty=${rating}&type=${source}&page=${rand_page}&_contentOnly=1`,
                     res => {
-                        if (res.code !== 200) return error("Requesting failed.")
+                        error.check_fe(res)
                         const
                             list = res.currentData.problems.result,
                             rand_idx = Math.floor(Math.random() * list.length),
                             pid = list[rand_idx].pid
-                        location.href = `https://www.luogu.com.cn/problem/${pid}`
+                        location.href = `/problem/${pid}`
                     }
                 )
             }
@@ -389,12 +418,12 @@ mod.reg("rand-problem", "@/", () => {
     })
 }, `
 .am-u-md-3 > .lg-index-stat {
-    overflow-y: scroll;
+    overflow-y: scroll !important;
 }
 `)
 
 mod.reg("keyboard", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
-    unsafeWindow.addEventListener("keydown", e => {
+    uindow.addEventListener("keydown", e => {
         const $act = $(document.activeElement)
         if ($act.is("body")) {
             const rel = { ArrowLeft: "prev", ArrowRight: "next" }[e.code]
@@ -408,5 +437,5 @@ mod.reg("keyboard", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
 $(mod.execute)
 log("Lauching")
 
-Object.assign(unsafeWindow, { exlg: { mod, marked, log, error } })
+Object.assign(uindow, { exlg: { mod, marked, log, error } })
 
