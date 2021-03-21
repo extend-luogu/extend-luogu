@@ -503,12 +503,12 @@ mod.reg("benben", "@/", () => {
                 <span class="feed-username">
                     <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
                         ${ m.user.name }
-                    </a>&nbsp
+                    </a>
                     <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
                         ${ check(m.user.ccfLevel) }
                     </a>
                     ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
-                </span>&nbsp;
+                </span>
                 ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
                 <a name="feed-reply" onclick="">回复</a>
             </div>
