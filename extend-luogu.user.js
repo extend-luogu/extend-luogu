@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.2
+// @version        4.3
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -317,9 +317,10 @@ mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
 `)
 
 mod.reg("update", "@/*", () => {
-    $.get("https://www.luogu.com.cn/paste/ijxozv3z", data => {
+    $.get("https://www.luogu.com.cn/team/33255?_contentOnly=true" /* exlg team */, res => {
+        error.check_fe(res)
         const
-            latest = data.match(/(%5C%2F){3}(.+?)(%5C%2F){3}/)[2].replaceAll("%20", " "),
+            latest = res.currentData.team.setting.description.match(/\*\*latest\*\* {(.*?)}/)?.[1],
             version = GM_info.script.version
         const v = [ version, latest ].map(s => {
             const [ nu, ex ] = s.split(" ")
