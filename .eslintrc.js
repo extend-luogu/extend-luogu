@@ -31,7 +31,9 @@ module.exports = {
     "no-multiple-empty-lines": [ 1, { max: 2, maxEOF: 1, maxBOF: 0 } ],
     "brace-style": [ 2, "stroustrup", { allowSingleLine: true } ],
     "no-fallthrough": 0,
-    "spaced-comment": 0
+    "spaced-comment": 0,
+    "no-multi-spaces": 0,
+    "key-spacing": 0
   },
   globals: {
     unsafeWindow: true,

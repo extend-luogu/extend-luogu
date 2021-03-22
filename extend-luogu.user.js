@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.0
+// @version        4.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -567,37 +567,67 @@ mod.reg("keyboard-and-cli", "@/*", () => {
     const $cli_input = $(`<input id="exlg-cli-input" />`).appendTo($cli)
 
     let cli_is_log = false
-    const cli_log = s => {
+    const cli_log = (sp, ...tp) => {
         cli_is_log = true
-        return $cli_input.val(s)
+        const m = sp.map((s, i) =>
+            s.split(/\b/).map(w => cli_lang_dict[w]?.[ cli_lang - 1 ] ?? w).join("") +
+            (tp[i] || "")
+        ).join("")
+        return $cli_input.val(m)
     }
-    const cli_error = s => {
-        cli_is_log = true
-        warn(s)
-        return $cli_input.addClass("error").val(s)
-    }
+    const cli_error = (sp, ...tp) =>
+        warn(cli_log(sp, ...tp).addClass("error").val())
     const cli_clean = () => {
         cli_is_log = false
         return $cli_input.val("").removeClass("error")
     }
     const cli_history = []
     let cli_history_index = 0
+    const cli_langs = [ "en", "zh" ], cli_lang_dict = {
+        ".": [ "。" ],
+        ",": [ "，" ],
+        "!": [ "！" ],
+        "?": [ "？" ],
+        "cli":        [ "命令行" ],
+        "current":    [ "当前" ],
+        "language":   [ "语言" ],
+        "available":  [ "可用" ],
+        "command":    [ "命令" ],
+        "commands":   [ "命令" ],
+        "unknown":    [ "未知" ],
+        "forum":      [ "板块" ],
+        "target":     [ "目标" ],
+        "mod":        [ "模块" ],
+        "action":     [ "操作" ],
+        "illegal":    [ "错误" ],
+        "param":      [ "参数" ],
+        "expected":   [ "期望" ],
+        "type":       [ "类型" ],
+        "lost":       [ "缺失" ],
+        "essential":  [ "必要" ],
+    }
+    let cli_lang = GM_getValue("cli-lang") || 0
 
     const cmds = {
         help: (cmd/*string*/) => {
             /* get the help of <cmd>. or list all cmds. */
-            if (! cmd) cli_log("exlg cli. available commands: " + Object.keys(cmds).join(", "))
+            /* 获取 <cmd> 的帮助。空则列出所有。 */
+            if (! cmd)
+                cli_log`exlg cli. current language: ${cli_lang}, available commands: ${ Object.keys(cmds).join(", ") }`
             else {
                 const f = cmds[cmd]
-                if (! f) return cli_error(`help: unknown command "${cmd}"`)
-                cli_log(cmd + " " + f.arg.map(a => {
+                if (! f) return cli_error`help: unknown command "${cmd}"`
+
+                const arg = f.arg.map(a => {
                     const i = a.name + ": " + a.type
                     return a.essential ? `<${i}>` : `[${i}]`
-                }).join(" ") + "  " + f.help)
+                }).join(" ")
+                cli_log`${cmd} ${arg} ${ f.help[cli_lang] }`
             }
         },
         cd: (path/*!string*/) => {
             /* jump to <path>, relative path is OK. */
+            /* 跳转至 <path>，支持相对路径。 */
             let tar
             if (path[0] === "/") tar = path
             else {
@@ -612,9 +642,24 @@ mod.reg("keyboard-and-cli", "@/*", () => {
             }
             location.href = location.origin + tar
         },
+        cdd: (forum/*!string*/) => {
+            /* jump to the forum named <forum> of discussion. use all the names you can think of. */
+            /* 跳转至名为 <forum> 的讨论板块，你能想到的名字基本都有用。 */
+            const tar = [
+                [ "relevantaffairs",    "gs", "gsq",    "灌水", "灌水区",               "r", "ra" ],
+                [ "academics",          "xs", "xsb",    "学术", "学术版",               "a", "ac" ],
+                [ "siteaffairs",        "zw", "zwb",    "站务", "站务版",               "s", "sa" ],
+                [ "problem",            "tm", "tmzb",   "灌水", "题目总版",             "p"       ],
+                [ "service",            "fk", "fksqgd", "反馈", "反馈、申请、工单专版",      "se" ]
+            ]
+            forum = tar.find(ns => ns.includes(forum))?.[0]
+            if (! tar) return cli_error`cdd: unknown forum "${forum}"`
+            cmds.cd(`/discuss/lists?forumname=${forum}`)
+        },
         cc: (name/*char*/) => {
-            /* jump to [name], "|h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I|message|notification. or jump home. */
-            name = name || "h"
+            /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I myself|message|notification. or jump home. */
+            /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
+            name ??= "h"
             const tar = {
                 h: "/",
                 p: "/problem/list",
@@ -626,16 +671,17 @@ mod.reg("keyboard-and-cli", "@/*", () => {
                 n: "/user/notification",
             }[name]
             if (tar) cmds.cd(tar)
-            else cli_error(`cc: unknown target "${name}"`)
+            else cli_error`cc: unknown target "${name}"`
         },
         mod: (action/*!string*/, name/*string*/) => {
             /* for <action> "enable|disable|toggle", opearte the mod named <name>. for <action> "save", save modification. */
+            /* 当 <action> 为 "enable|disable|toggle"，对名为 <name> 的模块执行对应操作：启用|禁用|切换。当 <action> 为 "save"，保存修改。 */
             const i = mod.find_i(name)
             switch (action) {
             case "enable":
             case "disable":
             case "toggle":
-                if (i < 0) return cli_error(`mod: unknown mod "${name}"`)
+                if (i < 0) return cli_error`mod: unknown mod "${name}"`
                 const $mod = $($("#exlg-dash-mods").children()[i]).children()
                 $mod.prop("checked", {
                     enable: () => true, disable: () => false, toggle: now => ! now
@@ -645,24 +691,33 @@ mod.reg("keyboard-and-cli", "@/*", () => {
                 GM_setValue("mod-map", mod.map)
                 break
             default:
-                return cli_error(`mod: unknown action "${action}"`)
+                return cli_error`mod: unknown action "${action}"`
             }
         },
         dash: (action/*!string*/) => {
             /* for <action> "show|hide|toggle", opearte the exlg dashboard. */
+            /* 当 <action> 为 "show|hide|toggle", 显示|隐藏|切换 exlg 管理面板。 */
             if (! [ "show", "hide", "toggle" ].includes(action))
-                return cli_error(`dash: unknown action "${action}"`)
+                return cli_error`dash: unknown action "${action}"`
             $("#exlg-dash-window")[action]()
+        },
+        lang: (lang/*!string*/) => {
+            /* for <lang> "en|zh" switch current cli language. */
+            /* 当 <lang> 为 "en|zh"，切换当前语言。 */
+            lang = cli_langs.indexOf(lang)
+            if (lang < 0) return cli_error`lang: unknown language ${lang}`
+            GM_setValue("cli-lang", cli_lang = lang)
         }
     }
     for (const f of Object.values(cmds)) {
-        [ , f.arg, f.help ] = f.toString().match(/^\((.*?)\) => {\n +\/\* (.+) \*\//)
+        [ , f.arg, f.help ] = f.toString().match(/^\((.*?)\) => {((?:\n +\/\*.+?\*\/)+)/)
         f.arg = f.arg.split(", ").map(a => {
             const [ , name, type ] = a.match(/([a-z_]+)\/\*(.+)\*\//)
             return {
                 name, essential: type[0] === "!", type: type.replace(/^!/, "")
             }
         })
+        f.help = f.help.trim().split("\n").map(s => s.match(/\/\* (.+) \*\//)[1])
     }
     const parse = cmd => {
         log(`Parsing command: "${cmd}"`)
@@ -671,7 +726,7 @@ mod.reg("keyboard-and-cli", "@/*", () => {
         const n = tk.shift()
         if (! n) return
         const f = cmds[n]
-        if (! f) return cli_error(`^: unknown command "${n}"`)
+        if (! f) return cli_error`exlg: unknown command "${n}"`
         let i = -1, a; for ([ i, a ] of tk.entries()) {
             const t = f.arg[i].type
             if (t === "number" || t === "integer") tk[i] = Number(a)
@@ -681,9 +736,9 @@ mod.reg("keyboard-and-cli", "@/*", () => {
                 t === "integer" && ! isNaN(tk[i]) && ! (tk[i] % 1) ||
                 t === "string"
             ) ;
-            else return cli_error(`${n}: illegal param "${a}", expected type ${t}.`)
+            else return cli_error`${n}: illegal param "${a}", expected type ${t}.`
         }
-        if (f.arg[i + 1]?.essential) return cli_error(`${n}: lost essential param "${ f.arg[i + 1].name }"`)
+        if (f.arg[i + 1]?.essential) return cli_error`${n}: lost essential param "${ f.arg[i + 1].name }"`
         f(...tk)
     }
 
