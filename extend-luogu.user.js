@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.1
+// @version        4.2
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -135,14 +135,19 @@ mod.reg("dash", "@/*", () => {
     const $dash = $(`<div id="exlg-dash">exlg</div>`).prependTo($("nav.user-nav, div.user-nav > nav"))
     const $win = $(`
 <span id="exlg-dash-window">
-    <p><b>版本</b> <span id="exlg-dash-verison">${ GM_info.script.version }</span></p>
+    <p>
+        <b>版本</b>
+        <a href="https://github.com/optimize-2/extend-luogu">GitHub</a>
+        <a href="https://cdn.jsdelivr.net/gh/optimize-2/extend-luogu@latest/extend-luogu.user.js">Jsdelivr</a> <br>
+        <span id="exlg-dash-verison">${ GM_info.script.version }</span>
+    </p>
     <p><b>模块管理</b> <a id="exlg-dash-mods-save">保存刷新</a>
     <ul id="exlg-dash-mods"></ul></p>
-    <p><a href="https://github.com/optimize-2/extend-luogu">GitHub</a></p>
 </span>
     `)
         .appendTo($dash)
         .on("click", e => e.stopPropagation())
+    $(`<sup class="exlg-warn">!</sup>`).hide().appendTo($dash)
 
     const $mods = $("#exlg-dash-mods")
     mod._.forEach(m => {
@@ -229,6 +234,21 @@ mod.reg("dash", "@/*", () => {
     
     border-radius: 7px;
 }
+
+.exlg-warn {
+    position: absolute;
+    right: -0.6em;
+    top: -0.6em;
+
+    display: inline-block;
+    padding: 0.8em 0.6em;
+
+    color: white;
+    background-color: rgb(231, 76, 60);
+    font-size: .7em;
+    text-align: center;
+    border-radius: 50%;
+}
 `)
 
 mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
@@ -305,17 +325,14 @@ mod.reg("update", "@/*", () => {
             const [ nu, ex ] = s.split(" ")
             return { nu: + nu, ex: ex ? [ "pre", "alpha", "beta" ].indexOf(ex) : -1 }
         })
-        let l = `Comparing version: ${version} -- ${latest}`
+        let l = `Comparing version: ${version} -- ${latest}`, hint = ""
         if (v[0].nu < v[1].nu || v[0].nu === v[1].nu && v[0].ex < v[1].ex) {
             l = l.replace("--", "!!")
-            const $alert = $(`<div>`
-                + `<button type="button" class="am-btn am-btn-warning am-btn-block">onclick="">extend-luogu 已有更新的版本 ${latest}. 点我更新</button>`
-                + `</div>`)
-            $("#app").before($alert)
-            $alert.children().on("click", () => uindow.open("/paste/fnln7ze9"))
+            hint = "<br> <i>点击 Jsdelivr 直接更新</i>"
+            $("#exlg-dash > .exlg-warn").show()
         }
         log(l)
-        $("#exlg-dash-verison").html(l.split(": ")[1])
+        $("#exlg-dash-verison").html(l.split(": ")[1] + hint)
     })
 })
 
@@ -412,11 +429,12 @@ mod.reg("user-css-edit", "@/theme/list", () => {
 }, `
 #exlg-user-css {
     display: block;
-    margin-bottom: 1.3em;
-    background-color: #fff;
-    box-shadow: 0 1px 3px rgb(26 26 26 / 10%);
     box-sizing: border-box;
     padding: 1.3em;
+    margin-bottom: 1.3em;
+
+    background-color: white;
+    box-shadow: 0 0 7px dodgerblue;
 }
 #exlg-user-css a {
     font-weight: normal;
