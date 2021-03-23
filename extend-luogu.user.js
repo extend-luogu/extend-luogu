@@ -189,8 +189,15 @@ mod.reg("dash", "@/*", () => {
         <br />
         <span id="exlg-dash-verison">${ GM_info.script.version }</span>
     </p>
-    <p><b>模块管理</b> <a id="exlg-dash-mods-save">保存</a>
-    <ul id="exlg-dash-mods"></ul></p>
+    <p>
+        <b>模块管理</b> <a id="exlg-dash-mods-save">保存</a>
+        <ul id="exlg-dash-mods"></ul>
+    </p>
+    <p>
+        <b>关于</b> <br />
+        <a href="https://www.luogu.com.cn/team/33255">官方团队 33255</a> <br />
+        <a href="https://qm.qq.com/cgi-bin/qm/qr?k=ODbPTKWbZfGq3ll3yBfjdDKWDPhJhlX4&jump_from=webapi">QQ群 817265691</a> <br />
+    </p>
 </span>
     `)
         .appendTo($dash)
@@ -366,7 +373,7 @@ mod.reg_chore("update", "1D", "@/*", () => {
     $.get("https://www.luogu.com.cn/team/33255?_contentOnly=true" /* exlg team */, res => {
         error.check_fe(res)
         const
-            latest = res.currentData.team.setting.description.match(/\*\*latest\*\* {(.*?)}/)?.[1],
+            latest = res.currentData.team.setting.description.match(/VER {(.*?)}/)?.[1],
             version = GM_info.script.version
         const v = [ version, latest ].map(s => {
             const [ nu, ex ] = s.split(" ")
@@ -864,6 +871,7 @@ mod.reg("keyboard-and-cli", "@/*", () => {
     height: 40px;
 
     background-color: white;
+    box-shadow: 0 0 7px dodgerblue;
 }
 
 #exlg-cli-input {
