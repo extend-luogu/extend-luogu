@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.3
+// @version        4.4
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -18,7 +18,7 @@
 // ==Utilities==
 
 const uindow = unsafeWindow
-const $ = jQuery; uindow.$$ = $
+const $ = jQuery
 const mdp = uindow.markdownPalettes
 const log = (...s) => uindow.console.log("%c[exlg]", "color: #0e90d2;", ...s)
 const warn = (...s) => uindow.console.warn("%c[exlg]", "color: #0e90d2;", ...s)
@@ -29,6 +29,11 @@ const error = (...s) => {
 error.check_fe = fe => {
     if (fe.code !== 200) error(`Requesting failure code: ${ fe.code }.`)
 }
+const xss = new filterXSS.FilterXSS({
+    onTagAttr: (t, k, v, w) => {
+        if (k === "style") return `${k}="${v}"`
+    }
+})
 
 Date.prototype.format = function (f, UTC) {
     UTC = UTC ? "UTC" : ""
@@ -52,32 +57,77 @@ Date.prototype.format = function (f, UTC) {
 
 const mod = {
     _: [],
-    _user_tab: (func, tab) => {
-        const $tabs = $(".items")
-        const work = () => {
-            if ((location.hash || "#main") !== "#" + tab) return
-            $tabs.off("click", work)
-            func()
-        }
-        $tabs.on("click", work)
-        work()
-    },
+
     reg: (name, path, func, styl) => mod._.push({
         name, path: Array.isArray(path) ? path : [ path ], func, styl
     }),
-    reg_user_tab: (name, tab, vars, func, styl) => mod._.push({
-        name, path: [ "@/user/*" ],
-        func: () => mod._user_tab(() => {
-            log(`Working user tab#${tab} mod: "${name}"`)
-            func(vars?.())
-        }, tab),
-        styl
-    }),
+    reg_main: (name, path, func, styl) =>
+        mod.reg("@" + name, path, () => (func(), false), styl),
+    reg_user_tab: (name, tab, vars, func, styl) =>
+        // FIXME: this seems not to work when the tab loads slowly.
+        mod.reg(
+            name, [ "@/user/*" ],
+            () => {
+                const $tabs = $(".items")
+                const work = () => {
+                    if ((location.hash || "#main") !== "#" + tab) return
+                    log(`Working user tab#${tab} mod: "${name}"`)
+                    $tabs.off("click", work)
+                    func(typeof vars === "function" ? vars() : vars)
+                }
+                $tabs.on("click", work)
+                work()
+            }, styl
+        ),
+    reg_chore: (name, period, path, func, styl) => {
+        if (typeof period === "string") {
+            const num = + period.slice(0, -1), unit = {
+                s: 1000,
+                m: 1000 * 60,
+                h: 1000 * 60 * 60,
+                D: 1000 * 60 * 60 * 24
+            }[ period.slice(-1) ]
+            if (! isNaN(num) && unit) period = num * unit
+            else error(`Parsing period failed: "${period}"`)
+        }
+        mod.reg(
+            "^" + name, path, named => {
+                const rec = GM_getValue("mod-chore-rec") ?? {}
+                const last = rec[name], now = Date.now()
+
+                let nostyl = true
+                if (named || ! last || now - last > period) {
+                    func()
+                    if (nostyl) {
+                        GM_addStyle(styl)
+                        nostyl = false
+                    }
+                    rec[name] = Date.now()
+                    GM_setValue("mod-chore-rec", rec)
+                }
+                else log(`Pending chore: "${name}"`)
+            }
+        )
+    },
+
     find: name => mod._.find(m => m.name === name),
     find_i: name => mod._.findIndex(m => m.name === name),
+
     disable: name => { mod.find(name).on = false },
     enable: name => { mod.find(name).on = true },
-    execute: () => {
+
+    execute: name => {
+        const exe = (m, named) => {
+            if (! m) error(`Executing named mod but not found: "${name}"`)
+            if (m.styl) GM_addStyle(m.styl)
+            log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
+            return m.func(named)
+        }
+        if (name) {
+            const m = mod.find(name)
+            return exe(m, true)
+        }
+
         mod.map = GM_getValue("mod-map")
         const map_init = mod.map ? false : (mod.map = {})
         for (const m of mod._)
@@ -91,19 +141,15 @@ const mod = {
             ) && (
                 p.endsWith("*") && pn.startsWith(pr.slice(0, -1)) ||
                 pn === pr
-            ))) {
-                if (m.styl) GM_addStyle(m.styl)
-                m.func()
-                log(`Executing mod: "${m.name}"`)
-                if (m.name[0] === "@") break
-            }
+            )))
+                if (exe(m) === false) return
         }
 
         if (map_init) GM_setValue("mod-map", mod.map)
     }
 }
 
-mod.reg("@springboard", "@/robots.txt", () => {
+mod.reg_main("springboard", "@/robots.txt", () => {
     const q = new URLSearchParams(location.search)
     if (q.has("benben")) {
         document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
@@ -126,7 +172,7 @@ iframe::-webkit-scrollbar {
 }
 `)
 
-mod.reg("@benben-data", "@tcs/release/APIGWHtmlDemo-1615602121", () => {
+mod.reg_main("benben-data", "@tcs/release/APIGWHtmlDemo-1615602121", () => {
     const data = JSON.parse(document.body.innerText)
     uindow.parent.postMessage(data, "*")
 })
@@ -136,18 +182,20 @@ mod.reg("dash", "@/*", () => {
     const $win = $(`
 <span id="exlg-dash-window">
     <p>
-        <b>版本</b>
-        <a href="https://github.com/optimize-2/extend-luogu">GitHub</a>
-        <a href="https://cdn.jsdelivr.net/gh/optimize-2/extend-luogu@latest/extend-luogu.user.js">Jsdelivr</a> <br>
+        <b>版本</b> <a id="exlg-dash-version-update">检查更新</a> <br />
+        <a href="https://github.com/optimize-2/extend-luogu">GitHub</a> <br />
+        <a href="https://cdn.jsdelivr.net/gh/optimize-2/extend-luogu@latest/extend-luogu.user.js">JsDelivr</a>
+        <i class="exlg-icon exlg-info" name="一键更新"></i>
+        <br />
         <span id="exlg-dash-verison">${ GM_info.script.version }</span>
     </p>
-    <p><b>模块管理</b> <a id="exlg-dash-mods-save">保存刷新</a>
+    <p><b>模块管理</b> <a id="exlg-dash-mods-save">保存</a>
     <ul id="exlg-dash-mods"></ul></p>
 </span>
     `)
         .appendTo($dash)
         .on("click", e => e.stopPropagation())
-    $(`<sup class="exlg-warn">!</sup>`).hide().appendTo($dash)
+    $(`<i class="exlg-icon exlg-warn"></i>`).hide().appendTo($dash)
 
     const $mods = $("#exlg-dash-mods")
     mod._.forEach(m => {
@@ -158,10 +206,8 @@ mod.reg("dash", "@/*", () => {
                 mod.map[ m.name ] = ! mod.map[ m.name ]
             })
     })
-    $("#exlg-dash-mods-save").on("click", () => {
-        GM_setValue("mod-map", mod.map)
-        location.reload()
-    })
+    $("#exlg-dash-mods-save").on("click", () => GM_setValue("mod-map", mod.map))
+    $("#exlg-dash-version-update").on("click", () => mod.execute("^update"))
 
     $dash.on("click", e => $win.toggle())
 }, `
@@ -199,55 +245,55 @@ mod.reg("dash", "@/*", () => {
     list-style: none;
     padding: 0;
 }
-#exlg-dash-mods > li > span {
-    
+
+#exlg-dash > .exlg-warn {
+    position: absolute;
+    top: -.5em;
+    right: -.5em;
 }
 
 /* global */
 
-.exlg-info::before {
-    content: "i";
-
+.exlg-icon::before {
     display: inline-block;
-    padding: 0 10px 0 8px;
+    width: 1.3em;
+    height: 1.3em;
+
     margin-left: 3px;
 
-    color: white;
-    background-color: deepskyblue;
-    font-style: italic;
-    font-weight: bold;
-
+    text-align: center;
     border-radius: 50%;
 }
-.exlg-info:hover::after {
+.exlg-icon:hover::after {
     display: inline-block;
 }
-.exlg-info::after {
+.exlg-icon::after {
     display: none;
     content: attr(name);
-    
+
     margin-left: 5px;
     padding: 0 3px;
 
     background-color: white;
     box-shadow: 0 0 7px deepskyblue;
-    
+
     border-radius: 7px;
 }
 
-.exlg-warn {
-    position: absolute;
-    right: -0.6em;
-    top: -0.6em;
+.exlg-icon.exlg-info::before {
+    content: "i";
 
-    display: inline-block;
-    padding: 0.8em 0.6em;
+    color: white;
+    background-color: deepskyblue;
+    font-style: italic;
+}
+
+.exlg-icon.exlg-warn::before {
+    content: "!";
 
     color: white;
     background-color: rgb(231, 76, 60);
-    font-size: .7em;
-    text-align: center;
-    border-radius: 50%;
+    font-style: normal;
 }
 `)
 
@@ -316,7 +362,7 @@ mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
 }
 `)
 
-mod.reg("update", "@/*", () => {
+mod.reg_chore("update", "1D", "@/*", () => {
     $.get("https://www.luogu.com.cn/team/33255?_contentOnly=true" /* exlg team */, res => {
         error.check_fe(res)
         const
@@ -326,14 +372,16 @@ mod.reg("update", "@/*", () => {
             const [ nu, ex ] = s.split(" ")
             return { nu: + nu, ex: ex ? [ "pre", "alpha", "beta" ].indexOf(ex) : -1 }
         })
-        let l = `Comparing version: ${version} -- ${latest}`, hint = ""
+        let l = `Comparing version: ${version} -- ${latest}`
         if (v[0].nu < v[1].nu || v[0].nu === v[1].nu && v[0].ex < v[1].ex) {
             l = l.replace("--", "!!")
-            hint = "<br> <i>点击 Jsdelivr 直接更新</i>"
             $("#exlg-dash > .exlg-warn").show()
         }
         log(l)
-        $("#exlg-dash-verison").html(l.split(": ")[1] + hint)
+        $("#exlg-dash-verison").html(l.split(": ")[1]
+            .replace("--", `<span style="color: #5eb95e;">--</span>`)
+            .replace("!!", `<span style="color: #e74c3c;">!!</span>`)
+        )
     })
 })
 
@@ -355,6 +403,7 @@ mod.reg_user_tab("user-intro-ins", "main", null, () => {
         case "blog":
             if ($blog.text().trim() !== "个人博客") return
             $blog.attr("href", arg)
+            $e.remove()
             break
         }
     })
@@ -405,7 +454,7 @@ mod.reg_user_tab("user-problem", "practice", () => ({
             }
         })
         $("#exlg-problem-count-1").html(`<span>${ ta.length } <> ${ my.length } : ${same}`
-            + `<i class="exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
+            + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     })
 }, `
 .main > .card > h3 {
@@ -657,7 +706,7 @@ mod.reg("keyboard-and-cli", "@/*", () => {
                 })
                 tar = pn.join("/")
             }
-            location.href = location.origin + tar
+            location.href = location.origin + "/" + tar.replace(/^\/+/, "")
         },
         cdd: (forum/*!string*/) => {
             /* jump to the forum named <forum> of discussion. use all the names you can think of. */
@@ -831,8 +880,11 @@ mod.reg("keyboard-and-cli", "@/*", () => {
 }
 `)
 
-$(mod.execute)
+$(() => mod.execute())
 log("Lauching")
 
-Object.assign(uindow, { exlg: { mod, marked, log, error } })
+Object.assign(uindow, {
+    exlg: { mod, marked, log, error },
+    $$: $, xss
+})
 
