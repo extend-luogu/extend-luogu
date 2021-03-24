@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.4.2
+// @version        4.5.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -26,9 +26,6 @@ const warn = (...s) => uindow.console.warn("%c[exlg]", "color: #0e90d2;", ...s)
 const error = (...s) => {
     uindow.console.error("%c[exlg]", "color: #0e90d2;", ...s)
     throw Error(s.join(" "))
-}
-error.check_fe = fe => {
-    if (fe.code !== 200) error(`Requesting failure code: ${ fe.code }.`)
 }
 const xss = new filterXSS.FilterXSS({
     onTagAttr: (t, k, v, w) => {
@@ -64,6 +61,13 @@ const version_cmp = (v1, v2) => {
     const [ m1, m2 ] = [ n1, n2 ].map(n => n.split("."))
     for (const [ k2, m ] of m1.entries())
         if (m !== m2[k2]) return op(+ m || 0, + m2[k2] || 0)
+}
+
+const lg_content = (url, cb) => {
+    $.get(url + (url.includes("?") ? "&" : "?") + "_contentOnly=1", res => {
+        if (res.code !== 200) error(`Requesting failure code: ${ res.code }.`)
+        cb(res)
+    })
 }
 
 // ==Modules==
@@ -382,9 +386,8 @@ mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
 }
 `)
 
-mod.reg_chore("update", "1D", "@/*", () => {
-    $.get("https://www.luogu.com.cn/team/33255?_contentOnly=true" /* exlg team */, res => {
-        error.check_fe(res)
+mod.reg_chore("update", "1D", "@/*", () =>
+    lg_content("/team/33255", res => {
         const
             latest = res.currentData.team.setting.description.match(/VER {(.*?)}/)?.[1],
             version = GM_info.script.version,
@@ -400,7 +403,7 @@ mod.reg_chore("update", "1D", "@/*", () => {
             .replace("<<", `<span style="color: #e74c3c;">&lt;&lt;</span>`)
         )
     })
-})
+)
 
 mod.reg_user_tab("user-intro-ins", "main", null, () => {
     $(".introduction > *").each((_, e, $e = $(e)) => {
@@ -458,8 +461,7 @@ mod.reg_user_tab("user-problem", "practice", () => ({
 
     if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
 
-    $.get(`/user/${ uindow._feInjection.currentUser.uid }?_contentOnly=true`, res => {
-        error.check_fe(res)
+    lg_content(`/user/${ uindow._feInjection.currentUser.uid }`, res => {
         const my = res.currentData.passedProblems
         const ta = uindow._feInjection.currentData.passedProblems
 
@@ -595,8 +597,10 @@ mod.reg("benben", "@/", () => {
     })
 })
 
-mod.reg("rand-problem-by-diffculty", "@/", () => {
-    $($(".lg-index-stat")[0]).append(`
+
+mod.reg("rand-problem", "@/", () => {
+    const $rand_problem = $($(".lg-index-stat")[0])
+    $rand_problem.append(`
 <h2>按难度随机跳题</h2>
 <select class="am-form-field" name="rand-problem-rating" autocomplete="off" placeholder="选择难度">
     <option value="0">暂无评定</option>
@@ -607,29 +611,26 @@ mod.reg("rand-problem-by-diffculty", "@/", () => {
     <option selected value="5">提高+/省选-</option>
     <option value="6">省选/NOI-</option>
     <option value="7">NOI/NOI+/CTSC</option>
-</select>
+</select> <br />
 <select class="am-form-field" name="rand-problem-source" autocomplete="off" placeholder="选择来源">
     <option selected value="P">洛谷题库</option>
     <option value="CF">CodeForces</option>
     <option value="SP">SPOJ</option>
     <option value="AT">AtCoder</option>
     <option value="UVA">UVa</option>
-</select>
-<br />
-<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem">跳转</button>
+</select> <br />
+<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1">跳转</button>
     `)
-    $("#rand-problem").click(() => {
-        const rating = $("[name=rand-problem-rating]").val(), source = $("[name=rand-problem-source]").val()
-        $.get(`/problem/list?difficulty=${rating}&type=${source}&page=1&_contentOnly=1`,
+    $("#rand-problem-1").on("click", () => {
+        const rating = $("[name=rand-problem-1]").val(), source = $("[name=rand-problem-source]").val()
+        lg_content(`/problem/list?difficulty=${rating}&type=${source}&page=1`,
             res => {
-                error.check_fe(res)
                 const
                     problem_count = res.currentData.problems.count,
                     page_count = Math.ceil(problem_count / 50),
                     rand_page = Math.floor(Math.random() * page_count) + 1
-                $.get(`/problem/list?difficulty=${rating}&type=${source}&page=${rand_page}&_contentOnly=1`,
+                lg_content(`/problem/list?difficulty=${rating}&type=${source}&page=${rand_page}`,
                     res => {
-                        error.check_fe(res)
                         const
                             list = res.currentData.problems.result,
                             rand_idx = Math.floor(Math.random() * list.length),
@@ -637,6 +638,26 @@ mod.reg("rand-problem-by-diffculty", "@/", () => {
                         location.href = `/problem/${pid}`
                     }
                 )
+            }
+        )
+    })
+
+    $rand_problem.append(`
+<h2>按题单随机跳题</h2>
+<div class="am-input-group am-input-group-primary am-input-group-sm">
+    <input type="text" class="am-form-field" name="rand-problem-2" />
+</div> <br/>
+<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2">跳转</button>
+    `)
+    $("#rand-problem-2").on("click", () => {
+        const id = $("[name=rand-problem-2]").val()
+        lg_content(`/training/${id}`,
+            res => {
+                const
+                    list = res.currentData.training.problems,
+                    rand_idx = Math.floor(Math.random() * list.length),
+                    pid = list[rand_idx].problem.pid
+                location.href = `/problem/${pid}`
             }
         )
     })
@@ -927,6 +948,6 @@ $(() => mod.execute())
 log("Lauching")
 
 Object.assign(uindow, {
-    exlg: { mod, marked, log, error },
-    $$: $, xss, version_cmp
+    exlg: { mod, marked, log, error, version_cmp, lg_content },
+    $$: $, xss
 })
