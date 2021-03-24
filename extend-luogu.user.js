@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.4
+// @version        4.4.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -51,6 +51,18 @@ Date.prototype.format = function (f, UTC) {
             ("000" + re[r]).substr(re[r].toString().length + 3 - RegExp.$1.length)
         )
     return f
+}
+
+const version_cmp = (v1, v2) => {
+    const op = (x1, x2) => x1 === x2 ? "==" : x1 < x2 ? "<<" : ">>"
+    const exs = [ "pre", "alpha", "beta" ]
+
+    const [ [ n1, e1 ], [ n2, e2 ] ] = [ v1, v2 ].map(v => v.split(" "))
+    if (n1 === n2) return op(...[ e1, e2 ].map(e => e ? exs.findIndex(ex => ex === e) : Infinity))
+
+    const [ m1, m2 ] = [ n1, n2 ].map(n => n.split("."))
+    for (const [ k2, m ] of m1.entries())
+        if (m !== m2[k2]) return op(+ m || 0, + m2[k2] || 0)
 }
 
 // ==Modules==
@@ -374,20 +386,17 @@ mod.reg_chore("update", "1D", "@/*", () => {
         error.check_fe(res)
         const
             latest = res.currentData.team.setting.description.match(/VER {(.*?)}/)?.[1],
-            version = GM_info.script.version
-        const v = [ version, latest ].map(s => {
-            const [ nu, ex ] = s.split(" ")
-            return { nu: + nu, ex: ex ? [ "pre", "alpha", "beta" ].indexOf(ex) : -1 }
-        })
-        let l = `Comparing version: ${version} -- ${latest}`
-        if (v[0].nu < v[1].nu || v[0].nu === v[1].nu && v[0].ex < v[1].ex) {
-            l = l.replace("--", "!!")
-            $("#exlg-dash > .exlg-warn").show()
-        }
+            version = GM_info.script.version,
+            op = version_cmp(version, latest)
+
+        const l = `Comparing version: ${version} ${op} ${latest}`
         log(l)
+
+        if (op === "<<") $("#exlg-dash > .exlg-warn").show()
         $("#exlg-dash-verison").html(l.split(": ")[1]
-            .replace("--", `<span style="color: #5eb95e;">--</span>`)
-            .replace("!!", `<span style="color: #e74c3c;">!!</span>`)
+            .replace(">>", `<span style="color: #5eb95e;">&gt;&gt;</span>`)
+            .replace("==", `<span style="color: #5eb95e;">==</span>`)
+            .replace("<<", `<span style="color: #e74c3c;">&lt;&lt;</span>`)
         )
     })
 })
@@ -893,6 +902,6 @@ log("Lauching")
 
 Object.assign(uindow, {
     exlg: { mod, marked, log, error },
-    $$: $, xss
+    $$: $, xss, version_cmp
 })
 
