@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.5.2
+// @version        4.6.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -976,6 +976,38 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
 
 #exlg-cli-input.error {
     background-color: indianred;
+}
+`)
+
+mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
+    const $cb = $("pre:has(> code)")
+    if ($cb.length) log(`Scanning code block:`, $cb.length)
+
+    $cb.each((i, e, $e = $(e)) => {
+        $(`<div class="exlg-copy">点我复制</div>`)
+            .on("click", () => {
+                const $textarea = $("<textarea></textarea>")
+                    .hide().appendTo($("body"))
+                    .text($e.text().slice(0, -1))
+                    .select()
+                document.execCommand("copy")
+                $textarea.remove()
+            })
+            .appendTo($cb[i])
+    })
+}, `
+.exlg-copy {
+    position: relative;
+    display: inline-block;
+
+    padding: 1px 10px 3px;
+
+    background-color: cornflowerblue;
+    color: white;
+    border-radius: 6px;
+}
+.exlg-copy:hover {
+    box-shadow: 0 0 7px dodgerblue;
 }
 `)
 
