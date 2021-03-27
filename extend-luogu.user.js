@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.6.1
+// @version        4.6.2
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -89,7 +89,6 @@ const mod = {
                 const work = () => {
                     if ((location.hash || "#main") !== "#" + tab) return
                     log(`Working user tab#${tab} mod: "${name}"`)
-                    $tabs.off("click", work)
                     func(typeof vars === "function" ? vars() : vars)
                 }
                 $tabs.on("click", work)
@@ -485,12 +484,14 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
         "rgb(14, 29, 105)"
     ]
 }), ({ color }) => {
+    $(".exlg-counter").remove()
+    debugger
     $(".problems").each((i, ps, $ps = $(ps)) => {
         const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
         $ps.find("a").each((d, p, $p = $(p)) =>
             $p.removeClass("color-default").css("color", color[ my[d].difficulty ])
         )
-        $ps.before($(`<span id="exlg-problem-count-${i}">${ my.length }</span>`))
+        $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter">${ my.length }</span>`))
     })
 
     if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
@@ -508,7 +509,7 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
                 $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
             }
         })
-        $("#exlg-problem-count-1").html(`<span>${ ta.length } <> ${ my.length } : ${same}`
+        $("#exlg-problem-count-1").html(`<span class="exlg-counter">${ ta.length } <> ${ my.length } : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     })
 }, `
@@ -988,9 +989,9 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
         $(`<div class="exlg-copy">点我复制</div>`)
             .on("click", () => {
                 const $textarea = $("<textarea></textarea>")
-                    .hide().appendTo($("body"))
-                    .text($e.text().slice(0, -1))
-                    .select()
+                      .appendTo($("body"))
+                      .text($e.text().slice(0, -4))
+                      .select()
                 document.execCommand("copy")
                 $textarea.remove()
             })
