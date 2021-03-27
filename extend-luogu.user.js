@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.6.0
+// @version        4.6.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -215,7 +215,8 @@ mod.reg("dash", "控制面板", "@/*", () => {
 <span id="exlg-dash-window">
     <p>
         <b>版本</b> <a id="exlg-dash-version-update">检查更新</a> <br />
-        <a href="https://github.com/optimize-2/extend-luogu">GitHub</a> <br />
+        <a href="https://github.com/optimize-2/extend-luogu">GitHub</a> |
+        <a href="https://github.com/optimize-2/extend-luogu/raw/main/extend-luogu.user.js">Raw</a> <br />
         <a href="https://cdn.jsdelivr.net/gh/optimize-2/extend-luogu@latest/extend-luogu.user.js">JsDelivr</a>
         <i class="exlg-icon exlg-info" name="一键更新"></i>
         <br />
