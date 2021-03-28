@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.4.1
+// @version        4.4.2
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -588,14 +588,14 @@ mod.reg("benben", "@/", () => {
                 .appendTo($("ul#feed"))
                 .find("a[name=feed-reply]").on("click", () =>
                     $("textarea")
-                        .trigger("focus").val(` || @${ m.user.name }: ${ m.content }`)
+                        .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
                         .trigger("input")
                 )
         )
     })
 })
 
-mod.reg("rand-problem", "@/", () => {
+mod.reg("rand-problem-by-diffculty", "@/", () => {
     $($(".lg-index-stat")[0]).append(`
 <h2>按难度随机跳题</h2>
 <select class="am-form-field" name="rand-problem-rating" autocomplete="off" placeholder="选择难度">
@@ -637,6 +637,30 @@ mod.reg("rand-problem", "@/", () => {
                         location.href = `/problem/${pid}`
                     }
                 )
+            }
+        )
+    })
+}, `
+.am-u-md-3 > .lg-index-stat {
+    overflow-y: scroll !important;
+}
+`)
+
+mod.reg("rand-problem-by-list", "@/", () => {
+    $($(".lg-index-stat")[0]).append(`
+<h2>按题单随机跳题</h2>
+<div><input class="exlg-jump2" style="padding: .2em .5em;width: 100%;box-sizing: border-box;border: 1px solid #ccc;border-radius: 5px;background: rgba(255, 255, 255, .3);outline: 0;"></input></div>&nbsp;
+<div><button class="am-btn am-btn-sm am-btn-primary" id="rand-problem2">跳转<tton></div>
+    `)
+    $("#rand-problem2").click(() => {
+        const id = $("input.exlg-jump2")[0].value
+        $.get(`/training/${id}?_contentOnly=1`,
+            res => {
+                error.check_fe(res)
+                const list = res.currentData.trainging.problems,
+                      rand_idx = Math_floor(Math.random() * list.length),
+                      pid = list[rand_idx]['problem']['pid']
+                location.href = `https://www.luogu.com.cm/problem/${pid}`
             }
         )
     })
@@ -906,4 +930,3 @@ Object.assign(uindow, {
     exlg: { mod, marked, log, error },
     $$: $, xss, version_cmp
 })
-
