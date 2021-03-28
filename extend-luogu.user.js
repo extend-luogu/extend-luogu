@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.5.1
+// @version        4.5.2
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET
 // @match          https://*.luogu.com.cn/*
@@ -75,15 +75,15 @@ const lg_content = (url, cb) => {
 const mod = {
     _: [],
 
-    reg: (name, path, func, styl) => mod._.push({
-        name, path: Array.isArray(path) ? path : [ path ], func, styl
+    reg: (name, info, path, func, styl) => mod._.push({
+        name, info, path: Array.isArray(path) ? path : [ path ], func, styl
     }),
-    reg_main: (name, path, func, styl) =>
-        mod.reg("@" + name, path, () => (func(), false), styl),
-    reg_user_tab: (name, tab, vars, func, styl) =>
+    reg_main: (name, info, path, func, styl) =>
+        mod.reg("@" + name, info, path, () => (func(), false), styl),
+    reg_user_tab: (name, info, tab, vars, func, styl) =>
         // FIXME: this seems not to work when the tab loads slowly.
         mod.reg(
-            name, [ "@/user/*" ],
+            name, info, [ "@/user/*" ],
             () => {
                 const $tabs = $(".items")
                 const work = () => {
@@ -96,7 +96,7 @@ const mod = {
                 work()
             }, styl
         ),
-    reg_chore: (name, period, path, func, styl) => {
+    reg_chore: (name, info, period, path, func, styl) => {
         if (typeof period === "string") {
             const num = + period.slice(0, -1), unit = {
                 s: 1000,
@@ -108,7 +108,7 @@ const mod = {
             else error(`Parsing period failed: "${period}"`)
         }
         mod.reg(
-            "^" + name, path, named => {
+            "^" + name, info, path, named => {
                 const rec = GM_getValue("mod-chore-rec") ?? {}
                 const last = rec[name], now = Date.now()
 
@@ -167,15 +167,21 @@ const mod = {
     }
 }
 
-mod.reg_main("springboard", "@/robots.txt", () => {
+mod.reg_main("springboard", "跨域跳板", "@/robots.txt", () => {
     const q = new URLSearchParams(location.search)
     if (q.has("benben")) {
         document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
-        uindow.addEventListener("message", e => {e.data.unshift("benben"); uindow.parent.postMessage(e.data, "*")})
+        uindow.addEventListener("message", e => {
+            e.data.unshift("benben")
+            uindow.parent.postMessage(e.data, "*")
+        })
     }
     else if (q.has("update")) {
         document.write(`<iframe src="https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version"></iframe>`)
-        uindow.addEventListener("message", e => {e.data.unshift("update"); uindow.parent.postMessage(e.data, "*")})
+        uindow.addEventListener("message", e => {
+            e.data.unshift("update")
+            uindow.parent.postMessage(e.data, "*")
+        })
     }
     else if (q.has("url")) {
         const url = q.get("url")
@@ -194,17 +200,15 @@ iframe::-webkit-scrollbar {
 }
 `)
 
-mod.reg_main("benben-data", "@tcs1/release/APIGWHtmlDemo-1615602121", () => {
-    const data = JSON.parse(document.body.innerText)
-    uindow.parent.postMessage(data, "*")
-})
+mod.reg_main("benben-data", "犇犇数据", "@tcs1/release/APIGWHtmlDemo-1615602121", () =>
+    uindow.parent.postMessage(JSON.parse(document.body.innerText), "*")
+)
 
-mod.reg_main("version-data", "@tcs2/release/exlg-version", () => {
-    const data = [document.body.innerText]
-    uindow.parent.postMessage(data, "*")
-})
+mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-version", () =>
+    uindow.parent.postMessage([ document.body.innerText ], "*")
+)
 
-mod.reg("dash", "@/*", () => {
+mod.reg("dash", "控制面板", "@/*", () => {
     const $dash = $(`<div id="exlg-dash">exlg</div>`).prependTo($("nav.user-nav, div.user-nav > nav"))
     const $win = $(`
 <span id="exlg-dash-window">
@@ -233,7 +237,14 @@ mod.reg("dash", "@/*", () => {
 
     const $mods = $("#exlg-dash-mods")
     mod._.forEach(m => {
-        const $m = $(`<li><input type="checkbox" /></span> ${ m.name }</li>`).appendTo($mods)
+        const $m = $(`
+<li>
+    <input type="checkbox" />
+    ${ m.name } <br/>
+    <i>${ m.info }</i>
+</li>
+        `)
+            .appendTo($mods)
         $m.children("input")
             .prop("checked", m.on).prop("disabled", m.name === "dash")
             .on("change", () => {
@@ -263,7 +274,9 @@ mod.reg("dash", "@/*", () => {
     top: 35px;
     left: 0px;
     z-index: 65536;
+
     display: none;
+    overflow-y: scroll;
 
     width: 200px;
     height: 600px;
@@ -331,7 +344,7 @@ mod.reg("dash", "@/*", () => {
 }
 `)
 
-mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
+mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
     const emo = [
         [ "62224", [ "qq" ] ],
         [ "62225", [ "cy" ] ],
@@ -396,10 +409,38 @@ mod.reg("emoticon", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
 }
 `)
 
-mod.reg_chore("update", "1D", "@/*", () => {
+mod.reg_chore("update", "脚本升级", "1D", "@/*", () => {
+    let loaded = false
+    if (loaded) $("#exlg-benben").attr("src", $("#exlg-benben").attr("src"))
+    else {
+        const $sb = $(`<iframe id="exlg-update" src="https://www.luogu.com.cn/robots.txt?update"></iframe>`)
+            .appendTo($("body")).hide()
+        log("Building springboard:", $sb[0])
+        loaded = true
+    }
+    uindow.addEventListener("message", e => {
+        log("Listening message:", e.data)
+        if (e.data[0] !== "update") return
+        e.data.shift()
+
+        const
+            latest = e.data[0],
+            version = GM_info.script.version,
+            op = version_cmp(version, latest)
+
+        const l = `Comparing version: ${version} ${op} ${latest}`
+        log(l)
+
+        if (op === "<<") $("#exlg-dash > .exlg-warn").show()
+        $("#exlg-dash-verison").html(l.split(": ")[1]
+            .replace(">>", `<span style="color: #5eb95e;">&gt;&gt;</span>`)
+            .replace("==", `<span style="color: #5eb95e;">==</span>`)
+            .replace("<<", `<span style="color: #e74c3c;">&lt;&lt;</span>`)
+        )
+    })
 })
 
-mod.reg_user_tab("user-intro-ins", "main", null, () => {
+mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, () => {
     $(".introduction > *").each((_, e, $e = $(e)) => {
         const t = $e.text()
         let [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
@@ -431,7 +472,7 @@ iframe::-webkit-scrollbar {
 }
 `)
 
-mod.reg_user_tab("user-problem", "practice", () => ({
+mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
     color: [
         "rgb(191, 191, 191)",
         "rgb(254, 76, 97)",
@@ -475,8 +516,8 @@ mod.reg_user_tab("user-problem", "practice", () => ({
 }
 `)
 
-mod.reg("user-css-load", "@/*", () => {}, GM_getValue("user-css"))
-mod.reg("user-css-edit", "@/theme/list", () => {
+mod.reg("user-css-load", "加载用户样式", "@/*", () => {}, GM_getValue("user-css"))
+mod.reg("user-css-edit", "编辑用户样式", "@/theme/list", () => {
     const $ps = $(`
 <div id="exlg-user-css">
     <h2>自定义 CSS <a>保存刷新</a></h2>
@@ -509,7 +550,7 @@ mod.reg("user-css-edit", "@/theme/list", () => {
 }
 `)
 
-mod.reg("benben", "@/", () => {
+mod.reg("benben", "全网犇犇", "@/", () => {
     const color = {
         Gray: "gray",
         Blue: "bluelight",
@@ -592,8 +633,7 @@ mod.reg("benben", "@/", () => {
     })
 })
 
-
-mod.reg("rand-problem", "@/", () => {
+mod.reg("rand-problem", "随机跳题ex", "@/", () => {
     const $rand_problem = $($(".lg-index-stat")[0])
     $rand_problem.append(`
 <h2>按难度随机跳题</h2>
@@ -686,7 +726,7 @@ mod.reg("rand-problem-by-list", "@/", () => {
 }
 `)
 
-mod.reg("keyboard-and-cli", "@/*", () => {
+mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
     const $cli = $(`<div id="exlg-cli"></div>`).appendTo($("body"))
     const $cli_input = $(`<input id="exlg-cli-input" />`).appendTo($cli)
 
