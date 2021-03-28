@@ -6,11 +6,13 @@ Make [Luogu](https://www.luogu.com.cn/) more powerful.
 
 [Chinese Guide](https://www.luogu.com.cn/paste/fnln7ze9)
 
-Copy `extend-luogu.user.js` into Tampermonkey's `Create a new script` page, and save it.
+1. (recommended) Visit [GitHub Raw](https://github.com/optimize-2/extend-luogu/raw/main/extend-luogu.user.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/).
 
-_Make sure to copy the code **completely**._
+2. Copy `extend-luogu.user.js` into Tampermonkey's `Create a new script` page, and save it.
 
-You will be automatically notified when there's a update.
+  _Make sure to copy the code **completely**._
+
+3. You will be automatically notified when there's a update. (since `VER 4.4`)
 
 ## Contribution
 
@@ -22,4 +24,5 @@ Welcome!
 ## Discussion
 
 - QQ Group: `817265691`
+- Discord Discussion: [click to join](https://discord.gg/mHsx9crXjv)
 
