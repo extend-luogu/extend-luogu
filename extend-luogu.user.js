@@ -3,7 +3,7 @@
 // @namespace      http://tampermonkey.net/
 // @version        5.0.0
 // @description    Make Luogu more powerful.
-// @author         optimize_2 ForkKILLET minstdfx
+// @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
