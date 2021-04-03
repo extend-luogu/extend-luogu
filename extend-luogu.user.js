@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.6.4
+// @version        5.0.0
 // @description    Make Luogu more powerful.
-// @author         optimize_2 ForkKILLET
+// @author         optimize_2 ForkKILLET minstdfx
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
-// @require        https://cdnjs.cloudflare.com/ajax/libs/js-xss/0.3.3/xss.min.js
-// @require        https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.1/marked.min.js
+// @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
+// @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
 // @grant          GM_addStyle
 // @grant          GM_getValue
 // @grant          GM_setValue
@@ -29,7 +29,7 @@ const error = (...s) => {
     throw Error(s.join(" "))
 }
 const xss = new filterXSS.FilterXSS({
-    onTagAttr: (t, k, v, w) => {
+    onTagAttr: (_, k, v, __) => {
         if (k === "style") return `${k}="${v}"`
     }
 })
@@ -70,6 +70,8 @@ const lg_content = (url, cb) => {
         cb(res)
     })
 }
+
+const lg_alert = msg => uindow.show_alert("exlg 提醒您", msg)
 
 // ==Modules==
 
@@ -126,7 +128,6 @@ const mod = {
             }
         )
     },
-
     find: name => mod._.find(m => m.name === name),
     find_i: name => mod._.findIndex(m => m.name === name),
 
@@ -165,6 +166,72 @@ const mod = {
 
         if (map_init) GM_setValue("mod-map", mod.map)
     }
+}
+
+const card = {
+    $put: (k, $e, that, n) => k
+        ? $e.insertAfter(that[n](k).$)
+        : $e.appendTo(that.$),
+    $: $(".lg-index-content"),
+    $row: $r => ({
+        $: $r,
+        after() {
+            return card.$row($(`<div class="am-g"></div>`).insertAfter(this.$))
+        },
+        before() {
+            return card.$row($(`<div class="am-g"></div>`).insertBefore(this.$))
+        },
+        cols() {
+            const cols = []
+            this.$.children().each((_, e, col = card.$col($(e))) => cols.push(col))
+            return cols
+        },
+        insert(k, w = 3, $c = undefined) {
+            if (w === "auto")
+                w = 12 - this.cols().reduce((a, v) => a + v, 0)
+            return card.$col(
+                card.$put(k, $c ?? $(`
+<div>
+    <div class="lg-article lg-index-stat"></div>
+</div>
+`),
+                this, "col")
+            ).width(w)
+        },
+        col(k) {
+            return card.$col(this.$.children(`div:nth-child(${k})`))
+        }
+    }),
+    row: k => card.$row(card.$.children(`.am-g:nth-child(${k})`)),
+    rows: () => {
+        const rows = []
+        card.$.children().each((_, e, row = card.row($(e))) => row.push(row))
+        return rows
+    },
+    insert(k) {
+        return card.$row(
+            card.$put(k, $(`<div class="am-g"></div>`), this, "row")
+        )
+    },
+
+    $col: $c => ({
+        $: $c,
+        $$: $c.children(),
+        width(w) {
+            switch (w) {
+            case undefined:
+                return + this.$.attr("class")?.match(/am-u-md-(\d+)/)?.[1] ?? 0
+            case "keep":
+                return this
+            default:
+                this.$.removeClass("am-u-md-" + this.width()).addClass("am-u-md-" + w)
+                return this
+            }
+        },
+        move(row, k) {
+            return row.insert(k, "keep", this.$)
+        }
+    })
 }
 
 mod.reg_main("springboard", "跨域跳板", "@/robots.txt", () => {
@@ -255,7 +322,7 @@ mod.reg("dash", "控制面板", "@/*", () => {
     $("#exlg-dash-mods-save").on("click", () => GM_setValue("mod-map", mod.map))
     $("#exlg-dash-version-update").on("click", () => mod.execute("^update"))
 
-    $dash.on("click", e => $win.toggle())
+    $dash.on("click", _ => $win.toggle())
 }, `
 /* dash */
 
@@ -488,7 +555,6 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
     ]
 }), ({ color }) => {
     $(".exlg-counter").remove()
-    debugger
     $(".problems").each((i, ps, $ps = $(ps)) => {
         const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
         $ps.find("a").each((d, p, $p = $(p)) =>
@@ -617,7 +683,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
                     ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
                 </span>
                 ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
-                <a name="feed-reply" onclick="">回复</a>
+                <a name="feed-reply">回复</a>
             </div>
         </header>
         <div class="am-comment-bd">
@@ -637,9 +703,12 @@ mod.reg("benben", "全网犇犇", "@/", () => {
     })
 })
 
-mod.reg("rand-problem", "随机跳题ex", "@/", () => {
-    const $rand_problem = $($(".lg-index-stat")[0])
-    $rand_problem.append(`
+mod.reg("rand-problem-ex", "随机跳题ex", "@/", () => {
+    card.insert(1)
+    card.row(3).col(1).move(card.row(2), 0)
+    card.row(3).col(1).width(12)
+
+    card.row(2).insert(1).$$.append(`
 <h2>按难度随机跳题</h2>
 <select class="am-form-field" name="rand-problem-rating" autocomplete="off" placeholder="选择难度">
     <option value="0">暂无评定</option>
@@ -650,16 +719,17 @@ mod.reg("rand-problem", "随机跳题ex", "@/", () => {
     <option selected value="5">提高+/省选-</option>
     <option value="6">省选/NOI-</option>
     <option value="7">NOI/NOI+/CTSC</option>
-</select> <br />
+</select>
 <select class="am-form-field" name="rand-problem-source" autocomplete="off" placeholder="选择来源">
     <option selected value="P">洛谷题库</option>
     <option value="CF">CodeForces</option>
     <option value="SP">SPOJ</option>
     <option value="AT">AtCoder</option>
     <option value="UVA">UVa</option>
-</select> <br />
+</select>
 <button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1">跳转</button>
     `)
+
     $("#rand-problem-1").on("click", () => {
         const rating = $("[name=rand-problem-1]").val(), source = $("[name=rand-problem-source]").val()
         lg_content(`/problem/list?difficulty=${rating}&type=${source}&page=1`,
@@ -681,11 +751,11 @@ mod.reg("rand-problem", "随机跳题ex", "@/", () => {
         )
     })
 
-    $rand_problem.append(`
+    card.row(2).insert(2).width(5).$$.append(`
 <h2>按题单随机跳题</h2>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
     <input type="text" class="am-form-field" name="rand-problem-2" />
-</div> <br/>
+</div>
 <button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2">跳转</button>
     `)
     $("#rand-problem-2").on("click", () => {
@@ -701,8 +771,8 @@ mod.reg("rand-problem", "随机跳题ex", "@/", () => {
         )
     })
 }, `
-.am-u-md-3 > .lg-index-stat {
-    overflow-y: scroll !important;
+#rand-problem-1, #rand-problem-2 {
+    margin-top: 5px;
 }
 `)
 
@@ -993,10 +1063,34 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
 }
 `)
 
+mod.reg("search-user", "查找用户名", "@/", () => {
+    card.insert(2).insert(0).$$.append(`
+<h2>查找用户</h2>
+<div class="am-input-group am-input-group-primary am-input-group-sm">
+	<input type="text" class="am-form-field" placeholder="用户名" name="username">
+</div>
+<p>
+	<button class="am-btn am-btn-danger am-btn-sm" id="search-user">跳转</button>
+</p>
+`)
+    const $search_user = $("#search-user").on("click", () => {
+        $search_user.prop("disabled", true)
+        $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
+            if (! res.users[0]) {
+                $search_user.prop("disabled", false)
+                lg_alert("无法找到指定用户")
+            }
+            else
+                location.href = "/user/" + res.users[0].uid
+        })
+    })
+})
+
 $(() => mod.execute())
 log("Lauching")
 
 Object.assign(uindow, {
-    exlg: { mod, marked, log, error, version_cmp, lg_content },
-    $$: $, xss
+    exlg: { mod, card, marked, log, error },
+    $$: $, xss, version_cmp
 })
+

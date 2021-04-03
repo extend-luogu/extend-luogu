@@ -34,7 +34,8 @@ module.exports = {
     "spaced-comment": 0,
     "no-multi-spaces": 0,
     "key-spacing": 0,
-    "no-sequences": 0
+    "no-sequences": 0,
+    "space-before-function-paren": 0
   },
   globals: {
     unsafeWindow: true,
