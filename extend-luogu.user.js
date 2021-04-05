@@ -819,6 +819,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
         "type":       [ "类型" ],
         "lost":       [ "缺失" ],
         "essential":  [ "必要" ],
+        "user":       [ "用户" ]
     }
     let cli_lang = GM_getValue("cli-lang") || 0
 
@@ -921,6 +922,21 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
             lang = cli_langs.indexOf(lang)
             if (lang < 0) return cli_error`lang: unknown language ${lang}`
             GM_setValue("cli-lang", cli_lang = lang)
+        },
+        uid: (uid/*!integer*/) => {
+            /* jumps to homepage of user whose uid is <uid>. */
+            /* 跳转至 uid 为 <uid> 的用户主页。 */
+            location.href = `/user/${uid}`
+        },
+        un: (name/*!string*/) => {
+            /* jumps to homepage of user whose username is like <name>. */
+            /* 跳转至用户名与 <name> 类似的用户主页。 */
+            $.get("/api/user/search?keyword=" + name, res => {
+                if (! res.users[0])
+                    cli_error`un: unknown user "${name}".`
+                else
+                    location.href = "/user/" + res.users[0].uid
+            })
         }
     }
     for (const f of Object.values(cmds)) {
@@ -1022,6 +1038,8 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
 
     border: none;
     outline: none;
+
+    font-family: "Fira Code", "consolas", "Courier New", monospace;
 }
 
 #exlg-cli-input.error {
@@ -1069,10 +1087,10 @@ mod.reg("search-user", "查找用户名", "@/", () => {
     card.insert(2).insert(0).$$.append(`
 <h2>查找用户</h2>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
-	<input type="text" class="am-form-field" placeholder="用户名" name="username">
+    <input type="text" class="am-form-field" placeholder="用户名" name="username">
 </div>
 <p>
-	<button class="am-btn am-btn-danger am-btn-sm" id="search-user">跳转</button>
+    <button class="am-btn am-btn-danger am-btn-sm" id="search-user">跳转</button>
 </p>
 `)
     const $search_user = $("#search-user").on("click", () => {
