@@ -1034,29 +1034,31 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
     if ($cb.length) log(`Scanning code block:`, $cb.length)
 
     $cb.each((i, e, $e = $(e)) => {
-        const btn = $(`<div class="exlg-copy">点我复制</div>`)
+        const btn = $(`<div class="exlg-copy">复制</div>`)
         btn.on("click", () => {
             const $textarea = $("<textarea></textarea>")
                 .appendTo($("body"))
                 .text($e.text().slice(0, -4))
                 .select()
             btn.text("已复制")
-            setTimeout(() => btn.text("点我复制"), 1000)
+            setTimeout(() => btn.text("复制"), 1000)
             document.execCommand("copy")
             $textarea.remove()
         })
-            .appendTo($cb[i])
+            .prependTo($cb[i])
     })
 }, `
 .exlg-copy {
     position: relative;
     display: inline-block;
 
-    padding: 1px 10px 3px;
+    padding: 1px 5px 1px;
 
     background-color: cornflowerblue;
     color: white;
     border-radius: 6px;
+    font-size:2px;
+    float:right
 }
 .exlg-copy:hover {
     box-shadow: 0 0 7px dodgerblue;
