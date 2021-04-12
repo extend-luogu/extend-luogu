@@ -1,7 +1,9 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true
+    es2021: true,
+    greasemonkey: true,
+    jquery: true
   },
   extends: [
     "standard"
@@ -38,12 +40,6 @@ module.exports = {
     "space-before-function-paren": 0
   },
   globals: {
-    unsafeWindow: true,
-    jQuery: true,
-    GM_info: true,
-    GM_addStyle: true,
-    GM_getValue: true,
-    GM_setValue: true,
     marked: true,
     filterXSS: true
   }
