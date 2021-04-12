@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.0.0
+// @version        5.1.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -289,7 +289,9 @@ mod.reg("dash", "控制面板", "@/*", () => {
         <span id="exlg-dash-verison">${ GM_info.script.version }</span>
     </p>
     <p>
-        <b>模块管理</b> <a id="exlg-dash-mods-save">保存</a>
+        <b>模块管理</b> <br />
+        <a id="exlg-dash-mods-save">保存</a>
+        <i class="exlg-icon exlg-info" name="刷新后生效"></i></span>
         <ul id="exlg-dash-mods"></ul>
     </p>
     <p>
