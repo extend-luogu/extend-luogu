@@ -460,7 +460,7 @@ mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, () => {
         let [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
         if (! ins) return
 
-        arg = arg.split(/(?<!!)%/g).map(s => s.replace(/!%/, "%"))
+        arg = arg.split(/(?<!!)%/g).map(s => s.replace(/!%/g, "%"))
         const $blog = $($(".user-action").children()[0])
         switch (ins) {
         case "html":
@@ -652,7 +652,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
 mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
     $board.html(`
 <h3>按难度随机跳题</h3>
-<select class="am-form-field" name="rand-problem-rating" autocomplete="off" placeholder="选择难度">
+<select class="am-form-field" name="difficulty" autocomplete="off" placeholder="选择难度">
     <option value="0">暂无评定</option>
     <option value="1">入门</option>
     <option value="2">普及-</option>
@@ -662,31 +662,31 @@ mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
     <option value="6">省选/NOI-</option>
     <option value="7">NOI/NOI+/CTSC</option>
 </select>
-<select class="am-form-field" name="rand-problem-source" autocomplete="off" placeholder="选择来源">
+<select class="am-form-field" name="source" autocomplete="off" placeholder="选择来源">
     <option selected value="P">洛谷题库</option>
     <option value="CF">CodeForces</option>
     <option value="SP">SPOJ</option>
     <option value="AT">AtCoder</option>
     <option value="UVA">UVa</option>
 </select>
-<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1" style="margin-top: 5px;">跳转</button>
+<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1">跳转</button>
 
 <h3>按题单随机跳题</h3>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
     <input type="text" class="am-form-field" name="rand-problem-2" />
 </div>
-<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2" style="margin-top: 5px;">跳转</button>
+<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2">跳转</button>
 `)
 
     $("#rand-problem-1").on("click", () => {
-        const rating = $("[name=rand-problem-1]").val(), source = $("[name=rand-problem-source]").val()
-        lg_content(`/problem/list?difficulty=${rating}&type=${source}&page=1`,
+        const difficulty = $("[name=difficulty").val(), source = $("[name=source]").val()
+        lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=1`,
             res => {
                 const
                     problem_count = res.currentData.problems.count,
                     page_count = Math.ceil(problem_count / 50),
                     rand_page = Math.floor(Math.random() * page_count) + 1
-                lg_content(`/problem/list?difficulty=${rating}&type=${source}&page=${rand_page}`,
+                lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=${rand_page}`,
                     res => {
                         const
                             list = res.currentData.problems.result,
