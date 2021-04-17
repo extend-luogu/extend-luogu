@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.1.0
+// @version        5.2.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -128,6 +128,16 @@ const mod = {
             }
         )
     },
+    reg_board: (name, info, func, styl) => mod.reg(
+        name, info, "@/",
+        () => {
+            let $board = $("#exlg-board")
+            if (! $board.length) $board = $(`
+<div class="lg-article" id="exlg-board"><h2>exlg</h2></div> <br />
+`).prependTo(".lg-right.am-u-md-4")
+            func($(`<div></div>`).appendTo($board))
+        }, styl
+    ),
     find: name => mod._.find(m => m.name === name),
     find_i: name => mod._.findIndex(m => m.name === name),
 
@@ -166,72 +176,6 @@ const mod = {
 
         if (map_init) GM_setValue("mod-map", mod.map)
     }
-}
-
-const card = {
-    $put: (k, $e, that, n) => k
-        ? $e.insertAfter(that[n](k).$)
-        : $e.appendTo(that.$),
-    $: $(".lg-index-content"),
-    $row: $r => ({
-        $: $r,
-        after() {
-            return card.$row($(`<div class="am-g"></div>`).insertAfter(this.$))
-        },
-        before() {
-            return card.$row($(`<div class="am-g"></div>`).insertBefore(this.$))
-        },
-        cols() {
-            const cols = []
-            this.$.children().each((_, e, col = card.$col($(e))) => cols.push(col))
-            return cols
-        },
-        insert(k, w = 3, $c = undefined) {
-            if (w === "auto")
-                w = 12 - this.cols().reduce((a, v) => a + v, 0)
-            return card.$col(
-                card.$put(k, $c ?? $(`
-<div>
-    <div class="lg-article lg-index-stat"></div>
-</div>
-`),
-                this, "col")
-            ).width(w)
-        },
-        col(k) {
-            return card.$col(this.$.children(`div:nth-child(${k})`))
-        }
-    }),
-    row: k => card.$row(card.$.children(`.am-g:nth-child(${k})`)),
-    rows: () => {
-        const rows = []
-        card.$.children().each((_, e, row = card.row($(e))) => row.push(row))
-        return rows
-    },
-    insert(k) {
-        return card.$row(
-            card.$put(k, $(`<div class="am-g"></div>`), this, "row")
-        )
-    },
-
-    $col: $c => ({
-        $: $c,
-        $$: $c.children(),
-        width(w) {
-            switch (w) {
-            case undefined:
-                return + this.$.attr("class")?.match(/am-u-md-(\d+)/)?.[1] ?? 0
-            case "keep":
-                return this
-            default:
-                this.$.removeClass("am-u-md-" + this.width()).addClass("am-u-md-" + w)
-                return this
-            }
-        },
-        move(row, k) {
-            return row.insert(k, "keep", this.$)
-        }
-    })
 }
 
 mod.reg_main("springboard", "跨域跳板", "@/robots.txt", () => {
@@ -516,7 +460,7 @@ mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, () => {
         let [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
         if (! ins) return
 
-        arg = arg.split(/(?<!!)%/g).map(s => s.replaceAll("!%", "%"))
+        arg = arg.split(/(?<!!)%/g).map(s => s.replace(/!%/, "%"))
         const $blog = $($(".user-action").children()[0])
         switch (ins) {
         case "frame":
@@ -704,13 +648,9 @@ mod.reg("benben", "全网犇犇", "@/", () => {
     })
 })
 
-mod.reg("rand-problem-ex", "随机跳题ex", "@/", () => {
-    card.insert(1)
-    card.row(3).col(1).move(card.row(2), 0)
-    card.row(3).col(1).width(12)
-
-    card.row(2).insert(1).$$.append(`
-<h2>按难度随机跳题</h2>
+mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
+    $board.html(`
+<h3>按难度随机跳题</h3>
 <select class="am-form-field" name="rand-problem-rating" autocomplete="off" placeholder="选择难度">
     <option value="0">暂无评定</option>
     <option value="1">入门</option>
@@ -728,8 +668,14 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", () => {
     <option value="AT">AtCoder</option>
     <option value="UVA">UVa</option>
 </select>
-<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1">跳转</button>
-    `)
+<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1" style="margin-top: 5px;">跳转</button>
+
+<h3>按题单随机跳题</h3>
+<div class="am-input-group am-input-group-primary am-input-group-sm">
+    <input type="text" class="am-form-field" name="rand-problem-2" />
+</div>
+<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2" style="margin-top: 5px;">跳转</button>
+`)
 
     $("#rand-problem-1").on("click", () => {
         const rating = $("[name=rand-problem-1]").val(), source = $("[name=rand-problem-source]").val()
@@ -751,14 +697,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", () => {
             }
         )
     })
-
-    card.row(2).insert(2).width(5).$$.append(`
-<h2>按题单随机跳题</h2>
-<div class="am-input-group am-input-group-primary am-input-group-sm">
-    <input type="text" class="am-form-field" name="rand-problem-2" />
-</div>
-<button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2">跳转</button>
-    `)
     $("#rand-problem-2").on("click", () => {
         const id = $("[name=rand-problem-2]").val()
         lg_content(`/training/${id}`,
@@ -771,11 +709,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", () => {
             }
         )
     })
-}, `
-#rand-problem-1, #rand-problem-2 {
-    margin-top: 5px;
-}
-`)
+})
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
     const $cli = $(`<div id="exlg-cli"></div>`).appendTo($("body"))
@@ -875,7 +809,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
         cc: (name/*char*/) => {
             /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I myself|message|notification. or jump home. */
             /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
-            name ??= "h"
+            name = name || "h"
             const tar = {
                 h: "/",
                 p: "/problem/list",
@@ -1084,9 +1018,9 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
 }
 `)
 
-mod.reg("search-user", "查找用户名", "@/", () => {
-    card.insert(2).insert(0).$$.append(`
-<h2>查找用户</h2>
+mod.reg_board("search-user", "查找用户名", $board => {
+    $board.html(`
+<h3>查找用户</h3>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
     <input type="text" class="am-form-field" placeholder="用户名" name="username">
 </div>
@@ -1111,7 +1045,6 @@ $(() => mod.execute())
 log("Lauching")
 
 Object.assign(uindow, {
-    exlg: { mod, card, marked, log, error },
+    exlg: { mod, marked, log, error },
     $$: $, xss, version_cmp
 })
-
