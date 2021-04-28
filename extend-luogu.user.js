@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.2.1
+// @version        5.2.3
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -135,7 +135,7 @@ const mod = {
             if (! $board.length) $board = $(`
 <div class="lg-article" id="exlg-board"><h2>exlg</h2></div> <br />
 `).prependTo(".lg-right.am-u-md-4")
-            func($(`<div></div>`).appendTo($board))
+            func($(`<div></div><br>`).appendTo($board))
         }, styl
     ),
     find: name => mod._.find(m => m.name === name),
@@ -669,12 +669,14 @@ mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
     <option value="AT">AtCoder</option>
     <option value="UVA">UVa</option>
 </select>
+<br>
 <button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-1">跳转</button>
 
 <h3>按题单随机跳题</h3>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
     <input type="text" class="am-form-field" name="rand-problem-2" />
 </div>
+<br>
 <button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2">跳转</button>
 `)
 
@@ -992,7 +994,7 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
         btn.on("click", () => {
             const $textarea = $("<textarea></textarea>")
                 .appendTo($("body"))
-                .text($e.text().slice(0, -4))
+                .text($e.text().substring(2))
                 .select()
             btn.text("已复制")
             setTimeout(() => btn.text("复制"), 1000)
@@ -1011,8 +1013,7 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
     background-color: cornflowerblue;
     color: white;
     border-radius: 6px;
-    font-size:2px;
-    float:right
+    width: auto
 }
 .exlg-copy:hover {
     box-shadow: 0 0 7px dodgerblue;
