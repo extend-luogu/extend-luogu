@@ -990,7 +990,7 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
     if ($cb.length) log(`Scanning code block:`, $cb.length)
 
     $cb.each((i, e, $e = $(e)) => {
-        const btn = $(`<div class="exlg-copy">复制</div>`)
+        const btn = $(`<div class="exlg-copy">复制</div><br>`)
         btn.on("click", () => {
             const $textarea = $("<textarea></textarea>")
                 .appendTo($("body"))
