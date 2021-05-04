@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.2.3
+// @version        5.3
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -226,7 +226,9 @@ mod.reg("dash", "控制面板", "@/*", () => {
     <p>
         <b>版本</b> <a id="exlg-dash-version-update">检查更新</a> <br />
         <a href="https://github.com/optimize-2/extend-luogu">GitHub</a> |
-        <a href="https://github.com/optimize-2/extend-luogu/raw/main/extend-luogu.user.js">Raw</a> <br />
+        <a href="https://github.com/optimize-2/extend-luogu/raw/main/extend-luogu.user.js">Raw</a> |
+        <a href="https://hub.fastgit.org/optimize-2/extend-luogu/raw/main/extend-luogu.user.js">FastGit</a>
+        <br />
         <a href="https://cdn.jsdelivr.net/gh/optimize-2/extend-luogu@latest/extend-luogu.user.js">JsDelivr</a>
         <i class="exlg-icon exlg-info" name="一键更新"></i>
         <br />
@@ -359,6 +361,7 @@ mod.reg("dash", "控制面板", "@/*", () => {
 `)
 
 mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/*" ], () => {
+    /*
     const emo = [
         [ "62224", [ "qq" ] ],
         [ "62225", [ "cy" ] ],
@@ -379,13 +382,41 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/*" ], (
         [ "69020", [ "youl", "yl" ] ]
     ]
     const emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${id}.png`
+    */
+    const emo = [
+        "qq",
+        "cy",
+        "kel",
+        "dk",
+        "kk",
+        "xyx",
+        "jk",
+        "ts",
+        "yun",
+        "yiw",
+        "se",
+        "px",
+        "wq",
+        "fad",
+        "xia",
+        "jy",
+        "qiao",
+        "youl",
+        "qiang",
+        "ruo",
+        "shq",
+        "mg",
+        "dx",
+        "tyt",
+    ]
+    const emo_url = name => `https://xn--9zr.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea"),
         $nl = $("<br />").appendTo($menu),
         $grd = $(".mp-editor-ground").addClass("exlg-ext")
 
     emo.forEach(m => {
-        const url = emo_url(m[0])
+        const url = emo_url(m)
         $(`<li class="exlg-emo"><img src="${url}" /></li>`)
             .on("click", () => $txt
                 .trigger("focus")
@@ -674,7 +705,7 @@ mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
 
 <h3>按题单随机跳题</h3>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
-    <input type="text" class="am-form-field" name="rand-problem-2" />
+    <input type="text" class="am-form-field" name="rand-problem-2" placeholder="请输入题单 ID"/>
 </div>
 <br>
 <button class="am-btn am-btn-sm am-btn-primary" id="rand-problem-2">跳转</button>
@@ -1024,7 +1055,7 @@ mod.reg_board("search-user", "查找用户名", $board => {
     $board.html(`
 <h3>查找用户</h3>
 <div class="am-input-group am-input-group-primary am-input-group-sm">
-    <input type="text" class="am-form-field" placeholder="用户名" name="username">
+    <input type="text" class="am-form-field" placeholder="请输入用户名或用户 ID" name="username">
 </div>
 <p>
     <button class="am-btn am-btn-danger am-btn-sm" id="search-user">跳转</button>
@@ -1032,7 +1063,11 @@ mod.reg_board("search-user", "查找用户名", $board => {
 `)
     const $search_user = $("#search-user").on("click", () => {
         $search_user.prop("disabled", true)
-        $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
+        const username = $("[name=username]").val()
+        if (/^[0-9]*$/.test(username))
+            location.href = "/user/" + username
+        else
+            $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
             if (! res.users[0]) {
                 $search_user.prop("disabled", false)
                 lg_alert("无法找到指定用户")
