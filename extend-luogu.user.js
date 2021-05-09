@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.4
+// @version        5.4.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -439,7 +439,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/*" ], (
     $txt.on("input", e => {
         if (e.originalEvent.data === "/")
             mdp.content = mdp.content.replace(/\/(.{1,5})\//g, (_, emo_txt) =>
-                `![${emo_txt}](` + emo_url(emo.find(m => m[1].includes(emo_txt))[0]) + `)`
+                `![${emo_txt}](` + emo_url(emo.find(m => m.includes(emo_txt))) + `)`
             )
     })
 }, `
