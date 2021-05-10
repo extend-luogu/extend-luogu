@@ -2,3 +2,4 @@ node_modules/
 
 update_version.py
 
+package-lock.json
