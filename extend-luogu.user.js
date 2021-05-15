@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.4.2
+// @version        5.5
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version
+// @match          https://www.bilibili.com/robots.txt?*
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
@@ -164,6 +165,7 @@ const mod = {
             const pn = location.pathname
             if (m.on && m.path.some((p, _, __, pr = p.replace(/^[a-z]*?@.*?(?=\/)/, "")) => (
                 p.startsWith("@/") && location.host === "www.luogu.com.cn" ||
+                p.startsWith("@bili/") && location.host === "www.bilibili.com" ||
                 p.startsWith("@cdn/") && location.host === "cdn.luogu.com.cn" ||
                 p.startsWith("@tcs1/") && location.host === "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ||
                 p.startsWith("@tcs2/") && location.host === "service-psscsax9-1305163805.sh.apigw.tencentcs.com"
@@ -178,7 +180,7 @@ const mod = {
     }
 }
 
-mod.reg_main("springboard", "跨域跳板", "@/robots.txt", () => {
+mod.reg_main("springboard", "跨域跳板", "@bili/robots.txt", () => {
     const q = new URLSearchParams(location.search)
     if (q.has("benben")) {
         document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
@@ -458,7 +460,7 @@ mod.reg_chore("update", "脚本升级", "1D", "@/*", () => {
     let loaded = false
     if (loaded) $("#exlg-benben").attr("src", $("#exlg-benben").attr("src"))
     else {
-        const $sb = $(`<iframe id="exlg-update" src="https://www.luogu.com.cn/robots.txt?update"></iframe>`)
+        const $sb = $(`<iframe id="exlg-update" src="https://www.bilibili.com/robots.txt?update"></iframe>`)
             .appendTo($("body")).hide()
         log("Building springboard:", $sb[0])
         loaded = true
@@ -626,7 +628,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
 
             if (loaded) $("#exlg-benben").attr("src", $("#exlg-benben").attr("src"))
             else {
-                const $sb = $(`<iframe id="exlg-benben" src="https://www.luogu.com.cn/robots.txt?benben"></iframe>`)
+                const $sb = $(`<iframe id="exlg-benben" src="https://www.bilibili.com/robots.txt?benben"></iframe>`)
                     .appendTo($("body")).hide()
                 log("Building springboard:", $sb[0])
                 loaded = true
