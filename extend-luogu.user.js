@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.5
+// @version        1.0.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -1223,7 +1223,9 @@ mod.reg_board("search-user", "查找用户名", $board => {
     $("#search-user-input").keydown((e)=>{if(e.keyCode==13) func()})
 })
 
-$(() => mod.execute())
+$(".user-nav").bind("DOMNodeInserted", (e) => {$(() => mod.execute())})
+$(".user-nav").bind("DOMNodeRemoved", (e) => {$(() => mod.execute())})
+
 log("Lauching")
 
 Object.assign(uindow, {
