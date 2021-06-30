@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.0.0
+// @version        1.1.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -34,6 +34,11 @@ const xss = new filterXSS.FilterXSS({
         if (k === "style") return `${k}="${v}"`
     }
 })
+
+const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
+1. 洛谷笔记增加重点功能, 增加显示标题功能<br>
+2. 洛谷笔记修复笔记不出现
+`)
 
 Date.prototype.format = function (f, UTC) {
     UTC = UTC ? "UTC" : ""
@@ -134,7 +139,7 @@ const mod = {
         () => {
             let $board = $("#exlg-board")
             if (! $board.length) $board = $(`
-<div class="lg-article" id="exlg-board"><h2>exlg</h2></div> <br />
+<div class="lg-article" id="exlg-board" exlg="exlg"><h2>exlg</h2></div> <br />
 `).prependTo(".lg-right.am-u-md-4")
             func($(`<div></div><br>`).appendTo($board))
         }, styl
@@ -160,7 +165,7 @@ const mod = {
         mod.map = GM_getValue("mod-map")
         const map_init = mod.map ? false : (mod.map = {})
         for (const m of mod._)
-            m.on = map_init ? (mod.map[ m.name ] = true) : mod.map[ m.name ]
+            m.on = map_init|mod.map[ m.name ]===undefined ? (mod.map[ m.name ] = true) : mod.map[ m.name ]
         for (const m of mod._) {
             const pn = location.pathname
             if (m.on && m.path.some((p, _, __, pr = p.replace(/^[a-z]*?@.*?(?=\/)/, "")) => (
@@ -183,14 +188,14 @@ const mod = {
 mod.reg_main("springboard", "跨域跳板", "@bili/robots.txt", () => {
     const q = new URLSearchParams(location.search)
     if (q.has("benben")) {
-        document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121"></iframe>`)
+        document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121" exlg="exlg"></iframe>`)
         uindow.addEventListener("message", e => {
             e.data.unshift("benben")
             uindow.parent.postMessage(e.data, "*")
         })
     }
     else if (q.has("update")) {
-        document.write(`<iframe src="https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version"></iframe>`)
+        document.write(`<iframe src="https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version" exlg="exlg"></iframe>`)
         uindow.addEventListener("message", e => {
             e.data.unshift("update")
             uindow.parent.postMessage(e.data, "*")
@@ -199,7 +204,7 @@ mod.reg_main("springboard", "跨域跳板", "@bili/robots.txt", () => {
     else if (q.has("url")) {
         const url = q.get("url")
         if (confirm(`是否加载来自 ${url} 的页面？`))
-            document.body.innerHTML = `<iframe src="${url}"></iframe>`
+            document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`
     }
 }, `
 iframe {
@@ -222,9 +227,10 @@ mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-version", () =>
 )
 
 mod.reg("dash", "控制面板", "@/*", () => {
-    const $dash = $(`<div id="exlg-dash">exlg</div>`).prependTo($("nav.user-nav, div.user-nav > nav"))
-    const $win = $(`
-<span id="exlg-dash-window">
+    const dashloader = () => {
+        const $dash = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`).prependTo($("nav.user-nav, div.user-nav > nav"))
+        const $win = $(`
+<span id="exlg-dash-window" exlg="exlg">
     <p>
         <b>版本</b> <a id="exlg-dash-version-update">检查更新</a> <br />
         <a href="https://github.com/optimize-2/extend-luogu">GitHub</a> |
@@ -235,6 +241,10 @@ mod.reg("dash", "控制面板", "@/*", () => {
         <i class="exlg-icon exlg-info" name="一键更新"></i>
         <br />
         <span id="exlg-dash-verison">${ GM_info.script.version }</span>
+    </p>
+    <p>
+        <b>调试</b>
+        <a onclick="$('*[exlg]').remove(0)">删除exlg的更改(测试)</a>
     </p>
     <p>
         <b>模块管理</b> <br />
@@ -251,28 +261,37 @@ mod.reg("dash", "控制面板", "@/*", () => {
     `)
         .appendTo($dash)
         .on("click", e => e.stopPropagation())
-    $(`<i class="exlg-icon exlg-warn"></i>`).hide().appendTo($dash)
+        $(`<i class="exlg-icon exlg-warn" exlg="exlg"></i>`).hide().appendTo($dash)
 
-    const $mods = $("#exlg-dash-mods")
-    mod._.forEach(m => {
-        const $m = $(`
-<li>
+        const $mods = $("#exlg-dash-mods")
+        mod._.forEach(m => {
+            const $m = $(`
+<li exlg="exlg">
     <input type="checkbox" />
     ${ m.name } <br/>
     <i>${ m.info }</i>
 </li>
         `)
             .appendTo($mods)
-        $m.children("input")
-            .prop("checked", m.on).prop("disabled", m.name === "dash")
-            .on("change", () => {
+            $m.children("input")
+                .prop("checked", m.on).prop("disabled", m.name === "dash")
+                .on("change", () => {
                 mod.map[ m.name ] = ! mod.map[ m.name ]
             })
-    })
-    $("#exlg-dash-mods-save").on("click", () => GM_setValue("mod-map", mod.map))
-    $("#exlg-dash-version-update").on("click", () => mod.execute("^update"))
+        })
+        $("#exlg-dash-mods-save").on("click", () => GM_setValue("mod-map", mod.map))
+        $("#exlg-dash-version-update").on("click", () => mod.execute("^update"))
 
-    $dash.on("click", _ => $win.toggle())
+        $dash.on("click", _ => $win.toggle())
+    }
+
+    const hook = (e) => {
+        if (e.target === $(".user-nav")[0] || e.target === $("div.header")[0]) dashloader()
+    }
+
+    if ($(".user-nav").length !== 0) dashloader()
+    $("body").bind("DOMNodeInserted", (e) => {hook(e)})
+    $("body").bind("DOMNodeRemoved", (e) => {hook(e)})
 }, `
 /* dash */
 
@@ -419,7 +438,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/*" ], (
 
     emo.forEach(m => {
         const url = emo_url(m)
-        $(`<li class="exlg-emo"><img src="${url}" /></li>`)
+        $(`<li class="exlg-emo" exlg="exlg"><img src="${url}" /></li>`)
             .on("click", () => $txt
                 .trigger("focus")
                 .val(`![${ m[1][0] }](${url})`)
@@ -429,7 +448,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/*" ], (
     })
     const $emo = $(".exlg-emo")
 
-    const $fold = $(`<li>表情 <i class="fa fa-chevron-left"></li>`)
+    const $fold = $(`<li exlg="exlg">表情 <i class="fa fa-chevron-left"></li>`)
         .on("click", () => {
             $nl.toggle()
             $emo.toggle()
@@ -460,7 +479,7 @@ mod.reg_chore("update", "脚本升级", "1D", "@/*", () => {
     let loaded = false
     if (loaded) $("#exlg-benben").attr("src", $("#exlg-benben").attr("src"))
     else {
-        const $sb = $(`<iframe id="exlg-update" src="https://www.bilibili.com/robots.txt?update"></iframe>`)
+        const $sb = $(`<iframe id="exlg-update" src="https://www.bilibili.com/robots.txt?update" exlg="exlg"></iframe>`)
             .appendTo($("body")).hide()
         log("Building springboard:", $sb[0])
         loaded = true
@@ -497,11 +516,11 @@ mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, () => {
         const $blog = $($(".user-action").children()[0])
         switch (ins) {
         case "html":
-            $e.replaceWith($(`<p>${ xss.process(arg[0]) }</p>`))
+            $e.replaceWith($(`<p exlg="exlg">${ xss.process(arg[0]) }</p>`))
             break
         case "frame":
             $e.replaceWith($(`<iframe src="https://www.bilibili.com/robots.txt?url=${ encodeURI(arg[0]) }"`
-                + `style="width: ${ arg[1] }; height: ${ arg[2] };"></iframe>`
+                + `style="width: ${ arg[1] }; height: ${ arg[2] };" exlg="exlg"></iframe>`
             ))
             break
         case "blog":
@@ -539,7 +558,7 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
         $ps.find("a").each((d, p, $p = $(p)) =>
             $p.removeClass("color-default").css("color", color[ my[d].difficulty ])
         )
-        $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter">${ my.length }</span>`))
+        $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`))
     })
 
     if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
@@ -556,7 +575,7 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
                 $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
             }
         })
-        $("#exlg-problem-count-1").html(`<span class="exlg-counter">${ ta.length } <> ${ my.length } : ${same}`
+        $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     })
 }, `
@@ -568,7 +587,7 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
 mod.reg("user-css-load", "加载用户样式", "@/*", () => {}, GM_getValue("user-css"))
 mod.reg("user-css-edit", "编辑用户样式", "@/theme/list", () => {
     const $ps = $(`
-<div id="exlg-user-css">
+<div id="exlg-user-css" exlg="exlg">
     <h2>自定义 CSS <a>保存刷新</a></h2>
     <textarea/>
 </div>
@@ -609,7 +628,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
         Purple: "purple lg-bold",
     }
     const check_svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="%" style="margin-bottom: -3px;">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="%" style="margin-bottom: -3px;" exlg="exlg">
     <path d="M16 8C16 6.84375 15.25 5.84375 14.1875 5.4375C14.6562 4.4375 14.4688 3.1875 13.6562 2.34375C12.8125 1.53125 11.5625 1.34375 10.5625 1.8125C10.1562 0.75 9.15625 0 8 0C6.8125 0 5.8125 0.75 5.40625 1.8125C4.40625 1.34375 3.15625 1.53125 2.34375 2.34375C1.5 3.1875 1.3125 4.4375 1.78125 5.4375C0.71875 5.84375 0 6.84375 0 8C0 9.1875 0.71875 10.1875 1.78125 10.5938C1.3125 11.5938 1.5 12.8438 2.34375 13.6562C3.15625 14.5 4.40625 14.6875 5.40625 14.2188C5.8125 15.2812 6.8125 16 8 16C9.15625 16 10.1562 15.2812 10.5625 14.2188C11.5938 14.6875 12.8125 14.5 13.6562 13.6562C14.4688 12.8438 14.6562 11.5938 14.1875 10.5938C15.25 10.1875 16 9.1875 16 8ZM11.4688 6.625L7.375 10.6875C7.21875 10.8438 7 10.8125 6.875 10.6875L4.5 8.3125C4.375 8.1875 4.375 7.96875 4.5 7.8125L5.3125 7C5.46875 6.875 5.6875 6.875 5.8125 7.03125L7.125 8.34375L10.1562 5.34375C10.3125 5.1875 10.5312 5.1875 10.6562 5.34375L11.4688 6.15625C11.5938 6.28125 11.5938 6.5 11.4688 6.625Z"></path>
 </svg>`
     const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
@@ -617,7 +636,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
     let loaded = false
 
     const $sel = $(".feed-selector")
-    $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all"><a style="cursor: pointer">全网动态</a></li>`)
+    $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all"><a style="cursor: pointer" exlg="exlg">全网动态</a></li>`)
         .appendTo($sel.parent())
         .on("click", e => {
             const $this = $(e.currentTarget)
@@ -629,7 +648,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
 
             if (loaded) $("#exlg-benben").attr("src", $("#exlg-benben").attr("src"))
             else {
-                const $sb = $(`<iframe id="exlg-benben" src="https://www.bilibili.com/robots.txt?benben"></iframe>`)
+                const $sb = $(`<iframe id="exlg-benben" src="https://www.bilibili.com/robots.txt?benben" exlg="exlg"></iframe>`)
                     .appendTo($("body")).hide()
                 log("Building springboard:", $sb[0])
                 loaded = true
@@ -643,7 +662,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
         e.data.shift()
         e.data.forEach(m =>
             $(`
-<li class="am-comment am-comment-primary feed-li">
+<li class="am-comment am-comment-primary feed-li" exlg="exlg">
     <div class="lg-left">
         <a href="/user/${ m.user.uid }" class="center">
             <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
@@ -684,10 +703,10 @@ mod.reg("benben", "全网犇犇", "@/", () => {
 
 mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
 	$("[name='gotorandom']").text("随机")
-	const $start_rand = $(`<button class="am-btn am-btn-primary am-btn-sm" name="gotorandomex" id="gtrdex">随机ex</button>`)
+	const $start_rand = $(`<button class="am-btn am-btn-primary am-btn-sm" name="gotorandomex" id="gtrdex" exlg="exlg">随机ex</button>`)
 	$start_rand.appendTo($("[name='gotorandom']").parent())
     $(`
-<div id="exlg-dash-0" class = "exlg-rand-settings">...</div>
+<div id="exlg-dash-0" class = "exlg-rand-settings" exlg="exlg">...</div>
 <span id="exlg-dash-0-window" class="exlg-window">
 	<p>
 		<ul id="exlg-rand-diffs"><h2>随机跳题ex</h2></ul>
@@ -886,7 +905,7 @@ mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
 `)
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
-    const $cli = $(`<div id="exlg-cli"></div>`).appendTo($("body"))
+    const $cli = $(`<div id="exlg-cli" exlg="exlg"></div>`).appendTo($("body"))
     const $cli_input = $(`<input id="exlg-cli-input" />`).appendTo($cli)
 
     let cli_is_log = false
@@ -1161,14 +1180,14 @@ mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
     if ($cb.length) log(`Scanning code block:`, $cb.length)
 
     $cb.each((i, e, $e = $(e)) => {
-        const $btn = $(`<div class="exlg-copy">复制</div>`)
+        const $btn = $(`<div class="exlg-copy" exlg="exlg">复制</div>`)
 		const $c = $e.find("code")
-        
-        $(`<body><text></text></body>`).prependTo($cb[i])
+
+        $(`<body exlg="exlg"><text></text></body>`).prependTo($cb[i])
 
 		let lang = $c.attr("data-rendered-lang")?.toString() ?? $c.attr("class").replace("hljs", "").trim()
 
-        btn.on("click", () => {
+        $btn.on("click", () => {
             const $textarea = $("<textarea></textarea>")
                 .appendTo($("body"))
                 .text($e.text().slice(6))
@@ -1210,24 +1229,35 @@ mod.reg_board("search-user", "查找用户名", $board => {
 </p>
 `)
         const func = () => {
-        $search_user.prop("disabled", true)
-        $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
-            if (! res.users[0]) {
-                $search_user.prop("disabled", false)
-                lg_alert("无法找到指定用户")
-            }
-            else
-                location.href = "/user/" + res.users[0].uid
-        })
+            $search_user.prop("disabled", true)
+            $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
+                if (! res.users[0]) {
+                    $search_user.prop("disabled", false)
+                    lg_alert("无法找到指定用户")
+                }
+                else
+                    location.href = "/user/" + res.users[0].uid
+            })
         }
         const $search_user = $("#search-user").on("click", func)
     $("#search-user-input").keydown((e)=>{if(e.keyCode==13) func()})
 })
 
-$(".user-nav").bind("DOMNodeInserted", (e) => {$(() => mod.execute())})
-$(".user-nav").bind("DOMNodeRemoved", (e) => {$(() => mod.execute())})
+mod.reg("update-log", "更新日志显示", "@/*", () => {
+    if (window.location.href === "https://www.luogu.com.cn/" && GM_getValue("exlg-last-used") !== GM_info.script.version) {
+        show_exlg_updlog()
+        GM_setValue("exlg-last-used", GM_info.script.version)
+    }
+    else if (GM_getValue("exlg-last-used") != GM_info.script.version) {
+        log("It's able to show the update log but not at mainpage")
+    }
+    else {
+        log("The version is the latest.")
+    }
+})
 
 log("Lauching")
+$(() => mod.execute())
 
 Object.assign(uindow, {
     exlg: { mod, marked, log, error },
