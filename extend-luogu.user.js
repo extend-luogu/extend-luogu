@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.1.0
+// @version        1.1.1
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -36,8 +36,9 @@ const xss = new filterXSS.FilterXSS({
 })
 
 const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
-1. 洛谷笔记增加重点功能, 增加显示标题功能<br>
-2. 洛谷笔记修复笔记不出现
+1. 修复了控制面板的钩子
+2. 修复了日志
+3. 版本显示暑假修
 `)
 
 Date.prototype.format = function (f, UTC) {
