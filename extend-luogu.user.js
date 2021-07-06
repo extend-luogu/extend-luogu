@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.2.0
+// @version        1.3.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
@@ -36,11 +36,9 @@ const xss = new filterXSS.FilterXSS({
 })
 
 const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
-1. 修复了控制面板的钩子
-2. 添加了题目颜色和比较的钩子
- - 拆分为两个模块 数量比较 和 颜色渲染
- - 颜色渲染如果比较卡顿不建议开
-3. 修复了版本比较
+1. 添加了代码块复制的钩子
+2. 修改了代码块复制
+3. 代码块复制的自定义字体还没写好 全新设置界面如果不咕的话下个版本发布
 `)
 
 Date.prototype.format = function (f, UTC) {
@@ -150,7 +148,9 @@ const mod = {
     ),
     reg_hook: (name, info, path, func, hook, styl) => mod.reg(
         name, info, path,
-        () => {$("body").bind("DOMNodeInserted", (e) => {
+        () => {
+            func()
+            $("body").bind("DOMNodeInserted", (e) => {
             if (hook(e)) func()
         })} , styl
     ),
@@ -1231,46 +1231,83 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
 }
 `)
 
-mod.reg("copy-code-block", "一键复制代码块", "@/*", () => {
-    const $cb = $("pre:has(> code)")
+mod.reg_hook("copy-code-block", "代码块功能优化", "@/*", () => {
+    const language_show = GM_getValue("copy-code-block-language", true)
+    const $cb = $("pre:has(> code):not([exlg-copy-code-block=''])")
     if ($cb.length) log(`Scanning code block:`, $cb.length)
-
     $cb.each((i, e, $e = $(e)) => {
-        const $btn = $(`<div class="exlg-copy" exlg="exlg">复制</div>`)
-		const $c = $e.find("code")
-
-        $(`<body exlg="exlg"><text></text></body>`).prependTo($cb[i])
-
-		let lang = $c.attr("data-rendered-lang")?.toString() ?? $c.attr("class").replace("hljs", "").trim()
-
-        $btn.on("click", () => {
+        $($cb[i]).attr("exlg-copy-code-block", "")
+        const btn = $(`<div class="exlg-copy">复制</div>`)
+        const language_list = ["c", "cpp", "pascal", "python", "java", "javascript", "php", "latex"]
+        let language = ""
+        if (language_show) {
+            if ($e.find("code").attr("data-rendered-lang")) language = $e.find("code").attr("data-rendered-lang").toString()
+            if ($e.find("code").attr("class")) {
+                const str = $e.find("code").attr("class").toString()
+                if (str.indexOf("hljs") != -1) language = str.substr(9, str.length - 14)
+                else language = str.substr(9, str.length - 9)
+            }
+            if (language.indexOf("ult language-") == 0) language = language.substr(13)
+            if (language_list.indexOf(language) == -1) language = ""
+            log(language_list.indexOf(language))
+            if (language == "cpp") language = "c++"
+            if (language != "") language = "-" + language
+        }
+        log("Language:" + language)
+        log($cb[i], e, $e)
+        const $$cb = $($cb[i]).parent()
+        $cb[i].before($(`<p></p>`).get(0))
+        $cb[i].before(btn.on("click", () => {
             const $textarea = $("<textarea></textarea>")
-                .appendTo($("body"))
-                .text($e.text().slice(6))
-                .select()
-            btn.text("复制成功")
-            setTimeout(() => btn.text("复制"), 1000)
+            .appendTo($("body"))
+            .text($e.text())
+            .select()
+            btn.text("复制成功").toggleClass("exlg-copied")
+            setTimeout(() => btn.text("复制").toggleClass("exlg-copied"), 1000)
             document.execCommand("copy")
             $textarea.remove()
-        }).prependTo($cb[i])
-
-        $(`<span style="font-size: 15px;">(${lang})</span>`).prependTo($cb[i])
+        }).get(0))
+        $cb[i].before($(`<span style="font-family: Microsoft YaHei;font-size:18px;font-weight:bold">源代码${language}</span>`).get(0))
+        $cb[i].before($(`<p></p>`).get(0))
+        if (!$cb.children("code").hasClass("hljs")) $cb.children("code").addClass("hljs").css("background", "white")
+        if (GM_getValue("code-fonts-val", "") != "") $cb.children("code").css("font-family", GM_getValue("code-fonts-val", ""))
     })
-}, `
+}, (e) => { return ($("pre:has(> code):not([exlg-copy-code-block=''])").length !== 0 && $(e.target).find("pre").length !== 0) }, `
 .exlg-copy {
     position: relative;
     display: inline-block;
-
-    padding: 1px 5px 1px;
-
-    background-color: cornflowerblue;
-    color: white;
-    border-radius: 6px;
-    font-size:2px;
-    float:right
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    background-color: rgba(52, 152, 219, 0);
+    color: #3498db;
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Noto Sans", "Noto Sans CJK SC", "Noto Sans CJK", "Source Han Sans", "PingFang SC", "Segoe UI", "Microsoft YaHei", sans-serif;
+    flex: none;
+    outline: 0;
+    cursor: pointer;
+    font-weight: inherit;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    background: 0 0;
+    font-size: .8em;
+    float: right;
+    padding: 0 5px;
 }
 .exlg-copy:hover {
-    box-shadow: 0 0 7px dodgerblue;
+    background-color: rgba(52, 152, 219, 0.1);
+}
+div.exlg-copied {
+    background-color: rgba(52, 152, 219, 0.9)!important;
+    color: white!important;
+}
+.copy-btn {
+    font-size: .8em;
+    float: right;
+    padding: 0 5px;
+}
+.lfe-form-sz-middle {
+    font-size: 0.875em;
+    padding: 0.313em 1em;
 }
 `)
 
