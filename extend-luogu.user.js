@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.1.1
+// @version        1.2.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
-// @match          https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version
+// @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://www.bilibili.com/robots.txt?*
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -37,8 +37,10 @@ const xss = new filterXSS.FilterXSS({
 
 const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
 1. 修复了控制面板的钩子
-2. 修复了日志
-3. 版本显示暑假修
+2. 添加了题目颜色和比较的钩子
+ - 拆分为两个模块 数量比较 和 颜色渲染
+ - 颜色渲染如果比较卡顿不建议开
+3. 修复了版本比较
 `)
 
 Date.prototype.format = function (f, UTC) {
@@ -79,6 +81,7 @@ const lg_content = (url, cb) => {
 }
 
 const lg_alert = msg => uindow.show_alert("exlg 提醒您", msg)
+// ==/Utilities==
 
 // ==Modules==
 
@@ -145,6 +148,12 @@ const mod = {
             func($(`<div></div><br>`).appendTo($board))
         }, styl
     ),
+    reg_hook: (name, info, path, func, hook, styl) => mod.reg(
+        name, info, path,
+        () => {$("body").bind("DOMNodeInserted", (e) => {
+            if (hook(e)) func()
+        })} , styl
+    ),
     find: name => mod._.find(m => m.name === name),
     find_i: name => mod._.findIndex(m => m.name === name),
 
@@ -174,7 +183,7 @@ const mod = {
                 p.startsWith("@bili/") && location.host === "www.bilibili.com" ||
                 p.startsWith("@cdn/") && location.host === "cdn.luogu.com.cn" ||
                 p.startsWith("@tcs1/") && location.host === "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ||
-                p.startsWith("@tcs2/") && location.host === "service-psscsax9-1305163805.sh.apigw.tencentcs.com"
+                p.startsWith("@tcs2/") && location.host === "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com"
             ) && (
                 p.endsWith("*") && pn.startsWith(pr.slice(0, -1)) ||
                 pn === pr
@@ -196,7 +205,7 @@ mod.reg_main("springboard", "跨域跳板", "@bili/robots.txt", () => {
         })
     }
     else if (q.has("update")) {
-        document.write(`<iframe src="https://service-psscsax9-1305163805.sh.apigw.tencentcs.com/release/exlg-version" exlg="exlg"></iframe>`)
+        document.write(`<iframe src="https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen" exlg="exlg"></iframe>`)
         uindow.addEventListener("message", e => {
             e.data.unshift("update")
             uindow.parent.postMessage(e.data, "*")
@@ -223,7 +232,7 @@ mod.reg_main("benben-data", "犇犇数据", "@tcs1/release/APIGWHtmlDemo-1615602
     uindow.parent.postMessage(JSON.parse(document.body.innerText), "*")
 )
 
-mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-version", () =>
+mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", () =>
     uindow.parent.postMessage([ document.body.innerText ], "*")
 )
 
@@ -287,9 +296,9 @@ mod.reg("dash", "控制面板", "@/*", () => {
     }
 
     const hook = (e) => {
-        if (e.target === $(".user-nav")[0] || e.target === $("div.header")[0]) dashloader()
+        //if (e.target === $(".user-nav")[0] || e.target === $("div.header")[0]) ddashloader()
+        if ($(".user-nav").length !== 0 && $("#exlg-dash").length === 0) dashloader()
     }
-
     if ($(".user-nav").length !== 0) dashloader()
     $("body").bind("DOMNodeInserted", (e) => {hook(e)})
     $("body").bind("DOMNodeRemoved", (e) => {hook(e)})
@@ -541,7 +550,7 @@ iframe::-webkit-scrollbar {
 }
 `)
 
-mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
+mod.reg_user_tab("user-problem-compare", "题目数量和比较", "practice", () => ({
     color: [
         "rgb(191, 191, 191)",
         "rgb(254, 76, 97)",
@@ -552,13 +561,10 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
         "rgb(157, 61, 207)",
         "rgb(14, 29, 105)"
     ]
-}), ({ color }) => {
+}), () => {
     $(".exlg-counter").remove()
     $(".problems").each((i, ps, $ps = $(ps)) => {
         const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
-        $ps.find("a").each((d, p, $p = $(p)) =>
-            $p.removeClass("color-default").css("color", color[ my[d].difficulty ])
-        )
         $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`))
     })
 
@@ -580,7 +586,56 @@ mod.reg_user_tab("user-problem", "题目颜色和比较", "practice", () => ({
         $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     })
+
 }, `
+.main > .card > h3 {
+    display: inline-block;
+}
+`)
+
+mod.reg_hook("user-problem-color", "题目颜色", "@/user/*", () => {
+    const color = [
+        "rgb(191, 191, 191)",
+        "rgb(254, 76, 97)",
+        "rgb(243, 156, 17)",
+        "rgb(255, 193, 22)",
+        "rgb(82, 196, 26)",
+        "rgb(52, 152, 219)",
+        "rgb(157, 61, 207)",    ]
+    const render = () => {
+        const $unrendered = $(".problems > span > a").not(".exlg")
+        const $problem = $(".problems")
+        const my = uindow._feInjection.currentData
+        $unrendered.addClass("exlg")
+        $unrendered.each((_, ps, $ps = $(ps)) => {
+            if ($ps.parent().children().length !== 2) {
+                const piece = $problem.first().find("a").index(ps) === -1 ? 1 : 0
+                const index = [ $problem.first().find("a"), $problem.last().find("a") ][piece].index(ps)
+                const col = color[my[[ "submittedProblems", "passedProblems" ][piece]][index].difficulty]
+                $ps.removeClass("color-default").css("color", col)
+            } else $ps.removeClass("color-default").css("color", $ps.parent().children().first().css("color"))
+        })
+
+        if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
+        // Disabled:
+        // lg_content(`/user/${ uindow._feInjection.currentUser.uid }`, res => {
+        //     const my = res.currentData.passedProblems
+        //     const ta = uindow._feInjection.currentData.passedProblems
+		//
+        //     let same = 0
+        //     const $ps = $($(".problems")[1])
+        //     $ps.find("a").each((d, p, $p = $(p)) => {
+        //         if (my.some(m => m.pid === ta[d].pid)) {
+        //             same ++
+        //             $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
+        //         }
+        //     })
+        //     $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
+        //                                     + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
+        // })
+    }
+    render()
+}, () => $(".problems > span > a").not(".exlg").length !== 0, `
 .main > .card > h3 {
     display: inline-block;
 }
@@ -638,7 +693,7 @@ mod.reg("benben", "全网犇犇", "@/", () => {
     let loaded = false
 
     const $sel = $(".feed-selector")
-    $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all"><a style="cursor: pointer" exlg="exlg">全网动态</a></li>`)
+    $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all" exlg="exlg"><a style="cursor: pointer">全网动态</a></li>`)
         .appendTo($sel.parent())
         .on("click", e => {
             const $this = $(e.currentTarget)
