@@ -79,6 +79,15 @@ const lg_content = (url, cb) => {
 }
 
 const lg_alert = msg => uindow.show_alert("exlg 提醒您", msg)
+const head_repl = ["@/", "@bili/", "@cdn/", "@tcs1/", "@tcs2/"]
+const head_repl_to = [
+    "www.luogu.com.cn",
+    "www.bilibili.com",
+    "cdn.luogu.com.cn",
+    "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com",
+    "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com"
+]
+
 // ==/Utilities==
 
 // ==Modules==
@@ -86,9 +95,26 @@ const lg_alert = msg => uindow.show_alert("exlg 提醒您", msg)
 const mod = {
     _: [],
 
-    reg: (name, info, path, func, styl) => mod._.push({
-        name, info, path: Array.isArray(path) ? path : [ path ], func, styl
-    }),
+    reg: (name, info, path, func, styl) => {
+        if (!Array.isArray(path)) {
+            path = [ path ]
+        }
+        path.forEach((str, __, pth) => {
+            head_repl.some((pst, idx) => {
+                if (str.startsWith(pst)) {
+                    path[__] = str.replace(pst, "https://" + head_repl_to[idx] + "/")
+                    return true;
+                }
+            })
+            str = path[__]
+            if (str.endsWith("*")) {
+                path[__] = str.slice(0, -1) + "\\S*"
+            }
+        })
+        mod._.push({
+            name, info, path, func, styl
+        })
+    },
     reg_main: (name, info, path, func, styl) =>
         mod.reg("@" + name, info, path, () => (func(), false), styl),
     reg_user_tab: (name, info, tab, vars, func, styl) =>
@@ -174,21 +200,14 @@ const mod = {
 
         mod.map = GM_getValue("mod-map")
         const map_init = mod.map ? false : (mod.map = {})
-        for (const m of mod._)
-            m.on = map_init|mod.map[ m.name ]===undefined ? (mod.map[ m.name ] = true) : mod.map[ m.name ]
         for (const m of mod._) {
-            const pn = location.pathname
-            if (m.on && m.path.some((p, _, __, pr = p.replace(/^[a-z]*?@.*?(?=\/)/, "")) => (
-                p.startsWith("@/") && location.host === "www.luogu.com.cn" ||
-                p.startsWith("@bili/") && location.host === "www.bilibili.com" ||
-                p.startsWith("@cdn/") && location.host === "cdn.luogu.com.cn" ||
-                p.startsWith("@tcs1/") && location.host === "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ||
-                p.startsWith("@tcs2/") && location.host === "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com"
-            ) && (
-                p.endsWith("*") && pn.startsWith(pr.slice(0, -1)) ||
-                pn === pr
-            )))
+            m.on = map_init|mod.map[ m.name ]===undefined ? (mod.map[ m.name ] = true) : mod.map[ m.name ]
+        }
+        for (const m of mod._) {
+            const pn = uindow.location.href
+            if (m.on && m.path.some((p, _, __) => { var r = new RegExp(p, "g"); return r.test(pn) })) {
                 if (exe(m) === false) return
+            }
         }
 
         if (map_init) GM_setValue("mod-map", mod.map)
@@ -960,6 +979,22 @@ mod.reg_board("rand-problem-ex", "随机跳题ex", $board => {
 }
 `)
 
+mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+*", () => {
+    var $btn
+    $$("div.operation").append($btn = $$("div.operation>button").clone(true))
+    $btn.css({
+        "border-color": "rgb(80, 200, 219)",
+        "background-color": "rgb(80, 200, 219)"
+    })
+    $btn.text("随机跳题")
+    $btn.addClass("exlg")
+    $$("div.operation>button.lfe-form-sz-middle.exlg").click(() => {
+        const prob_cnt = parseInt($("span.value").innerText)
+        const $target = $$("div.row")[parseInt(Math.random() * prob_cnt)].children[2]
+        uindow.location.href = $target.children[0].href
+    })
+})
+
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/*", () => {
     const $cli = $(`<div id="exlg-cli" exlg="exlg"></div>`).appendTo($("body"))
     const $cli_input = $(`<input id="exlg-cli-input" />`).appendTo($cli)
@@ -1349,7 +1384,7 @@ mod.reg("update-log", "更新日志显示", "@/*", () => {
     }
 })
 
-log("Lauching")
+log("Launching")
 $(() => mod.execute())
 
 Object.assign(uindow, {
