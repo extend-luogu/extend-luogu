@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.3.0
+// @version        1.4.1
 // @description    Make Luogu more powerful.
-// @author         optimize_2 ForkKILLET minstdfx haraki
+// @author         optimize_2 ForkKILLET minstdfx haraki 5ab
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
@@ -36,9 +36,9 @@ const xss = new filterXSS.FilterXSS({
 })
 
 const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
-1. 添加了代码块复制的钩子
-2. 修改了代码块复制
-3. 代码块复制的自定义字体还没写好 全新设置界面如果不咕的话下个版本发布
+1. 将识别运行改为用正则表达式
+2. 加入题单自动跳题
+3. 全新设置界面咕了
 `)
 
 Date.prototype.format = function (f, UTC) {
@@ -990,9 +990,16 @@ mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+*", 
     $btn.text("随机跳题")
     $btn.addClass("exlg")
     $$("div.operation>button.lfe-form-sz-middle.exlg").click(() => {
-        const prob_cnt = parseInt($("span.value").innerText)
-        const $target = $$("div.row")[parseInt(Math.random() * prob_cnt)].children[2]
-        uindow.location.href = $target.children[0].href
+        const $info = uindow._feInjection.currentData.training
+        if ($info.problemCount == 0) {
+            alert("题单不能为空")
+            return
+        }
+        var pid = $info.problemCount
+        while (pid >= $info.problemCount) {
+            pid = parseInt(Math.random() * $info.problemCount)
+        }
+        uindow.location.href = "https://www.luogu.com.cn/problem/" + $info.problems[pid].problem.pid
     })
 })
 
