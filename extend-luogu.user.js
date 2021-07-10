@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.4.1
+// @version        1.4.2
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki 5ab
 // @match          https://*.luogu.com.cn/*
@@ -36,9 +36,8 @@ const xss = new filterXSS.FilterXSS({
 })
 
 const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
-1. 将识别运行改为用正则表达式
-2. 加入题单自动跳题
-3. 全新设置界面咕了
+1. 修了正则表达式匹配的一个锅，现在一些界面不会随意出现了；
+2. 设置界面下个版本更新。
 `)
 
 Date.prototype.format = function (f, UTC) {
@@ -108,8 +107,10 @@ const mod = {
             })
             str = path[__]
             if (str.endsWith("*")) {
-                path[__] = str.slice(0, -1) + "\\S*"
-            }
+                path[__] = str.slice(0, -1) + ".*"
+            } else {
+		        path[__] += "$"
+	        }
         })
         mod._.push({
             name, info, path, func, styl
