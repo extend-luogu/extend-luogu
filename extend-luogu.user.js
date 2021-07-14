@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        1.4.2
+// @version        1.5.0
 // @description    Make Luogu more powerful.
 // @author         optimize_2 ForkKILLET minstdfx haraki 5ab
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
+// @match          https://*.freenode.net/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://www.bilibili.com/robots.txt?*
@@ -36,8 +37,7 @@ const xss = new filterXSS.FilterXSS({
 })
 
 const show_exlg_updlog = () => uindow.show_alert(`extend-luogu Ver. ${ GM_info.script.version } 更新日志`, `
-1. 修了正则表达式匹配的一个锅，现在一些界面不会随意出现了；
-2. 设置界面下个版本更新。
+1. 增加了irc聊天。
 `)
 
 Date.prototype.format = function (f, UTC) {
@@ -78,13 +78,14 @@ const lg_content = (url, cb) => {
 }
 
 const lg_alert = msg => uindow.show_alert("exlg 提醒您", msg)
-const head_repl = ["@/", "@bili/", "@cdn/", "@tcs1/", "@tcs2/"]
+const head_repl = ["@/", "@bili/", "@cdn/", "@tcs1/", "@tcs2/", "@fn/"]
 const head_repl_to = [
     "www.luogu.com.cn",
     "www.bilibili.com",
     "cdn.luogu.com.cn",
     "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com",
-    "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com"
+    "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com",
+    "webchat.freenode.net"
 ]
 
 // ==/Utilities==
@@ -1389,6 +1390,14 @@ mod.reg("update-log", "更新日志显示", "@/*", () => {
     }
     else {
         log("The version is the latest.")
+    }
+})
+
+mod.reg("irc-chat-launch", "irc聊天启动", "@/*", () => {
+    try {
+        uindow.open("https://webchat.freenode.net/#extend-luogu")
+    } catch (error) {
+        lg_alert(error)
     }
 })
 
