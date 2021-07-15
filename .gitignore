@@ -1,5 +1,7 @@
 node_modules/
 
+test/
 update_version.py
 
 package-lock.json
+
