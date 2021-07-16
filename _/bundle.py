@@ -31,4 +31,5 @@ for i, ln in enumerate(text):
 
 with open("bundle.html", "w") as html:
     html.writelines(text)
+
 print("Finishing bundling")
