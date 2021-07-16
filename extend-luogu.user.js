@@ -15,10 +15,10 @@
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
 // @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=950722
-// @require
 // @grant          GM_addStyle
 // @grant          GM_getValue
 // @grant          GM_setValue
+// @grant          GM_deleteValue
 // @grant          GM_listValues
 // @grant          unsafeWindow
 // ==/UserScript==
@@ -1027,7 +1027,20 @@ mod.reg("update-log", "更新日志显示", "@/*", {
 $(() => {
     log("Exposing")
 
-    sto = load_dat(mod.data, false)
+    const init_sto = chance => {
+        try {
+            sto = load_dat(mod.data, false)
+        }
+        catch {
+            if (chance) {
+                lg_alert("存储代理加载失败，清存重试中……")
+                GM_listValues().forEach(GM_deleteValue)
+                init_sto(chance - 1)
+            }
+            else lg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
+        }
+    }
+    init_sto(1)
 
     // TODO: Switch to real-time saving.
     uindow.addEventListener("beforeunload", () => {
