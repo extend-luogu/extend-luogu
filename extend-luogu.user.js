@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version                                  2.0.3
+// @version                                   2.0.4
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
@@ -87,7 +87,7 @@ const version_cmp = (v1, v2) => {
 const lg_content = url => new Promise((res, rej) =>
     $.get(url + (url.includes("?") ? "&" : "?") + "_contentOnly=1", data => {
         if (data.code !== 200) rej(`Requesting failure code: ${ res.code }.`)
-        res(res)
+        res(data)
     })
 )
 
