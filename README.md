@@ -6,7 +6,7 @@ Make [Luogu](https://www.luogu.com.cn/) more powerful.
 
 [Chinese Guide](https://www.luogu.com.cn/paste/fnln7ze9)
 
-1. (recommended) Visit [GitHub Raw](https://github.com/optimize-2/extend-luogu/raw/main/extend-luogu.user.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/).
+1. (recommended) Visit [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/main/extend-luogu.user.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/).
 
 2. Copy `extend-luogu.user.js` into Tampermonkey's `Create a new script` page, and save it.
 
