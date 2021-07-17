@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.1.2
+// @version        2.2.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -688,7 +688,473 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     })
 })
 
-// FIXME rand-problem-ex
+
+
+mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
+    exrand_difficulty: {
+        ty: "tuple",
+        lvs: [
+            { ty: "boolean", dft: false, strict: true, repeat: 8}
+        ],
+        priv: true
+    },
+    exrand_source: {
+        ty: "tuple",
+        lvs: [
+            { ty: "boolean", dft: false, strict: true, repeat: 5}
+        ],
+        priv: true
+    }
+}, ({msto}) => {
+    const difficulty_html = [
+        `<div exlgcolor="red"    class="exlg-difficulties exlg-unselectable">入门</div>`,
+        `<div exlgcolor="orange" class="exlg-difficulties exlg-unselectable">普及-</div>`,
+        `<div exlgcolor="yellow" class="exlg-difficulties exlg-unselectable">普及/提高-</div>`,
+        `<div exlgcolor="green"  class="exlg-difficulties exlg-unselectable">普及+/提高</div>`,
+        `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">提高+/省选-</div>`,
+        `<div exlgcolor="purple" class="exlg-difficulties exlg-unselectable">省选/NOI-</div>`,
+        `<div exlgcolor="black"  class="exlg-difficulties exlg-unselectable">NOI/NOI+/CTSC</div>`,
+        `<div exlgcolor="grey"   class="exlg-difficulties exlg-unselectable">暂无评定</div>`
+    ];
+    const source_html = [
+        `<div exlgcolor="red"    class="exlg-difficulties exlg-unselectable">洛谷题库</div>`,
+        `<div exlgcolor="orange" class="exlg-difficulties exlg-unselectable">Codeforces</div>`,
+        `<div exlgcolor="yellow" class="exlg-difficulties exlg-unselectable">SPOJ</div>`,
+        `<div exlgcolor="green"  class="exlg-difficulties exlg-unselectable">ATcoder</div>`,
+        `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
+    ];
+    const judge_problem = (text) => { //Note: 判断字符串是否为题号, B不算在内
+        if ((/AT[0-9]{1,4}/i).test(text)) return true;
+        if ((/CF[0-9]{1,4}[A-Z][0-9]{0,1}/i).test(text)) return true;
+        if ((/SP[0-9]{1,5}/i).test(text)) return true;
+        if ((/P[0-9]{4}/i).test(text)) return true;
+        if ((/UVA[0-9]{1,5}/i).test(text)) return true;
+        if ((/U[0-9]{1,6}/i).test(text)) return true;
+        if ((/T[0-9]{1,6}/i).test(text)) return true;
+        return false;
+    };
+    const func_jump_problem = (str) => { //Note: 很好理解
+        if (judge_problem(str)) str = str.toUpperCase();
+        if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号");
+        else location.href = "https://www.luogu.com.cn/problemnew/show/" + str;
+    };
+    //start to do fucking things.
+    let mouse_on_board = false, mouse_on_dash = false;
+    if ($("#exlg-rand-diffs").length) return; //Note: 防重复
+    
+    //Note: 对于界面的修正
+    //Note: input框套皮
+    let $input = $("input[name='toproblem']");
+    $input.after($input.clone()).remove();
+    $input = $("input[name='toproblem']");
+    
+    //Note: 跳转按钮
+    let $jump = $(".am-btn[name='goto']");
+    $jump.after($jump.clone()).remove();
+    $jump = $(".am-btn[name='goto']");
+    
+    //Note: 避免分成两行
+    const $jump_rand = $(".am-btn[name='gotorandom']").text("随机");
+    
+    //Note: 随机ex按钮好耶！！
+    $jump_rand.after($(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex" id="gtrdex">随机ex</button>`));
+    
+    //Note: set behavior
+    $jump.on("click", () => {
+        if (/^[0-9]+.?[0-9]*$/.test($input.val())) $input.val("P" + $input.val());
+            func_jump_problem($input.val());
+    });
+    $input.on("keydown", e => {
+        if (e.keyCode === 13) $jump.click();
+    });
+    
+    //Note: exrand部分
+    const $jump_exrand = $("#gtrdex");
+    $(".lg-index-stat>h2").text("问题跳转 ").append(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`);
+    const exrand_setting = $("#exlg-dash-0");
+    exrand_setting.mouseenter(() => {
+        mouse_on_dash = true;
+        $("#exlg-dash-0-window").show(); //Hack: 鼠标放在dash上开window
+    })
+    .mouseleave(() => {
+        mouse_on_dash = false; //Hack: 离开dash和board超过200ms直接关掉
+        if (!mouse_on_board) {
+            setTimeout(() => {
+                if (!mouse_on_board) $("#exlg-dash-0-window").hide();
+            }, 200);
+        }
+    });
+    const $board = $(`<span id="exlg-dash-0-window" class="exlg-window" style="display: block;"><p></p><ul id="exlg-rand-diffs">
+<div>
+<span class=".exlg-title-span">
+<div id="button-showdiff" class="exlg-rand-settings select exlg-unselectable">题目难度</div>
+<span class="exlg-unselectable">&nbsp;&nbsp;</span>
+<div id="button-showsrce" class="exlg-rand-settings exlg-unselectable">题目来源</div>
+</span>
+</div>
+<p></p>
+<div id="exlg-exrd-diff">
+<span style="width: 49%; float: left " id="exlg-exrd-diff-1">
+<span class="lg-small lg-inline-up exlg-unselectable">已选择</span><p></p>
+</span>
+<span style="width: 49%; float: right" id="exlg-exrd-diff-0">
+<span class="lg-small lg-inline-up exlg-unselectable">未选择</span><p></p>
+</span>
+</div>
+<div id="exlg-exrd-srce" style="display:none;">
+<span style="width: 49%; float: left " id="exlg-exrd-srce-1">
+<span class="lg-small lg-inline-up exlg-unselectable">已选择</span><p></p>
+</span>
+<span style="width: 49%; float: right" id="exlg-exrd-srce-0">
+<span class="lg-small lg-inline-up exlg-unselectable">未选择</span><p></p>
+</span>
+</div>
+</ul><p></p></span>`).hide();
+    $jump_exrand.after($board);
+    $jump_exrand.before("&nbsp;");
+    $board.mouseenter(() => {mouse_on_board = true;})
+        .mouseleave((e) => {
+            mouse_on_board = false;
+            if (!mouse_on_dash) {
+                $("#exlg-dash-0-window").hide();
+            }
+        }); //Hack: 维护onboard
+        
+    //Note: 切换界面的按钮
+    const $btn_diff = $("#button-showdiff"), $btn_srce = $("#button-showsrce");
+    const $diff_div = $("#exlg-exrd-diff") , $srce_div = $("#exlg-exrd-srce") ;
+    $btn_diff.on("click", () => {
+        $btn_diff.addClass("select");
+        $btn_srce.removeClass("select");
+        $diff_div.show();
+        $srce_div.hide();
+    });
+    $btn_srce.on("click", () => {
+        $btn_diff.removeClass("select");
+        $btn_srce.addClass("select");
+        $diff_div.hide();
+        $srce_div.show();
+    });
+    
+    
+    let i = 0;
+    for (i = 0; i < difficulty_html.length; ++ i) {
+        const j = i; //Hack: 否则等执行完for后click就一直按最后的i的值来，似乎用let写在里面是动态访问？
+        const $btn = $(difficulty_html[i]).attr("unselectable", "on")
+        .on("click", (e) => { //Note: 建一个dash而已
+            $btn.hide();
+            $("#exlg-exrd-diff-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
+            msto.exrand_difficulty[j] = false;
+        }).appendTo($("#exlg-exrd-diff-1"));
+        if (msto.exrand_difficulty[i] === false) $btn.hide();
+    }
+    for (i = 0; i < difficulty_html.length; ++ i) {
+        const j = i; //Note: 同上 不写了
+        const $btn = $(difficulty_html[i]).attr("unselectable", "on")
+        .on("click", (e) => {
+            $btn.hide();
+            $("#exlg-exrd-diff-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
+            msto.exrand_difficulty[j] = true;
+        }).appendTo($("#exlg-exrd-diff-0"));
+        if (msto.exrand_difficulty[i] === true) $btn.hide();
+    }
+    for (i = 0; i < source_html.length; ++ i) {
+        const j = i;
+        const $btn = $(source_html[i]).attr("unselectable", "on")
+        .on("click", (e) => {
+            $btn.hide();
+            $("#exlg-exrd-srce-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
+            msto.exrand_source[j] = false;
+        }).appendTo($("#exlg-exrd-srce-1"));
+        if (msto.exrand_source[i] === false) $btn.hide();
+    }
+    for (i = 0; i < source_html.length; ++ i) {
+        const j = i;
+        const $btn = $(source_html[i]).attr("unselectable", "on")
+        .on("click", (e) => {
+            $btn.hide();
+            $("#exlg-exrd-srce-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
+            msto.exrand_source[j] = true;
+        }).appendTo($("#exlg-exrd-srce-0"));
+        if (msto.exrand_source[i] === true) $btn.hide();
+    }
+    const exrand_poi = async () => { //Note: 异步写法（用到了lg_content）
+        let difficulty_list = [], source_list = [];
+        for (i = 0; i < difficulty_html.length; ++ i) {
+            if (msto.exrand_difficulty[i]) difficulty_list.push((i + 1) % 8);
+        }
+        for (let i = 0; i < source_html.length; ++ i) {
+            if (msto.exrand_source[i]) source_list.push(i);
+        }
+        //Note: 未选中的缺省选项
+        if (difficulty_list.length === 0) difficulty_list = [0, 1, 2, 3, 4, 5, 6, 7];
+        if (source_list.length === 0) source_list  = [0];
+        
+        const difficulty = difficulty_list[Math.floor(Math.random() * difficulty_list.length)];
+        const source = ["P","CF","SP","AT","UVA"][source_list[Math.floor(Math.random() * source_list.length)]];
+        let res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=1`);
+        //Note: 随机而已问题不大
+        const
+            problem_count = res.currentData.problems.count,
+            page_count = Math.ceil(problem_count / 50),
+            rand_page = Math.floor(Math.random() * page_count) + 1;
+
+        res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=${rand_page}`);
+        const
+            list = res.currentData.problems.result,
+            rand_idx = Math.floor(Math.random() * list.length),
+            pid = list[rand_idx].pid;
+        location.href = `/problem/${pid}`;
+    };
+    $jump_exrand.on("click", exrand_poi);
+    /*
+    //KiLL: 不知道干什么的东西(
+    const css_load_here = '';
+    const node_style=document.createElement("style");
+    node_style.innerHTML = css_load_here;
+    document.head.append(node_style);
+    */
+},`
+#exlg-rand-diffs {
+    list-style-type:none
+}
+.exlg-rand-settings {
+    position: relative;
+    display: inline-block;
+
+    padding: 1px 5px 1px 5px;
+
+    background-color: white;
+    border: 1px solid #6495ED;
+    color: cornflowerblue;
+    border-radius: 6px;
+    font-size:12px;
+}
+.exlg-rand-settings.select {
+    background-color: cornflowerblue;
+    border: 1px solid #6495ED;
+    color: white;
+}
+.exlg-difficulties {
+    position: relative;
+    display: inline-block;
+    padding: 1px 5px 1px;
+    color: white;
+    border-radius: 6px;
+    font-size:12px;
+}
+.exlg-unselectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+div[exlgcolor='red'] {
+    background-color: rgb(254, 76, 97);
+}
+div[exlgcolor='orange'] {
+    background-color: rgb(243, 156, 17);
+}
+div[exlgcolor='yellow'] {
+    background-color: rgb(255, 193, 22);
+}
+div[exlgcolor='green'] {
+    background-color: rgb(82, 196, 26);
+}
+div[exlgcolor='blue'] {
+    background-color: rgb(52, 152, 219);
+}
+div[exlgcolor='purple'] {
+    background-color: rgb(157, 61, 207);
+}
+div[exlgcolor='black'] {
+    background-color: rgb(14, 29, 105);
+}
+div[exlgcolor='grey'] {
+    background-color: rgb(191, 191, 191);
+}
+.exlg-rand-settings:hover {
+    box-shadow: 0 0 7px dodgerblue;
+}
+.exlg-window {
+    position: absolute;
+    top: 35px;
+    left: 0px;
+    z-index: 65536;
+    display: none;
+    width: 250px;
+    height: 300px;
+    padding: 5px;
+    background: white;
+    color: black;
+    border-radius: 7px;
+    box-shadow: rgb(187 227 255) 0px 0px 7px;
+}
+`);
+mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
+    show_code_language : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
+    copy_code_rightfloat : { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
+    copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
+},  ({msto}) => {
+    const language_avaliable = ["c", "cpp", "pascal", "python", "java", "javascript", "php", "latex"];
+    const language_show_name = ["C", "C++", "Pascal", "Python", "Java", "Javascript", "PHP", "Latex"];
+    const get_language = ($code) => {
+        if (!msto.show_code_language) return ""; //Note: 不使用语言显示
+        let language = "";
+        if ((/\/record\/.*/).test(location.href)) return $($(".value.lfe-caption")[0]).text();
+        if ($code.attr("data-rendered-lang")) language = $code.attr("data-rendered-lang");
+        else if ($code.attr("class")) {
+            //Note: 转成字符串数组
+            $code.attr("class").split(" ").forEach((str) => {
+                if (!/language-.*/.test(str)) return;
+                language = str.slice(9);
+            });
+        }
+        return (language_avaliable.includes(language)) ? (language_show_name[language_avaliable.indexOf(language)]) : ("");
+    }
+    const $cb = $("pre:has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "");
+    if ($cb.length) log(`Scanning code block:`, $cb.length);
+    $cb.each((i, e, $e = $(e)) => {
+        const $code = $cb.children("code"), $fa = $e.parent();
+        //Note: 创建复制按钮
+        const $btn = ((/\/record\/.*/).test(location.href)) ? ($e.children(".copy-btn")) : (
+            $(`<div class="exlg-copy">复制</div>`)
+            .on("click", () => {
+                const $textarea = $("<textarea></textarea>")
+                    .appendTo($("body"))
+                    .text($e.text())
+                    .select();
+                if ($btn.text() === "复制") {//Note: 防止瞎jb点导致创建大量settimeout, 洛谷也是这么做的
+                    $btn.text("复制成功").toggleClass("exlg-copied");
+                    setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800);
+                }
+                document.execCommand("copy");
+                $textarea.remove();
+            })
+        );
+        const $title = ((/\/record\/.*/).test(location.href)) ? $(".lfe-h3") :$(`<h3 class="exlg-code-title" style="width: 100%;">源代码 </h3>`);
+        //Note: 字体
+        const code_font = msto.copy_code_font;
+        if (code_font && code_font !== "") $code.css("font-family", code_font);
+        //Note: 背景
+        if (!$code.hasClass("hljs")) $code.addClass("hljs").css("background", "white");
+        //Note: 复制按钮右对齐
+        $btn.addClass(`exlg-copy-${msto.copy_code_rightfloat}`);
+        //Note: 构建ui
+        const lgg = get_language($code);
+        if (lgg !== "") {//Note: 可以用语言
+            $title.text(`源代码 - ${lgg}${(/\/record\/.*/).test(location.href)?"":" "}`);
+            //Note: record不用加空格，平时要
+        }
+        //如果是record
+        if ((/\/record\/.*/).test(location.href)) {
+            //TODO: 以后没准要用所以留着了
+        }
+        else { //不是
+            $e.before($title.append($btn));    
+        }
+    });
+}, () => $("pre:has(> code):not([exlg-copy-code-block])").length !== 0, `
+.exlg-copy {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    background-color: rgba(52, 152, 219, 0);
+    color: #3498db;
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Noto Sans", "Noto Sans CJK SC", "Noto Sans CJK", "Source Han Sans", "PingFang SC", "Segoe UI", "Microsoft YaHei", sans-serif;
+    flex: none;
+    outline: 0;
+    cursor: pointer;
+    font-weight: normal;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    background: 0 0;
+    font-size: 12px;
+    padding: 0 5px;
+}
+.exlg-copy.exlg-copy-right {
+    float: right;
+}
+.exlg-copy:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+div.exlg-copied {
+    background-color: rgba(52, 152, 219, 0.9)!important;
+    color: white!important;
+}
+.copy-btn {
+    font-size: .8em;
+    padding: 0 5px;
+}
+.lfe-form-sz-middle {
+    font-size: 0.875em;
+    padding: 0.313em 1em;
+}
+.exlg-code-title {
+    margin-top: 0;
+    margin-bottom: .5em;
+    font-family: inherit;
+    font-weight: bold;
+    line-height: 1.2;
+    color: inherit;
+    font-size: 1.125em;
+    display: inline-block;
+}
+`);/*
+mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+", null, () => {
+    const id = location.pathname.slice(10);
+    const $rand_poi = $(`<button type="button" class="lfe-form-sz-middle" style="border-color: rgb(52, 52, 52);background-color: rgb(52, 52, 52);">随机跳题</button>`)
+        .mouseenter((e) => { $rand_poi.css("opacity", "0.9"); })
+        .mouseleave((e) => { $rand_poi.css("opacity", "1"); })
+        .on("click", async () => {
+            const res = await getContent(`/training/${id}`);
+            const
+                list = res.currentData.training.problems,
+                rand_idx = Math.floor(Math.random() * list.length),
+                pid = list[rand_idx].problem.pid;
+            location.href = `/problem/${pid}`;
+        });
+}, `
+.exlg-randex-list{
+    display: inline-block;
+    flex: none;
+    outline: 0;
+    cursor: pointer;
+    color: #fff;
+    font-weight: inherit;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    background: 0 0;
+    border-radius: 3px;
+    border: 1px solid;
+    
+    margin-right: 0.5em;
+}
+`);*/
+//Kill: 用哪个版本看着办
+
+mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
+    if ($(".exlg-difficulty-color").length) return;
+    const u = await lg_content(window.location.href);
+    const dif = u.currentData.records.result.map((u) => u.problem.difficulty); //Hack: What the Fuck ??
+    $("div.problem>div>a>span.pid").each((i, e, $e = $(e)) => {
+        $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`); //Note: 加颜色
+    });
+}, () => $("div.problem>div>a>span.pid").length !== 0 && $(".exlg-difficulty-color").length === 0, `
+.exlg-difficulty-color { font-weight: bold; }
+.exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
+.exlg-difficulty-color.color-1 { color: rgb(254, 76, 97)!important; }
+.exlg-difficulty-color.color-2 { color: rgb(243, 156, 17)!important; }
+.exlg-difficulty-color.color-3 { color: rgb(255, 193, 22)!important; }
+.exlg-difficulty-color.color-4 { color: rgb(82, 196, 26)!important; }
+.exlg-difficulty-color.color-5 { color: rgb(52, 152, 219)!important; }
+.exlg-difficulty-color.color-6 { color: rgb(157, 61, 207)!important; }
+.exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
+`);
+
 
 mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+", null, () => {
     const $op = $("div.operation")
