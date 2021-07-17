@@ -80,44 +80,33 @@ const getNextSlider = sliderId => {
 		return "h"
 	}
 }
-const checkboxChecked = setting => {
-	return $("#" + setting + " > .checkbox-value").hasClass("checkbox-checked")
-}
-const getSliderValue = setting => {
-	return $("#" + setting + " > .real-slider").val()
-}
-const getSelectboxValue = setting => {
-	return $("#" + setting + " > .selectbox-value").text()
-}
-const selectboxHasItem = (setting, item) => {
-	return $(
-		"#" + setting + " > .combobox-items > li:contains('" + item + "')"
-	).hasClass("selected-item")
-}
+const checkboxChecked = setting => $(`#${setting} > .checkbox-value`).hasClass("checkbox-checked")
+const getSliderValue = setting =>  $(`#${setting} > .real-slider`).val()
+const getSelectboxValue = setting => $(`#${setting} > .selectbox-value`).text()
+const selectboxHasItem = (setting, item) => $(`#${setting} > .combobox-items > li:contains('${item}')`).hasClass("selected-item")
 const expandHandler = module => {
-	let growDiv = $("#" + module + "-module > .module-settings-wrapper")
-	let expander = $("#" + module + "-module > .module-header > .module-expand")
+	let growDiv = $(`#${module}-module > .module-settings-wrapper`)
+	let expander = $(`#${module}-module > .module-header > .module-expand`)
 	if (growDiv.height()) {
 		growDiv.height(0)
 		expander.css("transform", "rotateX(0deg)")
 	} else {
-		let wrapper = $(
-			"#" + module + "-module > .module-settings-wrapper > .module-settings"
-		)
+		let wrapper = $(`#${module}-module > .module-settings-wrapper > .module-settings`)
 		growDiv.height(wrapper.height())
 		expander.css("transform", "rotateX(180deg)")
 	}
 	return false
 }
+
 const forceUpdate = module => {
-	let growDiv = $("#" + module + "-module > .module-settings-wrapper")
+	let growDiv = $(`#${module}-module > .module-settings-wrapper`)
 	let wrapper = $(
-		"#" + module + "-module > .module-settings-wrapper > .module-settings"
+		`#${module}-module > .module-settings-wrapper > .module-settings`
 	)
 	growDiv.height(wrapper.height())
 }
 const toggleModule = module => {
-	let moduleHeader = $("#" + module + "-module > .module-header")
+	let moduleHeader = $(`#${module}-module > .module-header`)
 	if (moduleHeader.hasClass("toggled-module")) {
 		moduleHeader.removeClass("toggled-module")
 		return false
@@ -200,6 +189,7 @@ const registerModules = modules => {
 	renderTextEditor()
 
 	log("Rendered modules")
+
 	registerHandlers()
 }
 const toggleClass = (element, name) => {
@@ -293,7 +283,7 @@ const renderSettings = module => {
 				<div id="${ setting.name }" class="setting textbox-setting">
 					<span class="setting-title">${ setting.displayName }</span>
 					<span class="textbox-at">@</span>
-					<input type="text" class="textbox" value="${ val || "" }" />
+					<textarea class="textbox" value="${ val || "" }"></textarea>
 				</div>
 			`
 			break
@@ -315,42 +305,43 @@ const renderSettings = module => {
 				</div>
 			`
 			break
-		// TODO
 		case SettingType.COLOR:
-			html += '<div class="setting color-setting" id="' + setting.name + '">'
-			html += '<div class="sliders" slider="h">'
-			html += '<input type="range" class="color-slider h-slider" min="1" max="360" disabled>'
-			html += '<input type="range" class="real-color-slider real-h-slider" min="0" max="360" slider="h">'
-			html += '<input type="range" class="color-slider s-slider disabled-color-slider" min="0" max="100" disabled>'
-			html += '<input type="range" class="real-color-slider real-s-slider disabled-color-slider" min="0" max="100" slider="s">'
-			html += '<input type="range" class="color-slider l-slider disabled-color-slider" min="0" max="100" disabled>'
-			html += '<input type="range" class="real-color-slider real-l-slider disabled-color-slider" min="0" max="100" slider="l">'
-			html += '<span class="setting-title">' + setting.displayName + "</span>"
-			html += "</div></div>"
+			html += `
+				<div class="setting color-setting" id="${ setting.name }">
+					<div class="sliders" slider="h">
+						<input type="range" class="color-slider h-slider" min="1" max="360" disabled />
+						<input type="range" class="real-color-slider real-h-slider" min="0" max="360" slider="h" />
+						<input type="range" class="color-slider s-slider disabled-color-slider" min="0" max="100" disabled />
+						<input type="range" class="real-color-slider real-s-slider disabled-color-slider" min="0" max="100" slider="s" />
+						<input type="range" class="color-slider l-slider disabled-color-slider" min="0" max="100" disabled />
+						<input type="range" class="real-color-slider real-l-slider disabled-color-slider" min="0" max="100" slider="l" />
+						<span class="setting-title">${ setting.displayName }</span>
+					</div>
+				</div>
+			`
 			break
 		}
 	})
 	return html
 }
+const renderSidebar = () => {}
 const refreshSettingVisiblity = module => {
 	if ("settings" in module)
-		module.settings.forEach(setting => {
-			if (eval(setting.visibilityDependency) == false) {
-				$("#" + setting.name).addClass("setting-disabled")
-			} else {
-				$("#" + setting.name).removeClass("setting-disabled")
-			}
-		})
+		module.settings.forEach(setting =>
+			$("#" + setting.name)[
+				eval(setting.visibilityDependency) === false ? "addClass" : "removeClass"
+			]("setting-disabled")
+		)
 }
 const refreshSettings = module => {
 	refreshSettingVisiblity(module)
 	forceUpdate(module.name)
 }
 const getHSLColorFromSetting = setting => {
-	let h = $("#" + setting + " > .sliders > .real-h-slider").val()
-	let s = $("#" + setting + " > .sliders > .real-s-slider").val()
-	let l = $("#" + setting + " > .sliders > .real-l-slider").val()
-	return "hsl(" + h + ", " + s + ", " + l + ")"
+	let h = $(`#${setting} > .sliders > .real-h-slider`).val()
+	let s = $(`#${setting} > .sliders > .real-s-slider`).val()
+	let l = $(`#${setting} > .sliders > .real-l-slider`).val()
+	return `hsl(${h}, ${s}, ${l})`
 }
 const registerHandlers = () => {
 	moduleRegistry.forEach(refreshSettingVisiblity)
@@ -359,8 +350,8 @@ const registerHandlers = () => {
 		let that = e.currentTarget
 		let id = $(that).parent().attr("id")
 		let setting = settings.get(id)
-		$("#" + id + " > .display-slider").val(that.value)
-		$("#" + id + " > .slider-value-holder > .slider-value").html(that.value)
+		$(`#${id} > .display-slider`).val(that.value)
+		$(`#${id} > .slider-value-holder > .slider-value`).html(that.value)
 		refreshSettings(setting.parent)
 
 		sto[setting.parent.rawName][id] = + that.value // Sto: save
@@ -377,7 +368,7 @@ const registerHandlers = () => {
 	})
 	$(".combobox-wrapper").on("click", e => {
 		let id = $(e.currentTarget).parent().attr("id")
-		toggleClass($("#" + id + " > .combobox-items"), "collapsed-combobox")
+		toggleClass($(`#${id} > .combobox-items`), "collapsed-combobox")
 		let module = $(e.currentTarget).parent().parent().parent().parent().attr("id").split("-")[0]
 		forceUpdate(module)
 	})
@@ -446,28 +437,16 @@ const registerHandlers = () => {
 		let that = e.currentTarget
 		let slider = $(that).attr("slider")
 		let id = $(that).parent().parent().attr("id")
-		$("#" + id + " > .sliders > ." + slider + "-slider").val(that.value)
-		if (slider == "h") {
-			$("#" + id + " > .sliders > .s-slider").css(
-				"background-color",
-				"hsl(" + that.value + ", 100%, 50%)"
-			)
-			$("#" + id + " > .sliders > .l-slider").css(
-				"background-color",
-				"hsl(" + that.value + ", 100%, 50%)"
-			)
+		$(`#${id} > .sliders > .${slider}-slider`).val(that.value)
+		if (slider === "h") {
+			$(`#${id} > .sliders > .s-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
+			$(`#${id} > .sliders > .l-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
 		}
 	})
 	$(".real-h-slider").each((_, that) => {
 		let id = $(that).parent().parent().attr("id")
-		$("#" + id + " > .sliders > .s-slider").css(
-			"background-color",
-			"hsl(" + that.value + ", 100%, 50%)"
-		)
-		$("#" + id + " > .sliders > .l-slider").css(
-			"background-color",
-			"hsl(" + that.value + ", 100%, 50%)"
-		)
+		$(`#${id} > .sliders > .s-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
+		$(`#${id} > .sliders > .l-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
 	})
 }
 
@@ -475,23 +454,10 @@ window.novogui = {
 	log,
 	init(modules) {
 		window.novogui._ = modules
-		
-		const sb = $(`
-			<iframe src="https://www.luogu.com.cn/robots.txt?type=dash"></iframe>
-		`).hide().appendTo($("body"))
+		sto = window.exlg.TM_dat.sto
 
-		window.addEventListener("message", e => {
-			log("Listening dash storage loading: %o", e.data)
-			sto = window.exlg.TM_dat.load_dat(window.exlg.mod.data, true, e.data)
-
-			const dat = window.exlg.TM_dat.load_dat.dat
-			window.exlg.TM_dat.save_dat = () => {
-				log("Asking dash storage saving: %o", dat)
-				sb[0].contentWindow.postMessage(dat, "*")
-			}
-
-			registerModules(modules)
-		})
+		registerModules(modules)
+		renderSidebar()
 	}
 }
 
