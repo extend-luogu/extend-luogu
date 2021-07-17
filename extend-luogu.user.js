@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.1.1
+// @version        2.1.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -571,13 +571,14 @@ mod.reg_user_tab("user-problem-compare", "题目数量和比较", "practice", nu
 
 mod.reg_hook("user-problem-color", "题目颜色", "@/user/.*", null, () => {
     const color = [
-        "rgb(191, 191, 191)",
-        "rgb(254, 76, 97)",
-        "rgb(243, 156, 17)",
-        "rgb(255, 193, 22)",
-        "rgb(82, 196, 26)",
-        "rgb(52, 152, 219)",
-        "rgb(157, 61, 207)",
+        [ 191, 191, 191 ],
+        [ 254, 76, 97 ],
+        [ 243, 156, 17 ],
+        [ 255, 193, 22 ],
+        [ 82, 196, 26 ],
+        [ 52, 152, 219 ],
+        [ 157, 61, 207 ],
+        [ 0, 0, 0 ]
     ]
     const $unrendered = $(".problems > span > a").not(".exlg")
     const $problem = $(".problems")
@@ -587,8 +588,9 @@ mod.reg_hook("user-problem-color", "题目颜色", "@/user/.*", null, () => {
         if ($ps.parent().children().length !== 2) {
             const piece = $problem.first().find("a").index(ps) === -1 ? 1 : 0
             const index = [ $problem.first().find("a"), $problem.last().find("a") ][piece].index(ps)
-            const col = color[my[[ "submittedProblems", "passedProblems" ][piece]][index].difficulty]
-            $ps.removeClass("color-default").css("color", col)
+            $ps.removeClass("color-default").css("color",
+                "rgb(" + color[my[[ "submittedProblems", "passedProblems" ][piece]][index].difficulty].join(", ") + ")"
+            )
         }
         else $ps.removeClass("color-default").css("color", $ps.parent().children().first().css("color"))
     })
