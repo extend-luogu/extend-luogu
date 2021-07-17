@@ -285,6 +285,7 @@ input[type=range] {
 
 .textbox-at {
 	margin-right: 3px;
+	transition: color .5s;
 }
 
 .textbox-extended {
@@ -298,6 +299,15 @@ input[type=range] {
 	outline: none;
 	box-shadow: #fff 0 .5px 0;
 	margin-left: 1px;
+
+	/* Note: Change to textarea to enable multiple lines. */
+	resize: none;
+	-ms-overflow-style: none;
+	overflow: -moz-scrollbars-none;
+}
+
+.textbox::-webkit-scrollbar {
+	display: none;
 }
 
 .textbox:disabled {

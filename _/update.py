@@ -23,7 +23,7 @@ with open(fn, "r") as js:
 
 for i, ln in enumerate(text):
     if ln.startswith("// @version"):
-        text[i] = "// @version" + " " * ln.count(" ") + ver + "\n"
+        text[i] = "// @version" + " " * (ln.count(" ") - 1) + ver + "\n"
         break
 
 with open(fn, "w+") as js:

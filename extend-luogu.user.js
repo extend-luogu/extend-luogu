@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version                                   2.0.4
+// @version        2.1.0
+//
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
@@ -9,10 +10,12 @@
 // @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
 // @match          https://www.bilibili.com/robots.txt?*
 // @match          localhost:1634
+//
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
-// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=950722
+// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=951422
+//
 // @grant          GM_addStyle
 // @grant          GM_getValue
 // @grant          GM_setValue
@@ -137,7 +140,7 @@ const mod = {
             ty: "object",
             lvs: {
                 ...data,
-                on: { ty: "boolean", dft: true, priv: true }
+                on: { ty: "boolean", dft: true }
             }
         }
 
@@ -275,15 +278,6 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
         break
     // Note: <-
     case "dash":
-        const dat = uindow.exlg.TM_dat.load_dat.dat
-        log("Asking dash storage loading: %o", dat)
-        uindow.parent.postMessage(dat, "*")
-
-        uindow.addEventListener("message", e => {
-            log("Listening dash storage saving: %o", e.data)
-            uindow.exlg.TM_dat.sto = sto = uindow.exlg.TM_dat.load_dat(mod.data, false, e.data)
-            uindow.exlg.TM_dat.save_dat()
-        })
         break
     }
 }, `
@@ -1027,45 +1021,36 @@ $(() => {
 
     const init_sto = chance => {
         try {
-            sto = load_dat(mod.data, false)
+            sto = load_dat(mod.data, {
+                map: s => {
+                    s.root = ! [ "object", "tuple" ].includes(s.ty)
+                    return s
+                }
+            })
         }
-        catch {
+        catch(err) {
             if (chance) {
                 lg_alert("存储代理加载失败，清存重试中……")
-                GM_listValues().forEach(GM_deleteValue)
+                clear_dat()
                 init_sto(chance - 1)
             }
-            else lg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
+            else {
+                lg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
+                throw err
+            }
         }
     }
     init_sto(1)
-
-    // TODO: Switch to real-time saving.
-    uindow.addEventListener("beforeunload", () => {
-        if (uindow.self !== uindow.top) return
-
-        const dat_now = uindow.exlg.TM_dat.load_dat.dat
-        sto = load_dat(mod.data, false)
-        const dat_mem = uindow.exlg.TM_dat.load_dat.dat
-        const merge = (d1, d2, lvs) => {
-            for (k in lvs) {
-                const s = lvs[k]
-                if ([ "object", "tuple" ].includes(s.ty)) d1[k] = merge(d1[k], d2[k], s.lvs[k])
-                else d1[k] = s.priv ? d1[k] : d2[k]
-            }
-            return d1
-        }
-        uindow.exlg.TM_dat.save_dat(merge(dat_now, dat_mem, mod.data))
-    })
 
     Object.assign(uindow, {
         exlg: {
             mod,
             log, error,
             springboard, version_cmp,
+            lg_alert, lg_content,
             TM_dat: {
                 sto,
-                type_dat, proxy_dat, load_dat, save_dat
+                type_dat, proxy_dat, load_dat, save_dat, clear_dat
             }
         },
         $$: $, xss, marked

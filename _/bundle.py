@@ -2,15 +2,16 @@
 
 import re
 
+d = "dashboard/"
 
-with open("index.html", "r") as html:
+with open(d + "index.html", "r") as html:
     text = html.readlines()
 
 for i, ln in enumerate(text):
     m = re.match(r'^\t<script src="(.*?)"></script>', ln)
     if m:
         fn = m.group(1)
-        with open(fn, "r") as js:
+        with open(d + fn, "r") as js:
             text[i] = (
                 "\t<script>\n" + "".join(js.readlines()) + "\t</script>\n\n"
             )
@@ -22,14 +23,14 @@ for i, ln in enumerate(text):
     )
     if m:
         fn = m.group(1)
-        with open(fn, "r") as css:
+        with open(d + fn, "r") as css:
             text[i] = (
                 "\t<style>\n" + "".join(css.readlines()) + "\t</style>\n\n"
             )
         print("Bundling stylesheet <%s> @ %d" % (fn, i))
         continue
 
-with open("bundle.html", "w") as html:
+with open(d + "bundle.html", "w") as html:
     html.writelines(text)
 
 print("Finishing bundling")
