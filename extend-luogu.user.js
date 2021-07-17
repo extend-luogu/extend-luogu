@@ -1,20 +1,21 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.1.0
+// @version        2.1.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
+// @match          https://www.bilibili.com/robots.txt?*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
-// @match          https://www.bilibili.com/robots.txt?*
+// @match          https://extend-luogu.github.io/exlg-setting/*
 // @match          localhost:1634
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
-// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=951422
+// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=951458
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
@@ -117,12 +118,14 @@ const mod = {
     data: {},
 
     path_alias: [
-        [ "", "www.luogu.com.cn" ],
-        [ "bili", "www.bilibili.com" ],
-        [ "cdn", "cdn.luogu.com.cn" ],
-        [ "tcs1", "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ],
-        [ "tcs2", "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com" ],
-        [ "tcs3", "service-otgstbe5-1305163805.sh.apigw.tencentcs.com" ]
+        [ "",        "www.luogu.com.cn" ],
+        [ "bili",    "www.bilibili.com" ],
+        [ "cdn",     "cdn.luogu.com.cn" ],
+        [ "tcs1",    "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ],
+        [ "tcs2",    "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com" ],
+        [ "tcs3",    "service-otgstbe5-1305163805.sh.apigw.tencentcs.com" ],
+        [ "debug",   "localhost:1634" ],
+        [ "ghpage",  "extend-luogu.github.io" ],
     ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
 
     reg: (name, info, path, data, func, styl) => {
@@ -301,18 +304,23 @@ mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null,
 )
 
 mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
-    debug: { ty: "boolean", dft: false }
+    source: { ty: "enum", vals: [ "tcs", "debug", "gh_index", "gh_bundle" ], dft: "tcs" }
 }, ({ msto }) => {
-    const debug = msto.debug
+    const source = msto.source
     $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
         .prependTo($("nav.user-nav, div.user-nav > nav"))
-        .addClass(debug ? "debug" : undefined)
-        .on("click", () =>
-            uindow.exlg.dash = uindow.open(debug
-                ? "localhost:1634"
-                : "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting"
-            )
-        )
+        .css("backgroundColor", {
+            tcs: "cornflowerblue",
+            debug: "steelblue",
+            gh_index: "darkblue",
+            gh_bundle: "darkslateblue"
+        }[source])
+        .on("click", () => uindow.exlg.dash = uindow.open({
+            tcs: "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting",
+            debug: "localhost:1634",
+            gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
+            gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
+        }[source]))
 }, () => $(".user-nav").length !== 0 && $("#exlg-dash").length === 0, `
     /* dash */
 
@@ -322,13 +330,9 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
 
         padding: 1px 10px 3px;
 
-        background-color: cornflowerblue;
         color: white;
         border-radius: 6px;
         box-shadow: 0 0 7px dodgerblue;
-    }
-    #exlg-dash.debug {
-        background-color: darkslateblue;
     }
 
     #exlg-dash > .exlg-warn {
@@ -382,7 +386,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     }
 `)
 
-mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "localhost:1634/" ], null, () => {
+mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
     const novogui_modules = [
         {
             name: "modules",
@@ -1059,4 +1063,3 @@ $(() => {
     log("Launching")
     mod.execute()
 })
-
