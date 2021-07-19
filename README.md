@@ -26,3 +26,6 @@ Welcome!
 - QQ Group: `817265691`
 - Discord Discussion: [click to join](https://discord.gg/mHsx9crXjv)
 
+## Support us
+
+[aifadian](https://afdian.net/@extend-luogu)
