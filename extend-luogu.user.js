@@ -15,7 +15,7 @@
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
-// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=951458
+// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=952068
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
