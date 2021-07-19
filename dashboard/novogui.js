@@ -283,7 +283,7 @@ const renderSettings = module => {
 				<div id="${ setting.name }" class="setting textbox-setting">
 					<span class="setting-title">${ setting.displayName }</span>
 					<span class="textbox-at">@</span>
-					<textarea class="textbox" value="${ val || "" }"></textarea>
+					<textarea class="textbox">${ val || "" /* Sto: load */  }</textarea>
 				</div>
 			`
 			break
