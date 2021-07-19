@@ -516,6 +516,11 @@ find-up@^2.0.0, find-up@^2.1.0:
   dependencies:
     locate-path "^2.0.0"
 
+fk-git-commit-msg-std@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/fk-git-commit-msg-std/-/fk-git-commit-msg-std-0.0.1.tgz#42408be70a846b98ac5af9b90fea8f650cb36b5e"
+  integrity sha512-dUv0QPlEwp4ay6VqLSJFBp5fWQaZN5T8H0QNeAaEBDy8jWUmmYsjlM4hZEfT/KWOZPxE8ddAEAozuLXhjjV29A==
+
 flat-cache@^3.0.4:
   version "3.0.4"
   resolved "https://registry.npm.taobao.org/flat-cache/download/flat-cache-3.0.4.tgz#61b0338302b2fe9f957dcc32fc2a87f1c3048b11"
