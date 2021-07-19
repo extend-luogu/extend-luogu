@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.2.0
+// @version        2.3.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -22,6 +22,7 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_listValues
+// @grant          GM_setClipboard
 // @grant          unsafeWindow
 // ==/UserScript==
 
@@ -688,8 +689,6 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     })
 })
 
-
-
 mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     exrand_difficulty: {
         ty: "tuple",
@@ -715,75 +714,75 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         `<div exlgcolor="purple" class="exlg-difficulties exlg-unselectable">省选/NOI-</div>`,
         `<div exlgcolor="black"  class="exlg-difficulties exlg-unselectable">NOI/NOI+/CTSC</div>`,
         `<div exlgcolor="grey"   class="exlg-difficulties exlg-unselectable">暂无评定</div>`
-    ];
+    ]
     const source_html = [
         `<div exlgcolor="red"    class="exlg-difficulties exlg-unselectable">洛谷题库</div>`,
         `<div exlgcolor="orange" class="exlg-difficulties exlg-unselectable">Codeforces</div>`,
         `<div exlgcolor="yellow" class="exlg-difficulties exlg-unselectable">SPOJ</div>`,
         `<div exlgcolor="green"  class="exlg-difficulties exlg-unselectable">ATcoder</div>`,
         `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
-    ];
-    const judge_problem = (text) => { //Note: 判断字符串是否为题号, B不算在内
-        if ((/AT[0-9]{1,4}/i).test(text)) return true;
-        if ((/CF[0-9]{1,4}[A-Z][0-9]{0,1}/i).test(text)) return true;
-        if ((/SP[0-9]{1,5}/i).test(text)) return true;
-        if ((/P[0-9]{4}/i).test(text)) return true;
-        if ((/UVA[0-9]{1,5}/i).test(text)) return true;
-        if ((/U[0-9]{1,6}/i).test(text)) return true;
-        if ((/T[0-9]{1,6}/i).test(text)) return true;
-        return false;
-    };
-    const func_jump_problem = (str) => { //Note: 很好理解
-        if (judge_problem(str)) str = str.toUpperCase();
-        if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号");
-        else location.href = "https://www.luogu.com.cn/problemnew/show/" + str;
-    };
-    //start to do fucking things.
-    let mouse_on_board = false, mouse_on_dash = false;
-    if ($("#exlg-rand-diffs").length) return; //Note: 防重复
-    
-    //Note: 对于界面的修正
-    //Note: input框套皮
-    let $input = $("input[name='toproblem']");
-    $input.after($input.clone()).remove();
-    $input = $("input[name='toproblem']");
-    
-    //Note: 跳转按钮
-    let $jump = $(".am-btn[name='goto']");
-    $jump.after($jump.clone()).remove();
-    $jump = $(".am-btn[name='goto']");
-    
-    //Note: 避免分成两行
-    const $jump_rand = $(".am-btn[name='gotorandom']").text("随机");
-    
-    //Note: 随机ex按钮好耶！！
-    $jump_rand.after($(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex" id="gtrdex">随机ex</button>`));
-    
-    //Note: set behavior
+    ]
+    const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
+        if ((/AT[0-9]{1,4}/i).test(text)) return true
+        if ((/CF[0-9]{1,4}[A-Z][0-9]{0,1}/i).test(text)) return true
+        if ((/SP[0-9]{1,5}/i).test(text)) return true
+        if ((/P[0-9]{4}/i).test(text)) return true
+        if ((/UVA[0-9]{1,5}/i).test(text)) return true
+        if ((/U[0-9]{1,6}/i).test(text)) return true
+        if ((/T[0-9]{1,6}/i).test(text)) return true
+        return false
+    }
+    const func_jump_problem = (str) => { // Note: 很好理解
+        if (judge_problem(str)) str = str.toUpperCase()
+        if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号")
+        else location.href = "https://www.luogu.com.cn/problemnew/show/" + str
+    }
+    // start to do fucking things.
+    let mouse_on_board = false, mouse_on_dash = false
+    if ($("#exlg-rand-diffs").length) return // Note: 防重复
+
+    // Note: 对于界面的修正
+    // Note: input框套皮
+    let $input = $("input[name='toproblem']")
+    $input.after($input.clone()).remove()
+    $input = $("input[name='toproblem']")
+
+    // Note: 跳转按钮
+    let $jump = $(".am-btn[name='goto']")
+    $jump.after($jump.clone()).remove()
+    $jump = $(".am-btn[name='goto']")
+
+    // Note: 避免分成两行
+    const $jump_rand = $(".am-btn[name='gotorandom']").text("随机")
+
+    // Note: 随机ex按钮好耶！！
+    $jump_rand.after($(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex" id="gtrdex">随机ex</button>`))
+
+    // Note: set behavior
     $jump.on("click", () => {
-        if (/^[0-9]+.?[0-9]*$/.test($input.val())) $input.val("P" + $input.val());
-        func_jump_problem($input.val());
-    });
+        if (/^[0-9]+.?[0-9]*$/.test($input.val())) $input.val("P" + $input.val())
+        func_jump_problem($input.val())
+    })
     $input.on("keydown", e => {
-        if (e.keyCode === 13) $jump.click();
-    });
-    
-    //Note: exrand部分
-    const $jump_exrand = $("#gtrdex");
-    $(".lg-index-stat>h2").text("问题跳转 ").append(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`);
-    const exrand_setting = $("#exlg-dash-0");
+        if (e.keyCode === 13) $jump.click()
+    })
+
+    // Note: exrand部分
+    const $jump_exrand = $("#gtrdex")
+    $(".lg-index-stat>h2").text("问题跳转 ").append(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`)
+    const exrand_setting = $("#exlg-dash-0")
     exrand_setting.mouseenter(() => {
-        mouse_on_dash = true;
-        $("#exlg-dash-0-window").show(); //Hack: 鼠标放在dash上开window
+        mouse_on_dash = true
+        $("#exlg-dash-0-window").show() // Hack: 鼠标放在dash上开window
     })
         .mouseleave(() => {
-            mouse_on_dash = false; //Hack: 离开dash和board超过200ms直接关掉
+            mouse_on_dash = false // Hack: 离开dash和board超过200ms直接关掉
             if (!mouse_on_board) {
                 setTimeout(() => {
-                    if (!mouse_on_board) $("#exlg-dash-0-window").hide();
-                }, 200);
+                    if (!mouse_on_board) $("#exlg-dash-0-window").hide()
+                }, 200)
             }
-        });
+        })
     const $board = $(`<span id="exlg-dash-0-window" class="exlg-window" style="display: block;"><p></p><ul id="exlg-rand-diffs">
 <div>
 <span class=".exlg-title-span">
@@ -809,104 +808,103 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 <span class="lg-small lg-inline-up exlg-unselectable">未选择</span><p></p>
 </span>
 </div>
-</ul><p></p></span>`).hide();
-    $jump_exrand.after($board);
-    $jump_exrand.before("&nbsp;");
-    $board.mouseenter(() => {mouse_on_board = true;})
-        .mouseleave((e) => {
-            mouse_on_board = false;
+</ul><p></p></span>`).hide()
+    $jump_exrand.after($board)
+    $jump_exrand.before("&nbsp;")
+    $board.mouseenter(() => {mouse_on_board = true})
+        .mouseleave(() => {
+            mouse_on_board = false
             if (!mouse_on_dash) {
-                $("#exlg-dash-0-window").hide();
+                $("#exlg-dash-0-window").hide()
             }
-        }); //Hack: 维护onboard
-        
-    //Note: 切换界面的按钮
-    const $btn_diff = $("#button-showdiff"), $btn_srce = $("#button-showsrce");
-    const $diff_div = $("#exlg-exrd-diff") , $srce_div = $("#exlg-exrd-srce") ;
+        }) // Hack: 维护onboard
+
+    // Note: 切换界面的按钮
+    const $btn_diff = $("#button-showdiff"), $btn_srce = $("#button-showsrce")
+    const $diff_div = $("#exlg-exrd-diff") , $srce_div = $("#exlg-exrd-srce")
     $btn_diff.on("click", () => {
-        $btn_diff.addClass("select");
-        $btn_srce.removeClass("select");
-        $diff_div.show();
-        $srce_div.hide();
-    });
+        $btn_diff.addClass("select")
+        $btn_srce.removeClass("select")
+        $diff_div.show()
+        $srce_div.hide()
+    })
     $btn_srce.on("click", () => {
-        $btn_diff.removeClass("select");
-        $btn_srce.addClass("select");
-        $diff_div.hide();
-        $srce_div.show();
-    });
-    
-    
-    let i = 0;
+        $btn_diff.removeClass("select")
+        $btn_srce.addClass("select")
+        $diff_div.hide()
+        $srce_div.show()
+    })
+
+    let i = 0
     for (i = 0; i < difficulty_html.length; ++ i) {
-        const j = i; //Hack: 否则等执行完for后click就一直按最后的i的值来，似乎用let写在里面是动态访问？
+        const j = i // Hack: 否则等执行完for后click就一直按最后的i的值来，似乎用let写在里面是动态访问？
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
-            .on("click", (e) => { //Note: 建一个dash而已
-                $btn.hide();
-                $("#exlg-exrd-diff-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
-                msto.exrand_difficulty[j] = false;
-            }).appendTo($("#exlg-exrd-diff-1"));
-        if (msto.exrand_difficulty[i] === false) $btn.hide();
+            .on("click", () => { // Note: 建一个dash而已
+                $btn.hide()
+                $("#exlg-exrd-diff-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                msto.exrand_difficulty[j] = false
+            }).appendTo($("#exlg-exrd-diff-1"))
+        if (msto.exrand_difficulty[i] === false) $btn.hide()
     }
     for (i = 0; i < difficulty_html.length; ++ i) {
-        const j = i; //Note: 同上 不写了
+        const j = i // Note: 同上 不写了
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
-            .on("click", (e) => {
-                $btn.hide();
-                $("#exlg-exrd-diff-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
-                msto.exrand_difficulty[j] = true;
-            }).appendTo($("#exlg-exrd-diff-0"));
-        if (msto.exrand_difficulty[i] === true) $btn.hide();
+            .on("click", () => {
+                $btn.hide()
+                $("#exlg-exrd-diff-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                msto.exrand_difficulty[j] = true
+            }).appendTo($("#exlg-exrd-diff-0"))
+        if (msto.exrand_difficulty[i] === true) $btn.hide()
     }
     for (i = 0; i < source_html.length; ++ i) {
-        const j = i;
+        const j = i
         const $btn = $(source_html[i]).attr("unselectable", "on")
-            .on("click", (e) => {
-                $btn.hide();
-                $("#exlg-exrd-srce-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
-                msto.exrand_source[j] = false;
-            }).appendTo($("#exlg-exrd-srce-1"));
-        if (msto.exrand_source[i] === false) $btn.hide();
+            .on("click", () => {
+                $btn.hide()
+                $("#exlg-exrd-srce-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                msto.exrand_source[j] = false
+            }).appendTo($("#exlg-exrd-srce-1"))
+        if (msto.exrand_source[i] === false) $btn.hide()
     }
     for (i = 0; i < source_html.length; ++ i) {
-        const j = i;
+        const j = i
         const $btn = $(source_html[i]).attr("unselectable", "on")
-            .on("click", (e) => {
-                $btn.hide();
-                $("#exlg-exrd-srce-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show();
-                msto.exrand_source[j] = true;
-            }).appendTo($("#exlg-exrd-srce-0"));
-        if (msto.exrand_source[i] === true) $btn.hide();
+            .on("click", () => {
+                $btn.hide()
+                $("#exlg-exrd-srce-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                msto.exrand_source[j] = true
+            }).appendTo($("#exlg-exrd-srce-0"))
+        if (msto.exrand_source[i] === true) $btn.hide()
     }
-    const exrand_poi = async () => { //Note: 异步写法（用到了lg_content）
-        let difficulty_list = [], source_list = [];
+    const exrand_poi = async () => { // Note: 异步写法（用到了lg_content）
+        let difficulty_list = [], source_list = []
         for (i = 0; i < difficulty_html.length; ++ i) {
-            if (msto.exrand_difficulty[i]) difficulty_list.push((i + 1) % 8);
+            if (msto.exrand_difficulty[i]) difficulty_list.push((i + 1) % 8)
         }
         for (let i = 0; i < source_html.length; ++ i) {
-            if (msto.exrand_source[i]) source_list.push(i);
+            if (msto.exrand_source[i]) source_list.push(i)
         }
-        //Note: 未选中的缺省选项
-        if (difficulty_list.length === 0) difficulty_list = [0, 1, 2, 3, 4, 5, 6, 7];
-        if (source_list.length === 0) source_list  = [0];
-        
-        const difficulty = difficulty_list[Math.floor(Math.random() * difficulty_list.length)];
-        const source = ["P","CF","SP","AT","UVA"][source_list[Math.floor(Math.random() * source_list.length)]];
-        let res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=1`);
-        //Note: 随机而已问题不大
+        // Note: 未选中的缺省选项
+        if (difficulty_list.length === 0) difficulty_list = [0, 1, 2, 3, 4, 5, 6, 7]
+        if (source_list.length === 0) source_list  = [0]
+
+        const difficulty = difficulty_list[Math.floor(Math.random() * difficulty_list.length)]
+        const source = ["P","CF","SP","AT","UVA"][source_list[Math.floor(Math.random() * source_list.length)]]
+        let res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=1`)
+        // Note: 随机而已问题不大
         const
             problem_count = res.currentData.problems.count,
             page_count = Math.ceil(problem_count / 50),
-            rand_page = Math.floor(Math.random() * page_count) + 1;
+            rand_page = Math.floor(Math.random() * page_count) + 1
 
-        res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=${rand_page}`);
+        res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=${rand_page}`)
         const
             list = res.currentData.problems.result,
             rand_idx = Math.floor(Math.random() * list.length),
-            pid = list[rand_idx].pid;
-        location.href = `/problem/${pid}`;
-    };
-    $jump_exrand.on("click", exrand_poi);
+            pid = list[rand_idx].pid
+        location.href = `/problem/${pid}`
+    }
+    $jump_exrand.on("click", exrand_poi)
     /*
     //KiLL: 不知道干什么的东西(
     const css_load_here = '';
@@ -990,70 +988,53 @@ div[exlgcolor='grey'] {
     border-radius: 7px;
     box-shadow: rgb(187 227 255) 0px 0px 7px;
 }
-`);
+`)
 mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
-    show_code_language : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
-    copy_code_rightfloat : { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
+    show_code_lang : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
+    copy_code_position : { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
     copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
-},  ({msto}) => {
-    const language_avaliable = ["c", "cpp", "pascal", "python", "java", "javascript", "php", "latex"];
-    const language_show_name = ["C", "C++", "Pascal", "Python", "Java", "Javascript", "PHP", "Latex"];
-    const get_language = ($code) => {
-        if (!msto.show_code_language) return ""; //Note: 不使用语言显示
-        let language = "";
-        if ((/\/record\/.*/).test(location.href)) return $($(".value.lfe-caption")[0]).text();
-        if ($code.attr("data-rendered-lang")) language = $code.attr("data-rendered-lang");
-        else if ($code.attr("class")) {
-            //Note: 转成字符串数组
-            $code.attr("class").split(" ").forEach((str) => {
-                if (!/language-.*/.test(str)) return;
-                language = str.slice(9);
-            });
-        }
-        return (language_avaliable.includes(language)) ? (language_show_name[language_avaliable.indexOf(language)]) : ("");
+},  ({ msto }) => {
+    const isRecord = /\/record\/.*/.test(location.href)
+
+    const langs = {
+        c: "C", cpp: "C++", pascal: "Pascal", python: "Python", java: "Java", javascript: "Javascript", php: "PHP", latex: "Latex"
     }
-    const $cb = $("pre:has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "");
-    if ($cb.length) log(`Scanning code block:`, $cb.length);
-    $cb.each((i, e, $e = $(e)) => {
-        const $code = $cb.children("code"), $fa = $e.parent();
-        //Note: 创建复制按钮
-        const $btn = ((/\/record\/.*/).test(location.href)) ? ($e.children(".copy-btn")) : (
-            $(`<div class="exlg-copy">复制</div>`)
+
+    const get_lang = $code => {
+        let lang = ""
+        if (isRecord) return $($(".value.lfe-caption")[0]).text()
+        if ($code.attr("data-rendered-lang")) lang = $code.attr("data-rendered-lang")
+        else  $code.attr("class").split(" ").forEach(cls => {
+            if (cls.startsWith("language-")) lang = cls.slice(9)
+        })
+        return langs[lang]
+    }
+
+    const $cb = $("pre:has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "")
+    if ($cb.length) log(`Scanning code block:`, $cb.length)
+    $cb.each((_, e, $pre = $(e)) => {
+        const $btn = isRecord
+            ? ($pre.children(".copy-btn"))
+            : $(`<div class="exlg-copy">复制</div>`)
                 .on("click", () => {
-                    const $textarea = $("<textarea></textarea>")
-                        .appendTo($("body"))
-                        .text($e.text())
-                        .select();
-                    if ($btn.text() === "复制") {//Note: 防止瞎jb点导致创建大量settimeout, 洛谷也是这么做的
-                        $btn.text("复制成功").toggleClass("exlg-copied");
-                        setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800);
-                    }
-                    document.execCommand("copy");
-                    $textarea.remove();
+                    if ($btn.text() !== "复制") return // Note: Debounce
+                    $btn.text("复制成功").toggleClass("exlg-copied")
+                    setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800)
+                    GM_setClipboard($pre.text(), { type: "text", mimetype: "text/plain" })
                 })
-        );
-        const $title = ((/\/record\/.*/).test(location.href)) ? $(".lfe-h3") :$(`<h3 class="exlg-code-title" style="width: 100%;">源代码 </h3>`);
-        //Note: 字体
-        const code_font = msto.copy_code_font;
-        if (code_font && code_font !== "") $code.css("font-family", code_font);
-        //Note: 背景
-        if (!$code.hasClass("hljs")) $code.addClass("hljs").css("background", "white");
-        //Note: 复制按钮右对齐
-        $btn.addClass(`exlg-copy-${msto.copy_code_rightfloat}`);
-        //Note: 构建ui
-        const lgg = get_language($code);
-        if (lgg !== "") {//Note: 可以用语言
-            $title.text(`源代码 - ${lgg}${(/\/record\/.*/).test(location.href)?"":" "}`);
-            //Note: record不用加空格，平时要
-        }
-        //如果是record
-        if ((/\/record\/.*/).test(location.href)) {
-            //TODO: 以后没准要用所以留着了
-        }
-        else { //不是
-            $e.before($title.append($btn));    
-        }
-    });
+
+        const $code = $pre.children("code")
+        $code.css("font-family", msto.copy_code_font || undefined)
+        if (! $code.hasClass("hljs")) $code.addClass("hljs").css("background", "white")
+        $btn.addClass(`exlg-copy-${msto.copy_code_position}`)
+
+        if (! msto.show_code_lang) return
+        const lang = get_lang($code)
+        const $title = isRecord ? $(".lfe-h3") : $(`<h3 class="exlg-code-title" style="width: 100%;">源代码 </h3>`)
+        if (lang) $title.text(`${lang} 源代码` + (isRecord ? "" : " ")) // Note: record 不用加空格
+
+        if (! isRecord) $pre.before($title.append($btn))
+    })
 }, () => $("pre:has(> code):not([exlg-copy-code-block])").length !== 0, `
 .exlg-copy {
     position: relative;
@@ -1093,56 +1074,40 @@ div.exlg-copied {
     padding: 0.313em 1em;
 }
 .exlg-code-title {
-    margin-top: 0;
-    margin-bottom: .5em;
+    margin: 0;
     font-family: inherit;
-    font-weight: bold;
-    line-height: 1.2;
-    color: inherit;
     font-size: 1.125em;
-    display: inline-block;
+    color: inherit;
 }
-`);/*
+`)
+
 mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+", null, () => {
-    const id = location.pathname.slice(10);
-    const $rand_poi = $(`<button type="button" class="lfe-form-sz-middle" style="border-color: rgb(52, 52, 52);background-color: rgb(52, 52, 52);">随机跳题</button>`)
-        .mouseenter((e) => { $rand_poi.css("opacity", "0.9"); })
-        .mouseleave((e) => { $rand_poi.css("opacity", "1"); })
+    const id = location.pathname.slice(10)
+    const $rand_poi = $(`<button type="button" class="exlg-rand-training-problem-btn lfe-form-sz-middle">随机跳题</button>`)
+        .mouseenter(() => $rand_poi.css("opacity", "0.9"))
+        .mouseleave(() => $rand_poi.css("opacity", "1"))
         .on("click", async () => {
-            const res = await getContent(`/training/${id}`);
             const
+                res = await getContent(`/training/${id}`),
                 list = res.currentData.training.problems,
                 rand_idx = Math.floor(Math.random() * list.length),
-                pid = list[rand_idx].problem.pid;
-            location.href = `/problem/${pid}`;
-        });
+                pid = list[rand_idx].problem.pid
+            location.href = `/problem/${pid}`
+        })
 }, `
-.exlg-randex-list{
-    display: inline-block;
-    flex: none;
-    outline: 0;
-    cursor: pointer;
-    color: #fff;
-    font-weight: inherit;
-    line-height: 1.5;
-    text-align: center;
-    vertical-align: middle;
-    background: 0 0;
-    border-radius: 3px;
-    border: 1px solid;
-    
-    margin-right: 0.5em;
+.exlg-rand-training-problem-btn {
+    border-color: rgb(52, 52, 52);
+    background-color: rgb(52, 52, 52);
 }
-`);*/
-//Kill: 用哪个版本看着办
+`)
 
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
-    if ($(".exlg-difficulty-color").length) return;
-    const u = await lg_content(window.location.href);
-    const dif = u.currentData.records.result.map((u) => u.problem.difficulty); //Hack: What the Fuck ??
+    if ($(".exlg-difficulty-color").length) return
+    const u = await lg_content(window.location.href)
+    const dif = u.currentData.records.result.map((u) => u.problem.difficulty) // Hack: What the Fuck ??
     $("div.problem>div>a>span.pid").each((i, e, $e = $(e)) => {
-        $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`); //Note: 加颜色
-    });
+        $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`) // Note: 加颜色
+    })
 }, () => $("div.problem>div>a>span.pid").length !== 0 && $(".exlg-difficulty-color").length === 0, `
 .exlg-difficulty-color { font-weight: bold; }
 .exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
@@ -1153,27 +1118,7 @@ mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", nul
 .exlg-difficulty-color.color-5 { color: rgb(52, 152, 219)!important; }
 .exlg-difficulty-color.color-6 { color: rgb(157, 61, 207)!important; }
 .exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
-`);
-
-
-mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+", null, () => {
-    const $op = $("div.operation")
-    $op.children("button").clone(true)
-        .appendTo($op)
-        .css({
-            "border-color": "rgb(80, 200, 219)",
-            "background-color": "rgb(80, 200, 219)"
-        })
-        .text("随机跳题")
-        .addClass("exlg")
-        .on("click", () => {
-            const $info = uindow._feInjection.currentData.training
-
-            if (info.problemCount === 0) return lg_alert("题单不能为空")
-            const pid = ~~ (Math.random() * 1.e6) % $info.problemCount
-            uindow.location.href = "https://www.luogu.com.cn/problem/" + info.problems[pid].problem.pid
-        })
-})
+`)
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     lang: { ty: "enum", dft: "en", vals: [ "en", "zh" ] }
@@ -1222,10 +1167,10 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         "essential":  [ "必要" ],
         "user":       [ "用户" ]
     }
-    let cli_lang = msto.lang || 0
+    let cli_lang = cli_langs.indexOf(msto.lang) || 0
 
     const cmds = {
-        help: (cmd/*string*/) => {
+        help: (cmd/* string*/) => {
             /* get the help of <cmd>. or list all cmds. */
             /* 获取 <cmd> 的帮助。空则列出所有。 */
             if (! cmd)
@@ -1241,7 +1186,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 cli_log`${cmd} ${arg} ${ f.help[cli_lang] }`
             }
         },
-        cd: (path/*!string*/) => {
+        cd: (path/* !string*/) => {
             /* jump to <path>, relative path is OK. */
             /* 跳转至 <path>，支持相对路径。 */
             let tar
@@ -1258,7 +1203,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             }
             location.href = location.origin + "/" + tar.replace(/^\/+/, "")
         },
-        cdd: (forum/*!string*/) => {
+        cdd: (forum/* !string*/) => {
             /* jump to the forum named <forum> of discussion. use all the names you can think of. */
             /* 跳转至名为 <forum> 的讨论板块，你能想到的名字基本都有用。 */
             const tar = [
@@ -1272,7 +1217,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             if (! tar) return cli_error`cdd: unknown forum "${forum}"`
             cmds.cd(`/discuss/lists?forumname=${forum}`)
         },
-        cc: (name/*char*/) => {
+        cc: (name/* char*/) => {
             /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I myself|message|notification. or jump home. */
             /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
             name = name || "h"
@@ -1289,7 +1234,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             if (tar) cmds.cd(tar)
             else cli_error`cc: unknown target "${name}"`
         },
-        mod: (action/*!string*/, name/*string*/) => {
+        mod: (action/* !string*/, name/* string*/) => {
             /* for <action> "enable|disable|toggle", opearte the mod named <name>. */
             /* 当 <action> 为 "enable|disable|toggle"，对名为 <name> 的模块执行对应操作：启用|禁用|切换。 */
             const i = mod.find_i(name)
@@ -1306,29 +1251,30 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 return cli_error`mod: unknown action "${action}"`
             }
         },
-        dash: (action/*!string*/) => {
+        dash: (action/* !string*/) => {
             /* for <action> "show|hide|toggle", opearte the exlg dashboard. */
             /* 当 <action> 为 "show|hide|toggle", 显示|隐藏|切换 exlg 管理面板。 */
             if (! [ "show", "hide", "toggle" ].includes(action))
                 return cli_error`dash: unknown action "${action}"`
             $("#exlg-dash-window")[action]()
         },
-        lang: (lang/*!string*/) => {
+        lang: (lang/* !string*/) => {
             /* for <lang> "en|zh" switch current cli language. */
             /* 当 <lang> 为 "en|zh"，切换当前语言。 */
             try {
-                msto.lang = cli_lang = cli_langs.indexOf(lang)
+                msto.lang = lang
+                cli_lang = cli_langs.indexOf(lang)
             }
             catch {
                 return cli_error`lang: unknown language ${lang}`
             }
         },
-        uid: (uid/*!integer*/) => {
+        uid: (uid/* !integer*/) => {
             /* jumps to homepage of user whose uid is <uid>. */
             /* 跳转至 uid 为 <uid> 的用户主页。 */
             location.href = `/user/${uid}`
         },
-        un: (name/*!string*/) => {
+        un: (name/* !string*/) => {
             /* jumps to homepage of user whose username is like <name>. */
             /* 跳转至用户名与 <name> 类似的用户主页。 */
             $.get("/api/user/search?keyword=" + name, res => {
@@ -1342,7 +1288,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     for (const f of Object.values(cmds)) {
         [ , f.arg, f.help ] = f.toString().match(/^\((.*?)\) => {((?:\n +\/\*.+?\*\/)+)/)
         f.arg = f.arg.split(", ").map(a => {
-            const [ , name, type ] = a.match(/([a-z_]+)\/\*(.+)\*\//)
+            const [ , name, type ] = a.match(/([a-z_]+)\/\* (.+)\*\//)
             return {
                 name, essential: type[0] === "!", type: type.replace(/^!/, "")
             }
@@ -1359,7 +1305,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         if (! f) return cli_error`exlg: unknown command "${n}"`
         let i = -1, a; for ([ i, a ] of tk.entries()) {
             const t = f.arg[i].type
-            if (t === "number" || t === "integer") tk[i] = Number(a)
+            if (t === "number" || t === "integer") tk[i] = + a
             if (
                 t === "char" && a.length === 1 ||
                 t === "number" && ! isNaN(tk[i]) ||

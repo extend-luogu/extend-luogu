@@ -12,22 +12,25 @@ module.exports = {
     "no-tabs": 0,
     "indent": [ 2, 4 ],
     "object-property-newline": 0,
-    "no-multiple-empty-lines": [ 1, { max: 2, maxEOF: 1, maxBOF: 0 } ],
-   
+    "no-multiple-empty-lines": [ 2, { max: 2, maxEOF: 1, maxBOF: 0 } ],
+
     "no-multi-spaces": 0,
+    "no-trailing-spaces": 2,
     "key-spacing": 0,
     "space-before-function-paren": 0,
+    "space-unary-ops": [ 2, { words: true, nonwords: true } ],
 
     "camelcase": 0,
-    "spaced-comment": 0,
-    "quotes": [ 1, "double", { allowTemplateLiterals: true } ],
-    "quote-props": [ 1, "consistent-as-needed" ],
+    "spaced-comment": 2,
+    "semi": [ 2, "never" ],
+    "quotes": [ 2, "double", { allowTemplateLiterals: true } ],
+    "quote-props": [ 2, "consistent-as-needed" ],
     "comma-dangle": 0,
     "no-sequences": 0,
 
     "no-var": 2,
     "one-var": 0,
-    "no-unused-vars": 1,
+    "no-unused-vars": 2,
 
     "no-case-declarations": 0,
     "no-fallthrough": 0,
