@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.2
+// @version        2.5.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1502,7 +1502,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
             const tag = tag_list[uid]
             if (tag !== undefined) {
                 $e.find(".exlg-badge").remove()
-                $(`<span class="am-radius exlg-badge">${tag}</span>`).appendTo($e)
+                $(`<span class="exlg-badge">${tag}</span>`).appendTo($e)
                 $e.addClass("exlg")
             }
         }
@@ -1510,15 +1510,24 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     })
 }, () => {return $("a[target='_blank'][href]").not(".exlg").length !== 0}, `
 .exlg-badge {
-    background-color: #0099fe9e;
+    border-radius: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    transition: all .15s;
     display: inline-block;
-    padding: .25em .625em;
-    font-weight: 1000;
-    color: #efff00;
+    min-width: 10px;
     font-size: 1.2rem;
-    border-radius: 15px;
+    font-weight: 700;
+    background-color: mediumturquoise;
+    color: #fff;
+    line-height: 1;
+    vertical-align: baseline;
+    white-space: nowrap;
+    cursor: pointer;
 }
-`) // TODO: 修改此处的 css
+`)
 
 $(() => {
     log("Exposing")
