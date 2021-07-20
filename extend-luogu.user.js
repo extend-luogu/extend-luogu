@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.3.2
+// @version        2.4.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -10,7 +10,7 @@
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
 // @match          https://extend-luogu.github.io/exlg-setting/*
-// @match          localhost:1634/*
+// @match          localhost:1634
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -157,8 +157,9 @@ const mod = {
         mod.reg("@" + name, info, path, data, arg => (func(arg), false), styl),
 
     reg_user_tab: (name, info, tab, vars, data, func, styl) =>
+        // FIXME: this seems not to work when the tab loads slowly.
         mod.reg(
-            name, info, "@/user/.*", data,
+            name, info, [ "@/user/*" ], data,
             arg => {
                 const $tabs = $(".items")
                 const work = () => {
@@ -317,7 +318,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         }[source])
         .on("click", () => uindow.exlg.dash = uindow.open({
             tcs: "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting",
-            debug: "localhost:1634/dashboard",
+            debug: "localhost:1634",
             gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
             gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
         }[source]))
@@ -386,7 +387,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     }
 `)
 
-mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/dashboard/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
+mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
     const novogui_modules = [
         {
             name: "modules",
@@ -1080,18 +1081,43 @@ div.exlg-copied {
 }
 `)
 
-mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+", null, () => {
-    const id = location.pathname.slice(10)
-    const $rand_poi = $(`<button type="button" class="exlg-rand-training-problem-btn lfe-form-sz-middle">随机跳题</button>`)
-        .mouseenter(() => $rand_poi.css("opacity", "0.9"))
-        .mouseleave(() => $rand_poi.css("opacity", "1"))
-        .on("click", async () => {
-            const
-                res = await getContent(`/training/${id}`),
-                list = res.currentData.training.problems,
-                rand_idx = Math.floor(Math.random() * list.length),
-                pid = list[rand_idx].problem.pid
-            location.href = `/problem/${pid}`
+mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*)?", {
+    problem_type: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
+        "Preferences about problem choosing", "随机跳题的题目种类"
+    ] }
+}, ({ msto }) => {
+    let ptypes = msto.problem_type.startsWith("unac") + msto.problem_type.endsWith("only") * (-1) + 2
+    const $op = $("div.operation")
+    $op.children("button").clone(true)
+        .appendTo($op)
+        .text("随机跳题")
+        .addClass("exlg-rand-training-problem-btn")
+        .on("click", () => {
+            const tInfo = uindow._feInjection.currentData.training
+            let candProbList = []
+
+            tInfo.problems.some(pb => {
+                if (tInfo.userScore.score[pb.problem.pid] === null) {
+                    if (ptypes & 1)
+                        candProbList.push(pb.problem.pid)
+                }
+                else if (tInfo.userScore.score[pb.problem.pid] < pb.problem.fullScore && (ptypes & 2))
+                    candProbList.push(pb.problem.pid)
+            })
+
+            if (tInfo.problemCount === 0)
+                return lg_alert("题单不能为空")
+            else if (candProbList.length === 0) {
+                if (ptypes === 1)
+                    return lg_alert("您已经做完所有新题啦！")
+                else if (ptypes === 2)
+                    return lg_alert("您已经订完所有错题啦！")
+                else
+                    return lg_alert("您已经切完所有题啦！")
+            }
+
+            const pid = ~~ (Math.random() * 1.e6) % candProbList.length
+            uindow.location.href = "https://www.luogu.com.cn/problem/" + candProbList[pid]
         })
 }, `
 .exlg-rand-training-problem-btn {
@@ -1419,7 +1445,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
 })
 
 // TODO
-mod.reg("update-log", "更新日志显示", "@/", {
+mod.reg("update-log", "更新日志显示", "@/*", {
     last_version: { ty: "string", priv: true }
 }, ({ msto }) => {
     const version = GM_info.script.version
