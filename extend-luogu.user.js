@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.0
+// @version        2.5.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1494,7 +1494,6 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
           $name = $("a[target='_blank'][href]").not(".exlg"),
           prefix = "/user/"
     $name.each((i, e, $e = $(e)) => {
-        console.log($e)
         const href = $e.attr("href")
         if (href.lastIndexOf(prefix) === 0) {
             const uid = href.substring(prefix.length)
