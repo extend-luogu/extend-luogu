@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.6
+// @version        2.5.7
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -328,33 +328,25 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         }[source]))
 }, () => $(".user-nav").length !== 0 && $("#exlg-dash").length === 0, `
     /* dash */
-
     #exlg-dash {
         position: relative;
         display: inline-block;
-
         padding: 1px 10px 3px;
-
         color: white;
         border-radius: 6px;
         box-shadow: 0 0 7px dodgerblue;
     }
-
     #exlg-dash > .exlg-warn {
         position: absolute;
         top: -.5em;
         right: -.5em;
     }
-
     /* global */
-
     .exlg-icon::before {
         display: inline-block;
         width: 1.3em;
         height: 1.3em;
-
         margin-left: 3px;
-
         text-align: center;
         border-radius: 50%;
     }
@@ -364,39 +356,32 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     .exlg-icon::after {
         display: none;
         content: attr(name);
-
         margin-left: 5px;
         padding: 0 3px;
-
         background-color: white;
         box-shadow: 0 0 7px deepskyblue;
-
         border-radius: 7px;
     }
-
     .exlg-icon.exlg-info::before {
         content: "i";
-
         color: white;
         background-color: deepskyblue;
         font-style: italic;
     }
-
     .exlg-icon.exlg-warn::before {
         content: "!";
-
         color: white;
         background-color: rgb(231, 76, 60);
         font-style: normal;
     }
-    
+
     .exlg-unselectable {
         -webkit-user-select: none;
         -moz-user-select: none;
         -o-user-select: none;
         user-select: none;
     }
-    
+
     [exlgcolor='red'] {
         background-color: rgb(254, 76, 97);
     }
@@ -952,9 +937,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 .exlg-rand-settings {
     position: relative;
     display: inline-block;
-
     padding: 1px 5px 1px 5px;
-
     background-color: white;
     border: 1px solid #6495ED;
     color: cornflowerblue;
@@ -1397,26 +1380,20 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         position: fixed;
         top: 0;
         z-index: 65536;
-
         display: none;
         width: 100%;
         height: 40px;
-
         background-color: white;
         box-shadow: 0 0 7px dodgerblue;
     }
-
     #exlg-cli-input {
         display: block;
         height: 100%;
         width: 100%;
-
         border: none;
         outline: none;
-
         font-family: "Fira Code", "consolas", "Courier New", monospace;
     }
-
     #exlg-cli-input.error {
         background-color: indianred;
     }
@@ -1488,7 +1465,6 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, () => {
-    log(sto["^sponsor-list"].tag_list)
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list),
         $name = $("a[target='_blank'][href]").not(".exlg"),
         prefix = "/user/"
