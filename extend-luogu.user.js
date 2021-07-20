@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.3
+// @version        2.5.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -389,6 +389,38 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         background-color: rgb(231, 76, 60);
         font-style: normal;
     }
+    
+    .exlg-unselectable {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+    }
+    
+    [exlgcolor='red'] {
+        background-color: rgb(254, 76, 97);
+    }
+    [exlgcolor='orange'] {
+        background-color: rgb(243, 156, 17);
+    }
+    [exlgcolor='yellow'] {
+        background-color: rgb(255, 193, 22);
+    }
+    [exlgcolor='green'] {
+        background-color: rgb(82, 196, 26);
+    }
+    [exlgcolor='blue'] {
+        background-color: rgb(52, 152, 219);
+    }
+    [exlgcolor='purple'] {
+        background-color: rgb(157, 61, 207);
+    }
+    [exlgcolor='black'] {
+        background-color: rgb(14, 29, 105);
+    }
+    [exlgcolor='grey'] {
+        background-color: rgb(191, 191, 191);
+    }
 `)
 
 mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/dashboard/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
@@ -699,14 +731,14 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     exrand_difficulty: {
         ty: "tuple",
         lvs: [
-            { ty: "boolean", dft: false, strict: true, repeat: 8}
+            { ty: "boolean", dft: false, strict: true, repeat: 8 }
         ],
         priv: true
     },
     exrand_source: {
         ty: "tuple",
         lvs: [
-            { ty: "boolean", dft: false, strict: true, repeat: 5}
+            { ty: "boolean", dft: false, strict: true, repeat: 5 }
         ],
         priv: true
     }
@@ -792,7 +824,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     const $board = $(`<span id="exlg-dash-0-window" class="exlg-window" style="display: block;"><p></p><ul id="exlg-rand-diffs">
 <div>
 <span class=".exlg-title-span">
-<div id="button-showdiff" class="exlg-rand-settings select exlg-unselectable">题目难度</div>
+<div id="button-showdiff" class="exlg-rand-settings selected exlg-unselectable">题目难度</div>
 <span class="exlg-unselectable">&nbsp;&nbsp;</span>
 <div id="button-showsrce" class="exlg-rand-settings exlg-unselectable">题目来源</div>
 </span>
@@ -829,56 +861,51 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     const $btn_diff = $("#button-showdiff"), $btn_srce = $("#button-showsrce")
     const $diff_div = $("#exlg-exrd-diff") , $srce_div = $("#exlg-exrd-srce")
     $btn_diff.on("click", () => {
-        $btn_diff.addClass("select")
-        $btn_srce.removeClass("select")
+        $btn_diff.addClass("selected")
+        $btn_srce.removeClass("selected")
         $diff_div.show()
         $srce_div.hide()
     })
     $btn_srce.on("click", () => {
-        $btn_diff.removeClass("select")
-        $btn_srce.addClass("select")
+        $btn_diff.removeClass("selected")
+        $btn_srce.addClass("selected")
         $diff_div.hide()
         $srce_div.show()
     })
 
-    let i = 0
-    for (i = 0; i < difficulty_html.length; ++ i) {
-        const j = i // Hack: 否则等执行完for后click就一直按最后的i的值来，似乎用let写在里面是动态访问？
+    for (let i = 0; i < difficulty_html.length; ++ i) {
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
             .on("click", () => { // Note: 建一个dash而已
                 $btn.hide()
                 $("#exlg-exrd-diff-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
-                msto.exrand_difficulty[j] = false
+                msto.exrand_difficulty[i] = false
             }).appendTo($("#exlg-exrd-diff-1"))
         if (msto.exrand_difficulty[i] === false) $btn.hide()
     }
-    for (i = 0; i < difficulty_html.length; ++ i) {
-        const j = i // Note: 同上 不写了
+    for (let i = 0; i < difficulty_html.length; ++ i) {
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
             .on("click", () => {
                 $btn.hide()
                 $("#exlg-exrd-diff-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
-                msto.exrand_difficulty[j] = true
+                msto.exrand_difficulty[i] = true
             }).appendTo($("#exlg-exrd-diff-0"))
         if (msto.exrand_difficulty[i] === true) $btn.hide()
     }
-    for (i = 0; i < source_html.length; ++ i) {
-        const j = i
+    for (let i = 0; i < source_html.length; ++ i) {
         const $btn = $(source_html[i]).attr("unselectable", "on")
             .on("click", () => {
                 $btn.hide()
                 $("#exlg-exrd-srce-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
-                msto.exrand_source[j] = false
+                msto.exrand_source[i] = false
             }).appendTo($("#exlg-exrd-srce-1"))
         if (msto.exrand_source[i] === false) $btn.hide()
     }
-    for (i = 0; i < source_html.length; ++ i) {
-        const j = i
+    for (let i = 0; i < source_html.length; ++ i) {
         const $btn = $(source_html[i]).attr("unselectable", "on")
             .on("click", () => {
                 $btn.hide()
                 $("#exlg-exrd-srce-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
-                msto.exrand_source[j] = true
+                msto.exrand_source[i] = true
             }).appendTo($("#exlg-exrd-srce-0"))
         if (msto.exrand_source[i] === true) $btn.hide()
     }
@@ -934,7 +961,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     border-radius: 6px;
     font-size:12px;
 }
-.exlg-rand-settings.select {
+.exlg-rand-settings.selected {
     background-color: cornflowerblue;
     border: 1px solid #6495ED;
     color: white;
@@ -946,36 +973,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     color: white;
     border-radius: 6px;
     font-size:12px;
-}
-.exlg-unselectable {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-}
-div[exlgcolor='red'] {
-    background-color: rgb(254, 76, 97);
-}
-div[exlgcolor='orange'] {
-    background-color: rgb(243, 156, 17);
-}
-div[exlgcolor='yellow'] {
-    background-color: rgb(255, 193, 22);
-}
-div[exlgcolor='green'] {
-    background-color: rgb(82, 196, 26);
-}
-div[exlgcolor='blue'] {
-    background-color: rgb(52, 152, 219);
-}
-div[exlgcolor='purple'] {
-    background-color: rgb(157, 61, 207);
-}
-div[exlgcolor='black'] {
-    background-color: rgb(14, 29, 105);
-}
-div[exlgcolor='grey'] {
-    background-color: rgb(191, 191, 191);
 }
 .exlg-rand-settings:hover {
     box-shadow: 0 0 7px dodgerblue;
@@ -995,6 +992,7 @@ div[exlgcolor='grey'] {
     box-shadow: rgb(187 227 255) 0px 0px 7px;
 }
 `)
+
 mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     show_code_lang : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
     copy_code_position : { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
