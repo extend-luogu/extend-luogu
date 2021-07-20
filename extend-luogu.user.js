@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.4.1
+// @version        2.5.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -11,6 +11,8 @@
 // @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
 // @match          https://extend-luogu.github.io/exlg-setting/*
 // @match          localhost:1634/*
+//
+// @conncect       https://*.tencentcs.com/release/*
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -1461,6 +1463,62 @@ mod.reg("update-log", "更新日志显示", "@/", {
         msto.last_version = version
     }
 })
+
+mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
+    tag_list: { ty: "string", priv: true }
+}, ({msto}) => {
+// mod.reg_chore("sponsor-list", "获取标签列表", "1D", null, "@/.*", () => {
+    GM_xmlhttpRequest({
+        method: "GET",
+        url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
+        onload: (res) => {
+            msto["tag_list"] = decodeURIComponent(res.responseText)
+            if (res.status === 200) {
+                log("Discuss saved");
+            }
+            else {
+                log(`Fail: ${res}`);
+            }
+        },
+        onerror: (err) => {
+            log(`Error:${err}`);
+        }
+    })
+})
+
+mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
+    tag_list: { ty: "string", priv: true }
+}, () => {
+    log(sto["^sponsor-list"].tag_list)
+    const tag_list = JSON.parse(sto["^sponsor-list"].tag_list),
+          $name = $("a[target='_blank'][href]").not(".exlg"),
+          prefix = "/user/"
+    $name.each((i, e, $e = $(e)) => {
+        console.log($e)
+        const href = $e.attr("href")
+        if (href.lastIndexOf(prefix) === 0) {
+            const uid = href.substring(prefix.length)
+            console.log(href + " " + uid)
+            const tag = tag_list[uid]
+            if (tag !== undefined) {
+                $e.find(".exlg-badge").remove()
+                $(`<span class="am-radius exlg-badge">${tag}</span>`).appendTo($e)
+                $e.addClass("exlg")
+            }
+        }
+        $e.addClass("exlg")
+    })
+}, () => {return $("a[target='_blank'][href]").not(".exlg").length !== 0}, `
+.exlg-badge {
+    background-color: #0099fe9e;
+    display: inline-block;
+    padding: .25em .625em;
+    font-weight: 1000;
+    color: #efff00;
+    font-size: 1.2rem;
+    border-radius: 15px;
+}
+`) // TODO: 修改此处的 css
 
 $(() => {
     log("Exposing")
