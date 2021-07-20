@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.3.2
+// @version        2.4.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1080,18 +1080,43 @@ div.exlg-copied {
 }
 `)
 
-mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+", null, () => {
-    const id = location.pathname.slice(10)
-    const $rand_poi = $(`<button type="button" class="exlg-rand-training-problem-btn lfe-form-sz-middle">随机跳题</button>`)
-        .mouseenter(() => $rand_poi.css("opacity", "0.9"))
-        .mouseleave(() => $rand_poi.css("opacity", "1"))
-        .on("click", async () => {
-            const
-                res = await getContent(`/training/${id}`),
-                list = res.currentData.training.problems,
-                rand_idx = Math.floor(Math.random() * list.length),
-                pid = list[rand_idx].problem.pid
-            location.href = `/problem/${pid}`
+mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*)?", {
+    problem_type: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
+        "Preferences about problem choosing", "随机跳题的题目种类"
+    ] }
+}, ({ msto }) => {
+    let ptypes = msto.problem_type.startsWith("unac") + msto.problem_type.endsWith("only") * (-1) + 2
+    const $op = $("div.operation")
+    $op.children("button").clone(true)
+        .appendTo($op)
+        .text("随机跳题")
+        .addClass("exlg-rand-training-problem-btn")
+        .on("click", () => {
+            const tInfo = uindow._feInjection.currentData.training
+            let candProbList = []
+
+            tInfo.problems.some(pb => {
+                if (tInfo.userScore.score[pb.problem.pid] === null) {
+                    if (ptypes & 1)
+                        candProbList.push(pb.problem.pid)
+                }
+                else if (tInfo.userScore.score[pb.problem.pid] < pb.problem.fullScore && (ptypes & 2))
+                    candProbList.push(pb.problem.pid)
+            })
+
+            if (tInfo.problemCount === 0)
+                return lg_alert("题单不能为空")
+            else if (candProbList.length === 0) {
+                if (ptypes === 1)
+                    return lg_alert("您已经做完所有新题啦！")
+                else if (ptypes === 2)
+                    return lg_alert("您已经订完所有错题啦！")
+                else
+                    return lg_alert("您已经切完所有题啦！")
+            }
+
+            const pid = ~~ (Math.random() * 1.e6) % candProbList.length
+            uindow.location.href = "https://www.luogu.com.cn/problem/" + candProbList[pid]
         })
 }, `
 .exlg-rand-training-problem-btn {
