@@ -1,8 +1,8 @@
 const log = (f, ...s) => console.log(`%c[novogui] ${f}`, "color: #d57870;", ...s)
 let sto
 
-let alwaysVisibile = "true"
-let SettingType = {
+const alwaysVisibile = "true"
+const SettingType = {
 	COMBOBOX: 0,
 	SLIDER: 1,
 	TEXTBOX: 2,
@@ -85,33 +85,31 @@ const getSliderValue = setting =>  $(`#${setting} > .real-slider`).val()
 const getSelectboxValue = setting => $(`#${setting} > .selectbox-value`).text()
 const selectboxHasItem = (setting, item) => $(`#${setting} > .combobox-items > li:contains('${item}')`).hasClass("selected-item")
 const expandHandler = module => {
-	let growDiv = $(`#${module}-module > .module-settings-wrapper`)
-	let expander = $(`#${module}-module > .module-header > .module-expand`)
-	if (growDiv.height()) {
-		growDiv.height(0)
-		expander.css("transform", "rotateX(0deg)")
+	let $growDiv = $(`#${module}-module > .module-settings-wrapper`)
+	let $expander = $(`#${module}-module > .module-header > .module-expand`)
+	if ($growDiv.height()) {
+		$growDiv.height(0)
+		$expander.css("transform", "rotateX(0deg)")
 	} else {
-		let wrapper = $(`#${module}-module > .module-settings-wrapper > .module-settings`)
-		growDiv.height(wrapper.height())
-		expander.css("transform", "rotateX(180deg)")
+		let $wrapper = $(`#${module}-module > .module-settings-wrapper > .module-settings`)
+		$growDiv.height($wrapper.height())
+		$expander.css("transform", "rotateX(180deg)")
 	}
 	return false
 }
 
 const forceUpdate = module => {
-	let growDiv = $(`#${module}-module > .module-settings-wrapper`)
-	let wrapper = $(
-		`#${module}-module > .module-settings-wrapper > .module-settings`
-	)
-	growDiv.height(wrapper.height())
+	let $growDiv = $(`#${module}-module > .module-settings-wrapper`)
+	let $wrapper = $(`#${module}-module > .module-settings-wrapper > .module-settings`)
+	$growDiv.height($wrapper.height())
 }
 const toggleModule = module => {
-	let moduleHeader = $(`#${module}-module > .module-header`)
-	if (moduleHeader.hasClass("toggled-module")) {
-		moduleHeader.removeClass("toggled-module")
+	let $moduleHeader = $(`#${module}-module > .module-header`)
+	if ($moduleHeader.hasClass("toggled-module")) {
+		$moduleHeader.removeClass("toggled-module")
 		return false
 	} else {
-		moduleHeader.addClass("toggled-module")
+		$moduleHeader.addClass("toggled-module")
 		return true
 	}
 }
@@ -231,14 +229,14 @@ const renderModule = (category, module) => {
 		</div>
 	`)
 
-	let header = $(`#${ module.name }-module > .module-header`)
+	let $header = $(`#${ module.name }-module > .module-header`)
 	if (hasSetting)
-		header.contextmenu(() => expandHandler(module.name))
+		$header.contextmenu(() => expandHandler(module.name))
 
-	if (module.rawName[0] === "@") header.addClass("locked-module")
+	if (module.rawName[0] === "@") $header.addClass("locked-module")
 	else {
 		if (sto[module.rawName].on) toggleModule(module.name) // Sto: load
-		header.on("click", () => {
+		$header.on("click", () => {
 			sto[module.rawName].on = toggleModule(module.name) // Sto: save
 		})
 	}
@@ -324,7 +322,9 @@ const renderSettings = module => {
 	})
 	return html
 }
-const renderSidebar = () => {}
+const renderSidebar = () => {
+	
+}
 const refreshSettingVisiblity = module => {
 	if ("settings" in module)
 		module.settings.forEach(setting =>
@@ -338,18 +338,18 @@ const refreshSettings = module => {
 	forceUpdate(module.name)
 }
 const getHSLColorFromSetting = setting => {
-	let h = $(`#${setting} > .sliders > .real-h-slider`).val()
-	let s = $(`#${setting} > .sliders > .real-s-slider`).val()
-	let l = $(`#${setting} > .sliders > .real-l-slider`).val()
+	const h = $(`#${setting} > .sliders > .real-h-slider`).val()
+	const s = $(`#${setting} > .sliders > .real-s-slider`).val()
+	const l = $(`#${setting} > .sliders > .real-l-slider`).val()
 	return `hsl(${h}, ${s}, ${l})`
 }
 const registerHandlers = () => {
 	moduleRegistry.forEach(refreshSettingVisiblity)
 
 	$(".real-slider").on("input", e => {
-		let that = e.currentTarget
-		let id = $(that).parent().attr("id")
-		let setting = settings.get(id)
+		const that = e.currentTarget
+		const id = $(that).parent().attr("id")
+		const setting = settings.get(id)
 		$(`#${id} > .display-slider`).val(that.value)
 		$(`#${id} > .slider-value-holder > .slider-value`).html(that.value)
 		refreshSettings(setting.parent)
@@ -358,71 +358,71 @@ const registerHandlers = () => {
 	})
 
 	$(".combobox-items > li").on("click", e => {
-		let element = $(e.target)
-		let id = $(e.currentTarget).parent().parent().attr("id")
-		let setting = settings.get(id)
-		toggleClass(element, "selected-item")
+		const $e = $(e.target)
+		const id = $(e.currentTarget).parent().parent().attr("id")
+		const setting = settings.get(id)
+		toggleClass($e, "selected-item")
 		refreshSettings(setting.parent)
 
 		// TODO Sto: save
 	})
 	$(".combobox-wrapper").on("click", e => {
-		let id = $(e.currentTarget).parent().attr("id")
+		const id = $(e.currentTarget).parent().attr("id")
 		toggleClass($(`#${id} > .combobox-items`), "collapsed-combobox")
-		let module = $(e.currentTarget).parent().parent().parent().parent().attr("id").split("-")[0]
+		const module = $(e.currentTarget).parent().parent().parent().parent().attr("id").split("-")[0]
 		forceUpdate(module)
 	})
 
 	$(".selectbox-value").on("click", e => {
-		let that = e.currentTarget
-		let name = that.parentElement.id
-		let setting = settings.get(name)
-		let value = $(that)
+		const that = e.currentTarget
+		const name = that.parentElement.id
+		const setting = settings.get(name)
+		const $value = $(that)
 		let i = setting.acceptableValues.indexOf(value.text())
 		i = ++i == setting.acceptableValues.length ? 0 : i
-		let val = setting.acceptableValues[i]
-		value.text(val)
+		const val = setting.acceptableValues[i]
+		$value.text(val)
 		refreshSettings(setting.parent)
 
 		sto[setting.parent.rawName][name] = val // Sto: save
 	})
 
 	$(".textbox").on("change", e => {
-		let that = e.currentTarget
-		let name = that.parentElement.id
-		let setting = settings.get(name)
+		const that = e.currentTarget
+		const name = that.parentElement.id
+		const setting = settings.get(name)
 		
 		sto[setting.parent.rawName][name] = that.value // Sto: save
 	})
 	$(".textbox-at").on("click", e => {
-		let at = $(e.currentTarget)
-		let text = at.next(".textbox")
-		let editor = $(".textbox-editor > textarea")
+		const $at = $(e.currentTarget)
+		const $text = at.next(".textbox")
+		const $editor = $(".textbox-editor > textarea")
 
-		if (toggleClass(at, "textbox-extended")) {
-			text.attr("disabled", true)
-			editor.val(text.val())
+		if (toggleClass($at, "textbox-extended")) {
+			$text.attr("disabled", true)
+			$editor.val($text.val())
 		} else {
-			text.attr("disabled", false)
-			text.val(editor.val()).change()
+			$text.attr("disabled", false)
+			$text.val($editor.val()).change()
 		}
 	})
 
 	$(".checkbox-value").parent().on("click", e => {
 		// Note: Larger clicking area.
-		let name = e.currentTarget.id
-		let element = $(e.currentTarget).children(".checkbox-value")
-		let setting = settings.get(name)
-		let val = toggleClass(element, "checkbox-checked")
+		const name = e.currentTarget.id
+		const $e = $(e.currentTarget).children(".checkbox-value")
+		const setting = settings.get(name)
+		const val = toggleClass($e, "checkbox-checked")
 		refreshSettings(setting.parent)
 
 		sto[setting.parent.rawName][name] = val // Sto: save
 	})
 
 	$(".sliders").contextmenu(e => {
-		let id = $(e.target).parent().parent().attr("id")
-		let slider = $(e.target).parent().attr("slider")
-		let next = getNextSlider(slider)
+		const id = $(e.target).parent().parent().attr("id")
+		const $slider = $(e.target).parent().attr("slider")
+		const next = getNextSlider($slider)
 		$(e.target).parent().attr("slider", next)
 		$(`#${id} > .sliders > .${slider}-slider`).addClass("disabled-color-slider")
 		$(`#${id} > .sliders > .real-${slider}-slider`).attr("disabled", true).addClass("disabled-color-slider")
@@ -434,9 +434,9 @@ const registerHandlers = () => {
 
 	// TODO
 	$(".real-color-slider").on("input", e => {
-		let that = e.currentTarget
-		let slider = $(that).attr("slider")
-		let id = $(that).parent().parent().attr("id")
+		const that = e.currentTarget
+		const slider = $(that).attr("slider")
+		const id = $(that).parent().parent().attr("id")
 		$(`#${id} > .sliders > .${slider}-slider`).val(that.value)
 		if (slider === "h") {
 			$(`#${id} > .sliders > .s-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
@@ -444,7 +444,7 @@ const registerHandlers = () => {
 		}
 	})
 	$(".real-h-slider").each((_, that) => {
-		let id = $(that).parent().parent().attr("id")
+		const id = $(that).parent().parent().attr("id")
 		$(`#${id} > .sliders > .s-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
 		$(`#${id} > .sliders > .l-slider`).css("background-color", `hsl(${that.value}, 100%, 50%)`)
 	})

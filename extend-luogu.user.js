@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.3.1
+// @version        2.3.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -10,7 +10,7 @@
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
 // @match          https://extend-luogu.github.io/exlg-setting/*
-// @match          localhost:1634
+// @match          localhost:1634/*
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -157,9 +157,8 @@ const mod = {
         mod.reg("@" + name, info, path, data, arg => (func(arg), false), styl),
 
     reg_user_tab: (name, info, tab, vars, data, func, styl) =>
-        // FIXME: this seems not to work when the tab loads slowly.
         mod.reg(
-            name, info, [ "@/user/*" ], data,
+            name, info, "@/user/.*", data,
             arg => {
                 const $tabs = $(".items")
                 const work = () => {
@@ -318,7 +317,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         }[source])
         .on("click", () => uindow.exlg.dash = uindow.open({
             tcs: "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting",
-            debug: "localhost:1634",
+            debug: "localhost:1634/dashboard",
             gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
             gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
         }[source]))
@@ -387,7 +386,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     }
 `)
 
-mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
+mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/dashboard/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
     const novogui_modules = [
         {
             name: "modules",
@@ -1420,7 +1419,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
 })
 
 // TODO
-mod.reg("update-log", "更新日志显示", "@/*", {
+mod.reg("update-log", "更新日志显示", "@/", {
     last_version: { ty: "string", priv: true }
 }, ({ msto }) => {
     const version = GM_info.script.version

@@ -1,4 +1,4 @@
-.eslintrc.js
-*/min.js
 dashboard/
+.eslintrc.js
+*.min.js
 
