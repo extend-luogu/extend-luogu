@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.1
+// @version        2.5.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -25,6 +25,7 @@
 // @grant          GM_deleteValue
 // @grant          GM_listValues
 // @grant          GM_setClipboard
+// @grant          GM_xmlhttpRequest
 // @grant          unsafeWindow
 // ==/UserScript==
 
