@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.6.0
+// @version        2.7.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -12,7 +12,7 @@
 // @match          https://extend-luogu.github.io/exlg-setting/*
 // @match          localhost:1634/*
 //
-// @connect       https://*.tencentcs.com/release/*
+// @connect        tencentcs.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -265,13 +265,6 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
     const q = new URLSearchParams(location.search)
     switch (q.get("type")) {
     // Note: ->
-    case "benben":
-        document.write(`<iframe src="https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121" exlg="exlg"></iframe>`)
-        uindow.addEventListener("message", e => {
-            e.data.unshift("benben")
-            uindow.parent.postMessage(e.data, "*")
-        })
-        break
     case "update":
         document.write(`<iframe src="https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen" exlg="exlg"></iframe>`)
         uindow.addEventListener("message", e => {
@@ -299,10 +292,6 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
         display: none;
     }
 `)
-
-mod.reg_main("benben-data", "犇犇数据", "@tcs1/release/APIGWHtmlDemo-1615602121", null, () =>
-    uindow.parent.postMessage(JSON.parse(document.body.innerText), "*")
-)
 
 mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null, () =>
     uindow.parent.postMessage([ document.body.innerText ], "*")
@@ -661,56 +650,61 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
             $("#feed-more").hide()
             $("li.am-comment").remove()
 
-            if (loaded) $("#exlg-benben").attr("src", $("#exlg-benben").attr("src"))
-            else {
-                springboard({ type: "benben" }).appendTo($("body")).hide()
-                loaded = true
-            }
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`,
+                onload: (res) => {
+                    const e = JSON.parse(res.response)
+                    e.forEach(m => $(`
+<li class="am-comment am-comment-primary feed-li" exlg="exlg">
+    <div class="lg-left">
+        <a href="/user/${ m.user.uid }" class="center">
+            <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
+        </a>
+    </div>
+    <div class="am-comment-main">
+        <header class="am-comment-hd">
+            <div class="am-comment-meta">
+                <span class="feed-username">
+                    <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
+                        ${ m.user.name }
+                    </a>
+                    <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
+                        ${ check(m.user.ccfLevel) }
+                    </a>
+                    ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
+                </span>
+                ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
+                <a name="feed-reply">回复</a>
+            </div>
+        </header>
+        <div class="am-comment-bd">
+            <span class="feed-comment">
+                ${ marked(m.content) }
+            </span>
+        </div>
+    </div>
+</li>
+                        `)
+                        .appendTo($("ul#feed"))
+                        .find("a[name=feed-reply]").on("click", () =>
+                            $("textarea")
+                            .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                            .trigger("input")
+                        )
+                    )
+                },
+                onerror: (err) => {
+                    error(err)
+                }
+            })
         })
 
+    /*
     uindow.addEventListener("message", e => {
-        if (e.data[0] !== "benben") return
-        e.data.shift()
-        e.data.forEach(m =>
-            $(`
-                <li class="am-comment am-comment-primary feed-li" exlg="exlg">
-                    <div class="lg-left">
-                        <a href="/user/${ m.user.uid }" class="center">
-                            <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
-                        </a>
-                    </div>
-                    <div class="am-comment-main">
-                        <header class="am-comment-hd">
-                            <div class="am-comment-meta">
-                                <span class="feed-username">
-                                    <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
-                                        ${ m.user.name }
-                                    </a>
-                                    <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
-                                        ${ check(m.user.ccfLevel) }
-                                    </a>
-                                    ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
-                                </span>
-                                ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
-                                <a name="feed-reply">回复</a>
-                            </div>
-                        </header>
-                        <div class="am-comment-bd">
-                            <span class="feed-comment">
-                                ${ marked(m.content) }
-                            </span>
-                        </div>
-                    </div>
-                </li>
-            `)
-                .appendTo($("ul#feed"))
-                .find("a[name=feed-reply]").on("click", () =>
-                    $("textarea")
-                        .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                        .trigger("input")
-                )
-        )
+        
     })
+    */
 })
 
 mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
@@ -1499,7 +1493,7 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
             msto["tag_list"] = decodeURIComponent(res.responseText)
         },
         onerror: (err) => {
-            log(`Error:${err}`)
+            error(err)
         }
     })
 })
@@ -1526,7 +1520,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     })
     const whref = window.location.href
     const hprefix = "https://www.luogu.com.cn/user/"
-    if (whref.lastIndexOf(hprefix === 0)) {
+    if (whref.lastIndexOf(hprefix) === 0) {
         const uid = whref.substring(hprefix.length).split("#")[0],
             tag = tag_list[uid],
             $title = $("div.user-name").not(".exlg")
@@ -1538,7 +1532,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     }
 }, (e) => {
     return ($(e.target).hasClass("exlg-badge") === false) &&
-        ($("a[target='_blank'][href]").not(".exlg").length !== 0)
+    ($("a[target='_blank'][href]").not(".exlg").length !== 0)
 }, `
 .exlg-badge {
     border-radius: 50px;
