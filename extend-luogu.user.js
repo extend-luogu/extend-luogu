@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.7
+// @version        2.5.8
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -932,7 +932,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     */
 },`
 #exlg-rand-diffs {
-    list-style-type:none
+    list-style-type: none
 }
 .exlg-rand-settings {
     position: relative;
@@ -942,7 +942,9 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     border: 1px solid #6495ED;
     color: cornflowerblue;
     border-radius: 6px;
-    font-size:12px;
+    font-size: 12px;
+    position: relative;
+    top: -2px;
 }
 .exlg-rand-settings.selected {
     background-color: cornflowerblue;
@@ -955,7 +957,9 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     padding: 1px 5px 1px;
     color: white;
     border-radius: 6px;
-    font-size:12px;
+    font-size: 12px;
+    margin-left: 1px;
+    margin-right: 1px;
 }
 .exlg-rand-settings:hover {
     box-shadow: 0 0 7px dodgerblue;
@@ -1499,6 +1503,10 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     vertical-align: baseline;
     white-space: nowrap;
     cursor: pointer;
+    margin-left: 2px;
+    margin-right: 2px;
+    position: relative;
+    top: -1px;
 }
 `)
 
