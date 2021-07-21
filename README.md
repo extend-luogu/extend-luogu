@@ -4,7 +4,7 @@ Makes [Luogu](https://www.luogu.com.cn/) more powerful.
 
 ## Installation
 
-[Chinese Guide](https://www.luogu.com.cn/paste/fnln7ze9)
+[Chinese Guide / 中文指导](https://github.com/extend-luogu/extend-luogu/blob/main/README-CN.md)
 
 1. (recommended) Visit [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/main/extend-luogu.user.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/).
 
