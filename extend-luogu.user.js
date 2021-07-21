@@ -1505,7 +1505,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     transition: all .15s;
     display: inline-block;
     min-width: 10px;
-    font-size: 1rem;
+    font-size: 1em;
     font-weight: 700;
     background-color: mediumturquoise;
     color: #fff;
