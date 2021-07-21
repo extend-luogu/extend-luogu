@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.3
+// @version        2.7.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -110,6 +110,17 @@ const springboard = (param, styl) => {
     `)
     log("Building springboard: %o", $sb[0])
     return $sb
+}
+
+const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
+    if ((/AT[0-9]{1,4}/i).test(text)) return true
+    if ((/CF[0-9]{1,4}[A-Z][0-9]{0,1}/i).test(text)) return true
+    if ((/SP[0-9]{1,5}/i).test(text)) return true
+    if ((/P[0-9]{4}/i).test(text)) return true
+    if ((/UVA[0-9]{1,5}/i).test(text)) return true
+    if ((/U[0-9]{1,6}/i).test(text)) return true
+    if ((/T[0-9]{1,6}/i).test(text)) return true
+    return false
 }
 
 // ==/Utilities==
@@ -740,16 +751,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         `<div exlgcolor="green"  class="exlg-difficulties exlg-unselectable">ATcoder</div>`,
         `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
     ]
-    const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
-        if ((/AT[0-9]{1,4}/i).test(text)) return true
-        if ((/CF[0-9]{1,4}[A-Z][0-9]{0,1}/i).test(text)) return true
-        if ((/SP[0-9]{1,5}/i).test(text)) return true
-        if ((/P[0-9]{4}/i).test(text)) return true
-        if ((/UVA[0-9]{1,5}/i).test(text)) return true
-        if ((/U[0-9]{1,6}/i).test(text)) return true
-        if ((/T[0-9]{1,6}/i).test(text)) return true
-        return false
-    }
+
     const func_jump_problem = (str) => { // Note: 很好理解
         if (judge_problem(str)) str = str.toUpperCase()
         if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号")
@@ -860,7 +862,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
                 $("#exlg-exrd-diff-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
                 msto.exrand_difficulty[i] = false
             }).appendTo($("#exlg-exrd-diff-1"))
-        if (msto.exrand_difficulty[i] === false) $btn.hide()
+        if (!msto.exrand_difficulty[i]) $btn.hide()
     }
     for (let i = 0; i < difficulty_html.length; ++ i) {
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
@@ -869,7 +871,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
                 $("#exlg-exrd-diff-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
                 msto.exrand_difficulty[i] = true
             }).appendTo($("#exlg-exrd-diff-0"))
-        if (msto.exrand_difficulty[i] === true) $btn.hide()
+        if (msto.exrand_difficulty[i]) $btn.hide()
     }
     for (let i = 0; i < source_html.length; ++ i) {
         const $btn = $(source_html[i]).attr("unselectable", "on")
@@ -878,7 +880,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
                 $("#exlg-exrd-srce-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
                 msto.exrand_source[i] = false
             }).appendTo($("#exlg-exrd-srce-1"))
-        if (msto.exrand_source[i] === false) $btn.hide()
+        if (!msto.exrand_source[i]) $btn.hide()
     }
     for (let i = 0; i < source_html.length; ++ i) {
         const $btn = $(source_html[i]).attr("unselectable", "on")
@@ -887,7 +889,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
                 $("#exlg-exrd-srce-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
                 msto.exrand_source[i] = true
             }).appendTo($("#exlg-exrd-srce-0"))
-        if (msto.exrand_source[i] === true) $btn.hide()
+        if (msto.exrand_source[i]) $btn.hide()
     }
     const exrand_poi = async () => { // Note: 异步写法（用到了lg_content）
         let difficulty_list = [], source_list = []
@@ -975,9 +977,11 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 }
 `)
 
+
 mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     show_code_lang : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
     copy_code_position : { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
+    code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: ["Custom Code Title", "自定义代码块标题"] },
     copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
 },  ({ msto }) => {
     const isRecord = /\/record\/.*/.test(location.href)
@@ -1017,7 +1021,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
         if (! msto.show_code_lang) return
         const lang = get_lang($code)
         const $title = isRecord ? $(".lfe-h3") : $(`<h3 class="exlg-code-title" style="width: 100%;">源代码 </h3>`)
-        if (lang) $title.text(`${lang} 源代码` + (isRecord ? "" : " ")) // Note: record 不用加空格
+        if (lang) $title.text((msto.copy_code_position.replace("${lang}", lang)) + (isRecord ? "" : " ")) // Note: record 不用加空格
 
         if (! isRecord) $pre.before($title.append($btn))
     })
@@ -1155,6 +1159,21 @@ mod.reg("tasklist-ex", "更好的任务列表", "@/", {
     background-color: rgb(36, 190, 36);
 }
 `)
+
+mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
+    const jump = (event) => {
+        const selection = window.getSelection()
+        const selected = selection.toString().replace(" ", "").toUpperCase()
+        let url
+        if (event.ctrlKey) {
+            const myBlog = document.querySelectorAll(".ops>a[href*=blog]")[0]
+            url = myBlog.href + "solution-"
+        }
+        else url = "https://www.luogu.com.cn/problem/"
+        if (judge_problem(selected)) window.open(url + selected)
+    }
+    document.ondblclick = jump
+})
 
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
     if ($(".exlg-difficulty-color").length) return
@@ -1465,7 +1484,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
         })
     }
     const $search_user = $("#search-user").on("click", func)
-    $("#search-user-input").keydown(e => e.key === "Enter" && func())
+    $("#search-user-input").keydown(e => { e.key === "Enter" && func() })
 })
 
 // TODO
