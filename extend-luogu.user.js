@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.13
+// @version        2.5.15
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1448,18 +1448,11 @@ mod.reg("update-log", "更新日志显示", "@/", {
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, ({msto}) => {
-// mod.reg_chore("sponsor-list", "获取标签列表", "1D", null, "@/.*", () => {
     GM_xmlhttpRequest({
         method: "GET",
         url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
         onload: (res) => {
             msto["tag_list"] = decodeURIComponent(res.responseText)
-            if (res.status === 200) {
-                log("Discuss saved")
-            }
-            else {
-                log(`Fail: ${res}`)
-            }
         },
         onerror: (err) => {
             log(`Error:${err}`)
