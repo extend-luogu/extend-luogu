@@ -1,6 +1,6 @@
 # extend-luogu
 
-Make [Luogu](https://www.luogu.com.cn/) more powerful.
+Makes [Luogu](https://www.luogu.com.cn/) more powerful.
 
 ## Installation
 
@@ -12,13 +12,13 @@ Make [Luogu](https://www.luogu.com.cn/) more powerful.
 
   _Make sure to copy the code **completely**._
 
-3. You will be automatically notified when there's a update. (since `VER 4.4`)
+3. You will be automatically notified when there's a update.
 
 ## Contribution
 
 Welcome!
 
-- Commits should obey our [Commit Rule](https://github.com/ForkFG/FkGitCommitInfoStd) (since `VER 3.0.0`).
+- Commits should obey our [Commit Rule](https://github.com/ForkFG/FkGitCommitInfoStd).
 - This repository uses [eslint](https://eslint.org/), so please make sure your code will be passed under `.eslintrc.js`.
 
 ## Discussion
