@@ -12,7 +12,7 @@
 // @match          https://extend-luogu.github.io/exlg-setting/*
 // @match          localhost:1634/*
 //
-// @conncect       https://*.tencentcs.com/release/*
+// @connect       https://*.tencentcs.com/release/*
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -639,6 +639,7 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
         Orange: "orange lg-bold",
         Red: "red lg-bold",
         Purple: "purple lg-bold",
+        Brown: "brown lg-bold",
     }
     const check_svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="%" style="margin-bottom: -3px;" exlg="exlg">
@@ -1164,9 +1165,9 @@ mod.reg("tasklist-ex", "更好的任务列表", "@/", {
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
     if ($(".exlg-difficulty-color").length) return
     const u = await lg_content(window.location.href)
-    const dif = u.currentData.records.result.map((u) => u.problem.difficulty) // Hack: What the Fuck ??
+    const dif = u.currentData.records.result.map((u) => u.problem.difficulty)
     $("div.problem>div>a>span.pid").each((i, e, $e = $(e)) => {
-        $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`) // Note: 加颜色
+        $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`)
     })
 }, () => $("div.problem>div>a>span.pid").length !== 0 && $(".exlg-difficulty-color").length === 0, `
 .exlg-difficulty-color { font-weight: bold; }
@@ -1270,7 +1271,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 [ "relevantaffairs",    "gs", "gsq",    "灌水", "灌水区",               "r", "ra" ],
                 [ "academics",          "xs", "xsb",    "学术", "学术版",               "a", "ac" ],
                 [ "siteaffairs",        "zw", "zwb",    "站务", "站务版",               "s", "sa" ],
-                [ "problem",            "tm", "tmzb",   "灌水", "题目总版",             "p"       ],
+                [ "problem",            "tm", "tmzb",   "题目", "题目总版",             "p"       ],
                 [ "service",            "fk", "fksqgd", "反馈", "反馈、申请、工单专版",      "se" ]
             ]
             forum = tar.find(ns => ns.includes(forum))?.[0]
@@ -1491,18 +1492,11 @@ mod.reg("update-log", "更新日志显示", "@/", {
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, ({msto}) => {
-// mod.reg_chore("sponsor-list", "获取标签列表", "1D", null, "@/.*", () => {
     GM_xmlhttpRequest({
         method: "GET",
         url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
         onload: (res) => {
             msto["tag_list"] = decodeURIComponent(res.responseText)
-            if (res.status === 200) {
-                log("Discuss saved")
-            }
-            else {
-                log(`Fail: ${res}`)
-            }
         },
         onerror: (err) => {
             log(`Error:${err}`)
@@ -1523,13 +1517,29 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
             const tag = tag_list[uid]
             if (tag !== undefined) {
                 $e.find(".exlg-badge").remove()
-                $(`<span class="exlg-badge" style="margin:0 4px;">${tag}</span>`).appendTo($e)
-                $e.addClass("exlg")
+                $(`<span class="exlg-badge">${tag}</span>`).appendTo(
+                    $e.addClass("exlg")
+                )
             }
         }
-        $e.addClass("exlg")
+        if (href !== "javascript:void 0") $e.addClass("exlg")
     })
-}, () => {return $("a[target='_blank'][href]").not(".exlg").length !== 0}, `
+    const whref = window.location.href
+    const hprefix = "https://www.luogu.com.cn/user/"
+    if (whref.lastIndexOf(hprefix === 0)) {
+        const uid = whref.substring(hprefix.length).split("#")[0],
+            tag = tag_list[uid],
+            $title = $("div.user-name").not(".exlg")
+        if (tag !== undefined) {
+            $(`<span class="exlg-badge">${tag}</span>`).appendTo(
+                $title.addClass("exlg")
+            )
+        }
+    }
+}, (e) => {
+    return ($(e.target).hasClass("exlg-badge") === false) &&
+        ($("a[target='_blank'][href]").not(".exlg").length !== 0)
+}, `
 .exlg-badge {
     border-radius: 50px;
     padding-left: 10px;
@@ -1539,7 +1549,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     transition: all .15s;
     display: inline-block;
     min-width: 10px;
-    font-size: 1.2rem;
+    font-size: 1em;
     font-weight: 700;
     background-color: mediumturquoise;
     color: #fff;
@@ -1549,8 +1559,6 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     cursor: pointer;
     margin-left: 2px;
     margin-right: 2px;
-    position: relative;
-    top: -1px;
 }
 `)
 

@@ -1,10 +1,10 @@
 # extend-luogu
 
-Make [Luogu](https://www.luogu.com.cn/) more powerful.
+Makes [Luogu](https://www.luogu.com.cn/) more powerful.
 
 ## Installation
 
-[Chinese Guide](https://www.luogu.com.cn/paste/fnln7ze9)
+[Chinese Guide / 中文指导](https://github.com/extend-luogu/extend-luogu/blob/main/README-CN.md)
 
 1. (recommended) Visit [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/main/extend-luogu.user.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/).
 
@@ -12,13 +12,13 @@ Make [Luogu](https://www.luogu.com.cn/) more powerful.
 
   _Make sure to copy the code **completely**._
 
-3. You will be automatically notified when there's a update. (since `VER 4.4`)
+3. You will be automatically notified when there's a update.
 
 ## Contribution
 
 Welcome!
 
-- Commits should obey our [Commit Rule](https://github.com/ForkFG/FkGitCommitInfoStd) (since `VER 3.0.0`).
+- Commits should obey our [Commit Rule](https://github.com/ForkFG/FkGitCommitInfoStd).
 - This repository uses [eslint](https://eslint.org/), so please make sure your code will be passed under `.eslintrc.js`.
 
 ## Discussion
