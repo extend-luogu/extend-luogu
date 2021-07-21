@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.7
+// @version        2.6.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1501,6 +1501,11 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     cursor: pointer;
 }
 `)
+
+mod.reg("ban-discuss", "禁用讨论", "@/discuss*", () => {
+    lg_alert("您已禁用讨论")
+    uindow.location.href = "https://www.luogu.com.cn/"
+})
 
 $(() => {
     log("Exposing")
