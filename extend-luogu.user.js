@@ -12,7 +12,7 @@
 // @match          https://extend-luogu.github.io/exlg-setting/*
 // @match          localhost:1634/*
 //
-// @conncect       https://*.tencentcs.com/release/*
+// @connect       https://*.tencentcs.com/release/*
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
