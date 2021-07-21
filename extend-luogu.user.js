@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.4
+// @version        2.7.5
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -648,7 +648,8 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     `
     const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
 
-    let loaded = false
+    //let loaded = false
+    //KiLL: 以后要用
 
     const $sel = $(".feed-selector")
     $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all" exlg="exlg"><a style="cursor: pointer">全网动态</a></li>`)
@@ -700,8 +701,8 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                         .appendTo($("ul#feed"))
                         .find("a[name=feed-reply]").on("click", () =>
                             $("textarea")
-                            .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                            .trigger("input")
+                                .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                                .trigger("input")
                         )
                     )
                 },
@@ -713,7 +714,7 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
 
     /*
     uindow.addEventListener("message", e => {
-        
+
     })
     */
 })
