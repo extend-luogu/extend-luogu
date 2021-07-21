@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.5.15
+// @version        2.6.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1115,6 +1115,50 @@ mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*
 .exlg-rand-training-problem-btn {
     border-color: rgb(52, 52, 52);
     background-color: rgb(52, 52, 52);
+}
+`)
+
+mod.reg("tasklist-ex", "更好的任务列表", "@/", {
+    auto_clear: { ty: "boolean", dft: true, info: ["Clear accepted problems", "清理已经 AC 的题目"] },
+    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务栏随机跳题"]}
+}, ({ msto }) => {
+    let actTList = []
+    $.each($$("div.tasklist-item"), (_, prob) => {
+        let pid = $(prob).attr("data-pid")
+        if (prob.innerHTML.search(/check/g) === -1) {
+            if (msto.rand_problem_in_tasklist)
+                actTList.push(pid)
+        }
+        else if (msto.auto_clear) {
+            $.ajax({ // FIXME: Unable to send requests (maybe because of async/await?)
+                type: "post",
+                url: "/fe/api/problem/tasklistRemove",
+                data: JSON.stringify({
+                    pid: pid
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+            })
+            $("div.tasklist-item[data-pid=" + pid + "]").hide()
+        }
+    })
+
+    if (msto.rand_problem_in_tasklist) {
+        let $btn = $("button[name=task-edit]")
+        $btn.clone().appendTo($btn.parent())
+        $btn.addClass("exlg-rand-tasklist-problem-btn")
+            .text("随机")
+            .removeAttr("onclick")
+            .click(() => {
+                let tid = ~~ (Math.random() * 1.e6) % actTList.length
+                location.href += `problem/${actTList[tid]}`
+            })
+    }
+}, `
+.exlg-rand-tasklist-problem-btn {
+    margin-left: 0.5em;
+    border-color: rgb(36, 190, 36);
+    background-color: rgb(36, 190, 36);
 }
 `)
 
