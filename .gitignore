@@ -1,5 +1,6 @@
 test/
-update_version.py
+
+exlg-setting/
 
 package-lock.json
 
