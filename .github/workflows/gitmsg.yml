@@ -12,7 +12,9 @@ jobs:
         with:
           node-version: 16.x
       - name: Install fk-git-commit-msg-std
-        run: yarn add fk-git-commit-msg-std
+        run: |
+          yarn config set registry https://registry.yarnpkg.com
+          yarn add fk-git-commit-msg-std
       - name: Run fk-git-commit-msg-std
         env:
           COMMIT_MSG: ${{ toJson(github.event.commits.*.message) }}
