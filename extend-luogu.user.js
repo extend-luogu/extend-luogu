@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.6
+// @version        2.7.7
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -112,24 +112,15 @@ const springboard = (param, styl) => {
     return $sb
 }
 
-const judge_problem = text => { // Note: 判断字符串是否为题号, B不算在内
-    let res = "dismatch"
-    const regexp = [
-        /AT[0-9]{1,4}/i,
-        /CF[0-9]{1,4}[A-Z][0-9]{0,1}/i,
-        /SP[0-9]{1,5}/i,
-        /P[0-9]{4}/i,
-        /UVA[0-9]{1,5}/i,
-        /U[0-9]{1,6}/i,
-        /T[0-9]{1,6}/i
-    ]
-    regexp.forEach(re => {
-        console.log(re, re.test(text), re.exec(text))
-        if (re.test(text)) {
-            res = re.exec(text)[0]
-        }
-    })
-    return res
+const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
+    if (text.match(/^AT[1-9][0-9]{0,}$/i)) return true
+    if (text.match(/^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i)) return true
+    if (text.match(/^SP[1-9][0-9]{0,}$/i)) return true
+    if (text.match(/^P[1-9][0-9]{3,}$/i)) return true
+    if (text.match(/^UVA[1-9][0-9]{2,}$/i)) return true
+    if (text.match(/^U[1-9][0-9]{0,}$/i)) return true
+    if (text.match(/^T[[1-9][0-9]{0,}$/i)) return true
+    return false
 }
 
 // ==/Utilities==
@@ -140,6 +131,7 @@ const mod = {
     _: [],
 
     data: {},
+
     path_alias: [
         [ "",        "www.luogu.com.cn" ],
         [ "bili",    "www.bilibili.com" ],
@@ -758,8 +750,8 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
     ]
 
-    const func_jump_problem = (str) => {
-        if (judge_problem(str) !== "dismatch") str = str.toUpperCase()
+    const func_jump_problem = (str) => { // Note: 很好理解
+        if (judge_problem(str)) str = str.toUpperCase()
         if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号")
         else location.href = "https://www.luogu.com.cn/problemnew/show/" + str
     }
@@ -927,7 +919,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     }
     $jump_exrand.on("click", exrand_poi)
     /*
-    //KiLL: 不知道干什么的东西(
+    // KiLL: 不知道干什么的东西(
     const css_load_here = '';
     const node_style=document.createElement("style");
     node_style.innerHTML = css_load_here;
@@ -990,6 +982,9 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: ["Custom Code Title", "自定义代码块标题"] },
     copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
 },  ({ msto }) => {
+
+    if (/\/blogAdmin\/.*/.test(location.href)) return
+
     const isRecord = /\/record\/.*/.test(location.href)
 
     const langs = {
@@ -1027,11 +1022,11 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
         if (! msto.show_code_lang) return
         const lang = get_lang($code)
         const $title = isRecord ? $(".lfe-h3") : $(`<h3 class="exlg-code-title" style="width: 100%;">源代码 </h3>`)
-        if (lang) $title.text((msto.copy_code_position.replace("${lang}", lang)) + (isRecord ? "" : " ")) // Note: record 不用加空格
+        if (lang) $title.text((msto.code_block_title.replace("${lang}", lang)) + (isRecord ? "" : " ")) // Note: record 不用加空格
 
         if (! isRecord) $pre.before($title.append($btn))
     })
-}, () => $("pre:has(> code):not([exlg-copy-code-block])").length !== 0, `
+}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:has(> code):not([exlg-copy-code-block])").length !== 0), `
 .exlg-copy {
     position: relative;
     display: inline-block;
@@ -1167,21 +1162,17 @@ mod.reg("tasklist-ex", "更好的任务列表", "@/", {
 `)
 
 mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
-    const jump = (event) => {
+    $(document).on("dblclick", (event) => {
         const selection = window.getSelection()
         const selected = selection.toString().replace(" ", "").toUpperCase()
         let url
         if (event.ctrlKey) {
-            const myBlog = document.querySelectorAll(".ops>a[href*=blog]")[0]
+            const myBlog = $(".ops>a[href*=blog]")[0]
             url = myBlog.href + "solution-"
         }
         else url = "https://www.luogu.com.cn/problem/"
-        const pid = judge_problem(selected)
-        if (pid !== "dismatch") {
-            window.open(url + pid)
-        }
-    }
-    document.ondblclick = jump
+        if (judge_problem(selected)) window.open(url + selected)
+    })
 })
 
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
