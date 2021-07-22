@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.5
+// @version        2.7.6
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -112,15 +112,24 @@ const springboard = (param, styl) => {
     return $sb
 }
 
-const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
-    if ((/AT[0-9]{1,4}/i).test(text)) return true
-    if ((/CF[0-9]{1,4}[A-Z][0-9]{0,1}/i).test(text)) return true
-    if ((/SP[0-9]{1,5}/i).test(text)) return true
-    if ((/P[0-9]{4}/i).test(text)) return true
-    if ((/UVA[0-9]{1,5}/i).test(text)) return true
-    if ((/U[0-9]{1,6}/i).test(text)) return true
-    if ((/T[0-9]{1,6}/i).test(text)) return true
-    return false
+const judge_problem = text => { // Note: 判断字符串是否为题号, B不算在内
+    let res = "dismatch"
+    const regexp = [
+        /AT[0-9]{1,4}/i,
+        /CF[0-9]{1,4}[A-Z][0-9]{0,1}/i,
+        /SP[0-9]{1,5}/i,
+        /P[0-9]{4}/i,
+        /UVA[0-9]{1,5}/i,
+        /U[0-9]{1,6}/i,
+        /T[0-9]{1,6}/i
+    ]
+    regexp.forEach(re => {
+        console.log(re, re.test(text), re.exec(text))
+        if (re.test(text)) {
+            res = re.exec(text)[0]
+        }
+    })
+    return res
 }
 
 // ==/Utilities==
@@ -131,7 +140,6 @@ const mod = {
     _: [],
 
     data: {},
-
     path_alias: [
         [ "",        "www.luogu.com.cn" ],
         [ "bili",    "www.bilibili.com" ],
@@ -648,9 +656,6 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     `
     const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
 
-    //let loaded = false
-    //KiLL: 以后要用
-
     const $sel = $(".feed-selector")
     $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all" exlg="exlg"><a style="cursor: pointer">全网动态</a></li>`)
         .appendTo($sel.parent())
@@ -753,8 +758,8 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
     ]
 
-    const func_jump_problem = (str) => { // Note: 很好理解
-        if (judge_problem(str)) str = str.toUpperCase()
+    const func_jump_problem = (str) => {
+        if (judge_problem(str) !== "dismatch") str = str.toUpperCase()
         if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号")
         else location.href = "https://www.luogu.com.cn/problemnew/show/" + str
     }
@@ -1171,7 +1176,10 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
             url = myBlog.href + "solution-"
         }
         else url = "https://www.luogu.com.cn/problem/"
-        if (judge_problem(selected)) window.open(url + selected)
+        const pid = judge_problem(selected)
+        if (pid !== "dismatch") {
+            window.open(url + pid)
+        }
     }
     document.ondblclick = jump
 })
