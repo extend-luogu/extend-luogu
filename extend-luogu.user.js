@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.7
+// @version        2.7.8
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -112,16 +112,15 @@ const springboard = (param, styl) => {
     return $sb
 }
 
-const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
-    if (text.match(/^AT[1-9][0-9]{0,}$/i)) return true
-    if (text.match(/^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i)) return true
-    if (text.match(/^SP[1-9][0-9]{0,}$/i)) return true
-    if (text.match(/^P[1-9][0-9]{3,}$/i)) return true
-    if (text.match(/^UVA[1-9][0-9]{2,}$/i)) return true
-    if (text.match(/^U[1-9][0-9]{0,}$/i)) return true
-    if (text.match(/^T[[1-9][0-9]{0,}$/i)) return true
-    return false
-}
+const judge_problem = text => [
+    /^AT[1-9][0-9]{0,}$/i,
+    /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
+    /^SP[1-9][0-9]{0,}$/i,
+    /^P[1-9][0-9]{3,}$/i,
+    /^UVA[1-9][0-9]{2,}$/i,
+    /^U[1-9][0-9]{0,}$/i,
+    /^T[[1-9][0-9]{0,}$/i
+].some(re => re.test(text))
 
 // ==/Utilities==
 
@@ -335,6 +334,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         color: white;
         border-radius: 6px;
         box-shadow: 0 0 7px dodgerblue;
+        cursor: pointer;
     }
     #exlg-dash > .exlg-warn {
         position: absolute;
@@ -382,29 +382,50 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         user-select: none;
     }
 
-    [exlgcolor='red'] {
+    [exlg-color='red'] {
         background-color: rgb(254, 76, 97);
     }
-    [exlgcolor='orange'] {
+    [exlg-color='orange'] {
         background-color: rgb(243, 156, 17);
     }
-    [exlgcolor='yellow'] {
+    [exlg-color='yellow'] {
         background-color: rgb(255, 193, 22);
     }
-    [exlgcolor='green'] {
+    [exlg-color='green'] {
         background-color: rgb(82, 196, 26);
     }
-    [exlgcolor='blue'] {
+    [exlg-color='blue'] {
         background-color: rgb(52, 152, 219);
     }
-    [exlgcolor='purple'] {
+    [exlg-color='purple'] {
         background-color: rgb(157, 61, 207);
     }
-    [exlgcolor='black'] {
+    [exlg-color='black'] {
         background-color: rgb(14, 29, 105);
     }
-    [exlgcolor='grey'] {
+    [exlg-color='grey'] {
         background-color: rgb(191, 191, 191);
+    }
+
+    :root {
+        --exlg-azure:           #7bb8eb;
+        --exlg-aqua:            #03a2e8;
+        --exlg-indigo:          #3f48cb;
+        --std-mediumturquoise:  #48d1cc;
+        --std-cornflowerblue:   #6495ed;
+        --std-dodgerblue:       #1e90ff;
+        --lg-gray:              #bbb;
+        --lg-blue:              #3498db;
+        --lg-blue-button:       #0e90d2;
+        --lg-green:             #5eb95e;
+        --lg-green-dark:        #054310c9;
+        --lg-green-light:       #5eb95e26;
+        --lg-green-light-2:     #c9e7c9;
+        --lg-yellow:            #f1c40f;
+        --lg-orange:            #e67e22;
+        --lg-reg:               #e74c3c;
+        --lg-red-button:        #dd514c;
+        --lg-purple:            #8e44ad;
     }
 `)
 
@@ -733,21 +754,21 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     }
 }, ({msto}) => {
     const difficulty_html = [
-        `<div exlgcolor="red"    class="exlg-difficulties exlg-unselectable">入门</div>`,
-        `<div exlgcolor="orange" class="exlg-difficulties exlg-unselectable">普及-</div>`,
-        `<div exlgcolor="yellow" class="exlg-difficulties exlg-unselectable">普及/提高-</div>`,
-        `<div exlgcolor="green"  class="exlg-difficulties exlg-unselectable">普及+/提高</div>`,
-        `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">提高+/省选-</div>`,
-        `<div exlgcolor="purple" class="exlg-difficulties exlg-unselectable">省选/NOI-</div>`,
-        `<div exlgcolor="black"  class="exlg-difficulties exlg-unselectable">NOI/NOI+/CTSC</div>`,
-        `<div exlgcolor="grey"   class="exlg-difficulties exlg-unselectable">暂无评定</div>`
+        `<div exlg-color="red"    class="exlg-difficulties exlg-unselectable">入门</div>`,
+        `<div exlg-color="orange" class="exlg-difficulties exlg-unselectable">普及-</div>`,
+        `<div exlg-color="yellow" class="exlg-difficulties exlg-unselectable">普及/提高-</div>`,
+        `<div exlg-color="green"  class="exlg-difficulties exlg-unselectable">普及+/提高</div>`,
+        `<div exlg-color="blue"   class="exlg-difficulties exlg-unselectable">提高+/省选-</div>`,
+        `<div exlg-color="purple" class="exlg-difficulties exlg-unselectable">省选/NOI-</div>`,
+        `<div exlg-color="black"  class="exlg-difficulties exlg-unselectable">NOI/NOI+/CTSC</div>`,
+        `<div exlg-color="grey"   class="exlg-difficulties exlg-unselectable">暂无评定</div>`
     ]
     const source_html = [
-        `<div exlgcolor="red"    class="exlg-difficulties exlg-unselectable">洛谷题库</div>`,
-        `<div exlgcolor="orange" class="exlg-difficulties exlg-unselectable">Codeforces</div>`,
-        `<div exlgcolor="yellow" class="exlg-difficulties exlg-unselectable">SPOJ</div>`,
-        `<div exlgcolor="green"  class="exlg-difficulties exlg-unselectable">ATcoder</div>`,
-        `<div exlgcolor="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
+        `<div exlg-color="red"    class="exlg-difficulties exlg-unselectable">洛谷题库</div>`,
+        `<div exlg-color="orange" class="exlg-difficulties exlg-unselectable">Codeforces</div>`,
+        `<div exlg-color="yellow" class="exlg-difficulties exlg-unselectable">SPOJ</div>`,
+        `<div exlg-color="green"  class="exlg-difficulties exlg-unselectable">ATcoder</div>`,
+        `<div exlg-color="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
     ]
 
     const func_jump_problem = (str) => { // Note: 很好理解
@@ -857,7 +878,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
             .on("click", () => { // Note: 建一个dash而已
                 $btn.hide()
-                $("#exlg-exrd-diff-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                $("#exlg-exrd-diff-0").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
                 msto.exrand_difficulty[i] = false
             }).appendTo($("#exlg-exrd-diff-1"))
         if (!msto.exrand_difficulty[i]) $btn.hide()
@@ -866,7 +887,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         const $btn = $(difficulty_html[i]).attr("unselectable", "on")
             .on("click", () => {
                 $btn.hide()
-                $("#exlg-exrd-diff-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                $("#exlg-exrd-diff-1").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
                 msto.exrand_difficulty[i] = true
             }).appendTo($("#exlg-exrd-diff-0"))
         if (msto.exrand_difficulty[i]) $btn.hide()
@@ -875,7 +896,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         const $btn = $(source_html[i]).attr("unselectable", "on")
             .on("click", () => {
                 $btn.hide()
-                $("#exlg-exrd-srce-0").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                $("#exlg-exrd-srce-0").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
                 msto.exrand_source[i] = false
             }).appendTo($("#exlg-exrd-srce-1"))
         if (!msto.exrand_source[i]) $btn.hide()
@@ -884,7 +905,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         const $btn = $(source_html[i]).attr("unselectable", "on")
             .on("click", () => {
                 $btn.hide()
-                $("#exlg-exrd-srce-1").find(`div[exlgcolor='${$btn.attr("exlgcolor")}']`).show()
+                $("#exlg-exrd-srce-1").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
                 msto.exrand_source[i] = true
             }).appendTo($("#exlg-exrd-srce-0"))
         if (msto.exrand_source[i]) $btn.hide()
