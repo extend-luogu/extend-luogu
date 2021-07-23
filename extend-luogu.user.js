@@ -301,6 +301,45 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
     iframe::-webkit-scrollbar {
         display: none;
     }
+
+    :root {
+        --exlg-azure:           #7bb8eb;
+        --exlg-aqua:            #03a2e8;
+        --exlg-indigo:          #3f48cb;
+        --std-mediumturquoise:  #48d1cc;
+        --std-cornflowerblue:   #6495ed;
+        --std-dodgerblue:       #1e90ff;
+        --std-white:            #fff;
+        --std-black:            #000;
+        --lg-gray:              #bbb;
+        --lg-gray-2:            #7f7f7f;
+        --lg-gray-3:            #6c757d;
+        --lg-gray-4:            #414345;
+        --lg-gray-5:            #333;
+        --lg-gray-6:            #000000bf;
+        --lg-blue:              #3498db;
+        --lg-blue-button:       #0e90d2;
+        --lg-blue-dark:         #34495e;
+        --lg-blue-2:            #7cb5ecbf;
+        --lg-green:             #5eb95e;
+        --lg-green-dark:        #054310c9;
+        --lg-green-light:       #5eb95e26;
+        --lg-green-light-2:     #c9e7c9;
+        --lg-yellow:            #f1c40f;
+        --lg-orange:            #e67e22;
+        --lg-reg:               #e74c3c;
+        --lg-red-light:         #dd514c26;
+        --lg-red-light-2:       #f5cecd;
+        --lg-red-button:        #dd514c;
+        --lg-purple:            #8e44ad;
+        --argon-indigo:         #5e72e4;
+        --argon-red:            #f80031;
+        --argon-red-button:     #f5365c;
+        --argon-green:          #1aae6f;
+        --argon-green-button:   #2dce89;
+        --agron-cyan:           #03acca;
+        --agron-yellow:         #ff9d09;
+    }
 `)
 
 mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null, () =>
@@ -406,45 +445,6 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     [exlg-color='grey'] {
         background-color: rgb(191, 191, 191);
     }
-
-    :root {
-        --exlg-azure:           #7bb8eb;
-        --exlg-aqua:            #03a2e8;
-        --exlg-indigo:          #3f48cb;
-        --std-mediumturquoise:  #48d1cc;
-        --std-cornflowerblue:   #6495ed;
-        --std-dodgerblue:       #1e90ff;
-        --std-white:            #fff;
-        --std-black:            #000;
-        --lg-gray:              #bbb;
-        --lg-gray-2:            #7f7f7f;
-        --lg-gray-3:            #6c757d;
-        --lg-gray-4:            #414345;
-        --lg-gray-5:            #333;
-        --lg-gray-6:            #000000bf;
-        --lg-blue:              #3498db;
-        --lg-blue-button:       #0e90d2;
-        --lg-blue-dark:         #34495e;
-        --lg-blue-2:            #7cb5ecbf;
-        --lg-green:             #5eb95e;
-        --lg-green-dark:        #054310c9;
-        --lg-green-light:       #5eb95e26;
-        --lg-green-light-2:     #c9e7c9;
-        --lg-yellow:            #f1c40f;
-        --lg-orange:            #e67e22;
-        --lg-reg:               #e74c3c;
-        --lg-red-light:         #dd514c26;
-        --lg-red-light-2:       #f5cecd;
-        --lg-red-button:        #dd514c;
-        --lg-purple:            #8e44ad;
-        --argon-indigo:         #5e72e4;
-        --argon-red:            #f80031;
-        --argon-red-button:     #f5365c;
-        --argon-green:          #1aae6f;
-        --argon-green-button:   #2dce89;
-        --agron-cyan:           #03acca;
-        --agron-yellow:         #ff9d09;
-    }    
 `)
 
 mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/dashboard/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
