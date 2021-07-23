@@ -426,8 +426,6 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         --lg-reg:               #e74c3c;
         --lg-red-light:         #dd514c26;
         --lg-red-light-2:       #f5cecd;
-        --lg-red-button:        #dd514c;
-        --lg-purple:            #8e44ad;
     }
 `)
 
