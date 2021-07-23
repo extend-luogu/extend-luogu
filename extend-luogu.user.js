@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.8
+// @version        2.7.9
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -424,6 +424,8 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         --lg-yellow:            #f1c40f;
         --lg-orange:            #e67e22;
         --lg-reg:               #e74c3c;
+        --lg-red-light:         #dd514c26;
+        --lg-red-light-2:       #f5cecd;
         --lg-red-button:        #dd514c;
         --lg-purple:            #8e44ad;
     }
