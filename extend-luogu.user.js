@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.9
+// @version        2.7.10
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -205,7 +205,7 @@ const mod = {
         mod.reg(
             name, info, path, data,
             arg => {
-                const last = sto[name].chore, now = Date.now()
+                const last = sto[name].last_chore, now = Date.now()
 
                 let nostyl = true
                 if (arg.named || ! last || now - last > period) {
