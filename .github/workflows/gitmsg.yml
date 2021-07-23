@@ -13,6 +13,7 @@ jobs:
           node-version: 16.x
       - name: Install fk-git-commit-msg-std
         run: |
+          npm config set registry http://registry.npmjs.org/
           yarn config set registry https://registry.yarnpkg.com
           yarn add fk-git-commit-msg-std
       - name: Run fk-git-commit-msg-std
