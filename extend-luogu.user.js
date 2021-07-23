@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.7
+// @version        2.7.9
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -112,16 +112,15 @@ const springboard = (param, styl) => {
     return $sb
 }
 
-const judge_problem = (text) => { // Note: 判断字符串是否为题号, B不算在内
-    if (text.match(/^AT[1-9][0-9]{0,}$/i)) return true
-    if (text.match(/^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i)) return true
-    if (text.match(/^SP[1-9][0-9]{0,}$/i)) return true
-    if (text.match(/^P[1-9][0-9]{3,}$/i)) return true
-    if (text.match(/^UVA[1-9][0-9]{2,}$/i)) return true
-    if (text.match(/^U[1-9][0-9]{0,}$/i)) return true
-    if (text.match(/^T[[1-9][0-9]{0,}$/i)) return true
-    return false
-}
+const judge_problem = text => [
+    /^AT[1-9][0-9]{0,}$/i,
+    /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
+    /^SP[1-9][0-9]{0,}$/i,
+    /^P[1-9][0-9]{3,}$/i,
+    /^UVA[1-9][0-9]{2,}$/i,
+    /^U[1-9][0-9]{0,}$/i,
+    /^T[[1-9][0-9]{0,}$/i
+].some(re => re.test(text))
 
 // ==/Utilities==
 
@@ -335,6 +334,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         color: white;
         border-radius: 6px;
         box-shadow: 0 0 7px dodgerblue;
+        cursor: pointer;
     }
     #exlg-dash > .exlg-warn {
         position: absolute;
@@ -405,6 +405,29 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     }
     [exlgcolor='grey'] {
         background-color: rgb(191, 191, 191);
+    }
+
+    :root {
+        --exlg-azure:           #7bb8eb;
+        --exlg-aqua:            #03a2e8;
+        --exlg-indigo:          #3f48cb;
+        --std-mediumturquoise:  #48d1cc;
+        --std-cornflowerblue:   #6495ed;
+        --std-dodgerblue:       #1e90ff;
+        --lg-gray:              #bbb;
+        --lg-blue:              #3498db;
+        --lg-blue-button:       #0e90d2;
+        --lg-green:             #5eb95e;
+        --lg-green-dark:        #054310c9;
+        --lg-green-light:       #5eb95e26;
+        --lg-green-light-2:     #c9e7c9;
+        --lg-yellow:            #f1c40f;
+        --lg-orange:            #e67e22;
+        --lg-reg:               #e74c3c;
+        --lg-red-light:         #dd514c26;
+        --lg-red-light-2:       #f5cecd;
+        --lg-red-button:        #dd514c;
+        --lg-purple:            #8e44ad;
     }
 `)
 
