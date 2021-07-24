@@ -497,13 +497,13 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     // ]
     // const emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${id}.png`
 
-    const emo = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', ]
+    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
+        "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
-        $txt = $(".CodeMirror-wrap textarea"),
-        $nl = $("<br />").appendTo($menu),
-        $grd = $(".mp-editor-ground").addClass("exlg-ext")
+        $txt = $(".CodeMirror-wrap textarea")
+        $("<br />").appendTo($menu)
+        $(".mp-editor-ground").addClass("exlg-ext")
 
     emo.forEach(m => {
         const url = emo_url(m)
@@ -516,7 +516,6 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
             .appendTo($menu)
     })
     $menu.append("<div style='height: .35em'></div>")
-    const $emo = $(".exlg-emo")
 
     // const $fold = $(`<li exlg="exlg">表情 <i class="fa fa-chevron-left"></li>`)
     //     .on("click", () => {
@@ -1680,8 +1679,8 @@ $(() => {
 mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
 }, () => {
-    const emo = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', ]
+    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
+    "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
     const emo_url = name => `//图.tk/${name}`
     $txt = $("#feed-content")
     $("#feed-content").before("<div id='emo-lst'></div>")
