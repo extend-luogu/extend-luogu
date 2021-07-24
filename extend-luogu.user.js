@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.10
+// @version        2.7.11
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1112,11 +1112,11 @@ div.exlg-copied {
 `)
 
 mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*)?", {
-    problem_type: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
+    mode: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
         "Preferences about problem choosing", "随机跳题的题目种类"
     ] }
 }, ({ msto }) => {
-    let ptypes = msto.problem_type.startsWith("unac") + msto.problem_type.endsWith("only") * (-1) + 2
+    let ptypes = msto.mode.startsWith("unac") + msto.mode.endsWith("only") * (-1) + 2
     const $op = $("div.operation")
     $op.children("button").clone(true)
         .appendTo($op)
