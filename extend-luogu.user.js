@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.0
+// @version        2.8.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -497,13 +497,12 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     // ]
     // const emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${id}.png`
 
-    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
-        "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
+    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
-        $("<br />").appendTo($menu)
-        $(".mp-editor-ground").addClass("exlg-ext")
+    $("<br />").appendTo($menu)
+    $(".mp-editor-ground").addClass("exlg-ext")
 
     emo.forEach(m => {
         const url = emo_url(m)
@@ -1679,8 +1678,7 @@ $(() => {
 mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
 }, () => {
-    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
-    "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
+    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
     const emo_url = name => `//图.tk/${name}`
     $txt = $("#feed-content")
     $("#feed-content").before("<div id='emo-lst'></div>")
