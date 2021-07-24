@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.1
+// @version        2.8.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -13,6 +13,7 @@
 // @match          localhost:1634/*
 //
 // @connect        tencentcs.com
+// @connect        luogulo.gq
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -49,6 +50,7 @@ const xss = new filterXSS.FilterXSS({
     }
 })
 const mdp = uindow.markdownPalettes
+$.double = (func, first, second) => [func(first), func(second)]
 
 // ==Utilities==Extensions==
 
@@ -382,31 +384,6 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         user-select: none;
     }
 
-    [exlg-color='red'] {
-        background-color: rgb(254, 76, 97);
-    }
-    [exlg-color='orange'] {
-        background-color: rgb(243, 156, 17);
-    }
-    [exlg-color='yellow'] {
-        background-color: rgb(255, 193, 22);
-    }
-    [exlg-color='green'] {
-        background-color: rgb(82, 196, 26);
-    }
-    [exlg-color='blue'] {
-        background-color: rgb(52, 152, 219);
-    }
-    [exlg-color='purple'] {
-        background-color: rgb(157, 61, 207);
-    }
-    [exlg-color='black'] {
-        background-color: rgb(14, 29, 105);
-    }
-    [exlg-color='grey'] {
-        background-color: rgb(191, 191, 191);
-    }
-
     :root {
         --exlg-azure:           #7bb8eb;
         --exlg-aqua:            #03a2e8;
@@ -442,8 +419,17 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         --argon-red-button:     #f5365c;
         --argon-green:          #1aae6f;
         --argon-green-button:   #2dce89;
-        --agron-cyan:           #03acca;
-        --agron-yellow:         #ff9d09;
+        --argon-cyan:           #03acca;
+        --argon-yellow:         #ff9d09;
+        
+        --lg-red-problem:       #fe4c61;
+        --lg-orange-problem:    #f39c11;
+        --lg-yellow-problem:    #ffc116;
+        --lg-green-problem:     #52c41a;
+        --lg-blue-problem:      #3498db;
+        --lg-purple-problem:    #9d3dcf;
+        --lg-black-problem:     #0e1d69;
+        --lg-gray-problem:      #bfbfbf;
     }
 `)
 
@@ -788,51 +774,98 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         priv: true
     }
 }, ({msto}) => {
-    const difficulty_html = [
-        `<div exlg-color="red"    class="exlg-difficulties exlg-unselectable">入门</div>`,
-        `<div exlg-color="orange" class="exlg-difficulties exlg-unselectable">普及-</div>`,
-        `<div exlg-color="yellow" class="exlg-difficulties exlg-unselectable">普及/提高-</div>`,
-        `<div exlg-color="green"  class="exlg-difficulties exlg-unselectable">普及+/提高</div>`,
-        `<div exlg-color="blue"   class="exlg-difficulties exlg-unselectable">提高+/省选-</div>`,
-        `<div exlg-color="purple" class="exlg-difficulties exlg-unselectable">省选/NOI-</div>`,
-        `<div exlg-color="black"  class="exlg-difficulties exlg-unselectable">NOI/NOI+/CTSC</div>`,
-        `<div exlg-color="grey"   class="exlg-difficulties exlg-unselectable">暂无评定</div>`
+    const dif_list = [
+        {
+            text: "入门",
+            color: "red",
+            id: 1
+        },
+        {
+            text: "普及-",
+            color: "orange",
+            id: 2
+        },
+        {
+            text: "普及/提高-",
+            color: "yellow",
+            id: 3
+        },
+        {
+            text: "普及+/提高",
+            color: "green",
+            id: 4
+        },
+        {
+            text: "提高+/省选-",
+            color: "blue",
+            id: 5
+        },
+        {
+            text: "省选/NOI-",
+            color: "purple",
+            id: 6
+        },
+        {
+            text: "NOI/NOI+/CTSC",
+            color: "black",
+            id: 7
+        },
+        {
+            text: "暂无评定",
+            color: "gray",
+            id: 0
+        }
     ]
-    const source_html = [
-        `<div exlg-color="red"    class="exlg-difficulties exlg-unselectable">洛谷题库</div>`,
-        `<div exlg-color="orange" class="exlg-difficulties exlg-unselectable">Codeforces</div>`,
-        `<div exlg-color="yellow" class="exlg-difficulties exlg-unselectable">SPOJ</div>`,
-        `<div exlg-color="green"  class="exlg-difficulties exlg-unselectable">ATcoder</div>`,
-        `<div exlg-color="blue"   class="exlg-difficulties exlg-unselectable">UVA</div>`
+    const src_list = [
+        {
+            text: "洛谷题库",
+            color: "red",
+            id: "P"
+        },
+        {
+            text: "Codeforces",
+            color: "orange",
+            id: "CF"
+        },
+        {
+            text: "SPOJ",
+            color: "yellow",
+            id: "SP"
+        },
+        {
+            text: "ATcoder",
+            color: "green",
+            id: "AT"
+        },
+        {
+            text: "UVA",
+            color: "blue",
+            id: "UVA"
+        }
     ]
 
-    const func_jump_problem = (str) => { // Note: 很好理解
+    const func_jump_problem = (str) => { // Note: 跳转题目
         if (judge_problem(str)) str = str.toUpperCase()
         if (str === "" || typeof (str) === "undefined") uindow.show_alert("提示", "请输入题号")
         else location.href = "https://www.luogu.com.cn/problemnew/show/" + str
     }
-    // start to do fucking things.
-    let mouse_on_board = false, mouse_on_dash = false
-    if ($("#exlg-rand-diffs").length) return // Note: 防重复
 
-    // Note: 对于界面的修正
-    // Note: input框套皮
+    let mouse_on_board = false, mouse_on_dash = false
+
+    // Note: 重新构建界面
     let $input = $("input[name='toproblem']")
     $input.after($input.clone()).remove()
     $input = $("input[name='toproblem']")
 
-    // Note: 跳转按钮
     let $jump = $(".am-btn[name='goto']")
     $jump.after($jump.clone()).remove()
     $jump = $(".am-btn[name='goto']")
+    
+    const $btn_list = $jump.parent().append($("<span>&nbsp;</span>"))
 
-    // Note: 避免分成两行
     const $jump_rand = $(".am-btn[name='gotorandom']").text("随机")
+    const $jump_exrand = $(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex">随机ex</button>`).appendTo($btn_list)
 
-    // Note: 随机ex按钮好耶！！
-    $jump_rand.after($(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex" id="gtrdex">随机ex</button>`))
-
-    // Note: set behavior
     $jump.on("click", () => {
         if (/^[0-9]+.?[0-9]*$/.test($input.val())) $input.val("P" + $input.val())
         func_jump_problem($input.val())
@@ -840,151 +873,97 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     $input.on("keydown", e => {
         if (e.keyCode === 13) $jump.click()
     })
-
-    // Note: exrand部分
-    const $jump_exrand = $("#gtrdex")
-    $(".lg-index-stat>h2").text("问题跳转 ").append(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`)
-    const exrand_setting = $("#exlg-dash-0")
-    exrand_setting.mouseenter(() => {
+    // Note: board
+    const $board = $(`<span id="exlg-exrand-window" class="exlg-window" style="display: block;">
+    <br>
+    <ul></ul>
+    </span>`).appendTo($btn_list).hide()
+        .mouseenter(() => {mouse_on_board = true})
+        .mouseleave(() => {
+            mouse_on_board = false
+            if (!mouse_on_dash) {
+                $board.hide()
+            } // Hack: 维护onboard
+        })
+    $(".lg-index-stat>h2").text("问题跳转 ").append($(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`))
+    $("#exlg-dash-0").mouseenter(() => {
         mouse_on_dash = true
-        $("#exlg-dash-0-window").show() // Hack: 鼠标放在dash上开window
+        $board.show() // Hack: 鼠标放在dash上开window
     })
         .mouseleave(() => {
             mouse_on_dash = false // Hack: 离开dash和board超过200ms直接关掉
             if (!mouse_on_board) {
                 setTimeout(() => {
-                    if (!mouse_on_board) $("#exlg-dash-0-window").hide()
+                    if (!mouse_on_board) $board.hide()
                 }, 200)
             }
         })
-    const $board = $(`<span id="exlg-dash-0-window" class="exlg-window" style="display: block;"><p></p><ul id="exlg-rand-diffs">
-<div>
-<span class=".exlg-title-span">
-<div id="button-showdiff" class="exlg-rand-settings selected exlg-unselectable">题目难度</div>
-<span class="exlg-unselectable">&nbsp;&nbsp;</span>
-<div id="button-showsrce" class="exlg-rand-settings exlg-unselectable">题目来源</div>
-</span>
-</div>
-<p></p>
-<div id="exlg-exrd-diff">
-<span style="width: 49%; float: left " id="exlg-exrd-diff-1">
-<span class="lg-small lg-inline-up exlg-unselectable">已选择</span><p></p>
-</span>
-<span style="width: 49%; float: right" id="exlg-exrd-diff-0">
-<span class="lg-small lg-inline-up exlg-unselectable">未选择</span><p></p>
-</span>
-</div>
-<div id="exlg-exrd-srce" style="display:none;">
-<span style="width: 49%; float: left " id="exlg-exrd-srce-1">
-<span class="lg-small lg-inline-up exlg-unselectable">已选择</span><p></p>
-</span>
-<span style="width: 49%; float: right" id="exlg-exrd-srce-0">
-<span class="lg-small lg-inline-up exlg-unselectable">未选择</span><p></p>
-</span>
-</div>
-</ul><p></p></span>`).hide()
-    $jump_exrand.after($board)
-    $jump_exrand.before("&nbsp;")
-    $board.mouseenter(() => {mouse_on_board = true})
-        .mouseleave(() => {
-            mouse_on_board = false
-            if (!mouse_on_dash) {
-                $("#exlg-dash-0-window").hide()
-            }
-        }) // Hack: 维护onboard
+    const $ul = $board.children("ul").css("list-style-type", "none")
 
-    // Note: 切换界面的按钮
-    const $btn_diff = $("#button-showdiff"), $btn_srce = $("#button-showsrce")
-    const $diff_div = $("#exlg-exrd-diff") , $srce_div = $("#exlg-exrd-srce")
-    $btn_diff.on("click", () => {
-        $btn_diff.addClass("selected")
-        $btn_srce.removeClass("selected")
-        $diff_div.show()
-        $srce_div.hide()
-    })
-    $btn_srce.on("click", () => {
-        $btn_diff.removeClass("selected")
-        $btn_srce.addClass("selected")
-        $diff_div.hide()
-        $srce_div.show()
-    })
+    const $exrand_menu = $(`<div id="exlg-exrand-menu"></div>`).appendTo($ul)
+    $("<br>").appendTo($ul)
+    const $exrand_diff = $(`<div id="exlg-exrand-diff" class="smallbtn-list"></div>`).appendTo($ul)
+    const $exrand_srce = $(`<div id="exlg-exrand-srce" class="smallbtn-list"></div>`).appendTo($ul).hide()
 
-    for (let i = 0; i < difficulty_html.length; ++ i) {
-        const $btn = $(difficulty_html[i]).attr("unselectable", "on")
-            .on("click", () => { // Note: 建一个dash而已
-                $btn.hide()
-                $("#exlg-exrd-diff-0").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
-                msto.exrand_difficulty[i] = false
-            }).appendTo($("#exlg-exrd-diff-1"))
-        if (!msto.exrand_difficulty[i]) $btn.hide()
-    }
-    for (let i = 0; i < difficulty_html.length; ++ i) {
-        const $btn = $(difficulty_html[i]).attr("unselectable", "on")
-            .on("click", () => {
-                $btn.hide()
-                $("#exlg-exrd-diff-1").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
-                msto.exrand_difficulty[i] = true
-            }).appendTo($("#exlg-exrd-diff-0"))
-        if (msto.exrand_difficulty[i]) $btn.hide()
-    }
-    for (let i = 0; i < source_html.length; ++ i) {
-        const $btn = $(source_html[i]).attr("unselectable", "on")
-            .on("click", () => {
-                $btn.hide()
-                $("#exlg-exrd-srce-0").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
-                msto.exrand_source[i] = false
-            }).appendTo($("#exlg-exrd-srce-1"))
-        if (!msto.exrand_source[i]) $btn.hide()
-    }
-    for (let i = 0; i < source_html.length; ++ i) {
-        const $btn = $(source_html[i]).attr("unselectable", "on")
-            .on("click", () => {
-                $btn.hide()
-                $("#exlg-exrd-srce-1").find(`div[exlg-color='${$btn.attr("exlg-color")}']`).show()
-                msto.exrand_source[i] = true
-            }).appendTo($("#exlg-exrd-srce-0"))
-        if (msto.exrand_source[i]) $btn.hide()
-    }
+    const $entries = $.double((text) => $(`<div class="exlg-rand-settings exlg-unselectable exrand-entry">${text}</div>`).appendTo($exrand_menu), "题目难度", "题目来源")
+    $entries[0].after($(`<span class="exlg-unselectable">&nbsp;&nbsp;</span>`))
+    $entries[0].addClass("selected").css("margin-right", "38px")
+
+    $.double(([$entry, $div]) => {
+        $entry.on("click", () => {
+            $(".exrand-entry").removeClass("selected")
+            $entry.addClass("selected")
+            $(".smallbtn-list").hide()
+            $div.show()
+        })
+    }, [$entries[0], $exrand_diff], [$entries[1], $exrand_srce])
+
+    $.double(([$parent, obj_list, msto_proxy]) => {
+        const $lists = $.double(([classname, desctext]) => $(`<span class="${classname}">
+        <span class="lg-small lg-inline-up exlg-unselectable">${desctext}</span>
+        <br>
+        </span>`).appendTo($parent), ["exrand-enabled", "已选择"], ["exrand-disabled", "未选择"])
+        obj_list.forEach((obj, index) => {
+            const $btn = $.double(($p) => $(`<div class="exlg-smallbtn exlg-unselectable">${obj.text}</div>`).css("background-color", `var(--lg-${obj.color}-problem)`).appendTo($p), $lists[0], $lists[1])
+            $.double((b) => {
+                $btn[b].on("click", () => {
+                    $btn[b].hide()
+                    $btn[1 - b].show()
+                    msto_proxy[index] = !! b
+                })
+                if (msto_proxy[index] !== (!! b)) $btn[b].hide()
+            }, 0, 1)
+        })
+    }, [$exrand_diff, dif_list, msto.exrand_difficulty], [$exrand_srce, src_list, msto.exrand_source])
+
     const exrand_poi = async () => { // Note: 异步写法（用到了lg_content）
-        let difficulty_list = [], source_list = []
-        for (i = 0; i < difficulty_html.length; ++ i) {
-            if (msto.exrand_difficulty[i]) difficulty_list.push((i + 1) % 8)
-        }
-        for (let i = 0; i < source_html.length; ++ i) {
-            if (msto.exrand_source[i]) source_list.push(i)
-        }
-        // Note: 未选中的缺省选项
-        if (difficulty_list.length === 0) difficulty_list = [0, 1, 2, 3, 4, 5, 6, 7]
-        if (source_list.length === 0) source_list  = [0]
-
-        const difficulty = difficulty_list[Math.floor(Math.random() * difficulty_list.length)]
-        const source = ["P","CF","SP","AT","UVA"][source_list[Math.floor(Math.random() * source_list.length)]]
-        let res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=1`)
+        const result = $.double(([l, msto_proxy, _empty]) => {
+            let g = []
+            l.forEach((e, i) => {
+                if (msto_proxy[i]) g.push(e.id)
+            })
+            if (g.length === 0) g = _empty
+            return g[Math.floor(Math.random() * g.length)]
+        }, [dif_list, msto.exrand_difficulty, [0, 1, 2, 3, 4, 5, 6, 7]], [src_list, msto.exrand_source, ["P"]])
+        
+        let res = await lg_content(`/problem/list?difficulty=${result[0]}&type=${result[1]}&page=1`)
         // Note: 随机而已问题不大
         const
             problem_count = res.currentData.problems.count,
             page_count = Math.ceil(problem_count / 50),
             rand_page = Math.floor(Math.random() * page_count) + 1
 
-        res = await lg_content(`/problem/list?difficulty=${difficulty}&type=${source}&page=${rand_page}`)
+        res = await lg_content(`/problem/list?difficulty=${result[0]}&type=${result[1]}&page=${rand_page}`)
         const
             list = res.currentData.problems.result,
             rand_idx = Math.floor(Math.random() * list.length),
             pid = list[rand_idx].pid
         location.href = `/problem/${pid}`
     }
+
     $jump_exrand.on("click", exrand_poi)
-    /*
-    // KiLL: 不知道干什么的东西(
-    const css_load_here = '';
-    const node_style=document.createElement("style");
-    node_style.innerHTML = css_load_here;
-    document.head.append(node_style);
-    */
 },`
-#exlg-rand-diffs {
-    list-style-type: none
-}
+
 .exlg-rand-settings {
     position: relative;
     display: inline-block;
@@ -1002,7 +981,10 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     border: 1px solid #6495ED;
     color: white;
 }
-.exlg-difficulties {
+.exlg-rand-settings:hover {
+    box-shadow: 0 0 7px dodgerblue;
+}
+.exlg-smallbtn {
     position: relative;
     display: inline-block;
     padding: 1px 5px 1px;
@@ -1011,9 +993,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     font-size: 12px;
     margin-left: 1px;
     margin-right: 1px;
-}
-.exlg-rand-settings:hover {
-    box-shadow: 0 0 7px dodgerblue;
 }
 .exlg-window {
     position: absolute;
@@ -1029,7 +1008,16 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     border-radius: 7px;
     box-shadow: rgb(187 227 255) 0px 0px 7px;
 }
+.exrand-enabled{
+    width: 49%;
+    float: left;
+}
+.exrand-disabled{
+    width: 49%;
+    float: right;
+}
 `)
+
 
 
 mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
@@ -1058,7 +1046,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     }
 
     const $cb = $("pre:has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "")
-    if ($cb.length) log(`Scanning code block:`, $cb.length)
+
     $cb.each((_, e, $pre = $(e)) => {
         const $btn = isRecord
             ? ($pre.children(".copy-btn"))
@@ -1573,6 +1561,39 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     })
 })
 
+mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
+    auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
+}, ({msto}) => {
+    const save_func = () => GM_xmlhttpRequest({
+        method: "GET",
+        url: `https://luogulo.gq/save.php?url=${window.location.href}`,
+        onload: (res) => {
+            if (res.status === 200) {
+                log("Discuss saved")
+            }
+            else {
+                log(`Fail: ${res}`)
+            }
+        },
+        onerror: (err) => {
+            log(`Error:${err}`)
+        }
+    })
+    //am-btn-success
+    const $btn = $(`<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>`).on("click", () => {
+        $btn.prop("disabled", true)
+        $btn.text("保存成功")
+        save_func()
+        setTimeout(() => {
+            $btn.removeAttr("disabled")
+            $btn.text("保存讨论")
+        }, 1000)
+    })
+    const $btn2 = $(`<a href="https://luogulo.gq/show.php?url=${location.href}"><button class="am-btn am-btn-success am-btn-sm" name="save-discuss" style="border-color: rgb(255, 193, 22); background-color: rgb(255, 193, 22);color: #fff;">查看备份</button></a>`)
+    $("section.lg-summary").find("p").append($btn).append($("<span>&nbsp;</span>")).append($btn2)
+    if (msto.auto_save_discussion) save_func()
+});
+
 mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, () => {
@@ -1631,6 +1652,40 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
 }
 `)
 
+
+mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
+    show: { ty: "boolean", dft: true }
+}, () => {
+    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
+    const emo_url = name => `//图.tk/${name}`
+    $txt = $("#feed-content")
+    $("#feed-content").before("<div id='emo-lst'></div>")
+    emo.forEach(m => {
+        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`)
+            .on("click", () => $txt
+                .trigger("focus")
+                .val(`![](${emo_url(m)})`)
+                .trigger("input")
+            )
+            .appendTo("#emo-lst")
+    })
+    $("#feed-content").before("<br>")
+}, `
+.exlg-emo-btn {
+    position: relative;
+    top: 0px;
+    border: none;
+    background-color: #eee;
+    border-radius: .7em;
+    margin: .1em;
+    transition: all .4s;
+}
+.exlg-emo-btn:hover {
+    background-color: #f3f3f3;
+    top: -3px;
+}
+`)
+
 $(() => {
     log("Exposing")
 
@@ -1674,36 +1729,3 @@ $(() => {
     log("Launching")
     mod.execute()
 })
-
-mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
-    show: { ty: "boolean", dft: true }
-}, () => {
-    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
-    const emo_url = name => `//图.tk/${name}`
-    $txt = $("#feed-content")
-    $("#feed-content").before("<div id='emo-lst'></div>")
-    emo.forEach(m => {
-        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`)
-            .on("click", () => $txt
-                .trigger("focus")
-                .val(`![](${emo_url(m)})`)
-                .trigger("input")
-            )
-            .appendTo("#emo-lst")
-    })
-    $("#feed-content").before("<br>")
-}, `
-.exlg-emo-btn {
-    position: relative;
-    top: 0px;
-    border: none;
-    background-color: #eee;
-    border-radius: .7em;
-    margin: .1em;
-    transition: all .4s;
-}
-.exlg-emo-btn:hover {
-    background-color: #f3f3f3;
-    top: -3px;
-}
-`)
