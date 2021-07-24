@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.2
+// @version        2.8.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -860,10 +860,10 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     let $jump = $(".am-btn[name='goto']")
     $jump.after($jump.clone()).remove()
     $jump = $(".am-btn[name='goto']")
-    
+
     const $btn_list = $jump.parent().append($("<span>&nbsp;</span>"))
 
-    const $jump_rand = $(".am-btn[name='gotorandom']").text("随机")
+    $(".am-btn[name='gotorandom']").text("随机")
     const $jump_exrand = $(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex">随机ex</button>`).appendTo($btn_list)
 
     $jump.on("click", () => {
@@ -945,7 +945,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             if (g.length === 0) g = _empty
             return g[Math.floor(Math.random() * g.length)]
         }, [dif_list, msto.exrand_difficulty, [0, 1, 2, 3, 4, 5, 6, 7]], [src_list, msto.exrand_source, ["P"]])
-        
+
         let res = await lg_content(`/problem/list?difficulty=${result[0]}&type=${result[1]}&page=1`)
         // Note: 随机而已问题不大
         const
@@ -1017,8 +1017,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     float: right;
 }
 `)
-
-
 
 mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     show_code_lang : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
@@ -1579,7 +1577,6 @@ mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
             log(`Error:${err}`)
         }
     })
-    //am-btn-success
     const $btn = $(`<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>`).on("click", () => {
         $btn.prop("disabled", true)
         $btn.text("保存成功")
@@ -1592,7 +1589,7 @@ mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
     const $btn2 = $(`<a href="https://luogulo.gq/show.php?url=${location.href}"><button class="am-btn am-btn-success am-btn-sm" name="save-discuss" style="border-color: rgb(255, 193, 22); background-color: rgb(255, 193, 22);color: #fff;">查看备份</button></a>`)
     $("section.lg-summary").find("p").append($btn).append($("<span>&nbsp;</span>")).append($btn2)
     if (msto.auto_save_discussion) save_func()
-});
+})
 
 mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
