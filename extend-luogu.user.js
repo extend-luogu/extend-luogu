@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.7.11
+// @version        2.8.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -432,7 +432,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         --lg-green-light-2:     #c9e7c9;
         --lg-yellow:            #f1c40f;
         --lg-orange:            #e67e22;
-        --lg-reg:               #e74c3c;
+        --lg-red:               #e74c3c;
         --lg-red-light:         #dd514c26;
         --lg-red-light-2:       #f5cecd;
         --lg-red-button:        #dd514c;
@@ -497,8 +497,9 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     // ]
     // const emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${id}.png`
 
-    const emo = [ "qq", "cy", "kel", "dk", "kk", "xyx", "jk", "ts", "yun", "yiw", "se", "px", "wq", "fad", "xia", "jy", "qiao", "youl", "qiang", "ruo", "shq", "mg", "dx", "tyt", ]
-    const emo_url = name => `https://xn--9zr.tk/${name}`
+    const emo = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', ]
+    const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea"),
         $nl = $("<br />").appendTo($menu),
@@ -506,40 +507,58 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
 
     emo.forEach(m => {
         const url = emo_url(m)
-        $(`<li class="exlg-emo" exlg="exlg"><img src="${url}" /></li>`)
+        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`)
             .on("click", () => $txt
                 .trigger("focus")
-                .val(`![${ m[1][0] }](${url})`)
+                .val(`![](${url})`)
                 .trigger("input")
             )
             .appendTo($menu)
     })
+    $menu.append("<div style='height: .35em'></div>")
     const $emo = $(".exlg-emo")
 
-    const $fold = $(`<li exlg="exlg">表情 <i class="fa fa-chevron-left"></li>`)
-        .on("click", () => {
-            $nl.toggle()
-            $emo.toggle()
-            $fold.children().toggleClass("fa-chevron-left fa-chevron-right")
-            $grd.toggleClass("exlg-ext")
-        })
-    $nl.after($fold)
+    // const $fold = $(`<li exlg="exlg">表情 <i class="fa fa-chevron-left"></li>`)
+    //     .on("click", () => {
+    //         $nl.toggle()
+    //         $emo.toggle()
+    //         $fold.children().toggleClass("fa-chevron-left fa-chevron-right")
+    //         $grd.toggleClass("exlg-ext")
+    //     })
+    // $nl.after($fold)
 
     $txt.on("input", e => {
         if (e.originalEvent.data === "/")
             mdp.content = mdp.content.replace(/\/(.{1,5})\//g, (_, emo_txt) =>
-                `![${emo_txt}](` + emo_url(emo.find(m => m.includes(emo_txt))) + `)`
+                `![](` + emo_url(emo.find(m => m.includes(emo_txt))) + `)`
             )
     })
 }, `
     .mp-editor-ground.exlg-ext {
-        top: 80px !important;
+        top: 6em !important;
     }
     .mp-editor-menu > br ~ li {
         position: relative;
         display: inline-block;
         margin: 0;
         padding: 5px 1px;
+    }
+    .mp-editor-menu {
+        height: 6em !important;
+        overflow: auto;
+    }
+    .exlg-emo-btn {
+        position: relative;
+        top: 0px;
+        border: none;
+        background-color: #eee;
+        border-radius: .7em;
+        margin: .1em;
+        transition: all .4s;
+    }
+    .exlg-emo-btn:hover {
+        background-color: #f3f3f3;
+        top: -3px;
     }
 `)
 
@@ -1657,3 +1676,37 @@ $(() => {
     log("Launching")
     mod.execute()
 })
+
+mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
+    show: { ty: "boolean", dft: true }
+}, () => {
+    const emo = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', ]
+    const emo_url = name => `//图.tk/${name}`
+    $txt = $("#feed-content")
+    $("#feed-content").before("<div id='emo-lst'></div>")
+    emo.forEach(m => {
+        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`)
+            .on("click", () => $txt
+                .trigger("focus")
+                .val(`![](${emo_url(m)})`)
+                .trigger("input")
+            )
+            .appendTo("#emo-lst")
+    })
+    $("#feed-content").before("<br>")
+}, `
+.exlg-emo-btn {
+    position: relative;
+    top: 0px;
+    border: none;
+    background-color: #eee;
+    border-radius: .7em;
+    margin: .1em;
+    transition: all .4s;
+}
+.exlg-emo-btn:hover {
+    background-color: #f3f3f3;
+    top: -3px;
+}
+`)
