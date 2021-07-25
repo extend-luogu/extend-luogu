@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.4
+// @version        2.8.5
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1607,7 +1607,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
             const tag = tag_list[uid]
             if (tag !== undefined) {
                 $e.find(".exlg-badge").remove()
-                if ($e[0].tagName == "H2") { // Note: h2处有一点点麻烦
+                if ($e[0].tagName === "H2") { // Note: h2处有一点点麻烦
                     $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag").children(":last-child"))
                 }
                 else $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag"))
