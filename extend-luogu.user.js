@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.3
+// @version        2.8.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1585,47 +1585,56 @@ mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
             $btn.removeAttr("disabled")
             $btn.text("保存讨论")
         }, 1000)
-    })
-    const $btn2 = $(`<a href="https://luogulo.gq/show.php?url=${location.href}"><button class="am-btn am-btn-success am-btn-sm" name="save-discuss" style="border-color: rgb(255, 193, 22); background-color: rgb(255, 193, 22);color: #fff;">查看备份</button></a>`)
-    $("section.lg-summary").find("p").append($btn).append($("<span>&nbsp;</span>")).append($btn2)
+    }).css("margin-top", "5px")
+    const $btn2 = $(`<a class="am-btn am-btn-success am-btn-sm" name="save-discuss" style="border-color: rgb(255, 193, 22); background-color: rgb(255, 193, 22);color: #fff;" href="https://luogulo.gq/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px")
+    $("section.lg-summary").find("p").append($(`<br>`)).append($btn).append($("<span>&nbsp;</span>")).append($btn2)
     if (msto.auto_save_discussion) save_func()
 })
 
 mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, () => {
-    const tag_list = JSON.parse(sto["^sponsor-list"].tag_list),
-        $name = $("a[target='_blank'][href]").not(".exlg"),
-        prefix = "/user/"
-    $name.each((i, e, $e = $(e)) => {
-        const href = $e.attr("href")
+    $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
+    const add_badge = ($e) => {
+        if (!$e) return
+        if (!$e.children("a[target='_blank'][href]").length) return
+        const $name = $e.children("a[target='_blank'][href]")
+        if (!$name.text().length) return
+        const href = $name.attr("href")
+        if (!href) return
         if (href.lastIndexOf(prefix) === 0) {
             const uid = href.substring(prefix.length)
             const tag = tag_list[uid]
             if (tag !== undefined) {
                 $e.find(".exlg-badge").remove()
-                $(`<span class="exlg-badge">${tag}</span>`).appendTo(
-                    $e.addClass("exlg")
-                )
+                if ($e[0].tagName == "H2") { // Note: h2处有一点点麻烦
+                    $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag").children(":last-child"))
+                }
+                else $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag"))
             }
         }
-        if (href !== "javascript:void 0") $e.addClass("exlg")
-    })
+        if (href !== "javascript:void 0") $e.addClass("exlg-sponsor-tag")
+    }
+    const tag_list = JSON.parse(sto["^sponsor-list"].tag_list),
+        $users = $("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)"),
+        prefix = "/user/"
+    add_badge($("h2:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)"))
+    $users.each((_, e) => add_badge($(e)))
     const whref = window.location.href
     const hprefix = "https://www.luogu.com.cn/user/"
     if (whref.lastIndexOf(hprefix) === 0) {
         const uid = whref.substring(hprefix.length).split("#")[0],
             tag = tag_list[uid],
-            $title = $("div.user-name").not(".exlg")
+            $title = $("div.user-name").not(".exlg-sponsor-tag")
         if (tag !== undefined) {
             $(`<span class="exlg-badge">${tag}</span>`).appendTo(
-                $title.addClass("exlg")
+                $title.addClass("exlg-sponsor-tag")
             )
         }
     }
 }, (e) => {
     return ($(e.target).hasClass("exlg-badge") === false) &&
-    ($("a[target='_blank'][href]").not(".exlg").length !== 0)
+    ($("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").length !== 0)
 }, `
 .exlg-badge {
     border-radius: 50px;
