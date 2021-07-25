@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.5
+// @version        2.8.6
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -18,7 +18,7 @@
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
-// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=952068
+// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=954039
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
@@ -431,6 +431,16 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
         --lg-black-problem:     #0e1d69;
         --lg-gray-problem:      #bfbfbf;
     }
+
+    .exlg-difficulty-color { font-weight: bold; }
+    .exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
+    .exlg-difficulty-color.color-1 { color: rgb(254, 76, 97)!important; }
+    .exlg-difficulty-color.color-2 { color: rgb(243, 156, 17)!important; }
+    .exlg-difficulty-color.color-3 { color: rgb(255, 193, 22)!important; }
+    .exlg-difficulty-color.color-4 { color: rgb(82, 196, 26)!important; }
+    .exlg-difficulty-color.color-5 { color: rgb(52, 152, 219)!important; }
+    .exlg-difficulty-color.color-6 { color: rgb(157, 61, 207)!important; }
+    .exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
 `)
 
 mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/dashboard/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
@@ -667,11 +677,6 @@ mod.reg_hook("user-problem-color", "题目颜色", "@/user/.*", null, () => {
         display: inline-block;
     }
 `)
-
-mod.reg("user-css-load", "加载用户样式", "@/.*", {
-    css: { ty: "string" }
-}, ({ msto }) => GM_addStyle(msto.css)
-)
 
 mod.reg("benben", "全网犇犇", "@/", null, () => {
     const color = {
@@ -931,7 +936,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
                     $btn[1 - b].show()
                     msto_proxy[index] = !! b
                 })
-                if (msto_proxy[index] !== (!! b)) $btn[b].hide()
+                if (msto_proxy[index] === (!! b)) $btn[b].hide()
             }, 0, 1)
         })
     }, [$exrand_diff, dif_list, msto.exrand_difficulty], [$exrand_srce, src_list, msto.exrand_source])
@@ -1025,7 +1030,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
 },  ({ msto }) => {
 
-    if (/\/blogAdmin\/.*/.test(location.href)) return
+//    if (/\/blogAdmin\/.*/.test(location.href)) return
 
     const isRecord = /\/record\/.*/.test(location.href)
 
@@ -1043,7 +1048,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
         return langs[lang]
     }
 
-    const $cb = $("pre:has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "")
+    const $cb = $("pre:not(.cm-s-default):has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "")
 
     $cb.each((_, e, $pre = $(e)) => {
         const $btn = isRecord
@@ -1068,7 +1073,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
 
         if (! isRecord) $pre.before($title.append($btn))
     })
-}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:has(> code):not([exlg-copy-code-block])").length !== 0), `
+}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:not(.cm-s-default)::has(> code):not([exlg-copy-code-block])").length !== 0), `
 .exlg-copy {
     position: relative;
     display: inline-block;
@@ -1159,37 +1164,42 @@ mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*
 }
 `)
 
-mod.reg("tasklist-ex", "更好的任务列表", "@/", {
-    auto_clear: { ty: "boolean", dft: true, info: ["Clear accepted problems", "清理已经 AC 的题目"] },
-    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务栏随机跳题"]}
+mod.reg("tasklist-ex", "任务计划ex", "@/", {
+    auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
+    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"]}
 }, ({ msto }) => {
+    const $board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空..
     let actTList = []
-    $.each($$("div.tasklist-item"), (_, prob) => {
-        let pid = $(prob).attr("data-pid")
+    $.each($("div.tasklist-item"), (_, prob, $e = $(prob)) => {
+        const pid = $e.attr("data-pid"), $pid = $e.find("b")
         if (prob.innerHTML.search(/check/g) === -1) {
             if (msto.rand_problem_in_tasklist)
                 actTList.push(pid)
         }
-        else if (msto.auto_clear) {
-            $.ajax({ // FIXME: Unable to send requests (maybe because of async/await?)
-                type: "post",
-                url: "/fe/api/problem/tasklistRemove",
-                data: JSON.stringify({
-                    pid: pid
-                }),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-            })
-            $("div.tasklist-item[data-pid=" + pid + "]").hide()
+        if ($e.find("i").hasClass("am-icon-check")) $e.addClass("tasklist-ac-problem")
+    })
+
+    const $toggle_AC = $(`<div>[<a id="toggle-button">隐藏已AC</a>]</div>`)
+    $("button[name=task-edit]").parent().after($toggle_AC)
+    const $toggle = $("#toggle-button").on("click", () => {
+        if ($toggle.text() === "显示已AC") {
+            $toggle.text("隐藏已AC")
+            $(".tasklist-ac-problem").show()
+            msto.auto_clear = false
+        }
+        else {
+            $toggle.text("显示已AC")
+            $(".tasklist-ac-problem").hide()
+            msto.auto_clear = true
         }
     })
 
+    if (msto.auto_clear) $toggle.click()
+
     if (msto.rand_problem_in_tasklist) {
-        let $btn = $("button[name=task-edit]")
-        $btn.clone().appendTo($btn.parent())
+        let $btn = $(`<button name="task-rand" class="am-btn am-btn-sm am-btn-success lg-right">随机</button>`)
+        $("button[name='task-edit']").before($btn)
         $btn.addClass("exlg-rand-tasklist-problem-btn")
-            .text("随机")
-            .removeAttr("onclick")
             .click(() => {
                 let tid = ~~ (Math.random() * 1.e6) % actTList.length
                 location.href += `problem/${actTList[tid]}`
@@ -1198,8 +1208,6 @@ mod.reg("tasklist-ex", "更好的任务列表", "@/", {
 }, `
 .exlg-rand-tasklist-problem-btn {
     margin-left: 0.5em;
-    border-color: rgb(36, 190, 36);
-    background-color: rgb(36, 190, 36);
 }
 `)
 
@@ -1224,17 +1232,7 @@ mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", nul
     $("div.problem>div>a>span.pid").each((i, e, $e = $(e)) => {
         $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`)
     })
-}, () => $("div.problem>div>a>span.pid").length !== 0 && $(".exlg-difficulty-color").length === 0, `
-.exlg-difficulty-color { font-weight: bold; }
-.exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
-.exlg-difficulty-color.color-1 { color: rgb(254, 76, 97)!important; }
-.exlg-difficulty-color.color-2 { color: rgb(243, 156, 17)!important; }
-.exlg-difficulty-color.color-3 { color: rgb(255, 193, 22)!important; }
-.exlg-difficulty-color.color-4 { color: rgb(82, 196, 26)!important; }
-.exlg-difficulty-color.color-5 { color: rgb(52, 152, 219)!important; }
-.exlg-difficulty-color.color-6 { color: rgb(157, 61, 207)!important; }
-.exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
-`)
+}, () => $("div.problem>div>a>span.pid").length !== 0 && $(".exlg-difficulty-color").length === 0)
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     lang: { ty: "enum", dft: "en", vals: [ "en", "zh" ] }
@@ -1620,6 +1618,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
         prefix = "/user/"
     add_badge($("h2:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)"))
     $users.each((_, e) => add_badge($(e)))
+    /*
     const whref = window.location.href
     const hprefix = "https://www.luogu.com.cn/user/"
     if (whref.lastIndexOf(hprefix) === 0) {
@@ -1632,6 +1631,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
             )
         }
     }
+    */
 }, (e) => {
     return ($(e.target).hasClass("exlg-badge") === false) &&
     ($("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").length !== 0)
@@ -1691,6 +1691,31 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     top: -3px;
 }
 `)
+
+// KiLL: 这个不好
+/*
+mod.reg("tasklist-difficulty", "任务计划难度显示", "@/", null, async () => {
+    setTimeout(() => {
+        $.each($("div.tasklist-item"), (_, prob, $e = $(prob)) => {
+            const pid = $e.attr("data-pid"), $pid = $e.find("b")
+            const func1 = async () => {
+                const u = await lg_content(`https://www.luogu.com.cn/problem/${pid}`)
+                $pid.addClass("exlg-difficulty-color").addClass(`color-${u.currentData.problem.difficulty}`)
+            }
+            func1() // Note: 尽量不要用, ok?    
+            const func2 = (delay) => {
+                var start = new Date().getTime();
+                while (new Date().getTime() < start + delay);
+            }
+            func2(75)
+        })
+    }, 0)
+})
+*/
+mod.reg("user-css-load", "加载用户样式", "@/.*", {
+    css: { ty: "string" }
+}, ({ msto }) => GM_addStyle(msto.css)
+)
 
 $(() => {
     log("Exposing")
