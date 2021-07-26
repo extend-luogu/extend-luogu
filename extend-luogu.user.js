@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.6
+// @version        2.8.7
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1030,8 +1030,6 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
     copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
 },  ({ msto }) => {
 
-//    if (/\/blogAdmin\/.*/.test(location.href)) return
-
     const isRecord = /\/record\/.*/.test(location.href)
 
     const langs = {
@@ -1073,7 +1071,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
 
         if (! isRecord) $pre.before($title.append($btn))
     })
-}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:not(.cm-s-default)::has(> code):not([exlg-copy-code-block])").length !== 0), `
+}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:not(.cm-s-default):has(> code):not([exlg-copy-code-block])").length !== 0), `
 .exlg-copy {
     position: relative;
     display: inline-block;
@@ -1168,10 +1166,10 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
     auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
     rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"]}
 }, ({ msto }) => {
-    const $board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空..
+    const _$board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空..
     let actTList = []
     $.each($("div.tasklist-item"), (_, prob, $e = $(prob)) => {
-        const pid = $e.attr("data-pid"), $pid = $e.find("b")
+        const pid = $e.attr("data-pid")
         if (prob.innerHTML.search(/check/g) === -1) {
             if (msto.rand_problem_in_tasklist)
                 actTList.push(pid)
@@ -1702,7 +1700,7 @@ mod.reg("tasklist-difficulty", "任务计划难度显示", "@/", null, async () 
                 const u = await lg_content(`https://www.luogu.com.cn/problem/${pid}`)
                 $pid.addClass("exlg-difficulty-color").addClass(`color-${u.currentData.problem.difficulty}`)
             }
-            func1() // Note: 尽量不要用, ok?    
+            func1() // Note: 尽量不要用, ok?
             const func2 = (delay) => {
                 var start = new Date().getTime();
                 while (new Date().getTime() < start + delay);
