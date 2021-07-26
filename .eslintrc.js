@@ -30,7 +30,7 @@ module.exports = {
 
     "no-var": 2,
     "one-var": 0,
-    "no-unused-vars": 2,
+    "no-unused-vars": [ 2, { varsIgnorePattern: "^_" } ],
 
     "no-case-declarations": 0,
     "no-fallthrough": 0,
