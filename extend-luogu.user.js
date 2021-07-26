@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.7
+// @version        2.8.8
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -327,7 +327,7 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
             gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
             gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
         }[source]))
-}, () => $(".user-nav").length !== 0 && $("#exlg-dash").length === 0, `
+}, () => $(".user-nav").length && !$("#exlg-dash").length, `
     /* dash */
     #exlg-dash {
         position: relative;
@@ -672,7 +672,7 @@ mod.reg_hook("user-problem-color", "题目颜色", "@/user/.*", null, () => {
     })
 
     if (uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
-}, () => $(".problems > span > a").not(".exlg").length !== 0, `
+}, () => $(".problems > span > a").not(".exlg").length, `
     .main > .card > h3 {
         display: inline-block;
     }
@@ -947,7 +947,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             l.forEach((e, i) => {
                 if (msto_proxy[i]) g.push(e.id)
             })
-            if (g.length === 0) g = _empty
+            if (!g.length) g = _empty
             return g[Math.floor(Math.random() * g.length)]
         }, [dif_list, msto.exrand_difficulty, [0, 1, 2, 3, 4, 5, 6, 7]], [src_list, msto.exrand_source, ["P"]])
 
@@ -1046,7 +1046,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
         return langs[lang]
     }
 
-    const $cb = $("pre:not(.cm-s-default):has(> code):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "")
+    const $cb = $("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])").attr("exlg-copy-code-block", "")
 
     $cb.each((_, e, $pre = $(e)) => {
         const $btn = isRecord
@@ -1071,7 +1071,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
 
         if (! isRecord) $pre.before($title.append($btn))
     })
-}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:not(.cm-s-default):has(> code):not([exlg-copy-code-block])").length !== 0), `
+}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])").length), `
 .exlg-copy {
     position: relative;
     display: inline-block;
@@ -1141,9 +1141,9 @@ mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*
                     candProbList.push(pb.problem.pid)
             })
 
-            if (tInfo.problemCount === 0)
+            if (!tInfo.problemCount)
                 return lg_alert("题单不能为空")
-            else if (candProbList.length === 0) {
+            else if (!candProbList.length) {
                 if (ptypes === 1)
                     return lg_alert("您已经做完所有新题啦！")
                 else if (ptypes === 2)
@@ -1166,7 +1166,7 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
     auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
     rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"]}
 }, ({ msto }) => {
-    const _$board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空..
+    /* const _$board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空.. */
     let actTList = []
     $.each($("div.tasklist-item"), (_, prob, $e = $(prob)) => {
         const pid = $e.attr("data-pid")
@@ -1230,7 +1230,7 @@ mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", nul
     $("div.problem>div>a>span.pid").each((i, e, $e = $(e)) => {
         $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`)
     })
-}, () => $("div.problem>div>a>span.pid").length !== 0 && $(".exlg-difficulty-color").length === 0)
+}, () => $("div.problem>div>a>span.pid").length && !$(".exlg-difficulty-color").length)
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     lang: { ty: "enum", dft: "en", vals: [ "en", "zh" ] }
@@ -1590,6 +1590,7 @@ mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
 mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, () => {
+    const isDiscuss = /\/discuss\/show\/.*/.test(location.href)
     $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
     const add_badge = ($e) => {
         if (!$e) return
@@ -1603,7 +1604,10 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
             const tag = tag_list[uid]
             if (tag !== undefined) {
                 $e.find(".exlg-badge").remove()
-                if ($e[0].tagName === "H2") { // Note: h2处有一点点麻烦
+                if (isDiscuss) { // Note: discuss/show
+                    (($e.children(".sb_amazeui").length) ? ($e.children(".sb_amazeui")) : ($e.children("a[target='_blank'][href]"))).after($(`<span class="exlg-badge">${tag}</span>`))
+                }
+                else if ($e[0].tagName === "H2") { // Note: h2处有一点点麻烦
                     $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag").children(":last-child"))
                 }
                 else $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag"))
@@ -1615,6 +1619,9 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
         $users = $("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)"),
         prefix = "/user/"
     add_badge($("h2:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)"))
+    if (isDiscuss) {
+        $("div.am-comment-meta:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)").each((_, e) => add_badge($(e)))
+    }
     $users.each((_, e) => add_badge($(e)))
     /*
     const whref = window.location.href
@@ -1631,8 +1638,8 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     }
     */
 }, (e) => {
-    return ($(e.target).hasClass("exlg-badge") === false) &&
-    ($("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").length !== 0)
+    return (!($(e.target).hasClass("exlg-badge"))) &&
+    ($("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").length || (/\/discuss\/show\/.*/.test(location.href) && $("div.am-comment-meta:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)").length))
 }, `
 .exlg-badge {
     border-radius: 50px;
