@@ -510,7 +510,6 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     $(".mp-editor-ground").addClass("exlg-ext")
 
     emo.forEach(m => {
-        const url = emo_url(m)
         $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`)
             .on("click", () => $txt
                 .trigger("focus")
