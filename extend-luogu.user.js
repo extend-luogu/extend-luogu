@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.9
+// @version        2.8.10
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -473,35 +473,44 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     show: { ty: "boolean", dft: true }
 }, () => {
     const emo = [
-        { name: [ "kk" ], slug: "0" },
-        { name: [ "jk" ], slug: "1" },
-        { name: [ "se" ], slug: "2" },
-        { name: [ "qq" ], slug: "3" },
-        { name: [ "xyx" ], slug: "4" },
-        { name: [ "xia" ], slug: "5" },
-        { name: [ "cy" ], slug: "6" },
-        { name: [ "ll" ], slug: "7" },
-        { name: [ "xk" ], slug: "8" },
-        { name: [ "qiao" ], slug: "9" },
-        { name: [ "qiang" ], slug: "a" },
-        { name: [ "ruo" ], slug: "b" },
-        { name: [ "mg" ], slug: "c" },
-        { name: [ "dx" ], slug: "d" },
-        { name: [ "youl" ], slug: "e" },
-        { name: [ "baojin" ], slug: "f" },
-        { name: [ "shq" ], slug: "g" },
-        { name: [ "lb" ], slug: "h" },
-        { name: [ "lh" ], slug: "i" },
-        { name: [ "qd" ], slug: "j" },
-        { name: [ "fad" ], slug: "k" },
-        { name: [ "dao" ], slug: "l" },
-        { name: [ "cd" ], slug: "m" },
-        { name: [ "kun" ], slug: "n" },
-        { name: [ "px" ], slug: "o" },
-        { name: [ "ts" ], slug: "p" },
-        { name: [ "kl" ], slug: "q" },
-        { name: [ "yiw" ], slug: "r" },
-        { name: [ "dk" ], slug: "s" },
+        { type: "emo", name: [ "kk" ], slug: "0" },
+        { type: "emo", name: [ "jk" ], slug: "1" },
+        { type: "emo", name: [ "se" ], slug: "2" },
+        { type: "emo", name: [ "qq" ], slug: "3" },
+        { type: "emo", name: [ "xyx" ], slug: "4" },
+        { type: "emo", name: [ "xia" ], slug: "5" },
+        { type: "emo", name: [ "cy" ], slug: "6" },
+        { type: "emo", name: [ "ll" ], slug: "7" },
+        { type: "emo", name: [ "xk" ], slug: "8" },
+        { type: "emo", name: [ "qiao" ], slug: "9" },
+        { type: "emo", name: [ "qiang" ], slug: "a" },
+        { type: "emo", name: [ "ruo" ], slug: "b" },
+        { type: "emo", name: [ "mg" ], slug: "c" },
+        { type: "emo", name: [ "dx" ], slug: "d" },
+        { type: "emo", name: [ "youl" ], slug: "e" },
+        { type: "emo", name: [ "baojin" ], slug: "f" },
+        { type: "emo", name: [ "shq" ], slug: "g" },
+        { type: "emo", name: [ "lb" ], slug: "h" },
+        { type: "emo", name: [ "lh" ], slug: "i" },
+        { type: "emo", name: [ "qd" ], slug: "j" },
+        { type: "emo", name: [ "fad" ], slug: "k" },
+        { type: "emo", name: [ "dao" ], slug: "l" },
+        { type: "emo", name: [ "cd" ], slug: "m" },
+        { type: "emo", name: [ "kun" ], slug: "n" },
+        { type: "emo", name: [ "px" ], slug: "o" },
+        { type: "emo", name: [ "ts" ], slug: "p" },
+        { type: "emo", name: [ "kl" ], slug: "q" },
+        { type: "emo", name: [ "yiw" ], slug: "r" },
+        { type: "emo", name: [ "dk" ], slug: "s" },
+        { type: "txt", name: [ "sqlm" ], slug: "g0", name_display: "山钳刘明" },
+        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
+        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
+        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
+        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
+        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "QωQ" },
+        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
+        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
+        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
     ]
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
@@ -510,13 +519,15 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     $(".mp-editor-ground").addClass("exlg-ext")
 
     emo.forEach(m => {
-        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`)
-            .on("click", () => $txt
-                .trigger("focus")
-                .val(`![](${emo_url(m.slug)})`)
-                .trigger("input")
-            )
-            .appendTo($menu)
+        $((m.type === "emo")?
+                `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
+            :
+            `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
+        ).on("click", () => $txt
+            .trigger("focus")
+            .val(`![](${emo_url(m.slug)})`)
+            .trigger("input")
+        ).appendTo($menu)
     })
     $menu.append("<div style='height: .35em'></div>")
 
@@ -557,6 +568,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
         border-radius: .7em;
         margin: .1em;
         transition: all .4s;
+        height: 2em;
     }
     .exlg-emo-btn:hover {
         background-color: #f3f3f3;
@@ -1692,47 +1704,58 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
 }, () => {
     const emo = [
-        { name: [ "kk" ], slug: "0" },
-        { name: [ "jk" ], slug: "1" },
-        { name: [ "se" ], slug: "2" },
-        { name: [ "qq" ], slug: "3" },
-        { name: [ "xyx" ], slug: "4" },
-        { name: [ "xia" ], slug: "5" },
-        { name: [ "cy" ], slug: "6" },
-        { name: [ "ll" ], slug: "7" },
-        { name: [ "xk" ], slug: "8" },
-        { name: [ "qiao" ], slug: "9" },
-        { name: [ "qiang" ], slug: "a" },
-        { name: [ "ruo" ], slug: "b" },
-        { name: [ "mg" ], slug: "c" },
-        { name: [ "dx" ], slug: "d" },
-        { name: [ "youl" ], slug: "e" },
-        { name: [ "baojin" ], slug: "f" },
-        { name: [ "shq" ], slug: "g" },
-        { name: [ "lb" ], slug: "h" },
-        { name: [ "lh" ], slug: "i" },
-        { name: [ "qd" ], slug: "j" },
-        { name: [ "fad" ], slug: "k" },
-        { name: [ "dao" ], slug: "l" },
-        { name: [ "cd" ], slug: "m" },
-        { name: [ "kun" ], slug: "n" },
-        { name: [ "px" ], slug: "o" },
-        { name: [ "ts" ], slug: "p" },
-        { name: [ "kl" ], slug: "q" },
-        { name: [ "yiw" ], slug: "r" },
-        { name: [ "dk" ], slug: "s" },
+        { type: "emo", name: [ "kk" ], slug: "0" },
+        { type: "emo", name: [ "jk" ], slug: "1" },
+        { type: "emo", name: [ "se" ], slug: "2" },
+        { type: "emo", name: [ "qq" ], slug: "3" },
+        { type: "emo", name: [ "xyx" ], slug: "4" },
+        { type: "emo", name: [ "xia" ], slug: "5" },
+        { type: "emo", name: [ "cy" ], slug: "6" },
+        { type: "emo", name: [ "ll" ], slug: "7" },
+        { type: "emo", name: [ "xk" ], slug: "8" },
+        { type: "emo", name: [ "qiao" ], slug: "9" },
+        { type: "emo", name: [ "qiang" ], slug: "a" },
+        { type: "emo", name: [ "ruo" ], slug: "b" },
+        { type: "emo", name: [ "mg" ], slug: "c" },
+        { type: "emo", name: [ "dx" ], slug: "d" },
+        { type: "emo", name: [ "youl" ], slug: "e" },
+        { type: "emo", name: [ "baojin" ], slug: "f" },
+        { type: "emo", name: [ "shq" ], slug: "g" },
+        { type: "emo", name: [ "lb" ], slug: "h" },
+        { type: "emo", name: [ "lh" ], slug: "i" },
+        { type: "emo", name: [ "qd" ], slug: "j" },
+        { type: "emo", name: [ "fad" ], slug: "k" },
+        { type: "emo", name: [ "dao" ], slug: "l" },
+        { type: "emo", name: [ "cd" ], slug: "m" },
+        { type: "emo", name: [ "kun" ], slug: "n" },
+        { type: "emo", name: [ "px" ], slug: "o" },
+        { type: "emo", name: [ "ts" ], slug: "p" },
+        { type: "emo", name: [ "kl" ], slug: "q" },
+        { type: "emo", name: [ "yiw" ], slug: "r" },
+        { type: "emo", name: [ "dk" ], slug: "s" },
+        { type: "txt", name: [ "sqlm" ], slug: "g0", name_display: "山钳刘明" },
+        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
+        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
+        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
+        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
+        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "QωQ" },
+        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
+        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
+        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
     ]
     const emo_url = name => `//图.tk/${name}`
     $txt = $("#feed-content")
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
-        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`)
-            .on("click", () => $txt
-                .trigger("focus")
-                .val(`![](${emo_url(m.slug)})`)
-                .trigger("input")
-            )
-            .appendTo("#emo-lst")
+        $((m.type === "emo")?
+                `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
+            :
+            `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
+        ).on("click", () => $txt
+            .trigger("focus")
+            .val(`![](${emo_url(m.slug)})`)
+            .trigger("input")
+        ).appendTo("#emo-lst")
     })
     $("#feed-content").before("<br>")
     $txt.on("input", e => {
@@ -1750,6 +1773,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     border-radius: .7em;
     margin: .1em;
     transition: all .4s;
+    height: 2em;
 }
 .exlg-emo-btn:hover {
     background-color: #f3f3f3;
