@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.8.8
+// @version        2.8.9
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -14,6 +14,7 @@
 //
 // @connect        tencentcs.com
 // @connect        luogulo.gq
+// @connect        bens.rotriw.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -761,6 +762,23 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
 
     })
     */
+})
+
+mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
+    GM_xmlhttpRequest({
+         method: "GET",
+         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
+         onload: function(res) {
+         let s="<h3>犇犇排行榜</h3>";
+         s+='<ol>';
+         $(JSON.parse(res.response)).each(function(){
+             s+=`<li><a href="https://bens.rotriw.com/user/${this[2]}">${this[1]}  共 ${this[0]} 条</a></li>`
+             //console.log(this)
+         })
+         s+='</ol>';
+         $board.html(s)
+    }
+    })
 })
 
 mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
