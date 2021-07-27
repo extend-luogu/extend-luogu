@@ -520,7 +520,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
 
     emo.forEach(m => {
         $((m.type === "emo")?
-                `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
+            `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
             :
             `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
         ).on("click", () => $txt
@@ -1748,7 +1748,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
         $((m.type === "emo")?
-                `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
+            `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
             :
             `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
         ).on("click", () => $txt
