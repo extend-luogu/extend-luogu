@@ -472,29 +472,37 @@ mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@deb
 mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], {
     show: { ty: "boolean", dft: true }
 }, () => {
-    // Kill:
-    // const emo = [
-    //     [ "62224", [ "qq" ] ],
-    //     [ "62225", [ "cy" ] ],
-    //     [ "62226", [ "kel", "kl" ] ],
-    //     [ "62227", [ "kk" ] ],
-    //     [ "62228", [ "dk" ] ],
-    //     [ "62230", [ "xyx", "hj" ] ],
-    //     [ "62234", [ "jk" ] ],
-    //     [ "62236", [ "qiang", "up", "+", "zan" ] ],
-    //     [ "62238", [ "ruo", "dn", "-", "cai" ] ],
-    //     [ "62239", [ "ts" ] ],
-    //     [ "62240", [ "yun" ] ],
-    //     [ "62243", [ "yiw", "yw", "?" ] ],
-    //     [ "62244", [ "se", "*" ] ],
-    //     [ "62246", [ "px" ] ],
-    //     [ "62248", [ "wq" ] ],
-    //     [ "62250", [ "fad", "fd" ] ],
-    //     [ "69020", [ "youl", "yl" ] ]
-    // ]
-    // const emo_url = id => `https://cdn.luogu.com.cn/upload/pic/${id}.png`
-
-    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
+    const emo = [
+        { "name": [ "kk" ], "slug": "0" },
+        { "name": [ "jk" ], "slug": "1" },
+        { "name": [ "se" ], "slug": "2" },
+        { "name": [ "qq" ], "slug": "3" },
+        { "name": [ "xyx" ], "slug": "4" },
+        { "name": [ "xia" ], "slug": "5" },
+        { "name": [ "cy" ], "slug": "6" },
+        { "name": [ "ll" ], "slug": "7" },
+        { "name": [ "xk" ], "slug": "8" },
+        { "name": [ "qiao" ], "slug": "9" },
+        { "name": [ "qiang" ], "slug": "a" },
+        { "name": [ "ruo" ], "slug": "b" },
+        { "name": [ "mg" ], "slug": "c" },
+        { "name": [ "dx" ], "slug": "d" },
+        { "name": [ "youl" ], "slug": "e" },
+        { "name": [ "baojin" ], "slug": "f" },
+        { "name": [ "shq" ], "slug": "g" },
+        { "name": [ "lb" ], "slug": "h" },
+        { "name": [ "lh" ], "slug": "i" },
+        { "name": [ "qd" ], "slug": "j" },
+        { "name": [ "fad" ], "slug": "k" },
+        { "name": [ "dao" ], "slug": "l" },
+        { "name": [ "cd" ], "slug": "m" },
+        { "name": [ "kun" ], "slug": "n" },
+        { "name": [ "px" ], "slug": "o" },
+        { "name": [ "ts" ], "slug": "p" },
+        { "name": [ "kl" ], "slug": "q" },
+        { "name": [ "yiw" ], "slug": "r" },
+        { "name": [ "dk" ], "slug": "s" },
+    ]
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
@@ -503,10 +511,10 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
 
     emo.forEach(m => {
         const url = emo_url(m)
-        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`)
+        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m["slug"])}" /></button>`)
             .on("click", () => $txt
                 .trigger("focus")
-                .val(`![](${url})`)
+                .val(`![](${emo_url(m["slug"])})`)
                 .trigger("input")
             )
             .appendTo($menu)
@@ -525,7 +533,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     $txt.on("input", e => {
         if (e.originalEvent.data === "/")
             mdp.content = mdp.content.replace(/\/(.{1,5})\//g, (_, emo_txt) =>
-                `![](` + emo_url(emo.find(m => m.includes(emo_txt))) + `)`
+                `![](` + emo_url(emo.find(m => m["name"].includes(emo_txt))["slug"]) + `)`
             )
     })
 }, `
@@ -1684,20 +1692,56 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
 mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
 }, () => {
-    const emo = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", ]
+    const emo = [
+        { "name": [ "kk" ], "slug": "0" },
+        { "name": [ "jk" ], "slug": "1" },
+        { "name": [ "se" ], "slug": "2" },
+        { "name": [ "qq" ], "slug": "3" },
+        { "name": [ "xyx" ], "slug": "4" },
+        { "name": [ "xia" ], "slug": "5" },
+        { "name": [ "cy" ], "slug": "6" },
+        { "name": [ "ll" ], "slug": "7" },
+        { "name": [ "xk" ], "slug": "8" },
+        { "name": [ "qiao" ], "slug": "9" },
+        { "name": [ "qiang" ], "slug": "a" },
+        { "name": [ "ruo" ], "slug": "b" },
+        { "name": [ "mg" ], "slug": "c" },
+        { "name": [ "dx" ], "slug": "d" },
+        { "name": [ "youl" ], "slug": "e" },
+        { "name": [ "baojin" ], "slug": "f" },
+        { "name": [ "shq" ], "slug": "g" },
+        { "name": [ "lb" ], "slug": "h" },
+        { "name": [ "lh" ], "slug": "i" },
+        { "name": [ "qd" ], "slug": "j" },
+        { "name": [ "fad" ], "slug": "k" },
+        { "name": [ "dao" ], "slug": "l" },
+        { "name": [ "cd" ], "slug": "m" },
+        { "name": [ "kun" ], "slug": "n" },
+        { "name": [ "px" ], "slug": "o" },
+        { "name": [ "ts" ], "slug": "p" },
+        { "name": [ "kl" ], "slug": "q" },
+        { "name": [ "yiw" ], "slug": "r" },
+        { "name": [ "dk" ], "slug": "s" },
+    ]
     const emo_url = name => `//图.tk/${name}`
     $txt = $("#feed-content")
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
-        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`)
+        $(`<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m["slug"])}" /></button>`)
             .on("click", () => $txt
                 .trigger("focus")
-                .val(`![](${emo_url(m)})`)
+                .val(`![](${emo_url(m["slug"])})`)
                 .trigger("input")
             )
             .appendTo("#emo-lst")
     })
     $("#feed-content").before("<br>")
+    $txt.on("input", e => {
+        if (e.originalEvent.data === "/")
+            mdp.content = mdp.content.replace(/\/(.{1,5})\//g, (_, emo_txt) =>
+                `![](` + emo_url(emo.find(m => m["name"].includes(emo_txt))["slug"]) + `)`
+            )
+    })
 }, `
 .exlg-emo-btn {
     position: relative;
