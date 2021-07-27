@@ -766,14 +766,13 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
 
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
     GM_xmlhttpRequest({
-         method: "GET",
-         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
-         onload: function(res) {
-         let s="<h3>犇犇排行榜</h3>";
-         s+='<ol>';
-         $(JSON.parse(res.response)).each(function(){
-             s+=`<li><a href="https://bens.rotriw.com/user/${this[2]}">${this[1]}  共 ${this[0]} 条</a></li>`
-             //console.log(this)
+        method: "GET",
+        url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
+        onload: function(res) {
+            let s="<h3>犇犇排行榜</h3>"
+            s+="<ol>"
+            $(JSON.parse(res.response)).each(function(){
+                s+=`<li><a href="https://bens.rotriw.com/user/${this[2]}">${this[1]}  共 ${this[0]} 条</a></li>`
          })
          s+='</ol>';
          $board.html(s)
