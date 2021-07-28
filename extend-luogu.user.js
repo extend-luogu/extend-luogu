@@ -1279,6 +1279,10 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     })
 })
 
+mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^list].*"], null, () => {
+    $$("a[href^='/problem/solution']").hide()
+})
+
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
     if ($(".exlg-difficulty-color").length) return
     const u = await lg_content(window.location.href)
