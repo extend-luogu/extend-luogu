@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.9.4
+// @version        2.9.5
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -772,10 +772,13 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
 </li>
                         `)
                         .appendTo($("ul#feed"))
-                        .find("a[name=feed-reply]").on("click", () =>
-                            $("textarea")
+                        .find("a[name=feed-reply]").on("click", () =>{
+                            scrollToId('feed-content')
+                            setTimeout(()=>$("textarea")
                                 .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                                .trigger("input")
+                                .trigger("input"),50)
+
+                        }
                         )
                     )
                 },
