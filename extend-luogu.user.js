@@ -1278,7 +1278,10 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
 })
 
 mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^list].*"], null, () => {
-    $$("a[href^='/problem/solution']").hide()
+    if (uindow.location.pathname.startsWith("/problem/solution/"))
+        uindow.location.href = uindow.location.href.replace("/solution", "")
+    else
+        $$("a[href^='/problem/solution']").hide()
 })
 
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
