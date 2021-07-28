@@ -513,6 +513,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
         { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
         { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
         { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
+        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
     ]
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
@@ -1763,6 +1764,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
         { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
         { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
         { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
+        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
     ]
     const emo_url = name => `//图.tk/${name}`
     $txt = $("#feed-content")
