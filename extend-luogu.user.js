@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.9.3
+// @version        2.9.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -518,6 +518,8 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
         { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
         { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
         { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
+        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
     ]
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
@@ -1780,6 +1782,8 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
         { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
         { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
         { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
+        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
     ]
     const emo_url = name => `//图.tk/${name}`
     $txt = $("#feed-content")
