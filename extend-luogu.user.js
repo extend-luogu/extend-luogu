@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.9.6
+// @version        2.9.7
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -796,39 +796,6 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     */
 })
 
-mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
-    GM_xmlhttpRequest({
-        method: "GET",
-        url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
-        onload: function(res) {
-            let s="<h3>犇犇排行榜</h3>"
-            s+="<div>"
-            $(JSON.parse(res.response)).each((index, obj) => {
-                s+=`<div class="bb-rnklst-${index + 1}">
-                    <span class="bb-rnklst-ind">${index + 1}.</span>
-                    <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
-                    <span style="float: right;">共 ${obj[0]} 条</span>
-                </div>`
-            })
-            s+="</div><br>"
-            $board.html(s)
-        }
-    })
-},`
-.bb-rnklst-1 > .bb-rnklst-ind {
-    color: var(--lg-red);
-    font-weight: 900;
-}
-.bb-rnklst-2 > .bb-rnklst-ind {
-    color: var(--lg-orange);
-    font-weight: 900;
-}
-.bb-rnklst-3 > .bb-rnklst-ind {
-    color: var(--lg-yellow);
-    font-weight: 900;
-}
-`)
-
 mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     exrand_difficulty: {
         ty: "tuple",
@@ -932,7 +899,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     $jump.after($jump.clone()).remove()
     $jump = $(".am-btn[name='goto']")
 
-    const $btn_list = $jump.parent().append($("<span>&nbsp;</span>"))
+    const $btn_list = $jump.parent()
 
     $(".am-btn[name='gotorandom']").text("随机")
     const $jump_exrand = $(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex">随机ex</button>`).appendTo($btn_list)
@@ -957,18 +924,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             } // Hack: 维护onboard
         })
     $(".lg-index-stat>h2").text("问题跳转 ").append($(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`))
-    $("#exlg-dash-0").mouseenter(() => {
-        mouse_on_dash = true
-        $board.show() // Hack: 鼠标放在dash上开window
-    })
-        .mouseleave(() => {
-            mouse_on_dash = false // Hack: 离开dash和board超过200ms直接关掉
-            if (!mouse_on_board) {
-                setTimeout(() => {
-                    if (!mouse_on_board) $board.hide()
-                }, 200)
-            }
-        })
     const $ul = $board.children("ul").css("list-style-type", "none")
 
     const $exrand_menu = $(`<div id="exlg-exrand-menu"></div>`).appendTo($ul)
@@ -1006,6 +961,27 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             }, 0, 1)
         })
     }, [$exrand_diff, dif_list, msto.exrand_difficulty], [$exrand_srce, src_list, msto.exrand_source])
+
+    $("#exlg-dash-0").mouseenter(() => {
+        mouse_on_dash = true
+        console.log(222)
+        $.double(([$p, mproxy]) => {
+            const $smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
+            console.log($smalldash)
+            $.double(([jqstr, bln]) => {
+                $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide())) 
+            }, [".exrand-enabled", true], [".exrand-disabled", false])
+        }, [$exrand_diff, msto.exrand_difficulty], [$exrand_srce, msto.exrand_source]) // Hack: 防止开两个页面瞎玩的情况
+        $board.show() // Hack: 鼠标放在dash上开window
+    })
+        .mouseleave(() => {
+            mouse_on_dash = false // Hack: 离开dash和board超过200ms直接关掉
+            if (!mouse_on_board) {
+                setTimeout(() => {
+                    if (!mouse_on_board) $board.hide()
+                }, 200)
+            }
+        })
 
     const exrand_poi = async () => { // Note: 异步写法（用到了lg_content）
         const result = $.double(([l, msto_proxy, _empty]) => {
@@ -1137,7 +1113,7 @@ mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
 
         if (! isRecord) $pre.before($title.append($btn))
     })
-}, () => (!/\/blogAdmin\/.*/.test(location.href) && $("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])").length), `
+}, () => ($("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])").length), `
 .exlg-copy {
     position: relative;
     display: inline-block;
@@ -1289,12 +1265,9 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     })
 })
 
-mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^list].*"], null, () => {
-    if (uindow.location.pathname.startsWith("/problem/solution/"))
-        uindow.location.href = uindow.location.href.replace("/solution", "")
-    else
-        $$("a[href^='/problem/solution']").hide()
-})
+mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^list].*"], {
+    hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
+}, ({ msto }) => (msto.hidesolu) ? ( (/\/problem\/solution\/.*/.match(location.href)) ? (location.href = location.href.replace("/solution", "")) : ($("a[href^='/problem/solution']").hide()) ) : "memset0珂爱")
 
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
     if ($(".exlg-difficulty-color").length) return
@@ -1598,6 +1571,42 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
     $("#search-user-input").keydown(e => { e.key === "Enter" && func() })
 })
 
+mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
+    GM_xmlhttpRequest({
+        method: "GET",
+        url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
+        onload: function(res) {
+            let s="<h3>犇犇排行榜</h3>"
+            s+="<div>"
+            $(JSON.parse(res.response)).each((index, obj) => {
+                s+=`<div class="bb-rnklst-${index + 1}">
+                    <span class="bb-rnklst-ind${(index < 9) ? (" bb-top-ten") : ("")}">${index + 1}.</span>
+                    <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
+                    <span style="float: right;">共 ${obj[0]} 条</span>
+                </div>`
+            })
+            s+="</div><br>"
+            $board.html(s)
+        }
+    })
+},`
+.bb-rnklst-1 > .bb-rnklst-ind {
+    color: var(--lg-red);
+    font-weight: 900;
+}
+.bb-rnklst-2 > .bb-rnklst-ind {
+    color: var(--lg-orange);
+    font-weight: 900;
+}
+.bb-rnklst-3 > .bb-rnklst-ind {
+    color: var(--lg-yellow);
+    font-weight: 900;
+}
+.bb-rnklst-ind.bb-top-ten {
+    margin-right: 9px;
+}
+`)
+
 // TODO
 mod.reg("update-log", "更新日志显示", "@/", {
     last_version: { ty: "string", priv: true }
@@ -1607,25 +1616,10 @@ mod.reg("update-log", "更新日志显示", "@/", {
     case "==":
         break
     case "<<":
-        lg_alert(`新 VER ${version}\n` + "更新日志功能正在维修中……")
+        lg_alert(`新 VER ${version}\n` + "提醒各位，现在sponsor-tag模块存在严重的bug，我已经将该模块的钩子屏蔽，建议大家还是关掉为好。谢谢配合")
     case ">>":
         msto.last_version = version
     }
-})
-
-mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
-    tag_list: { ty: "string", priv: true }
-}, ({msto}) => {
-    GM_xmlhttpRequest({
-        method: "GET",
-        url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
-        onload: (res) => {
-            msto["tag_list"] = decodeURIComponent(res.responseText)
-        },
-        onerror: (err) => {
-            error(err)
-        }
-    })
 })
 
 mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
@@ -1658,6 +1652,21 @@ mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
     const $btn2 = $(`<a class="am-btn am-btn-success am-btn-sm" name="save-discuss" style="border-color: rgb(255, 193, 22); background-color: rgb(255, 193, 22);color: #fff;" href="https://luogulo.gq/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px")
     $("section.lg-summary").find("p").append($(`<br>`)).append($btn).append($("<span>&nbsp;</span>")).append($btn2)
     if (msto.auto_save_discussion) save_func()
+})
+
+mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
+    tag_list: { ty: "string", priv: true }
+}, ({msto}) => {
+    GM_xmlhttpRequest({
+        method: "GET",
+        url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
+        onload: (res) => {
+            msto["tag_list"] = decodeURIComponent(res.responseText)
+        },
+        onerror: (err) => {
+            error(err)
+        }
+    })
 })
 
 mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
@@ -1711,6 +1720,7 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     }
     */
 }, (e) => {
+    return false // Hack: 严重的bug必须修掉, 但是先暂时这样了
     return (!($(e.target).hasClass("exlg-badge"))) &&
     ($("span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").length || (/\/discuss\/show\/.*/.test(location.href) && $("div.am-comment-meta:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)").length))
 }, `
@@ -1735,7 +1745,6 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
     margin-right: 2px;
 }
 `)
-
 
 mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
@@ -1790,18 +1799,21 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
         { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
         { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
     ]
-    const emo_url = name => `//图.tk/${name}`
-    $txt = $("#feed-content")
+    const $txt = $("#feed-content"), emo_url = name => `//图.tk/${name}`, txt = $txt[0]
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
         $((m.type === "emo")?
             `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
             :
             `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
-        ).on("click", () => $txt
-            .trigger("focus")
-            .val(`![](${emo_url(m.slug)})`)
-            .trigger("input")
+        ).on("click", () => {
+            const preval = txt.value
+            const pselstart = txt.selectionStart
+            const str1 = preval.slice(0, pselstart) + `![](${emo_url(m.slug)})`
+            txt.value = (str1 + preval.slice(txt.selectionEnd))
+            txt.focus()
+            txt.setSelectionRange(str1.length, str1.length)
+        }
         ).appendTo("#emo-lst")
     })
     $("#feed-content").before("<br>")
