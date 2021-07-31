@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.10.0
+// @version        2.10.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -146,8 +146,8 @@ const mod = {
     ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
 
     path_dash_board: [
-		"@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/(index|bundle)(.html)?"
-	],
+        "@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/(index|bundle)(.html)?"
+    ],
 
     reg: (name, info, path, data, func, styl) => {
         if (! Array.isArray(path)) path = [ path ]
@@ -482,7 +482,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
             children: mod._.map(m => ({
                 rawName: m.name,
                 name: m.name.replace(/^[@^]/g, ""),
-                description: m.description,
+                description: m.info,
                 settings: Object.entries(mod.data[m.name].lvs)
                     .filter(([ k, s ]) => k !== "on" && ! s.priv)
                     .map(([ k, s ]) => ({
@@ -804,7 +804,7 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                         </li>
                     `)
                         .appendTo($("ul#feed"))
-                        .find("a[name=feed-reply]").on("click", () =>{
+                        .find("a[name=feed-reply]").on("click", () => {
                             scrollToId("feed-content")
                             setTimeout(
                                 () => $("textarea")
@@ -993,7 +993,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             const $smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
             console.log($smalldash)
             $.double(([jqstr, bln]) => {
-                $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide())) 
+                $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide()))
             }, [".exrand-enabled", true], [".exrand-disabled", false])
         }, [$exrand_diff, msto.exrand_difficulty], [$exrand_srce, msto.exrand_source]) // Hack: 防止开两个页面瞎玩的情况
         $board.show() // Hack: 鼠标放在dash上开window

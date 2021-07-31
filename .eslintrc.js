@@ -52,6 +52,7 @@ module.exports = {
   globals: [
     "marked",
     "filterXSS",
+    "scrollToId",
     "type_dat", "proxy_dat", "load_dat", "save_dat", "clear_dat", "raw_dat"
   ].reduce((o, k) => (o[k] = true, o), {})
 }
