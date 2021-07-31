@@ -758,10 +758,8 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
 
     const oriloadfeed=unsafeWindow.loadFeed
 
-    unsafeWindow.loadFeed = function ()
-    {
-        if (unsafeWindow.feedMode==="all-exlg")
-        {
+    unsafeWindow.loadFeed = function (){
+        if (unsafeWindow.feedMode==="all-exlg"){
             GM_xmlhttpRequest({
                 method: "GET",
                 url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
@@ -803,8 +801,8 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                             scrollToId("feed-content")
                             setTimeout(
                                 () => $("textarea")
-                                .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                                .trigger("input"),
+                                    .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                                    .trigger("input"),
                                 50
                             )
                         })
@@ -813,10 +811,9 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                 onerror: error
             })
             unsafeWindow.feedPage++
-            $('#feed-more').children('a').text('点击查看更多...')
+            $("#feed-more").children("a").text("点击查看更多...")
         }
-        else
-        {
+        else{
             oriloadfeed()
         }
     }
