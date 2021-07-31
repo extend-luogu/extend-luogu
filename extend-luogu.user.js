@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.10.3
+// @version        2.10.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -756,23 +756,17 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     `
     const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
 
-    const $sel = $(".feed-selector")
-    $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all" exlg="exlg"><a style="cursor: pointer">全网动态</a></li>`)
-        .appendTo($sel.parent())
-        .on("click", e => {
-            const $this = $(e.currentTarget)
-            $sel.removeClass("am-active")
-            $this.addClass("am-active")
+    const oriloadfeed=unsafeWindow.loadFeed
 
-            $("#feed-more").hide()
-            $("li.am-comment").remove()
-
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: `https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`,
-                onload: (res) => {
-                    const e = JSON.parse(res.response)
-                    e.forEach(m => $(`
+    unsafeWindow.loadFeed = function (){
+                if (unsafeWindow.feedMode=="all-exlg")
+                {
+                    GM_xmlhttpRequest({
+                        method: "GET",
+                        url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
+                        onload: (res) => {
+                            const e = JSON.parse(res.response)
+                            e.forEach(m => $(`
                         <li class="am-comment am-comment-primary feed-li" exlg="exlg">
                             <div class="lg-left">
                                 <a href="/user/${ m.user.uid }" class="center">
@@ -803,20 +797,42 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                             </div>
                         </li>
                     `)
-                        .appendTo($("ul#feed"))
-                        .find("a[name=feed-reply]").on("click", () => {
-                            scrollToId("feed-content")
-                            setTimeout(
-                                () => $("textarea")
+                                      .appendTo($("ul#feed"))
+                                      .find("a[name=feed-reply]").on("click", () => {
+                                scrollToId("feed-content")
+                                setTimeout(
+                                    () => $("textarea")
                                     .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
                                     .trigger("input"),
-                                50
-                            )
-                        })
-                    )
-                },
-                onerror: error
-            })
+                                    50
+                                )
+                            })
+                                     )
+                        },
+                        onerror: error
+                    })
+                    unsafeWindow.feedPage++
+                    $('#feed-more').children('a').text('点击查看更多...')
+                }
+                else
+                {
+                    oriloadfeed()
+                }
+            }
+
+    const $sel = $(".feed-selector")
+    $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all-exlg" exlg="exlg"><a style="cursor: pointer">全网动态</a></li>`)
+        .appendTo($sel.parent())
+        .on("click", e => {
+            const $this = $(e.currentTarget)
+            $sel.removeClass("am-active")
+            $this.addClass("am-active")
+
+            //$("#feed-more").hide()
+            unsafeWindow.feedPage=1
+            unsafeWindow.feedMode="all-exlg"
+            $("li.am-comment").remove()
+            unsafeWindow.loadFeed()
         })
 })
 
