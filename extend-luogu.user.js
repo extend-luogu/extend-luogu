@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.9.7
+// @version        2.10.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -10,7 +10,7 @@
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
 // @match          https://extend-luogu.github.io/exlg-setting/*
-// @match          localhost:1634/*
+// @match          http://localhost:1634/*
 //
 // @connect        tencentcs.com
 // @connect        luogulo.gq
@@ -19,7 +19,7 @@
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
-// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=954039
+// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=955951
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
@@ -145,6 +145,10 @@ const mod = {
         [ "ghpage",  "extend-luogu.github.io" ],
     ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
 
+    path_dash_board: [
+		"@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/(index|bundle)(.html)?"
+	],
+
     reg: (name, info, path, data, func, styl) => {
         if (! Array.isArray(path)) path = [ path ]
         path.forEach((p, i) => {
@@ -227,8 +231,18 @@ const mod = {
     reg_board: (name, info, data, func, styl) => mod.reg(
         name, info, "@/", data,
         arg => {
-            // const icon = `<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 0 136.14 30.56"><g transform="translate(1.755, 0)" fill="#00a0d8"><g><path d="M5.02-33.80L34.56-33.80L34.07-28.62L16.96-28.62L15.93-21.92L31.97-21.92L31.48-16.74L14.85-16.74L13.82-8.42L31.97-8.42L31.48-3.24L2.43-3.24L6.59-31.75L5.02-33.80Z" transform="translate(-4.14, 33.9)"></path><path d="M7.34-32.29L5.78-33.80L16.63-33.80L21.33-25.00L27.54-32.78L26.51-33.80L38.93-33.80L25.49-18.79L34.78-3.24L24.41-3.24L19.76-12.58L11.99-3.24L1.62-3.24L15.12-18.79L7.34-32.29Z" transform="translate(27.23, 33.9)"></path><path d="M4.00-33.80L16.42-33.80L12.80-8.42L32.99-8.42L32.51-3.24L5.56-3.24Q4.00-3.24 3.21-4.27Q2.43-5.29 2.43-6.86L2.43-6.86L5.56-31.75L4.00-33.80Z" transform="translate(-4.14, 66.055)"></path><path d="M38.83-33.80L37.80-25.00L27.43-25.00L27.92-28.62L15.50-28.62L12.91-8.42L25.33-8.42L25.87-14.63L22.73-19.82L36.72-19.82L34.67-3.24L5.62-3.24Q4.86-3.24 4.21-3.51Q3.56-3.78 3.10-4.27Q2.65-4.75 2.48-5.43Q2.32-6.10 2.54-6.86L2.54-6.86L6.16-33.80L38.83-33.80Z" transform="translate(27.23, 66.055)"></path></g></g></svg>`
-            const icon_b = `<svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 0 136.14 30.56"><g transform="translate(1.755, 0)" fill="#00a0d8"><g><path d="M5.02-33.80L34.56-33.80L34.07-28.62L16.96-28.62L15.93-21.92L31.97-21.92L31.48-16.74L14.85-16.74L13.82-8.42L31.97-8.42L31.48-3.24L2.43-3.24L6.59-31.75L5.02-33.80Z" transform="translate(-4.14, 33.9)"></path><path d="M7.34-32.29L5.78-33.80L16.63-33.80L21.33-25.00L27.54-32.78L26.51-33.80L38.93-33.80L25.49-18.79L34.78-3.24L24.41-3.24L19.76-12.58L11.99-3.24L1.62-3.24L15.12-18.79L7.34-32.29Z" transform="translate(27.23, 33.9)"></path><path d="M4.00-33.80L16.42-33.80L12.80-8.42L32.99-8.42L32.51-3.24L5.56-3.24Q4.00-3.24 3.21-4.27Q2.43-5.29 2.43-6.86L2.43-6.86L5.56-31.75L4.00-33.80Z" transform="translate(63.8, 33.9)"></path><path d="M38.83-33.80L37.80-25.00L27.43-25.00L27.92-28.62L15.50-28.62L12.91-8.42L25.33-8.42L25.87-14.63L22.73-19.82L36.72-19.82L34.67-3.24L5.62-3.24Q4.86-3.24 4.21-3.51Q3.56-3.78 3.10-4.27Q2.65-4.75 2.48-5.43Q2.32-6.10 2.54-6.86L2.54-6.86L6.16-33.80L38.83-33.80Z" transform="translate(95.6, 33.9)"></path></g></g></svg>`
+            const icon_b = `
+                <svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 0 136.14 30.56">
+                    <g transform="translate(1.755, 0)" fill="#00a0d8">
+                        <g>
+                            <path d="M5.02-33.80L34.56-33.80L34.07-28.62L16.96-28.62L15.93-21.92L31.97-21.92L31.48-16.74L14.85-16.74L13.82-8.42L31.97-8.42L31.48-3.24L2.43-3.24L6.59-31.75L5.02-33.80Z" transform="translate(-4.14, 33.9)"></path>
+                            <path d="M7.34-32.29L5.78-33.80L16.63-33.80L21.33-25.00L27.54-32.78L26.51-33.80L38.93-33.80L25.49-18.79L34.78-3.24L24.41-3.24L19.76-12.58L11.99-3.24L1.62-3.24L15.12-18.79L7.34-32.29Z" transform="translate(27.23, 33.9)"></path>
+                            <path d="M4.00-33.80L16.42-33.80L12.80-8.42L32.99-8.42L32.51-3.24L5.56-3.24Q4.00-3.24 3.21-4.27Q2.43-5.29 2.43-6.86L2.43-6.86L5.56-31.75L4.00-33.80Z" transform="translate(63.8, 33.9)"></path>
+                            <path d="M38.83-33.80L37.80-25.00L27.43-25.00L27.92-28.62L15.50-28.62L12.91-8.42L25.33-8.42L25.87-14.63L22.73-19.82L36.72-19.82L34.67-3.24L5.62-3.24Q4.86-3.24 4.21-3.51Q3.56-3.78 3.10-4.27Q2.65-4.75 2.48-5.43Q2.32-6.10 2.54-6.86L2.54-6.86L6.16-33.80L38.83-33.80Z" transform="translate(95.6, 33.9)"></path>
+                        </g>
+                    </g>
+            </svg>
+            `
             let $board = $("#exlg-board")
             if (! $board.length) $board = $(`
                 <div class="lg-article" id="exlg-board" exlg="exlg"><h2>${icon_b}</h2></div>
@@ -264,7 +278,7 @@ const mod = {
             return exe(m, true)
         }
 
-        const pn = uindow.location.href
+        const pn = location.href
         for (const m of mod._) {
             m.on = sto[m.name].on
             if (m.on && m.path.some(re => new RegExp(re, "g").test(pn))) {
@@ -444,7 +458,23 @@ mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
     .exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
 `)
 
-mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@debug/dashboard/", "@ghpage/exlg-setting/(index|bundle)(.html)?" ], null, () => {
+mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
+    msg: {
+        ty: "object",
+        priv: true,
+        lvs: {
+            queue: {
+                ty: "array", itm: {
+                    ty: "object", lvs: {
+                        text: { ty: "string" },
+                        id: { ty: "number" }
+                    }
+                }
+            },
+            last_id: { ty: "number", dft: 0 }
+        }
+    }
+}, () => {
     const novogui_modules = [
         {
             name: "modules",
@@ -467,6 +497,39 @@ mod.reg_main("dash-board", "控制面板", [ "@tcs3/release/exlg-setting", "@deb
         }
     ]
     uindow.novogui.init(novogui_modules)
+})
+
+mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
+    springboard({ type: "update" }).appendTo($("body")).hide()
+    uindow.addEventListener("message", e => {
+        if (e.data[0] !== "update") return
+        e.data.shift()
+
+        const
+            latest = e.data[0],
+            version = GM_info.script.version,
+            op = version_cmp(version, latest)
+
+        const l = `Comparing version: ${version} ${op} ${latest}`
+        log(l)
+
+        uindow.novogui.msg(l)
+    })
+})
+
+// TODO
+mod.reg("update-log", "更新日志显示", "@/", {
+    last_version: { ty: "string", priv: true }
+}, ({ msto }) => {
+    const version = GM_info.script.version
+    switch (version_cmp(msto.last_version, version)) {
+    case "==":
+        break
+    case "<<":
+        lg_alert(`新 VER ${version}\n` + "更新日志功能正在维修中……")
+    case ">>":
+        msto.last_version = version
+    }
 })
 
 mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], {
@@ -541,19 +604,10 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
     })
     $menu.append("<div style='height: .35em'></div>")
 
-    // const $fold = $(`<li exlg="exlg">表情 <i class="fa fa-chevron-left"></li>`)
-    //     .on("click", () => {
-    //         $nl.toggle()
-    //         $emo.toggle()
-    //         $fold.children().toggleClass("fa-chevron-left fa-chevron-right")
-    //         $grd.toggleClass("exlg-ext")
-    //     })
-    // $nl.after($fold)
-
     $txt.on("input", e => {
         if (e.originalEvent.data === "/")
-            mdp.content = mdp.content.replace(/\/(.{1,5})\//g, (_, emo_txt) =>
-                `![](` + emo_url(emo.find(m => m.name.includes(emo_txt)).slug) + `)`
+            mdp.content = mdp.content.replace(/\/[0-9a-z]\//g, (_, emo_txt) =>
+                `![](` + emo_url(emo.find(m => m.includes(emo_txt))) + `)`
             )
     })
 }, `
@@ -585,29 +639,6 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
         top: -3px;
     }
 `)
-
-mod.reg_chore("update", "脚本升级", "1D", "@/.*", null, () => {
-    springboard({ type: "update" }).appendTo($("body")).hide()
-    uindow.addEventListener("message", e => {
-        if (e.data[0] !== "update") return
-        e.data.shift()
-
-        const
-            latest = e.data[0],
-            version = GM_info.script.version,
-            op = version_cmp(version, latest)
-
-        const l = `Comparing version: ${version} ${op} ${latest}`
-        log(l)
-
-        if (op === "<<") $("#exlg-dash > .exlg-warn").show()
-        $("#exlg-dash-verison").html(l.split(": ")[1]
-            .replace(">>", `<span style="color: #5eb95e;">&gt;&gt;</span>`)
-            .replace("==", `<span style="color: #5eb95e;">==</span>`)
-            .replace("<<", `<span style="color: #e74c3c;">&lt;&lt;</span>`)
-        )
-    })
-})
 
 mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, null, () => {
     $(".introduction > *").each((_, e, $e = $(e)) => {
@@ -742,58 +773,51 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                 onload: (res) => {
                     const e = JSON.parse(res.response)
                     e.forEach(m => $(`
-<li class="am-comment am-comment-primary feed-li" exlg="exlg">
-    <div class="lg-left">
-        <a href="/user/${ m.user.uid }" class="center">
-            <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
-        </a>
-    </div>
-    <div class="am-comment-main">
-        <header class="am-comment-hd">
-            <div class="am-comment-meta">
-                <span class="feed-username">
-                    <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
-                        ${ m.user.name }
-                    </a>
-                    <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
-                        ${ check(m.user.ccfLevel) }
-                    </a>
-                    ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
-                </span>
-                ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
-                <a name="feed-reply">回复</a>
-            </div>
-        </header>
-        <div class="am-comment-bd">
-            <span class="feed-comment">
-                ${ marked(m.content) }
-            </span>
-        </div>
-    </div>
-</li>
-                        `)
+                        <li class="am-comment am-comment-primary feed-li" exlg="exlg">
+                            <div class="lg-left">
+                                <a href="/user/${ m.user.uid }" class="center">
+                                    <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
+                                </a>
+                            </div>
+                            <div class="am-comment-main">
+                                <header class="am-comment-hd">
+                                    <div class="am-comment-meta">
+                                        <span class="feed-username">
+                                            <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
+                                                ${ m.user.name }
+                                            </a>
+                                            <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
+                                                ${ check(m.user.ccfLevel) }
+                                            </a>
+                                            ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
+                                        </span>
+                                        ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
+                                        <a name="feed-reply">回复</a>
+                                    </div>
+                                </header>
+                                <div class="am-comment-bd">
+                                    <span class="feed-comment">
+                                        ${ marked(m.content) }
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    `)
                         .appendTo($("ul#feed"))
                         .find("a[name=feed-reply]").on("click", () =>{
                             scrollToId("feed-content")
-                            setTimeout(()=>$("textarea")
-                                .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                                .trigger("input"),50)
-
-                        }
-                        )
+                            setTimeout(
+                                () => $("textarea")
+                                    .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                                    .trigger("input"),
+                                50
+                            )
+                        })
                     )
                 },
-                onerror: (err) => {
-                    error(err)
-                }
+                onerror: error
             })
         })
-
-    /*
-    uindow.addEventListener("message", e => {
-
-    })
-    */
 })
 
 mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
@@ -992,9 +1016,8 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             if (!g.length) g = _empty
             return g[Math.floor(Math.random() * g.length)]
         }, [dif_list, msto.exrand_difficulty, [0, 1, 2, 3, 4, 5, 6, 7]], [src_list, msto.exrand_source, ["P"]])
-
         let res = await lg_content(`/problem/list?difficulty=${result[0]}&type=${result[1]}&page=1`)
-        // Note: 随机而已问题不大
+
         const
             problem_count = res.currentData.problems.count,
             page_count = Math.ceil(problem_count / 50),
@@ -1195,7 +1218,7 @@ mod.reg("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*
             }
 
             const pid = ~~ (Math.random() * 1.e6) % candProbList.length
-            uindow.location.href = "https://www.luogu.com.cn/problem/" + candProbList[pid]
+            location.href = "https://www.luogu.com.cn/problem/" + candProbList[pid]
         })
 }, `
 .exlg-rand-training-problem-btn {
@@ -1212,6 +1235,7 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
     let actTList = []
     $.each($("div.tasklist-item"), (_, prob, $e = $(prob)) => {
         const pid = $e.attr("data-pid")
+
         if (prob.innerHTML.search(/check/g) === -1) {
             if (msto.rand_problem_in_tasklist)
                 actTList.push(pid)
@@ -1221,17 +1245,11 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
 
     const $toggle_AC = $(`<div>[<a id="toggle-button">隐藏已AC</a>]</div>`)
     $("button[name=task-edit]").parent().after($toggle_AC)
+
+    const $ac_problem = $(".tasklist-ac-problem")
     const $toggle = $("#toggle-button").on("click", () => {
-        if ($toggle.text() === "显示已AC") {
-            $toggle.text("隐藏已AC")
-            $(".tasklist-ac-problem").show()
-            msto.auto_clear = false
-        }
-        else {
-            $toggle.text("显示已AC")
-            $(".tasklist-ac-problem").hide()
-            msto.auto_clear = true
-        }
+        $ac_problem.toggle()
+        $toggle.text([ "隐藏", "显示" ][ + (msto.auto_clear = ! msto.auto_clear) ] + "已 AC")
     })
 
     if (msto.auto_clear) $toggle.click()
@@ -1242,7 +1260,7 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
         $btn.addClass("exlg-rand-tasklist-problem-btn")
             .click(() => {
                 let tid = ~~ (Math.random() * 1.e6) % actTList.length
-                location.href += `problem/${actTList[tid]}`
+                location.href += `problem/${ actTList[tid] }`
             })
     }
 }, `
@@ -1252,16 +1270,12 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
 `)
 
 mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
-    $(document).on("dblclick", (event) => {
-        const selection = window.getSelection()
-        const selected = selection.toString().replace(" ", "").toUpperCase()
-        let url
-        if (event.ctrlKey) {
-            const myBlog = $(".ops>a[href*=blog]")[0]
-            url = myBlog.href + "solution-"
-        }
-        else url = "https://www.luogu.com.cn/problem/"
-        if (judge_problem(selected)) window.open(url + selected)
+    $(document).on("dblclick", e => {
+        const pid = window.getSelection().toString().trim().toUpperCase()
+        const url = e.ctrlkey
+            ? $(".ops > a[href*=blog]").attr("href") + "solution-"
+            : url = "https://www.luogu.com.cn/problem/"
+        if (judge_problem(pid)) window.open(url + pid)
     })
 })
 
@@ -1271,12 +1285,13 @@ mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^
 
 mod.reg_hook("submission-color", "记录难度可视化", "@/record/list.*", null, async () => {
     if ($(".exlg-difficulty-color").length) return
-    const u = await lg_content(window.location.href)
+    const u = await lg_content(location.href)
     const dif = u.currentData.records.result.map((u) => u.problem.difficulty)
-    $("div.problem>div>a>span.pid").each((i, e, $e = $(e)) => {
+    $("div.problem > div > a > span.pid").each((i, e, $e = $(e)) => {
         $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`)
     })
-}, () => $("div.problem>div>a>span.pid").length && !$(".exlg-difficulty-color").length)
+}, () => $("div.problem > div > a > span.pid").length && ! $(".exlg-difficulty-color").length
+)
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     lang: { ty: "enum", dft: "en", vals: [ "en", "zh" ] }
@@ -1868,14 +1883,31 @@ mod.reg("user-css-load", "加载用户样式", "@/.*", {
 $(() => {
     log("Exposing")
 
+    Object.assign(uindow, {
+        exlg: {
+            mod,
+            log, error,
+            springboard, version_cmp,
+            lg_alert, lg_content,
+            TM_dat: {
+                reload_dat: () => {
+                    raw_dat = null
+                    return load_dat(mod.data, {
+                        map: s => {
+                            s.root = ! s.rec
+                            s.itmRoot = s.rec === 2
+                        }
+                    })
+                },
+                type_dat, proxy_dat, load_dat, save_dat, clear_dat, raw_dat
+            }
+        },
+        $$: $, xss, marked
+    })
+
     const init_sto = chance => {
         try {
-            sto = load_dat(mod.data, {
-                map: s => {
-                    s.root = ! [ "object", "tuple" ].includes(s.ty)
-                    return s
-                }
-            })
+            sto = uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat()
         }
         catch(err) {
             if (chance) {
@@ -1891,20 +1923,7 @@ $(() => {
     }
     init_sto(1)
 
-    Object.assign(uindow, {
-        exlg: {
-            mod,
-            log, error,
-            springboard, version_cmp,
-            lg_alert, lg_content,
-            TM_dat: {
-                sto,
-                type_dat, proxy_dat, load_dat, save_dat, clear_dat
-            }
-        },
-        $$: $, xss, marked
-    })
-
     log("Launching")
     mod.execute()
 })
+

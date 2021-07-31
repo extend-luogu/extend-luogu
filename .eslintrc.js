@@ -31,6 +31,7 @@ module.exports = {
     "no-var": 2,
     "one-var": 0,
     "no-unused-vars": [ 2, { varsIgnorePattern: "^_" } ],
+	"no-undef": 2,
 
     "no-case-declarations": 0,
     "no-fallthrough": 0,
@@ -48,9 +49,10 @@ module.exports = {
 
     "no-extend-native": 0,
   },
-  globals: {
-    marked: true,
-    filterXSS: true
-  }
+  globals: [
+    "marked",
+    "filterXSS",
+    "type_dat", "proxy_dat", "load_dat", "save_dat", "clear_dat", "raw_dat"
+  ].reduce((o, k) => (o[k] = true, o), {})
 }
 
