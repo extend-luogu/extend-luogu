@@ -759,66 +759,66 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     const oriloadfeed=unsafeWindow.loadFeed
 
     unsafeWindow.loadFeed = function (){
-                if (unsafeWindow.feedMode=="all-exlg")
-                {
-                    GM_xmlhttpRequest({
-                        method: "GET",
-                        url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
-                        onload: (res) => {
-                            const e = JSON.parse(res.response)
-                            e.forEach(m => $(`
-                        <li class="am-comment am-comment-primary feed-li" exlg="exlg">
-                            <div class="lg-left">
-                                <a href="/user/${ m.user.uid }" class="center">
-                                    <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
-                                </a>
+        if (unsafeWindow.feedMode==="all-exlg")
+        {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
+                onload: (res) => {
+                    const e = JSON.parse(res.response)
+                    e.forEach(m => $(`
+                <li class="am-comment am-comment-primary feed-li" exlg="exlg">
+                    <div class="lg-left">
+                        <a href="/user/${ m.user.uid }" class="center">
+                            <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
+                        </a>
+                    </div>
+                    <div class="am-comment-main">
+                        <header class="am-comment-hd">
+                            <div class="am-comment-meta">
+                                <span class="feed-username">
+                                    <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
+                                        ${ m.user.name }
+                                    </a>
+                                    <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
+                                        ${ check(m.user.ccfLevel) }
+                                    </a>
+                                    ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
+                                </span>
+                                ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
+                                <a name="feed-reply">回复</a>
                             </div>
-                            <div class="am-comment-main">
-                                <header class="am-comment-hd">
-                                    <div class="am-comment-meta">
-                                        <span class="feed-username">
-                                            <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
-                                                ${ m.user.name }
-                                            </a>
-                                            <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
-                                                ${ check(m.user.ccfLevel) }
-                                            </a>
-                                            ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
-                                        </span>
-                                        ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
-                                        <a name="feed-reply">回复</a>
-                                    </div>
-                                </header>
-                                <div class="am-comment-bd">
-                                    <span class="feed-comment">
-                                        ${ marked(m.content) }
-                                    </span>
-                                </div>
-                            </div>
-                        </li>
-                    `)
-                                      .appendTo($("ul#feed"))
-                                      .find("a[name=feed-reply]").on("click", () => {
-                                scrollToId("feed-content")
-                                setTimeout(
-                                    () => $("textarea")
-                                    .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                                    .trigger("input"),
-                                    50
-                                )
-                            })
-                                     )
-                        },
-                        onerror: error
+                        </header>
+                        <div class="am-comment-bd">
+                            <span class="feed-comment">
+                                ${ marked(m.content) }
+                            </span>
+                        </div>
+                    </div>
+                </li>
+            `)
+                              .appendTo($("ul#feed"))
+                              .find("a[name=feed-reply]").on("click", () => {
+                        scrollToId("feed-content")
+                        setTimeout(
+                            () => $("textarea")
+                            .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                            .trigger("input"),
+                            50
+                        )
                     })
-                    unsafeWindow.feedPage++
-                    $('#feed-more').children('a').text('点击查看更多...')
-                }
-                else
-                {
-                    oriloadfeed()
-                }
-            }
+                             )
+                },
+                onerror: error
+            })
+            unsafeWindow.feedPage++
+            $('#feed-more').children('a').text('点击查看更多...')
+        }
+        else
+        {
+            oriloadfeed()
+        }
+    }
 
     const $sel = $(".feed-selector")
     $(`<li class="feed-selector" id="exlg-benben-selector" data-mode="all-exlg" exlg="exlg"><a style="cursor: pointer">全网动态</a></li>`)
