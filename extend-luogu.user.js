@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.10.2
+// @version        2.10.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1274,7 +1274,7 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
         const pid = window.getSelection().toString().trim().toUpperCase()
         const url = e.ctrlkey
             ? $(".ops > a[href*=blog]").attr("href") + "solution-"
-            : url = "https://www.luogu.com.cn/problem/"
+            : "https://www.luogu.com.cn/problem/"
         if (judge_problem(pid)) window.open(url + pid)
     })
 })
@@ -1840,27 +1840,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
 }
 `)
 
-// KiLL: 这个不好
-/*
-mod.reg("tasklist-difficulty", "任务计划难度显示", "@/", null, async () => {
-    setTimeout(() => {
-        $.each($("div.tasklist-item"), (_, prob, $e = $(prob)) => {
-            const pid = $e.attr("data-pid"), $pid = $e.find("b")
-            const func1 = async () => {
-                const u = await lg_content(`https://www.luogu.com.cn/problem/${pid}`)
-                $pid.addClass("exlg-difficulty-color").addClass(`color-${u.currentData.problem.difficulty}`)
-            }
-            func1() // Note: 尽量不要用, ok?
-            const func2 = (delay) => {
-                var start = new Date().getTime();
-                while (new Date().getTime() < start + delay);
-            }
-            func2(75)
-        })
-    }, 0)
-})
-*/
-mod.reg("user-css-load", "加载用户样式", "@/.*", {
+mod.reg("user-css", "自定义样式表", ".*", {
     css: { ty: "string" }
 }, ({ msto }) => GM_addStyle(msto.css)
 )
