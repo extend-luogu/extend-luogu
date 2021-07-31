@@ -1622,21 +1622,6 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-// TODO
-mod.reg("update-log", "更新日志显示", "@/", {
-    last_version: { ty: "string", priv: true }
-}, ({ msto }) => {
-    const version = GM_info.script.version
-    switch (version_cmp(msto.last_version, version)) {
-    case "==":
-        break
-    case "<<":
-        lg_alert(`新 VER ${version}\n` + "提醒各位，现在sponsor-tag模块存在严重的bug，我已经将该模块的钩子屏蔽，建议大家还是关掉为好。谢谢配合")
-    case ">>":
-        msto.last_version = version
-    }
-})
-
 mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
 }, ({msto}) => {
