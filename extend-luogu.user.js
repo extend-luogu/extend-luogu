@@ -826,7 +826,7 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
             $sel.removeClass("am-active")
             $this.addClass("am-active")
 
-            //$("#feed-more").hide()
+            // $("#feed-more").hide()
             unsafeWindow.feedPage=1
             unsafeWindow.feedMode="all-exlg"
             $("li.am-comment").remove()
