@@ -758,7 +758,8 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
 
     const oriloadfeed=unsafeWindow.loadFeed
 
-    unsafeWindow.loadFeed = function (){
+    unsafeWindow.loadFeed = function ()
+    {
         if (unsafeWindow.feedMode==="all-exlg")
         {
             GM_xmlhttpRequest({
@@ -797,17 +798,17 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                     </div>
                 </li>
             `)
-                              .appendTo($("ul#feed"))
-                              .find("a[name=feed-reply]").on("click", () => {
-                        scrollToId("feed-content")
-                        setTimeout(
-                            () => $("textarea")
-                            .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                            .trigger("input"),
-                            50
-                        )
-                    })
-                             )
+                        .appendTo($("ul#feed"))
+                        .find("a[name=feed-reply]").on("click", () => {
+                            scrollToId("feed-content")
+                            setTimeout(
+                                () => $("textarea")
+                                .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                                .trigger("input"),
+                                50
+                            )
+                        })
+                    )
                 },
                 onerror: error
             })
