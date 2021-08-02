@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.10.4
+// @version        2.10.5
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -146,7 +146,7 @@ const mod = {
     ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
 
     path_dash_board: [
-        "@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/(index|bundle)(.html)?"
+        "@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/((index|bundle)(.html)?)?"
     ],
 
     reg: (name, info, path, data, func, styl) => {
@@ -324,8 +324,16 @@ mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null,
     uindow.parent.postMessage([ document.body.innerText ], "*")
 )
 
+mod.reg("user-css", "自定义样式表", ".*", {
+    css: { ty: "string" }
+}, ({ msto }) => GM_addStyle(msto.css)
+)
+
 mod.reg_hook("dash-bridge", "控制桥", "@/.*", {
-    source: { ty: "enum", vals: [ "tcs", "debug", "gh_index", "gh_bundle" ], dft: "tcs" }
+    source: {
+        ty: "enum", vals: [ "tcs", "debug", "gh_index", "gh_bundle" ], dft: "tcs",
+        info: [ "The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页" ]
+    }
 }, ({ msto }) => {
     const source = msto.source
     $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
@@ -473,6 +481,10 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
             },
             last_id: { ty: "number", dft: 0 }
         }
+    },
+    lang: {
+        ty: "enum", dft: "en", vals: [ "en", "zh" ],
+        desc: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
     }
 }, () => {
     const novogui_modules = [
@@ -488,6 +500,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                     .map(([ k, s ]) => ({
                         name: k,
                         displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                        description: s.info,
                         type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
                         ...(s.ty === "boolean" && { type: "CHECKBOX" }),
                         ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
@@ -1103,16 +1116,16 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 `)
 
 mod.reg_hook("code-block-ex", "代码块优化", "@/.*", {
-    show_code_lang : { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
-    copy_code_position : { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
-    code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: ["Custom Code Title", "自定义代码块标题"] },
+    show_code_lang : { ty: "boolean", dft: true, strict: true, info: [ "Show Language Before Codeblocks", "显示代码块语言" ] },
+    copy_code_position : { ty: "enum", vals: [ "left", "right" ], dft: "left", info: [ "Copy Button Position", "复制按钮对齐方式" ] },
+    code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: [ "Custom Code Title", "自定义代码块标题" ] },
     copy_code_font : { ty: "string", dft: "Fira Code", strict: true }
 },  ({ msto }) => {
 
     const isRecord = /\/record\/.*/.test(location.href)
 
     const langs = {
-        c: "C", cpp: "C++", pascal: "Pascal", python: "Python", java: "Java", javascript: "Javascript", php: "PHP", latex: "Latex"
+        c: "C", cpp: "C++", pascal: "Pascal", python: "Python", java: "Java", javascript: "JavaScript", php: "PHP", latex: "LaTeX"
     }
 
     const get_lang = $code => {
@@ -1670,7 +1683,7 @@ mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
-}, ({msto}) => {
+}, ({ msto }) => {
     GM_xmlhttpRequest({
         method: "GET",
         url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
@@ -1719,20 +1732,6 @@ mod.reg_hook("sponsor-tag", "标签显示", "@/.*", {
         $("div.am-comment-meta:has(a[target='_blank'][href]):not(.exlg-sponsor-tag)").each((_, e) => add_badge($(e)))
     }
     $users.each((_, e) => add_badge($(e)))
-    /*
-    const whref = window.location.href
-    const hprefix = "https://www.luogu.com.cn/user/"
-    if (whref.lastIndexOf(hprefix) === 0) {
-        const uid = whref.substring(hprefix.length).split("#")[0],
-            tag = tag_list[uid],
-            $title = $("div.user-name").not(".exlg-sponsor-tag")
-        if (tag !== undefined) {
-            $(`<span class="exlg-badge">${tag}</span>`).appendTo(
-                $title.addClass("exlg-sponsor-tag")
-            )
-        }
-    }
-    */
 }, (e) => {
     return false // Hack: 严重的bug必须修掉, 但是先暂时这样了
     return (!($(e.target).hasClass("exlg-badge"))) &&
@@ -1854,11 +1853,6 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
 }
 `)
 
-mod.reg("user-css", "自定义样式表", ".*", {
-    css: { ty: "string" }
-}, ({ msto }) => GM_addStyle(msto.css)
-)
-
 $(() => {
     log("Exposing")
 
@@ -1880,6 +1874,10 @@ $(() => {
                 },
                 type_dat, proxy_dat, load_dat, save_dat, clear_dat, raw_dat
             }
+        },
+        GM: {
+            GM_info, GM_addStyle, GM_setClipboard, GM_xmlhttpRequest,
+            GM_getValue, GM_setValue, GM_deleteValue, GM_listValues
         },
         $$: $, xss, marked
     })
