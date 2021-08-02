@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.10.5
+// @version        2.10.6
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1614,23 +1614,37 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
 })
 
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
-    GM_xmlhttpRequest({
-        method: "GET",
-        url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
-        onload: function(res) {
-            let s="<h3>犇犇排行榜</h3>"
-            s+="<div>"
-            $(JSON.parse(res.response)).each((index, obj) => {
-                s+=`<div class="bb-rnklst-${index + 1}">
-                    <span class="bb-rnklst-ind${(index < 9) ? (" bb-top-ten") : ("")}">${index + 1}.</span>
-                    <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
-                    <span style="float: right;">共 ${obj[0]} 条</span>
-                </div>`
+    let s=`<h3>犇犇排行榜 <a style="float: right;" id="showrkl">▼展开</a></h3>`
+    s+=`<div id="bbrkl">`
+    s+="</div>"
+    $board.html(s)
+    $("#showrkl").on("click",function(){
+        if ($("#bbrkl").is(':visible')){
+            $("#bbrkl").hide()
+            $(this).text("▼展开")
+        }
+        else{
+            log("start loading")
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
+                onload: function(res) {
+                    let stemp=""
+                    $(JSON.parse(res.response)).each((index, obj) => {
+                        stemp+=`<div class="bb-rnklst-${index + 1}">
+                        <span class="bb-rnklst-ind${(index < 9) ? (" bb-top-ten") : ("")}">${index + 1}.</span>
+                        <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
+                        <span style="float: right;">共 ${obj[0]} 条</span>
+                        </div>`
+                    })
+                    $("#bbrkl").html(stemp)
+                    $("#bbrkl").show()
+                    $(this).text("▲隐藏")
+                }
             })
-            s+="</div><br>"
-            $board.html(s)
         }
     })
+    $("#bbrkl").hide()
 },`
 .bb-rnklst-1 > .bb-rnklst-ind {
     color: var(--lg-red);
