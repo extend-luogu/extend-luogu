@@ -1619,7 +1619,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
     s+="</div>"
     $board.html(s)
     $("#showrkl").on("click",function(){
-        if ($("#bbrkl").is(':visible')){
+        if ($("#bbrkl").is(":visible")){
             $("#bbrkl").hide()
             $(this).text("▼展开")
         }
