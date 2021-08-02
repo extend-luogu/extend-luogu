@@ -1639,7 +1639,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
                     })
                     $("#bbrkl").html(stemp)
                     $("#bbrkl").show()
-                    $(this).text("▲隐藏")
+                    $("#showrkl").text("▲隐藏")
                 }
             })
         }
