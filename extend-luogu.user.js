@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.10.5
+// @version        2.10.6
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -122,7 +122,8 @@ const judge_problem = text => [
     /^P[1-9][0-9]{3,}$/i,
     /^UVA[1-9][0-9]{2,}$/i,
     /^U[1-9][0-9]{0,}$/i,
-    /^T[[1-9][0-9]{0,}$/i
+    /^T[1-9][0-9]{0,}$/i,
+    /^B[1-9][0-9]{0,}$/i
 ].some(re => re.test(text))
 
 // ==/Utilities==
@@ -912,23 +913,28 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
             id: "P"
         },
         {
-            text: "Codeforces",
+            text: "入门与面试",
             color: "orange",
+            id: "B"
+        },
+        {
+            text: "Codeforces",
+            color: "yellow",
             id: "CF"
         },
         {
             text: "SPOJ",
-            color: "yellow",
+            color: "green",
             id: "SP"
         },
         {
             text: "ATcoder",
-            color: "green",
+            color: "blue",
             id: "AT"
         },
         {
             text: "UVA",
-            color: "blue",
+            color: "purple",
             id: "UVA"
         }
     ]
