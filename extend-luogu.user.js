@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.1
+// @version        2.11.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -556,9 +556,9 @@ mod.reg("update-log", "更新日志显示", "@/", {
     }
 })
 
-mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], {
+mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@/discuss/lists?.*", "@/paste" ], {
     show: { ty: "boolean", dft: true }
-}, () => {
+}, ({ msto }) => {
     const emo = [
         { type: "emo", name: [ "kk" ], slug: "0" },
         { type: "emo", name: [ "jk" ], slug: "1" },
@@ -614,6 +614,17 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
         $txt = $(".CodeMirror-wrap textarea")
     $("<br />").appendTo($menu)
     $(".mp-editor-ground").addClass("exlg-ext")
+    
+    const $ground = $(".mp-editor-ground"), $show_hide = $menu.children().first().clone(true).addClass("exlg-unselectable")
+    $menu.children().last().before($show_hide)
+    $show_hide.children()[0].innerHTML = (msto.show) ? "隐藏" : "显示"
+    if (msto.show) $menu.addClass("exlg-show-emo"), $ground.addClass("exlg-show-emo")
+    $show_hide.on("click", () => {
+        $show_hide.children()[0].innerHTML = ["显示", "隐藏"][["隐藏", "显示"].indexOf($show_hide.children()[0].innerHTML)]
+        $menu.toggleClass("exlg-show-emo")
+        $ground.toggleClass("exlg-show-emo")
+        msto.show = ! msto.show
+    })
 
     emo.forEach(m => {
         $((m.type === "emo")?
@@ -635,7 +646,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
             )
     })
 }, `
-    .mp-editor-ground.exlg-ext {
+    .mp-editor-ground.exlg-ext.exlg-show-emo {
         top: 6em !important;
     }
     .mp-editor-menu > br ~ li {
@@ -644,7 +655,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*" ], 
         margin: 0;
         padding: 5px 1px;
     }
-    .mp-editor-menu {
+    .mp-editor-menu.exlg-show-emo {
         height: 6em !important;
         overflow: auto;
     }
@@ -718,10 +729,8 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
         if (arg.target.href === "javascript:void 0") return  // Hack: 这行绝对不能删！！！不知道为什么钩子那里会放 Js void0 过 check
         // console.log("arg: ",arg.target, arg)
         // if (! uindow._feInjection.currentData[arg.board_id][arg.position])
-            // console.log(arg)
         arg.target.style.color = _color([uindow._feInjection.currentData[arg.board_id][arg.position].difficulty])
-        if (arg.board_id === "passedProblems" && arg.position === uindow._feInjection.currentData["passedProblems"].length - 1) // Note: 染色染到最后一个
-        {
+        if (arg.board_id === "passedProblems" && arg.position === uindow._feInjection.currentData["passedProblems"].length - 1) { // Note: 染色染到最后一个
             $(".exlg-counter").remove()
             const gf = arg.target.parentNode.parentNode.parentNode.parentNode
             const $prb = [$(gf.firstChild.childNodes[2]), $(gf.lastChild.childNodes[2])]
@@ -751,15 +760,10 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
             func()
         }
     })
-    
 }, (e) => {
-    if (! /.*\/user\/.*#practice/.test(location.href)) return { result: false, args: { message: "Not at practice page." } } 
-    // else if (e.target.className && e.target.className !== "color-default") 
-    // console.log(e.target)
-    // if (e.target.className === "exlg-counter" && e.target.className === "exlg-counter")
-    //    console.log(e.target)
+    if (! /.*\/user\/.*#practice/.test(location.href)) return { result: false, args: { message: "Not at practice page." } }
     if (e.target.tagName !== "A" || e.target.className !== "color-default" || e.target.href.indexOf("/problem/") === -1)
-        return { result: false, args: { message: "It's not a problem element" } } 
+        return { result: false, args: { message: "It's not a problem element" } }
     const tar = e.target, _pid = tar.href.slice(33), ucd = uindow._feInjection.currentData,
         _onchange = [ucd.submittedProblems[0].pid, ucd.passedProblems[0].pid].includes(_pid)
     return {
@@ -1167,6 +1171,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
     args.attr("exlg-copy-code-block", "")
 
     args.each((_, e, $pre = $(e)) => {
+        if (e.parentNode.className === "mp-preview-content") return
         const $btn = isRecord
             ? ($pre.children(".copy-btn"))
             : $(`<div class="exlg-copy">复制</div>`)
@@ -1281,7 +1286,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
         })
 }, (e) => {
     const $tmp = $(e.target).find("div.operation")
-    return { result: $tmp.length > 0, args: $tmp } 
+    return { result: $tmp.length > 0, args: $tmp }
 }, () => $("div.operation"), `
 .exlg-rand-training-problem-btn {
     border-color: rgb(52, 52, 52);
@@ -1341,9 +1346,12 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     })
 })
 
-mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^list].*"], {
+mod.reg_hook_new("hide-solution", "隐藏题解", "@/problem/solution/.*", {
     hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
-}, ({ msto }) => (msto.hidesolu) ? ( (/\/problem\/solution\/.*/.match(location.href)) ? (location.href = location.href.replace("/solution", "")) : ($("a[href^='/problem/solution']").hide()) ) : "memset0珂爱")
+}, ({ msto, args }) => (msto.hidesolu) ? (args.hide()) : "memset0珂爱", (e) => {
+    if (e.target.className === "item-row") return { result: true, args: $(e.target) }
+    return {result: false, args: undefined}
+}, () => $(".item-row"))
 
 // let submission_color_tmp = {
 //   complete: true,
@@ -1360,22 +1368,21 @@ mod.reg("hide-solution", "隐藏题解", ["@/problem/solution/.*", "@/problem/[^
 //     })
 //     //* /
 //     const dif = (pid) => {
-//         
 //     }
 // }, (e) => {
 //     if ()
-//     
+//
 // const lg_content = url => new Promise((res, rej) =>
 //    $.get(url + (url.includes("?") ? "&" : "?") + "_contentOnly=1", data => {
 //         if (data.code !== 200) rej(`Requesting failure code: ${ res.code }.`)
 //         res(data)
 //     })
 // )
-// 
-// 
-// 
-// 
-// 
+//
+//
+//
+//
+//
 //     return $("div.problem > div > a > span.pid").length && ! $(".exlg-difficulty-color").length
 // }
 // )
@@ -1758,7 +1765,7 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 
 mod.reg_hook_new("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
-}, ({ msto, args }) => {
+}, ({ args }) => {
     const isDiscuss = /\/discuss\/show\/.*/.test(location.href)
     // $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
