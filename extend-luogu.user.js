@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.2
+// @version        2.11.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -614,7 +614,7 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@
         $txt = $(".CodeMirror-wrap textarea")
     $("<br />").appendTo($menu)
     $(".mp-editor-ground").addClass("exlg-ext")
-    
+
     const $ground = $(".mp-editor-ground"), $show_hide = $menu.children().first().clone(true).addClass("exlg-unselectable")
     $menu.children().last().before($show_hide)
     $show_hide.children()[0].innerHTML = (msto.show) ? "隐藏" : "显示"
@@ -781,7 +781,12 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
     }
 `)
 
-mod.reg("benben", "全网犇犇", "@/", null, () => {
+mod.reg("benben", "全网犇犇", "@/", {
+    source: {
+        ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
+        desc: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
+    }
+}, ({msto}) => {
     const color = {
         Gray: "gray",
         Blue: "bluelight",
@@ -798,13 +803,13 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
     `
     const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
 
-    const oriloadfeed=unsafeWindow.loadFeed
+    const oriloadfeed = unsafeWindow.loadFeed
 
-    unsafeWindow.loadFeed = function (){
-        if (unsafeWindow.feedMode==="all-exlg"){
+    unsafeWindow.loadFeed = function () {
+        if (unsafeWindow.feedMode==="all-exlg") {
             GM_xmlhttpRequest({
                 method: "GET",
-                url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
+                url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (`https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`),
                 onload: (res) => {
                     const e = JSON.parse(res.response)
                     e.forEach(m => $(`
@@ -852,8 +857,8 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
                 },
                 onerror: error
             })
-            unsafeWindow.feedPage++
-            $("#feed-more").children("a").text("点击查看更多...")
+            // unsafeWindow.feedPage++
+            // $("#feed-more").children("a").text("点击查看更多...")
         }
         else{
             oriloadfeed()
@@ -867,11 +872,13 @@ mod.reg("benben", "全网犇犇", "@/", null, () => {
             const $this = $(e.currentTarget)
             $sel.removeClass("am-active")
             $this.addClass("am-active")
-
-            // $("#feed-more").hide()
+            if (msto.source === "o2") {
+                $("#feed-more").hide()
+            }
             unsafeWindow.feedPage=1
             unsafeWindow.feedMode="all-exlg"
             $("li.am-comment").remove()
+
             unsafeWindow.loadFeed()
         })
 })
