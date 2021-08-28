@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.3
+// @version        2.11.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -784,7 +784,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
         ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
-        desc: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
+        info: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
     }
 }, ({msto}) => {
     const color = {
