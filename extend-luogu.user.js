@@ -15,6 +15,7 @@
 // @connect        tencentcs.com
 // @connect        luogulo.gq
 // @connect        bens.rotriw.com
+// @connect        cb.smallfang.fun
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -783,7 +784,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
 
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
-        ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
+        ty: "enum", dft: "smallfang", vals: [ "o2", "shy", "smallfang" ],
         info: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
     }
 }, ({msto}) => {
@@ -809,7 +810,7 @@ mod.reg("benben", "全网犇犇", "@/", {
         if (unsafeWindow.feedMode==="all-exlg") {
             GM_xmlhttpRequest({
                 method: "GET",
-                url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (`https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`),
+                url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (msto.source == "smallang") ?(`https://cb.smallfang.fun/api/list/proxy?page=${unsafeWindow.feedPage}`) : (`https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`),
                 onload: (res) => {
                     const e = JSON.parse(res.response)
                     e.forEach(m => $(`
