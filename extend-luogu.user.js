@@ -1688,6 +1688,12 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
 })
 
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
+    $board.html(`
+<h3>犇犇排行榜</h3>
+<div>
+    Loading...
+</div>
+`)
     GM_xmlhttpRequest({
         method: "GET",
         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
@@ -1697,7 +1703,12 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
             $(JSON.parse(res.response)).each((index, obj) => {
                 s+=`<div class="bb-rnklst-${index + 1}">
                     <span class="bb-rnklst-ind${(index < 9) ? (" bb-top-ten") : ("")}">${index + 1}.</span>
-                    <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
+                    <a href="https://bens.rotriw.com/user/${obj[2]}">${(str => {
+                        if (str.length >= 10)
+                            return str.slice(0, 10) + '…'
+                        else
+                            return str
+                    })(obj[1])}</a>
                     <span style="float: right;">共 ${obj[0]} 条</span>
                 </div>`
             })
