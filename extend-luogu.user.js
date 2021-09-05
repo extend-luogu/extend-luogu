@@ -1492,8 +1492,8 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             cmds.cd(`/discuss/lists?forumname=${forum}`)
         },
         cc: (name/* char*/) => {
-            /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I myself|message|notification. or jump home. */
-            /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
+            /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|contest|record|discuss|I myself|message|notification. or jump home. */
+            /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|比赛|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
             name = name || "h"
             const tar = {
                 h: "/",
