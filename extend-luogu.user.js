@@ -556,7 +556,7 @@ mod.reg("update-log", "更新日志显示", "@/", {
     }
 })
 
-mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@/discuss/lists?.*", "@/paste" ], {
+mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/.*", "@/discuss/lists?.*", "@/paste" ], {
     show: { ty: "boolean", dft: true }
 }, ({ msto }) => {
     const emo = [
@@ -826,7 +826,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                                     <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
                                         ${ m.user.name }
                                     </a>
-                                    <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
+                                    <a class="sb_amazeui" target="_blank" href="/discuss/142324">
                                         ${ check(m.user.ccfLevel) }
                                     </a>
                                     ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
@@ -1723,7 +1723,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
+mod.reg("discussion-save", "讨论保存", "@/discuss/.*", {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
 }, ({msto}) => {
     const save_func = () => GM_xmlhttpRequest({
