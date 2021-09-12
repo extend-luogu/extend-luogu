@@ -1773,7 +1773,7 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 mod.reg_hook_new("sponsor-tag", "标签显示", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, ({ args }) => {
-    const isDiscuss = /\/discuss\/show\/.*/.test(location.href)
+    const isDiscuss = /\/discuss\/.*/.test(location.href)
     // $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
     const add_badge = ($e) => {
