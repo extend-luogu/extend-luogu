@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.5
+// @version        2.11.6
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -556,7 +556,7 @@ mod.reg("update-log", "更新日志显示", "@/", {
     }
 })
 
-mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@/discuss/lists?.*", "@/paste", "@/discuss/.*" ], {
+mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
     show: { ty: "boolean", dft: true }
 }, ({ msto }) => {
     const emo = [
@@ -609,9 +609,13 @@ mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@
         { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
         { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
     ]
+
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
+
+    if (! $menu.length) return
+
     $("<br />").appendTo($menu)
     $(".mp-editor-ground").addClass("exlg-ext")
 
@@ -726,7 +730,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
     ]
     const _color = id => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`
     args.forEach(arg => {
-        if (arg.target.href === "javascript:void 0") return  // Hack: 这行绝对不能删！！！不知道为什么钩子那里会放 Js void0 过 check
+        if (arg.target.href === "javascript:void 0") return  // Hack: 这行绝对不能删！！！不知道为什么钩子那里会放 Js void0 过 check 删了就等着当场原地爆炸吧
         // console.log("arg: ",arg.target, arg)
         // if (! uindow._feInjection.currentData[arg.board_id][arg.position])
         arg.target.style.color = _color([uindow._feInjection.currentData[arg.board_id][arg.position].difficulty])
@@ -1053,7 +1057,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         mouse_on_dash = true
 
         $.double(([$p, mproxy]) => {
-            const $smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
+            const _$smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
 
             $.double(([jqstr, bln]) => {
                 $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide()))
@@ -1178,7 +1182,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
     args.attr("exlg-copy-code-block", "")
 
     args.each((_, e, $pre = $(e)) => {
-        if (e.parentNode.className === "mp-preview-content") return
+        if (e.parentNode.className === "mp-preview-content" || e.parentNode.parentNode.className === "mp-preview-area") return
         const $btn = isRecord
             ? ($pre.children(".copy-btn"))
             : $(`<div class="exlg-copy">复制</div>`)
@@ -1259,7 +1263,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
     ] }
 }, ({ msto, args }) => {
     let ptypes = msto.mode.startsWith("unac") + msto.mode.endsWith("only") * (-1) + 2
-    if (! args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE，鬼知道什么 bug，我 tmd 只能这么搞了
+    if (! args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE，鬼知道什么 bug
     $(args[0].firstChild).clone(true)
         .appendTo(args)
         .text("随机跳题")
@@ -1723,7 +1727,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-mod.reg("discussion-save", "讨论保存", [ "@/discuss/show/.*", "@/discuss/.*" ], {
+mod.reg("discussion-save", "讨论保存", [ "@/discuss/[1-9][0-9]{0,}$" ], {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
 }, ({msto}) => {
     const save_func = () => GM_xmlhttpRequest({
@@ -1770,43 +1774,32 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     })
 })
 
-mod.reg_hook_new("sponsor-tag", "标签显示", "@/.*", {
+mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
     tag_list: { ty: "string", priv: true }
 }, ({ args }) => {
-    const isDiscuss = /\/discuss\/show\/.*/.test(location.href)
+    const isDiscuss = /\/discuss\/.*/.test(location.href)
     // $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
     const add_badge = ($e) => {
-        if (!$e) return
-        if (!$e.children("a[target='_blank'][href]").length) return
-        const $name = $e.children("a[target='_blank'][href]")
-        if (!$name.text().length) return
-        const href = $name.attr("href")
-        if (!href) return
-        if (href.lastIndexOf("/user/") === 0) {
-            const uid = href.substring("/user/".length)
-            const tag = tag_list[uid]
-            if (tag !== undefined) {
-                $e.find(".exlg-badge").remove()
-                if (isDiscuss) { // Note: discuss/show
-                    (($e.children(".sb_amazeui").length) ? ($e.children(".sb_amazeui")) : ($e.children("a[target='_blank'][href]"))).after($(`<span class="exlg-badge">${tag}</span>`))
-                }
-                else if ($e[0].tagName === "H2") { // Note: h2处有一点点麻烦
-                    $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag").children(":last-child"))
-                }
-                else $(`<span class="exlg-badge">${tag}</span>`).appendTo($e.addClass("exlg-sponsor-tag"))
-            }
-        }
-        if (href !== "javascript:void 0") $e.addClass("exlg-sponsor-tag")
+        if (! $e) return
+        // Note: 又 tm 重构啊啊啊啊啊啊啊啊啊啊啊 wdnmd
+        if (! /\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
+        const tag = tag_list[$e.attr("href").substring("/user/".length)]
+        if (! tag) return
+        const $badge = $(`<span class="exlg-badge">${ tag }</span>`).on("click", () => location.href = "https://www.luogu.com.cn/paste/asz40850")
+        let $tar = $e
+        if ($tar.next().length && $tar.next().hasClass("sb_amazeui")) $tar = $tar.next()
+        if ($tar.next().length && $tar.next().hasClass("am-badge")) $tar = $tar.next()
+        $tar.after($badge) // Note: 短多了，舒服
     }
     args.each((_, e) => add_badge($(e)))
 }, (e) => {
-    const $tmp = $(e.target).find("h2:has(a[target='_blank'][href]):not(.exlg-sponsor-tag), div.am-comment-meta:has(a[target='_blank'][href]):not(.exlg-sponsor-tag), span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)")
+    const $tmp = $(e.target).find("a[target='_blank'][href]")
     return {
         result: $tmp.length,
         args: $tmp
-    }
-}, () => $("h2:has(a[target='_blank'][href]):not(.exlg-sponsor-tag), div.am-comment-meta:has(a[target='_blank'][href]):not(.exlg-sponsor-tag), span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)"),`
+    } // Note: 我他妈不知道怎么回事我淦但就是要这么写 就 n m 离 谱
+}, () => $("a[target='_blank'][href]"),`
 .exlg-badge {
     border-radius: 50px;
     padding-left: 10px;
