@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.4
+// @version        2.11.5
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -556,7 +556,7 @@ mod.reg("update-log", "更新日志显示", "@/", {
     }
 })
 
-mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@/discuss/lists?.*", "@/paste" ], {
+mod.reg("emoticon", "表情输入", [ "@/discuss/lists", "@/discuss/show/.*", "@/discuss/lists?.*", "@/paste", "@/discuss/.*" ], {
     show: { ty: "boolean", dft: true }
 }, ({ msto }) => {
     const emo = [
@@ -734,7 +734,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
             $(".exlg-counter").remove()
             const gf = arg.target.parentNode.parentNode.parentNode.parentNode
             const $prb = [$(gf.firstChild.childNodes[2]), $(gf.lastChild.childNodes[2])]
-            console.log("OK", $prb)
+
             for (let i = 0; i < 2; ++ i) {
                 const $ps = $prb[i]
                 const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
@@ -1051,10 +1051,10 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 
     $("#exlg-dash-0").mouseenter(() => {
         mouse_on_dash = true
-        console.log(222)
+
         $.double(([$p, mproxy]) => {
             const $smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
-            console.log($smalldash)
+
             $.double(([jqstr, bln]) => {
                 $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide()))
             }, [".exrand-enabled", true], [".exrand-disabled", false])
@@ -1155,7 +1155,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
     show_code_lang : { ty: "boolean", dft: true, strict: true, info: [ "Show Language Before Codeblocks", "显示代码块语言" ] },
     copy_code_position : { ty: "enum", vals: [ "left", "right" ], dft: "left", info: [ "Copy Button Position", "复制按钮对齐方式" ] },
     code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: [ "Custom Code Title", "自定义代码块标题" ] },
-    copy_code_font : { ty: "string", dft: "Fira Code", info: [ "Code Block Font", "代码块字体" ], strict: true },
+    copy_code_font : { ty: "string", dft: "'Fira Code', Consolas, monospace", info: [ "Code Block Font", "代码块字体" ], strict: true },
     max_show_lines : { ty: "number", dft: -1, min: -1, max: 100, info: [ "Max Lines On Show", "代码块最大显示行数" ], strict: true }
 },  ({ msto, args }) => {
 
@@ -1492,8 +1492,8 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             cmds.cd(`/discuss/lists?forumname=${forum}`)
         },
         cc: (name/* char*/) => {
-            /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|record|discuss|I myself|message|notification. or jump home. */
-            /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
+            /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|contest|record|discuss|I myself|message|notification. or jump home. */
+            /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|比赛|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
             name = name || "h"
             const tar = {
                 h: "/",
@@ -1723,7 +1723,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-mod.reg("discussion-save", "讨论保存", "@/discuss/show/.*", {
+mod.reg("discussion-save", "讨论保存", [ "@/discuss/show/.*", "@/discuss/.*" ], {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
 }, ({msto}) => {
     const save_func = () => GM_xmlhttpRequest({
@@ -1828,6 +1828,14 @@ mod.reg_hook_new("sponsor-tag", "标签显示", "@/.*", {
     margin-right: 2px;
 }
 `)
+
+mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
+    max_discuss : { ty: "number", dft: 12, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
+}, ({ msto }) => {
+    $(".am-panel-primary").each((i, e, $e = $(e)) => {
+        if (i >= msto.max_discuss) $e.hide()
+    })
+})
 
 mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
