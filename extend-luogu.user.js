@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.8
+// @version        2.12.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -410,14 +410,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         background-color: rgb(231, 76, 60);
         font-style: normal;
     }
-
     .exlg-unselectable {
         -webkit-user-select: none;
         -moz-user-select: none;
         -o-user-select: none;
         user-select: none;
     }
-
     :root {
         --exlg-azure:           #7bb8eb;
         --exlg-aqua:            #03a2e8;
@@ -455,7 +453,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         --argon-green-button:   #2dce89;
         --argon-cyan:           #03acca;
         --argon-yellow:         #ff9d09;
-
         --lg-red-problem:       #fe4c61;
         --lg-orange-problem:    #f39c11;
         --lg-yellow-problem:    #ffc116;
@@ -465,7 +462,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         --lg-black-problem:     #0e1d69;
         --lg-gray-problem:      #bfbfbf;
     }
-
     .exlg-difficulty-color { font-weight: bold; }
     .exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
     .exlg-difficulty-color.color-1 { color: rgb(254, 76, 97)!important; }
@@ -1100,7 +1096,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 
     $jump_exrand.on("click", exrand_poi)
 },`
-
 .exlg-rand-settings {
     position: relative;
     display: inline-block;
@@ -1321,11 +1316,11 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
         if ($e.find("i").hasClass("am-icon-check")) $e.addClass("tasklist-ac-problem")
     })
 
-    const $toggle_AC = $(`<div>[<a id="toggle-button">隐藏已AC</a>]</div>`)
+    const $toggle_AC = $(`<div class="hide-ac">[<a id="tasklist-toggle-button">隐藏已AC</a>]</div>`)
     $("button[name=task-edit]").parent().after($toggle_AC)
 
     const $ac_problem = $(".tasklist-ac-problem")
-    const $toggle = $("#toggle-button").on("click", () => {
+    const $toggle = $("#tasklist-toggle-button").on("click", () => {
         $ac_problem.toggle()
         $toggle.text([ "隐藏", "显示" ][ + (msto.auto_clear = ! msto.auto_clear) ] + "已 AC")
     })
@@ -1343,6 +1338,48 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
     }
 }, `
 .exlg-rand-tasklist-problem-btn {
+    margin-left: 0.5em;
+}
+`)
+
+mod.reg("recommandation-ex", "智能推荐ex", "@/", {
+    auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
+    rand_problem_in_recommandation: { ty: "boolean", dft: true, info: ["Random problem in recommandation", "智能推荐随机跳题"]}
+}, ({ msto }) => {
+    let actTList = []
+    const $el = $("div.tasklist-item").first().siblings()    // 这应该不是最好的实现方式 但我是傻逼
+    $.each($el.filter("div").not(".tasklist-item, .hide-ac"), (_, prob, $e = $(prob)) => {
+        const pid = $e.find("b").first().text()
+
+        if (prob.innerHTML.search(/check/g) === -1) {
+            if (msto.rand_problem_in_recommandation)
+                actTList.push(pid)
+        }
+        if ($e.find("i").hasClass("am-icon-check")) $e.addClass("recommandation-ac-problem")
+    })
+
+    const $toggle_AC = $(`<div class="hide-ac">[<a id="recommandation-toggle-button">隐藏已AC</a>]</div>`)
+    $el.filter("h2").last().after($toggle_AC)
+
+    const $ac_problem = $(".recommandation-ac-problem")
+    const $toggle = $("#recommandation-toggle-button").on("click", () => {
+        $ac_problem.toggle()
+        $toggle.text([ "隐藏", "显示" ][ + (msto.auto_clear = ! msto.auto_clear) ] + "已 AC")
+    })
+
+    if (msto.auto_clear) $toggle.click()
+
+    if (msto.rand_problem_in_recommandation) {
+        let $btn = $(`<button name="recommand-rand" class="am-btn am-btn-sm am-btn-success lg-right">随机</button>`)
+        $el.filter("h2").last().append($btn)
+        $btn.addClass("exlg-rand-recommandation-problem-btn")
+            .click(() => {
+                let tid = ~~ (Math.random() * 1.e6) % actTList.length
+                location.href += `problem/${ actTList[tid] }`
+            })
+    }
+}, `
+.exlg-rand-recommandation-problem-btn {
     margin-left: 0.5em;
 }
 `)
@@ -1979,4 +2016,3 @@ $(() => {
     log("Launching")
     mod.execute()
 })
-
