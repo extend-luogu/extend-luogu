@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.8
+// @version        2.11.10
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -30,7 +30,11 @@
 // @grant          GM_xmlhttpRequest
 // @grant          unsafeWindow
 // ==/UserScript==
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+var __webpack_exports__ = {};
 
+;// CONCATENATED MODULE: ./src/utilities.js
 // ==Utilities==
 
 const uindow = unsafeWindow
@@ -127,6 +131,10 @@ const judge_problem = text => [
 
 // ==/Utilities==
 
+
+;// CONCATENATED MODULE: ./src/extend-luogu.js
+
+
 // ==Modules==
 
 const mod = {
@@ -135,29 +143,29 @@ const mod = {
     data: {},
 
     path_alias: [
-        [ "",        ".*\\.luogu\\.(com\\.cn|org)" ],
-        [ "bili",    "www.bilibili.com" ],
-        [ "cdn",     "cdn.luogu.com.cn" ],
-        [ "tcs1",    "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ],
-        [ "tcs2",    "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com" ],
-        [ "tcs3",    "service-otgstbe5-1305163805.sh.apigw.tencentcs.com" ],
-        [ "debug",   "localhost:1634" ],
-        [ "ghpage",  "extend-luogu.github.io" ],
-    ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
+        ["", ".*\\.luogu\\.(com\\.cn|org)"],
+        ["bili", "www.bilibili.com"],
+        ["cdn", "cdn.luogu.com.cn"],
+        ["tcs1", "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com"],
+        ["tcs2", "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com"],
+        ["tcs3", "service-otgstbe5-1305163805.sh.apigw.tencentcs.com"],
+        ["debug", "localhost:1634"],
+        ["ghpage", "extend-luogu.github.io"],
+    ].map(([alias, path]) => [new RegExp(`^@${alias}/`), path]),
 
     path_dash_board: [
         "@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/((index|bundle)(.html)?)?"
     ],
 
     reg: (name, info, path, data, func, styl) => {
-        if (! Array.isArray(path)) path = [ path ]
+        if (!Array.isArray(path)) path = [path]
         path.forEach((p, i) => {
-            mod.path_alias.some(([ re, url ]) => {
+            mod.path_alias.some(([re, url]) => {
                 if (p.match(re))
                     return path[i] = p.replace(re, url + "/"), true
             })
 
-            if (! p.endsWith("$")) path[i] += "$"
+            if (!p.endsWith("$")) path[i] += "$"
         })
 
         mod.data[name] = {
@@ -198,8 +206,8 @@ const mod = {
                 m: 1000 * 60,
                 h: 1000 * 60 * 60,
                 D: 1000 * 60 * 60 * 24
-            }[ period.slice(-1) ]
-            if (! isNaN(num) && unit) period = num * unit
+            }[period.slice(-1)]
+            if (!isNaN(num) && unit) period = num * unit
             else error(`Parsing period failed: "${period}"`)
         }
 
@@ -215,7 +223,7 @@ const mod = {
                 const last = sto[name].last_chore, now = Date.now()
 
                 let nostyl = true
-                if (arg.named || ! last || now - last > period) {
+                if (arg.named || !last || now - last > period) {
                     if (nostyl) {
                         GM_addStyle(styl)
                         nostyl = false
@@ -244,7 +252,7 @@ const mod = {
             </svg>
             `
             let $board = $("#exlg-board")
-            if (! $board.length) $board = $(`
+            if (!$board.length) $board = $(`
                 <div class="lg-article" id="exlg-board" exlg="exlg"><h2>${icon_b}</h2></div>
             `)
                 .prependTo(".lg-right.am-u-md-4")
@@ -263,10 +271,10 @@ const mod = {
     reg_hook_new: (name, info, path, data, func, hook, darg, styl) => mod.reg(
         name, info, path, data,
         arg => {
-            func({...arg, ...{ result: false, args: darg() }})
+            func({ ...arg, ...{ result: false, args: darg() } })
             $("body").bind("DOMNodeInserted", (e) => {
                 const res = hook(e)
-                return res.result && func({...arg, ...res})
+                return res.result && func({ ...arg, ...res })
             })
         }, styl
     ),
@@ -279,9 +287,9 @@ const mod = {
 
     execute: name => {
         const exe = (m, named) => {
-            if (! m) error(`Executing named mod but not found: "${name}"`)
+            if (!m) error(`Executing named mod but not found: "${name}"`)
             if (m.styl) GM_addStyle(m.styl)
-            log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
+            log(`Executing ${named ? "named " : ""}mod: "${m.name}"`)
             return m.func({ msto: sto[m.name], named })
         }
         if (name) {
@@ -299,25 +307,25 @@ const mod = {
     }
 }
 
-mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.txt?.*" ], null, () => {
+mod.reg_main("springboard", "跨域跳板", ["@bili/robots.txt?.*", "@/robots.txt?.*"], null, () => {
     const q = new URLSearchParams(location.search)
     switch (q.get("type")) {
-    // Note: ->
-    case "update":
-        document.write(`<iframe src="https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen" exlg="exlg"></iframe>`)
-        uindow.addEventListener("message", e => {
-            e.data.unshift("update")
-            uindow.parent.postMessage(e.data, "*")
-        })
-        break
-    case "page":
-        const url = q.get("url")
-        if (! q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`))
-            document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`
-        break
-    // Note: <-
-    case "dash":
-        break
+        // Note: ->
+        case "update":
+            document.write(`<iframe src="https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen" exlg="exlg"></iframe>`)
+            uindow.addEventListener("message", e => {
+                e.data.unshift("update")
+                uindow.parent.postMessage(e.data, "*")
+            })
+            break
+        case "page":
+            const url = q.get("url")
+            if (!q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`))
+                document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`
+            break
+        // Note: <-
+        case "dash":
+            break
     }
 }, `
     iframe {
@@ -332,13 +340,13 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
 `)
 
 mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null, () =>
-    uindow.parent.postMessage([ document.body.innerText ], "*")
+    uindow.parent.postMessage([document.body.innerText], "*")
 )
 
 mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     source: {
-        ty: "enum", vals: [ "tcs", "debug", "gh_index", "gh_bundle" ], dft: "tcs",
-        info: [ "The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页" ]
+        ty: "enum", vals: ["tcs", "debug", "gh_index", "gh_bundle"], dft: "tcs",
+        info: ["The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页"]
     }
 }, ({ msto, args }) => {
     const source = msto.source
@@ -494,8 +502,8 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         }
     },
     lang: {
-        ty: "enum", dft: "en", vals: [ "en", "zh" ],
-        info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
+        ty: "enum", dft: "en", vals: ["en", "zh"],
+        info: ["Language of descriptions in the dashboard", "控制面板提示语言"]
     }
 }, () => {
     const novogui_modules = [
@@ -507,15 +515,15 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                 name: m.name.replace(/^[@^]/g, ""),
                 description: m.info,
                 settings: Object.entries(mod.data[m.name].lvs)
-                    .filter(([ k, s ]) => k !== "on" && ! s.priv)
-                    .map(([ k, s ]) => ({
+                    .filter(([k, s]) => k !== "on" && !s.priv)
+                    .map(([k, s]) => ({
                         name: k,
                         displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
                         description: s.info,
                         type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
                         ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                        ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
-                        ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
+                        ...(s.ty === "number" && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
+                        ...(s.ty === "enum" && { type: "SELECTBOX", acceptableValues: s.vals })
                     }))
             }))
         }
@@ -547,74 +555,74 @@ mod.reg("update-log", "更新日志显示", "@/", {
 }, ({ msto }) => {
     const version = GM_info.script.version
     switch (version_cmp(msto.last_version, version)) {
-    case "==":
-        break
-    case "<<":
-        lg_alert(`新 VER ${version}\n` + "更新日志功能正在维修中……")
-    case ">>":
-        msto.last_version = version
+        case "==":
+            break
+        case "<<":
+            lg_alert(`新 VER ${version}\n` + "更新日志功能正在维修中……")
+        case ">>":
+            msto.last_version = version
     }
 })
 
-mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
+mod.reg("emoticon", "表情输入", ["@/paste", "@/discuss/.*"], {
     show: { ty: "boolean", dft: true }
 }, ({ msto }) => {
     const emo = [
-        { type: "emo", name: [ "kk" ], slug: "0" },
-        { type: "emo", name: [ "jk" ], slug: "1" },
-        { type: "emo", name: [ "se" ], slug: "2" },
-        { type: "emo", name: [ "qq" ], slug: "3" },
-        { type: "emo", name: [ "xyx" ], slug: "4" },
-        { type: "emo", name: [ "xia" ], slug: "5" },
-        { type: "emo", name: [ "cy" ], slug: "6" },
-        { type: "emo", name: [ "ll" ], slug: "7" },
-        { type: "emo", name: [ "xk" ], slug: "8" },
-        { type: "emo", name: [ "qiao" ], slug: "9" },
-        { type: "emo", name: [ "qiang" ], slug: "a" },
-        { type: "emo", name: [ "ruo" ], slug: "b" },
-        { type: "emo", name: [ "mg" ], slug: "c" },
-        { type: "emo", name: [ "dx" ], slug: "d" },
-        { type: "emo", name: [ "youl" ], slug: "e" },
-        { type: "emo", name: [ "baojin" ], slug: "f" },
-        { type: "emo", name: [ "shq" ], slug: "g" },
-        { type: "emo", name: [ "lb" ], slug: "h" },
-        { type: "emo", name: [ "lh" ], slug: "i" },
-        { type: "emo", name: [ "qd" ], slug: "j" },
-        { type: "emo", name: [ "fad" ], slug: "k" },
-        { type: "emo", name: [ "dao" ], slug: "l" },
-        { type: "emo", name: [ "cd" ], slug: "m" },
-        { type: "emo", name: [ "kun" ], slug: "n" },
-        { type: "emo", name: [ "px" ], slug: "o" },
-        { type: "emo", name: [ "ts" ], slug: "p" },
-        { type: "emo", name: [ "kl" ], slug: "q" },
-        { type: "emo", name: [ "yiw" ], slug: "r" },
-        { type: "emo", name: [ "dk" ], slug: "s" },
-        { type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
-        { type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
-        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
-        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
-        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
-        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
-        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "QωQ" },
-        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
-        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
-        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
-        { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
-        { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
-        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
-        { type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
-        { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
-        { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
-        { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
-        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
-        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
+        { type: "emo", name: ["kk"], slug: "0" },
+        { type: "emo", name: ["jk"], slug: "1" },
+        { type: "emo", name: ["se"], slug: "2" },
+        { type: "emo", name: ["qq"], slug: "3" },
+        { type: "emo", name: ["xyx"], slug: "4" },
+        { type: "emo", name: ["xia"], slug: "5" },
+        { type: "emo", name: ["cy"], slug: "6" },
+        { type: "emo", name: ["ll"], slug: "7" },
+        { type: "emo", name: ["xk"], slug: "8" },
+        { type: "emo", name: ["qiao"], slug: "9" },
+        { type: "emo", name: ["qiang"], slug: "a" },
+        { type: "emo", name: ["ruo"], slug: "b" },
+        { type: "emo", name: ["mg"], slug: "c" },
+        { type: "emo", name: ["dx"], slug: "d" },
+        { type: "emo", name: ["youl"], slug: "e" },
+        { type: "emo", name: ["baojin"], slug: "f" },
+        { type: "emo", name: ["shq"], slug: "g" },
+        { type: "emo", name: ["lb"], slug: "h" },
+        { type: "emo", name: ["lh"], slug: "i" },
+        { type: "emo", name: ["qd"], slug: "j" },
+        { type: "emo", name: ["fad"], slug: "k" },
+        { type: "emo", name: ["dao"], slug: "l" },
+        { type: "emo", name: ["cd"], slug: "m" },
+        { type: "emo", name: ["kun"], slug: "n" },
+        { type: "emo", name: ["px"], slug: "o" },
+        { type: "emo", name: ["ts"], slug: "p" },
+        { type: "emo", name: ["kl"], slug: "q" },
+        { type: "emo", name: ["yiw"], slug: "r" },
+        { type: "emo", name: ["dk"], slug: "s" },
+        { type: "txt", name: ["hqlm"], slug: "l0", name_display: "火前留名" },
+        { type: "txt", name: ["sqlm"], slug: "l1", name_display: "山前留名" },
+        { type: "txt", name: ["xbt"], slug: "g1", name_display: "屑标题" },
+        { type: "txt", name: ["iee", "wee"], slug: "g2", name_display: "我谔谔" },
+        { type: "txt", name: ["kg"], slug: "g3", name_display: "烤咕" },
+        { type: "txt", name: ["gl"], slug: "g4", name_display: "盖楼" },
+        { type: "txt", name: ["qwq"], slug: "g5", name_display: "QωQ" },
+        { type: "txt", name: ["wyy"], slug: "g6", name_display: "无意义" },
+        { type: "txt", name: ["wgzs"], slug: "g7", name_display: "违规紫衫" },
+        { type: "txt", name: ["tt"], slug: "g8", name_display: "贴贴" },
+        { type: "txt", name: ["jbl"], slug: "g9", name_display: "举报了" },
+        { type: "txt", name: ["%%%", "mmm"], slug: "ga", name_display: "%%%" },
+        { type: "txt", name: ["ngrb"], slug: "gb", name_display: "你谷日爆" },
+        { type: "txt", name: ["qpzc", "qp", "zc"], slug: "gc", name_display: "前排资瓷" },
+        { type: "txt", name: ["cmzz"], slug: "gd", name_display: "臭名昭著" },
+        { type: "txt", name: ["zyx"], slug: "ge", name_display: "致远星" },
+        { type: "txt", name: ["zh"], slug: "gf", name_display: "祝好" },
+        { type: "txt", name: ["sto"], slug: "gg", name_display: "sto" },
+        { type: "txt", name: ["orz"], slug: "gh", name_display: "orz" },
     ]
 
     const emo_url = name => `//图.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
 
-    if (! $menu.length) return
+    if (!$menu.length) return
 
     $("<br />").appendTo($menu)
     $(".mp-editor-ground").addClass("exlg-ext")
@@ -627,11 +635,11 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
         $show_hide.children()[0].innerHTML = ["显示", "隐藏"][["隐藏", "显示"].indexOf($show_hide.children()[0].innerHTML)]
         $menu.toggleClass("exlg-show-emo")
         $ground.toggleClass("exlg-show-emo")
-        msto.show = ! msto.show
+        msto.show = !msto.show
     })
 
     emo.forEach(m => {
-        $((m.type === "emo")?
+        $((m.type === "emo") ?
             `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
             :
             `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
@@ -682,26 +690,26 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
 mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, null, () => {
     $(".introduction > *").each((_, e, $e = $(e)) => {
         const t = $e.text()
-        let [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
-        if (! ins) return
+        let [, , ins, arg] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
+        if (!ins) return
 
         arg = arg.split(/(?<!!)%/g).map(s => s.replace(/!%/g, "%"))
         const $blog = $($(".user-action").children()[0])
         switch (ins) {
-        case "html":
-            $e.replaceWith($(`<p exlg="exlg">${ xss.process(arg[0]) }</p>`))
-            break
-        case "frame":
-            $e.replaceWith(springboard(
-                { type: "page", url: encodeURI(arg[0]), confirm: true },
-                `width: ${ arg[1] }; height: ${ arg[2] };`
-            ))
-            break
-        case "blog":
-            if ($blog.text().trim() !== "个人博客") return
-            $blog.attr("href", arg)
-            $e.remove()
-            break
+            case "html":
+                $e.replaceWith($(`<p exlg="exlg">${xss.process(arg[0])}</p>`))
+                break
+            case "frame":
+                $e.replaceWith(springboard(
+                    { type: "page", url: encodeURI(arg[0]), confirm: true },
+                    `width: ${arg[1]}; height: ${arg[2]};`
+                ))
+                break
+            case "blog":
+                if ($blog.text().trim() !== "个人博客") return
+                $blog.attr("href", arg)
+                $e.remove()
+                break
         }
     })
 }, `
@@ -719,14 +727,14 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
     problem_compare: { ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC题目比较"] }
 }, ({ msto, args }) => {
     const color = [
-        [ 191, 191, 191 ],
-        [ 254, 76, 97 ],
-        [ 243, 156, 17 ],
-        [ 255, 193, 22 ],
-        [ 82, 196, 26 ],
-        [ 52, 152, 219 ],
-        [ 157, 61, 207 ],
-        [ 0, 0, 0 ]
+        [191, 191, 191],
+        [254, 76, 97],
+        [243, 156, 17],
+        [255, 193, 22],
+        [82, 196, 26],
+        [52, 152, 219],
+        [157, 61, 207],
+        [0, 0, 0]
     ]
     const _color = id => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`
     args.forEach(arg => {
@@ -734,31 +742,31 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
         // console.log("arg: ",arg.target, arg)
         // if (! uindow._feInjection.currentData[arg.board_id][arg.position])
         arg.target.style.color = _color([uindow._feInjection.currentData[arg.board_id][arg.position].difficulty])
-        if (arg.board_id === "passedProblems" && arg.position === uindow._feInjection.currentData["passedProblems"].length - 1) { // Note: 染色染到最后一个
+        if (arg.board_id === "passedProblems" && arg.position === uindow._feInjection.currentData.passedProblems.length - 1) { // Note: 染色染到最后一个
             $(".exlg-counter").remove()
             const gf = arg.target.parentNode.parentNode.parentNode.parentNode
             const $prb = [$(gf.firstChild.childNodes[2]), $(gf.lastChild.childNodes[2])]
 
-            for (let i = 0; i < 2; ++ i) {
+            for (let i = 0; i < 2; ++i) {
                 const $ps = $prb[i]
-                const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
-                $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`))
+                const my = uindow._feInjection.currentData[["submittedProblems", "passedProblems"][i]]
+                $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${my.length}</span>`))
             }
 
-            if ((! msto.problem_compare) || uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
+            if ((!msto.problem_compare) || uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
             const func = async () => {
-                const content = await lg_content(`/user/${ uindow._feInjection.currentUser.uid }`)
+                const content = await lg_content(`/user/${uindow._feInjection.currentUser.uid}`)
                 const my = content.currentData.passedProblems
                 const ta = uindow._feInjection.currentData.passedProblems
                 let same = 0
                 const $ps = $prb[1]
                 $ps.find("a").each((d, p, $p = $(p)) => {
                     if (my.some(m => m.pid === ta[d].pid)) {
-                        same ++
+                        same++
                         $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
                     }
                 })
-                $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
+                $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ta.length} <> ${my.length} : ${same}`
                     + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
             }
             func()
@@ -775,11 +783,11 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
         args: [{
             onchange: _onchange,
             board_id: ["submittedProblems", "passedProblems"][(_onchange ? (last_board = [ucd.submittedProblems[0].pid, ucd.passedProblems[0].pid].indexOf(_pid)) : (last_board))],
-            position: (_onchange ? (last_ptr = 0) : (++ last_ptr)),
+            position: (_onchange ? (last_ptr = 0) : (++last_ptr)),
             target: tar
         }]
     }
-}, () => [],`
+}, () => [], `
     .main > .card > h3 {
         display: inline-block;
     }
@@ -787,10 +795,10 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
 
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
-        ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
-        info: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
+        ty: "enum", dft: "o2", vals: ["o2", "shy"],
+        info: ["Switch the way of fetching benben", "切换全网犇犇获取方式"]
     }
-}, ({msto}) => {
+}, ({ msto }) => {
     const color = {
         Gray: "gray",
         Blue: "bluelight",
@@ -810,7 +818,7 @@ mod.reg("benben", "全网犇犇", "@/", {
     const oriloadfeed = unsafeWindow.loadFeed
 
     unsafeWindow.loadFeed = function () {
-        if (unsafeWindow.feedMode==="all-exlg") {
+        if (unsafeWindow.feedMode === "all-exlg") {
             GM_xmlhttpRequest({
                 method: "GET",
                 url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (`https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`),
@@ -819,29 +827,29 @@ mod.reg("benben", "全网犇犇", "@/", {
                     e.forEach(m => $(`
                 <li class="am-comment am-comment-primary feed-li" exlg="exlg">
                     <div class="lg-left">
-                        <a href="/user/${ m.user.uid }" class="center">
-                            <img src="https://cdn.luogu.com.cn/upload/usericon/${ m.user.uid }.png" class="am-comment-avatar">
+                        <a href="/user/${m.user.uid}" class="center">
+                            <img src="https://cdn.luogu.com.cn/upload/usericon/${m.user.uid}.png" class="am-comment-avatar">
                         </a>
                     </div>
                     <div class="am-comment-main">
                         <header class="am-comment-hd">
                             <div class="am-comment-meta">
                                 <span class="feed-username">
-                                    <a class="lg-fg-${ color[m.user.color] }" href="/user/${ m.user.uid }" target="_blank">
-                                        ${ m.user.name }
+                                    <a class="lg-fg-${color[m.user.color]}" href="/user/${m.user.uid}" target="_blank">
+                                        ${m.user.name}
                                     </a>
                                     <a class="sb_amazeui" target="_blank" href="/discuss/show/142324">
-                                        ${ check(m.user.ccfLevel) }
+                                        ${check(m.user.ccfLevel)}
                                     </a>
-                                    ${ m.user.badge ? `<span class="am-badge am-radius lg-bg-${ color[m.user.color] }">${ m.user.badge }</span>` : "" }
+                                    ${m.user.badge ? `<span class="am-badge am-radius lg-bg-${color[m.user.color]}">${m.user.badge}</span>` : ""}
                                 </span>
-                                ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
+                                ${new Date(m.time * 1000).format("yyyy-mm-dd HH:MM")}
                                 <a name="feed-reply">回复</a>
                             </div>
                         </header>
                         <div class="am-comment-bd">
                             <span class="feed-comment">
-                                ${ marked(m.content) }
+                                ${marked(m.content)}
                             </span>
                         </div>
                     </div>
@@ -852,7 +860,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                             scrollToId("feed-content")
                             setTimeout(
                                 () => $("textarea")
-                                    .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
+                                    .trigger("focus").val(` || @${m.user.name} : ${m.content}`)
                                     .trigger("input"),
                                 50
                             )
@@ -864,7 +872,7 @@ mod.reg("benben", "全网犇犇", "@/", {
             // unsafeWindow.feedPage++
             // $("#feed-more").children("a").text("点击查看更多...")
         }
-        else{
+        else {
             oriloadfeed()
         }
     }
@@ -879,8 +887,8 @@ mod.reg("benben", "全网犇犇", "@/", {
             if (msto.source === "o2") {
                 $("#feed-more").hide()
             }
-            unsafeWindow.feedPage=1
-            unsafeWindow.feedMode="all-exlg"
+            unsafeWindow.feedPage = 1
+            unsafeWindow.feedMode = "all-exlg"
             $("li.am-comment").remove()
 
             unsafeWindow.loadFeed()
@@ -902,7 +910,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
         ],
         priv: true
     }
-}, ({msto}) => {
+}, ({ msto }) => {
     const dif_list = [
         {
             text: "入门",
@@ -1007,7 +1015,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     <br>
     <ul></ul>
     </span>`).appendTo($btn_list).hide()
-        .mouseenter(() => {mouse_on_board = true})
+        .mouseenter(() => { mouse_on_board = true })
         .mouseleave(() => {
             mouse_on_board = false
             if (!mouse_on_dash) {
@@ -1046,9 +1054,9 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
                 $btn[b].on("click", () => {
                     $btn[b].hide()
                     $btn[1 - b].show()
-                    msto_proxy[index] = !! b
+                    msto_proxy[index] = !!b
                 })
-                if (msto_proxy[index] === (!! b)) $btn[b].hide()
+                if (msto_proxy[index] === (!!b)) $btn[b].hide()
             }, 0, 1)
         })
     }, [$exrand_diff, dif_list, msto.exrand_difficulty], [$exrand_srce, src_list, msto.exrand_source])
@@ -1099,7 +1107,7 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
     }
 
     $jump_exrand.on("click", exrand_poi)
-},`
+}, `
 
 .exlg-rand-settings {
     position: relative;
@@ -1156,12 +1164,12 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 `)
 
 mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
-    show_code_lang : { ty: "boolean", dft: true, strict: true, info: [ "Show Language Before Codeblocks", "显示代码块语言" ] },
-    copy_code_position : { ty: "enum", vals: [ "left", "right" ], dft: "left", info: [ "Copy Button Position", "复制按钮对齐方式" ] },
-    code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: [ "Custom Code Title", "自定义代码块标题" ] },
-    copy_code_font : { ty: "string", dft: "'Fira Code', Consolas, monospace", info: [ "Code Block Font", "代码块字体" ], strict: true },
-    max_show_lines : { ty: "number", dft: -1, min: -1, max: 100, info: [ "Max Lines On Show", "代码块最大显示行数" ], strict: true }
-},  ({ msto, args }) => {
+    show_code_lang: { ty: "boolean", dft: true, strict: true, info: ["Show Language Before Codeblocks", "显示代码块语言"] },
+    copy_code_position: { ty: "enum", vals: ["left", "right"], dft: "left", info: ["Copy Button Position", "复制按钮对齐方式"] },
+    code_block_title: { ty: "string", dft: "源代码 - ${lang}", info: ["Custom Code Title", "自定义代码块标题"] },
+    copy_code_font: { ty: "string", dft: "'Fira Code', Consolas, monospace", info: ["Code Block Font", "代码块字体"], strict: true },
+    max_show_lines: { ty: "number", dft: -1, min: -1, max: 100, info: ["Max Lines On Show", "代码块最大显示行数"], strict: true }
+}, ({ msto, args }) => {
 
     const isRecord = /\/record\/.*/.test(location.href)
 
@@ -1195,14 +1203,14 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
 
         const $code = $pre.children("code")
         $code.css("font-family", msto.copy_code_font || undefined)
-        if (! $code.hasClass("hljs")) $code.addClass("hljs").css("background", "white")
+        if (!$code.hasClass("hljs")) $code.addClass("hljs").css("background", "white")
         $btn.addClass(`exlg-copy-${msto.copy_code_position}`)
 
         const lang = get_lang($code)
-        const title_text = ((msto.show_code_lang && lang) ? ( msto.code_block_title.replace("${lang}", lang)) : ("源代码"))
+        const title_text = ((msto.show_code_lang && lang) ? (msto.code_block_title.replace("${lang}", lang)) : ("源代码"))
         const $title = isRecord ? $(".lfe-h3").text(title_text) : $(`<h3 class="exlg-code-title" style="width: 100%;">${title_text}</h3>`)
 
-        if (! isRecord) $pre.before($title.append($btn))
+        if (!isRecord) $pre.before($title.append($btn))
     })
 }, (e) => {
     const $tar = $(e.target).find("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])")
@@ -1258,12 +1266,14 @@ div.exlg-copied {
 `)
 
 mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*)?", {
-    mode: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
-        "Preferences about problem choosing", "随机跳题的题目种类"
-    ] }
+    mode: {
+        ty: "enum", vals: ["unac only", "unac and new", "new only"], dft: "unac and new", info: [
+            "Preferences about problem choosing", "随机跳题的题目种类"
+        ]
+    }
 }, ({ msto, args }) => {
     let ptypes = msto.mode.startsWith("unac") + msto.mode.endsWith("only") * (-1) + 2
-    if (! args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE，鬼知道什么 bug
+    if (!args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE，鬼知道什么 bug
     $(args[0].firstChild).clone(true)
         .appendTo(args)
         .text("随机跳题")
@@ -1292,7 +1302,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
                     return lg_alert("您已经切完所有题啦！")
             }
 
-            const pid = ~~ (Math.random() * 1.e6) % candProbList.length
+            const pid = ~~(Math.random() * 1.e6) % candProbList.length
             location.href = "https://www.luogu.com.cn/problem/" + candProbList[pid]
         })
 }, (e) => {
@@ -1307,7 +1317,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
 
 mod.reg("tasklist-ex", "任务计划ex", "@/", {
     auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
-    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"]}
+    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"] }
 }, ({ msto }) => {
     /* const _$board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空.. */
     let actTList = []
@@ -1327,7 +1337,7 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
     const $ac_problem = $(".tasklist-ac-problem")
     const $toggle = $("#toggle-button").on("click", () => {
         $ac_problem.toggle()
-        $toggle.text([ "隐藏", "显示" ][ + (msto.auto_clear = ! msto.auto_clear) ] + "已 AC")
+        $toggle.text(["隐藏", "显示"][+ (msto.auto_clear = !msto.auto_clear)] + "已 AC")
     })
 
     if (msto.auto_clear) $toggle.click()
@@ -1337,8 +1347,8 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
         $("button[name='task-edit']").before($btn)
         $btn.addClass("exlg-rand-tasklist-problem-btn")
             .click(() => {
-                let tid = ~~ (Math.random() * 1.e6) % actTList.length
-                location.href += `problem/${ actTList[tid] }`
+                let tid = ~~(Math.random() * 1.e6) % actTList.length
+                location.href += `problem/${actTList[tid]}`
             })
     }
 }, `
@@ -1361,7 +1371,7 @@ mod.reg_hook_new("hide-solution", "隐藏题解", "@/problem/solution/.*", {
     hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
 }, ({ msto, args }) => (msto.hidesolu) ? (args.hide()) : "memset0珂爱", (e) => {
     if (e.target.className === "item-row") return { result: true, args: $(e.target) }
-    return {result: false, args: undefined}
+    return { result: false, args: undefined }
 }, () => $(".item-row"))
 
 // let submission_color_tmp = {
@@ -1399,7 +1409,7 @@ mod.reg_hook_new("hide-solution", "隐藏题解", "@/problem/solution/.*", {
 // )
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
-    lang: { ty: "enum", dft: "en", vals: [ "en", "zh" ] }
+    lang: { ty: "enum", dft: "en", vals: ["en", "zh"] }
 }, ({ msto }) => {
     const $cli = $(`<div id="exlg-cli" exlg="exlg"></div>`).appendTo($("body"))
     const $cli_input = $(`<input id="exlg-cli-input" />`).appendTo($cli)
@@ -1408,7 +1418,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     const cli_log = (sp, ...tp) => {
         cli_is_log = true
         const m = sp.map((s, i) =>
-            s.split(/\b/).map(w => cli_lang_dict[w]?.[ cli_lang - 1 ] ?? w).join("") +
+            s.split(/\b/).map(w => cli_lang_dict[w]?.[cli_lang - 1] ?? w).join("") +
             (tp[i] || "")
         ).join("")
         return $cli_input.val(m)
@@ -1421,29 +1431,29 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     }
     const cli_history = []
     let cli_history_index = 0
-    const cli_langs = [ "en", "zh" ], cli_lang_dict = {
-        ".": [ "。" ],
-        ",": [ "，" ],
-        "!": [ "！" ],
-        "?": [ "？" ],
-        "cli":        [ "命令行" ],
-        "current":    [ "当前" ],
-        "language":   [ "语言" ],
-        "available":  [ "可用" ],
-        "command":    [ "命令" ],
-        "commands":   [ "命令" ],
-        "unknown":    [ "未知" ],
-        "forum":      [ "板块" ],
-        "target":     [ "目标" ],
-        "mod":        [ "模块" ],
-        "action":     [ "操作" ],
-        "illegal":    [ "错误" ],
-        "param":      [ "参数" ],
-        "expected":   [ "期望" ],
-        "type":       [ "类型" ],
-        "lost":       [ "缺失" ],
-        "essential":  [ "必要" ],
-        "user":       [ "用户" ]
+    const cli_langs = ["en", "zh"], cli_lang_dict = {
+        ".": ["。"],
+        ",": ["，"],
+        "!": ["！"],
+        "?": ["？"],
+        "cli": ["命令行"],
+        "current": ["当前"],
+        "language": ["语言"],
+        "available": ["可用"],
+        "command": ["命令"],
+        "commands": ["命令"],
+        "unknown": ["未知"],
+        "forum": ["板块"],
+        "target": ["目标"],
+        "mod": ["模块"],
+        "action": ["操作"],
+        "illegal": ["错误"],
+        "param": ["参数"],
+        "expected": ["期望"],
+        "type": ["类型"],
+        "lost": ["缺失"],
+        "essential": ["必要"],
+        "user": ["用户"]
     }
     let cli_lang = cli_langs.indexOf(msto.lang) || 0
 
@@ -1451,17 +1461,17 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         help: (cmd/* string*/) => {
             /* get the help of <cmd>. or list all cmds. */
             /* 获取 <cmd> 的帮助。空则列出所有。 */
-            if (! cmd)
-                cli_log`exlg cli. current language: ${cli_lang}, available commands: ${ Object.keys(cmds).join(", ") }`
+            if (!cmd)
+                cli_log`exlg cli. current language: ${cli_lang}, available commands: ${Object.keys(cmds).join(", ")}`
             else {
                 const f = cmds[cmd]
-                if (! f) return cli_error`help: unknown command "${cmd}"`
+                if (!f) return cli_error`help: unknown command "${cmd}"`
 
                 const arg = f.arg.map(a => {
                     const i = a.name + ": " + a.type
                     return a.essential ? `<${i}>` : `[${i}]`
                 }).join(" ")
-                cli_log`${cmd} ${arg} ${ f.help[cli_lang] }`
+                cli_log`${cmd} ${arg} ${f.help[cli_lang]}`
             }
         },
         cd: (path/* !string*/) => {
@@ -1485,14 +1495,14 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             /* jump to the forum named <forum> of discussion. use all the names you can think of. */
             /* 跳转至名为 <forum> 的讨论板块，你能想到的名字基本都有用。 */
             const tar = [
-                [ "relevantaffairs",    "gs", "gsq",    "灌水", "灌水区",               "r", "ra" ],
-                [ "academics",          "xs", "xsb",    "学术", "学术版",               "a", "ac" ],
-                [ "siteaffairs",        "zw", "zwb",    "站务", "站务版",               "s", "sa" ],
-                [ "problem",            "tm", "tmzb",   "题目", "题目总版",             "p"       ],
-                [ "service",            "fk", "fksqgd", "反馈", "反馈、申请、工单专版",      "se" ]
+                ["relevantaffairs", "gs", "gsq", "灌水", "灌水区", "r", "ra"],
+                ["academics", "xs", "xsb", "学术", "学术版", "a", "ac"],
+                ["siteaffairs", "zw", "zwb", "站务", "站务版", "s", "sa"],
+                ["problem", "tm", "tmzb", "题目", "题目总版", "p"],
+                ["service", "fk", "fksqgd", "反馈", "反馈、申请、工单专版", "se"]
             ]
             forum = tar.find(ns => ns.includes(forum))?.[0]
-            if (! tar) return cli_error`cdd: unknown forum "${forum}"`
+            if (!tar) return cli_error`cdd: unknown forum "${forum}"`
             cmds.cd(`/discuss/lists?forumname=${forum}`)
         },
         cc: (name/* char*/) => {
@@ -1517,22 +1527,22 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             /* 当 <action> 为 "enable|disable|toggle"，对名为 <name> 的模块执行对应操作：启用|禁用|切换。 */
             const i = mod.find_i(name)
             switch (action) {
-            case "enable":
-            case "disable":
-            case "toggle":
-                if (i < 0) return cli_error`mod: unknown mod "${name}"`
-                sto[name].on = {
-                    enable: () => true, disable: () => false, toggle: now => ! now
-                }[action](sto[name].on)
-                break
-            default:
-                return cli_error`mod: unknown action "${action}"`
+                case "enable":
+                case "disable":
+                case "toggle":
+                    if (i < 0) return cli_error`mod: unknown mod "${name}"`
+                    sto[name].on = {
+                        enable: () => true, disable: () => false, toggle: now => !now
+                    }[action](sto[name].on)
+                    break
+                default:
+                    return cli_error`mod: unknown action "${action}"`
             }
         },
         dash: (action/* !string*/) => {
             /* for <action> "show|hide|toggle", opearte the exlg dashboard. */
             /* 当 <action> 为 "show|hide|toggle", 显示|隐藏|切换 exlg 管理面板。 */
-            if (! [ "show", "hide", "toggle" ].includes(action))
+            if (!["show", "hide", "toggle"].includes(action))
                 return cli_error`dash: unknown action "${action}"`
             $("#exlg-dash-window")[action]()
         },
@@ -1556,7 +1566,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             /* jumps to homepage of user whose username is like <name>. */
             /* 跳转至用户名与 <name> 类似的用户主页。 */
             $.get("/api/user/search?keyword=" + name, res => {
-                if (! res.users[0])
+                if (!res.users[0])
                     cli_error`un: unknown user "${name}".`
                 else
                     location.href = "/user/" + res.users[0].uid
@@ -1564,9 +1574,9 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         }
     }
     for (const f of Object.values(cmds)) {
-        [ , f.arg, f.help ] = f.toString().match(/^\((.*?)\) => {((?:\n +\/\*.+?\*\/)+)/)
+        [, f.arg, f.help] = f.toString().match(/^\((.*?)\) => {((?:\n +\/\*.+?\*\/)+)/)
         f.arg = f.arg.split(", ").map(a => {
-            const [ , name, type ] = a.match(/([a-z_]+)\/\* (.+)\*\//)
+            const [, name, type] = a.match(/([a-z_]+)\/\* (.+)\*\//)
             return {
                 name, essential: type[0] === "!", type: type.replace(/^!/, "")
             }
@@ -1578,58 +1588,58 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
 
         const tk = cmd.trim().replace(/^\//, "").split(" ")
         const n = tk.shift()
-        if (! n) return
+        if (!n) return
         const f = cmds[n]
-        if (! f) return cli_error`exlg: unknown command "${n}"`
-        let i = -1, a; for ([ i, a ] of tk.entries()) {
+        if (!f) return cli_error`exlg: unknown command "${n}"`
+        let i = -1, a; for ([i, a] of tk.entries()) {
             const t = f.arg[i].type
             if (t === "number" || t === "integer") tk[i] = + a
             if (
                 t === "char" && a.length === 1 ||
-                t === "number" && ! isNaN(tk[i]) ||
-                t === "integer" && ! isNaN(tk[i]) && ! (tk[i] % 1) ||
+                t === "number" && !isNaN(tk[i]) ||
+                t === "integer" && !isNaN(tk[i]) && !(tk[i] % 1) ||
                 t === "string"
-            ) ;
+            );
             else return cli_error`${n}: illegal param "${a}", expected type ${t}.`
         }
-        if (f.arg[i + 1]?.essential) return cli_error`${n}: lost essential param "${ f.arg[i + 1].name }"`
+        if (f.arg[i + 1]?.essential) return cli_error`${n}: lost essential param "${f.arg[i + 1].name}"`
         f(...tk)
     }
 
     $cli_input.on("keydown", e => {
         switch (e.key) {
-        case "Enter":
-            if (cli_is_log) return cli_clean()
-            const cmd = $cli_input.val()
-            cli_history.push(cmd)
-            cli_history_index = cli_history.length
-            parse(cmd)
-            if (! cli_is_log) return cli_clean()
-            break
-        case "/":
-            if (cli_is_log) cli_clean()
-            break
-        case "Escape":
-            $cli.hide()
-            break
-        case "ArrowUp":
-        case "ArrowDown":
-            const i = cli_history_index + { ArrowUp: -1, ArrowDown: +1 }[ e.key ]
-            if (i < 0 || i >= cli_history.length) return
-            cli_history_index = i
-            $cli_input.val(cli_history[i])
-            break
+            case "Enter":
+                if (cli_is_log) return cli_clean()
+                const cmd = $cli_input.val()
+                cli_history.push(cmd)
+                cli_history_index = cli_history.length
+                parse(cmd)
+                if (!cli_is_log) return cli_clean()
+                break
+            case "/":
+                if (cli_is_log) cli_clean()
+                break
+            case "Escape":
+                $cli.hide()
+                break
+            case "ArrowUp":
+            case "ArrowDown":
+                const i = cli_history_index + { ArrowUp: -1, ArrowDown: +1 }[e.key]
+                if (i < 0 || i >= cli_history.length) return
+                cli_history_index = i
+                $cli_input.val(cli_history[i])
+                break
         }
     })
 
     $(uindow).on("keydown", e => {
         const $act = $(document.activeElement)
         if ($act.is("body")) {
-            const rel = { ArrowLeft: "prev", ArrowRight: "next" }[ e.key ]
+            const rel = { ArrowLeft: "prev", ArrowRight: "next" }[e.key]
             if (rel) return $(`a[rel=${rel}]`)[0].click()
 
             if (e.shiftKey) {
-                const y = { ArrowUp: 0, ArrowDown: 1e6 }[ e.key ]
+                const y = { ArrowUp: 0, ArrowDown: 1e6 }[e.key]
                 if (y !== undefined) uindow.scrollTo(0, y)
             }
 
@@ -1680,7 +1690,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
     const func = () => {
         $search_user.prop("disabled", true)
         $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
-            if (! res.users[0]) {
+            if (!res.users[0]) {
                 $search_user.prop("disabled", false)
                 lg_alert("无法找到指定用户")
             }
@@ -1691,25 +1701,25 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
     $("#search-user-input").keydown(e => { e.key === "Enter" && func() })
 })
 
-mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
+mod.reg_board("benben-ranklist", "犇犇龙王排行榜", null, ({ $board }) => {
     GM_xmlhttpRequest({
         method: "GET",
         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
-        onload: function(res) {
-            let s="<h3>犇犇排行榜</h3>"
-            s+="<div>"
+        onload: function (res) {
+            let s = "<h3>犇犇排行榜</h3>"
+            s += "<div>"
             $(JSON.parse(res.response)).each((index, obj) => {
-                s+=`<div class="bb-rnklst-${index + 1}">
+                s += `<div class="bb-rnklst-${index + 1}">
                     <span class="bb-rnklst-ind${(index < 9) ? (" bb-top-ten") : ("")}">${index + 1}.</span>
                     <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
                     <span style="float: right;">共 ${obj[0]} 条</span>
                 </div>`
             })
-            s+="</div><br>"
+            s += "</div><br>"
             $board.html(s)
         }
     })
-},`
+}, `
 .bb-rnklst-1 > .bb-rnklst-ind {
     color: var(--lg-red);
     font-weight: 900;
@@ -1727,9 +1737,9 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-mod.reg("discussion-save", "讨论保存", [ "@/discuss/[1-9][0-9]{0,}$" ], {
-    auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
-}, ({msto}) => {
+mod.reg("discussion-save", "讨论保存", ["@/discuss/[1-9][0-9]{0,}$"], {
+    auto_save_discussion: { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
+}, ({ msto }) => {
     const save_func = () => GM_xmlhttpRequest({
         method: "GET",
         url: `https://luogulo.gq/save.php?url=${window.location.href}`,
@@ -1774,19 +1784,19 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     })
 })
 
-mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
+mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*"], {
     tag_list: { ty: "string", priv: true }
 }, ({ args }) => {
     // $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
     const add_badge = ($e) => {
-        if (! $e || $e.hasClass("exlg-badge-username")) return
+        if (!$e || $e.hasClass("exlg-badge-username")) return
         // Note: 又 tm 重构啊啊啊啊啊啊啊啊啊啊啊 wdnmd
         if (! /\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
         $e.addClass("exlg-badge-username") // Note: 删掉这行会出刷犇犇的bug，一开始我以为每个元素被添加一次所以问题不大 但是事实证明我是傻逼
         const tag = tag_list[$e.attr("href").substring("/user/".length)]
-        if (! tag) return
-        const $badge = $(`<span class="exlg-badge">${ tag }</span>`).on("click", () => location.href = "https://www.luogu.com.cn/paste/asz40850")
+        if (!tag) return
+        const $badge = $(`<span class="exlg-badge">${tag}</span>`).on("click", () => location.href = "https://www.luogu.com.cn/paste/asz40850")
         let $tar = $e
         if ($tar.next().length && $tar.next().hasClass("sb_amazeui")) $tar = $tar.next()
         if ($tar.next().length && $tar.next().hasClass("am-badge")) $tar = $tar.next()
@@ -1799,7 +1809,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         result: $tmp.length,
         args: $tmp
     } // Note: 我他妈不知道怎么回事我淦但就是要这么写 就 n m 离 谱
-}, () => $("a[target='_blank'][href]"),`
+}, () => $("a[target='_blank'][href]"), `
 .exlg-badge {
     border-radius: 50px;
     padding-left: 10px;
@@ -1822,71 +1832,71 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
 }
 `)
 
-mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
-    max_discuss : { ty: "number", dft: 12, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
+mod.reg("mainpage-discuss-limit", "主页讨论个数限制", ["@/"], {
+    max_discuss: { ty: "number", dft: 12, min: 4, max: 16, info: ["Max Discussions On Show", "主页讨论显示上限"], strict: true }
 }, ({ msto }) => {
     $(".am-panel-primary").each((i, e, $e = $(e)) => {
         if (i >= msto.max_discuss) $e.hide()
     })
 })
 
-mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
+mod.reg("benben-emoticon", "犇犇表情输入", ["@/"], {
     show: { ty: "boolean", dft: true }
 }, () => {
     const emo = [
-        { type: "emo", name: [ "kk" ], slug: "0" },
-        { type: "emo", name: [ "jk" ], slug: "1" },
-        { type: "emo", name: [ "se" ], slug: "2" },
-        { type: "emo", name: [ "qq" ], slug: "3" },
-        { type: "emo", name: [ "xyx" ], slug: "4" },
-        { type: "emo", name: [ "xia" ], slug: "5" },
-        { type: "emo", name: [ "cy" ], slug: "6" },
-        { type: "emo", name: [ "ll" ], slug: "7" },
-        { type: "emo", name: [ "xk" ], slug: "8" },
-        { type: "emo", name: [ "qiao" ], slug: "9" },
-        { type: "emo", name: [ "qiang" ], slug: "a" },
-        { type: "emo", name: [ "ruo" ], slug: "b" },
-        { type: "emo", name: [ "mg" ], slug: "c" },
-        { type: "emo", name: [ "dx" ], slug: "d" },
-        { type: "emo", name: [ "youl" ], slug: "e" },
-        { type: "emo", name: [ "baojin" ], slug: "f" },
-        { type: "emo", name: [ "shq" ], slug: "g" },
-        { type: "emo", name: [ "lb" ], slug: "h" },
-        { type: "emo", name: [ "lh" ], slug: "i" },
-        { type: "emo", name: [ "qd" ], slug: "j" },
-        { type: "emo", name: [ "fad" ], slug: "k" },
-        { type: "emo", name: [ "dao" ], slug: "l" },
-        { type: "emo", name: [ "cd" ], slug: "m" },
-        { type: "emo", name: [ "kun" ], slug: "n" },
-        { type: "emo", name: [ "px" ], slug: "o" },
-        { type: "emo", name: [ "ts" ], slug: "p" },
-        { type: "emo", name: [ "kl" ], slug: "q" },
-        { type: "emo", name: [ "yiw" ], slug: "r" },
-        { type: "emo", name: [ "dk" ], slug: "s" },
-        { type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
-        { type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
-        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
-        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
-        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
-        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
-        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "QωQ" },
-        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
-        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
-        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
-        { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
-        { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
-        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
-        { type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
-        { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
-        { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
-        { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
-        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
-        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
+        { type: "emo", name: ["kk"], slug: "0" },
+        { type: "emo", name: ["jk"], slug: "1" },
+        { type: "emo", name: ["se"], slug: "2" },
+        { type: "emo", name: ["qq"], slug: "3" },
+        { type: "emo", name: ["xyx"], slug: "4" },
+        { type: "emo", name: ["xia"], slug: "5" },
+        { type: "emo", name: ["cy"], slug: "6" },
+        { type: "emo", name: ["ll"], slug: "7" },
+        { type: "emo", name: ["xk"], slug: "8" },
+        { type: "emo", name: ["qiao"], slug: "9" },
+        { type: "emo", name: ["qiang"], slug: "a" },
+        { type: "emo", name: ["ruo"], slug: "b" },
+        { type: "emo", name: ["mg"], slug: "c" },
+        { type: "emo", name: ["dx"], slug: "d" },
+        { type: "emo", name: ["youl"], slug: "e" },
+        { type: "emo", name: ["baojin"], slug: "f" },
+        { type: "emo", name: ["shq"], slug: "g" },
+        { type: "emo", name: ["lb"], slug: "h" },
+        { type: "emo", name: ["lh"], slug: "i" },
+        { type: "emo", name: ["qd"], slug: "j" },
+        { type: "emo", name: ["fad"], slug: "k" },
+        { type: "emo", name: ["dao"], slug: "l" },
+        { type: "emo", name: ["cd"], slug: "m" },
+        { type: "emo", name: ["kun"], slug: "n" },
+        { type: "emo", name: ["px"], slug: "o" },
+        { type: "emo", name: ["ts"], slug: "p" },
+        { type: "emo", name: ["kl"], slug: "q" },
+        { type: "emo", name: ["yiw"], slug: "r" },
+        { type: "emo", name: ["dk"], slug: "s" },
+        { type: "txt", name: ["hqlm"], slug: "l0", name_display: "火前留名" },
+        { type: "txt", name: ["sqlm"], slug: "l1", name_display: "山前留名" },
+        { type: "txt", name: ["xbt"], slug: "g1", name_display: "屑标题" },
+        { type: "txt", name: ["iee", "wee"], slug: "g2", name_display: "我谔谔" },
+        { type: "txt", name: ["kg"], slug: "g3", name_display: "烤咕" },
+        { type: "txt", name: ["gl"], slug: "g4", name_display: "盖楼" },
+        { type: "txt", name: ["qwq"], slug: "g5", name_display: "QωQ" },
+        { type: "txt", name: ["wyy"], slug: "g6", name_display: "无意义" },
+        { type: "txt", name: ["wgzs"], slug: "g7", name_display: "违规紫衫" },
+        { type: "txt", name: ["tt"], slug: "g8", name_display: "贴贴" },
+        { type: "txt", name: ["jbl"], slug: "g9", name_display: "举报了" },
+        { type: "txt", name: ["%%%", "mmm"], slug: "ga", name_display: "%%%" },
+        { type: "txt", name: ["ngrb"], slug: "gb", name_display: "你谷日爆" },
+        { type: "txt", name: ["qpzc", "qp", "zc"], slug: "gc", name_display: "前排资瓷" },
+        { type: "txt", name: ["cmzz"], slug: "gd", name_display: "臭名昭著" },
+        { type: "txt", name: ["zyx"], slug: "ge", name_display: "致远星" },
+        { type: "txt", name: ["zh"], slug: "gf", name_display: "祝好" },
+        { type: "txt", name: ["sto"], slug: "gg", name_display: "sto" },
+        { type: "txt", name: ["orz"], slug: "gh", name_display: "orz" },
     ]
     const $txt = $("#feed-content"), emo_url = name => `//图.tk/${name}`, txt = $txt[0]
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
-        $((m.type === "emo")?
+        $((m.type === "emo") ?
             `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
             :
             `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
@@ -1935,15 +1945,15 @@ $(() => {
     Object.assign(uindow, {
         exlg: {
             mod,
-            log, error,
-            springboard, version_cmp,
-            lg_alert, lg_content,
+            log: log, error: error,
+            springboard: springboard, version_cmp: version_cmp,
+            lg_alert: lg_alert, lg_content: lg_content,
             TM_dat: {
                 reload_dat: () => {
                     raw_dat = null
                     return load_dat(mod.data, {
                         map: s => {
-                            s.root = ! s.rec
+                            s.root = !s.rec
                             s.itmRoot = s.rec === 2
                         }
                     })
@@ -1955,14 +1965,14 @@ $(() => {
             GM_info, GM_addStyle, GM_setClipboard, GM_xmlhttpRequest,
             GM_getValue, GM_setValue, GM_deleteValue, GM_listValues
         },
-        $$: $, xss, marked
+        $$: $, xss: xss, marked
     })
 
     const init_sto = chance => {
         try {
             sto = uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat()
         }
-        catch(err) {
+        catch (err) {
             if (chance) {
                 lg_alert("存储代理加载失败，清存重试中……")
                 clear_dat()
@@ -1980,3 +1990,6 @@ $(() => {
     mod.execute()
 })
 
+
+/******/ })()
+;

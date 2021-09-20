@@ -6,7 +6,7 @@ const webpack = require('webpack-stream');
 const USER_JS_METADATA = `// ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.10
+// @version        2.11.11
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -52,5 +52,5 @@ exports.default = function () {
         }))
         .pipe(concat('extend-luogu.user.js'))
         .pipe(header(USER_JS_METADATA))
-        .pipe(dest('output/'));
+        .pipe(dest('./'));
 };
