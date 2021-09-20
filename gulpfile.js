@@ -6,7 +6,7 @@ const webpack = require('webpack-stream');
 const USER_JS_METADATA = `// ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.9
+// @version        2.11.10
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*

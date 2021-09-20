@@ -17,7 +17,7 @@ ver = input("VER ")
 
 print("Modifying the version in the script")
 
-fn = "extend-luogu.user.js"
+fn = "gulpfile.js"
 with open(fn, "r") as js:
     text = js.readlines()
 
@@ -29,7 +29,7 @@ for i, ln in enumerate(text):
 with open(fn, "w+") as js:
     js.writelines(text)
 
-shell("git add " + fn)
+shell("git add " + '.')
 
 shell("git commit" + (" --amend" if "a" in sys.argv else ""))
 

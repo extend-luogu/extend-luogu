@@ -2,3 +2,5 @@
 
 *.min.js
 
+gulpfile.js
+output/*
