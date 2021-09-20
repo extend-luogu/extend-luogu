@@ -268,3 +268,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# output files
+output/

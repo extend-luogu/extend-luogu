@@ -1,6 +1,6 @@
 {
   "name": "extend-luogu",
-  "version": "2.3.0",
+  "version": "2.11.9",
   "description": "Make luogu more powerful.",
   "main": "extend-luogu.user.js",
   "scripts": {
@@ -21,7 +21,12 @@
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1"
+    "eslint-plugin-promise": "^4.3.1",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-header": "^2.0.9",
+    "webpack": "^5.53.0",
+    "webpack-stream": "^7.0.0"
   },
   "dependencies": {}
 }
