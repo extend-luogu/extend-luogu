@@ -341,21 +341,38 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         info: [ "The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页" ]
     }
 }, ({ msto, args }) => {
-    const source = msto.source
-    $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
+    const $btn = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
         .prependTo(args)
         .css("backgroundColor", {
             tcs: "cornflowerblue",
             debug: "steelblue",
             gh_index: "darkblue",
             gh_bundle: "darkslateblue"
-        }[source])
-        .on("click", () => uindow.exlg.dash = uindow.open({
-            tcs: "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting",
-            debug: "localhost:1634/dashboard",
-            gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
-            gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
-        }[source]))
+        }[msto.source])
+        .bind("contextmenu", () => false)
+        .on("mousedown", (e) => {
+            if (! e.button)
+                uindow.exlg.dash = uindow.open({
+                    tcs: "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting",
+                    debug: "localhost:1634/dashboard",
+                    gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
+                    gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
+                }[msto.source])
+            else if (e.button === 2) {
+                msto.source = {
+                    tcs: "debug",
+                    debug: "gh_index",
+                    gh_index: "gh_bundle",
+                    gh_bundle: "tcs",
+                }[msto.source]
+                $btn.css("backgroundColor", {
+                    tcs: "cornflowerblue",
+                    debug: "steelblue",
+                    gh_index: "darkblue",
+                    gh_bundle: "darkslateblue"
+                }[msto.source])
+            }
+        })
 }, (e) => {
     const $tmp = $(e.target).find(".user-nav")
     if ($tmp.length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName 不知道为什么
@@ -1357,12 +1374,9 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     })
 })
 
-mod.reg_hook_new("hide-solution", "隐藏题解", "@/problem/solution/.*", {
+mod.reg("hide-solution", "隐藏题解", "@/problem/solution/.*", {
     hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
-}, ({ msto, args }) => (msto.hidesolu) ? (args.hide()) : "memset0珂爱", (e) => {
-    if (e.target.className === "item-row") return { result: true, args: $(e.target) }
-    return {result: false, args: undefined}
-}, () => $(".item-row"))
+}, ({ msto }) => (msto.hidesolu) ? (GM_addStyle(".item-row { display: none; }")) : "memset0珂爱")
 
 // let submission_color_tmp = {
 //   complete: true,
@@ -1727,7 +1741,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-mod.reg("discussion-save", "讨论保存", [ "@/discuss/[1-9][0-9]{0,}$" ], {
+mod.reg("discussion-save", "讨论保存", [ "@/discuss/[1-9][0-9]" ], {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
 }, ({msto}) => {
     const save_func = () => GM_xmlhttpRequest({
@@ -1825,7 +1839,13 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
     max_discuss : { ty: "number", dft: 12, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
 }, ({ msto }) => {
-    $(".am-panel-primary").each((i, e, $e = $(e)) => {
+    let $discuss = undefined
+    $(".lg-article").each((i, e, $e = $(e)) => {
+        const title = e.childNodes[1]
+        if (title && title.tagName === "H2" && title.innerText.includes("讨论"))
+            $discuss = $e.children(".am-panel")
+    })
+    $discuss.each((i, e, $e = $(e)) => {
         if (i >= msto.max_discuss) $e.hide()
     })
 })
