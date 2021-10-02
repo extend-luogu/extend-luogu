@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.8
+// @version        2.11.10
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -103,8 +103,23 @@ const lg_content = url => new Promise((res, rej) =>
 )
 
 const lg_alert = uindow.show_alert
-    ? msg => uindow.show_alert("exlg 提醒您", msg.replaceAll("\n", "<br />"))
-    : msg => uindow.alert("exlg 提醒您\n" + msg)
+    ? (msg, title = "exlg 提醒您") => uindow.show_alert(title, msg)
+    : (msg, title = "exlg 提醒您") => {
+        if (! $(document.body).hasClass("lg-alert-built")) {
+            $(`<div class="am-modal am-modal-alert am-modal-out" tabindex="-1" id="exlg-alert" style="display: none; margin-top: -40px;">
+            <div class="am-modal-dialog">
+                <div class="am-modal-hd" id="exlg-alert-title"></div>
+                <div class="am-modal-bd" id="exlg-alert-message"></div>
+                <div class="am-modal-footer">
+                    <span class="am-modal-btn">确定</span>
+                </div>
+            </div></div>`).appendTo($(document.body))
+            $(document.body).addClass("lg-alert-built")
+        }
+        $("#lg-alert-title").html(title)
+        $("#lg-alert-message").html(msg)
+        $("#exlg-alert").modal("open")
+    }
 
 const springboard = (param, styl) => {
     const q = new URLSearchParams(); for (let k in param) q.set(k, param[k])
@@ -373,11 +388,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 }[msto.source])
             }
         })
+        .css("margin-top", args.hasClass("nav-container") ? "5px" : "0px")
 }, (e) => {
-    const $tmp = $(e.target).find(".user-nav")
-    if ($tmp.length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName 不知道为什么
+    const $tmp = $(e.target).find(".user-nav, .nav-container")
+    if ($tmp.length) return { result: ($tmp.length), args: ($tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName 不知道为什么
     else return { result: 0 }
-}, () => $("nav.user-nav, div.user-nav > nav"), `
+}, () => $("nav.user-nav, div.user-nav > nav, .nav-container"), `
     /* dash */
     #exlg-dash {
         margin-right: 5px;
@@ -559,19 +575,46 @@ mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
 })
 
 // TODO
-mod.reg("update-log", "更新日志显示", "@/", {
+mod.reg("update-log", "更新日志显示", "@/.*", {
     last_version: { ty: "string", priv: true }
 }, ({ msto }) => {
+    if (location.href.includes("blog")) return // Note: 如果是博客就退出
     const version = GM_info.script.version
+    const fix_html = (str) => {
+        let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`
+        str.split('\n').forEach(e => {
+            res += `<div>${e.replaceAll(" ", "&nbsp;")}</div><br>`
+        })
+        return res + "</div>"
+    }
     switch (version_cmp(msto.last_version, version)) {
     case "==":
         break
     case "<<":
-        lg_alert(`新 VER ${version}\n` + "更新日志功能正在维修中……")
+        lg_alert(fix_html(`*M discussion-save
+   *- func, url
+    : Fix the bug that can't match "?page=x" and always show Save successfully
+     *M mainpage-discuss-limit, user-problem-color
+        *- func
+         : Fix a hidden bug
+     *M dash-bridge
+        *- func, hook
+         : now you can use it on the phone or when width < 576px
+     *M update-log
+         *- func
+         : Enabled.`), `extend-luogu ver. ${version} 更新日志`)
     case ">>":
         msto.last_version = version
     }
-})
+}, `
+.exlg-update-log-text {
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+.exlg-update-log-text > div {
+    float: left;
+}
+`)
 
 mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
     show: { ty: "boolean", dft: true }
@@ -783,7 +826,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
     })
 }, (e) => {
     if (! /.*\/user\/.*#practice/.test(location.href)) return { result: false, args: { message: "Not at practice page." } }
-    if (e.target.tagName !== "A" || e.target.className !== "color-default" || e.target.href.indexOf("/problem/") === -1)
+    if (e.target.tagName.toLowerCase() !== "a" || e.target.className !== "color-default" || e.target.href.indexOf("/problem/") === -1)
         return { result: false, args: { message: "It's not a problem element" } }
     const tar = e.target, _pid = tar.href.slice(33), ucd = uindow._feInjection.currentData,
         _onchange = [ucd.submittedProblems[0].pid, ucd.passedProblems[0].pid].includes(_pid)
@@ -1741,37 +1784,64 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
 }
 `)
 
-mod.reg("discussion-save", "讨论保存", [ "@/discuss/[1-9][0-9]" ], {
+mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" ], {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
-}, ({msto}) => {
-    const save_func = () => GM_xmlhttpRequest({
-        method: "GET",
-        url: `https://luogulo.gq/save.php?url=${window.location.href}`,
-        onload: (res) => {
-            if (res.status === 200) {
-                log("Discuss saved")
-            }
-            else {
-                log(`Fail: ${res}`)
-            }
-        },
-        onerror: (err) => {
-            log(`Error:${err}`)
-        }
-    })
-    const $btn = $(`<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>`).on("click", () => {
+}, ({ msto }) => {
+    const $btn = $(`<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>`)
+    $btn.on("click", () => {
         $btn.prop("disabled", true)
-        $btn.text("保存成功")
-        save_func()
-        setTimeout(() => {
-            $btn.removeAttr("disabled")
-            $btn.text("保存讨论")
-        }, 1000)
-    }).css("margin-top", "5px")
-    const $btn2 = $(`<a class="am-btn am-btn-success am-btn-sm" name="save-discuss" style="border-color: rgb(255, 193, 22); background-color: rgb(255, 193, 22);color: #fff;" href="https://luogulo.gq/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px")
+        $btn.text("保存中...")
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `https://luogulo.gq/save.php?url=${window.location.href}`,
+            onload: (res) => {
+                if (res.status === 200) {
+                    if (res.response === 'success') {
+                        log("Discuss saved")
+                        $btn.text("保存成功")
+                        setTimeout(() => {
+                            $btn.text("保存讨论")
+                            $btn.removeAttr("disabled")
+                        }, 1000)
+                    }
+                    else {
+                        log(`Discuss unsuccessfully saved, return data: ${ res.response }`)
+                        $btn.text("保存失败")
+                        $btn.toggleClass("am-btn-success").toggleClass("am-btn-warning")
+                        setTimeout(() => {
+                            $btn.text("保存讨论")
+                            $btn.removeAttr("disabled")
+                            $btn.toggleClass("am-btn-success").toggleClass("am-btn-warning")
+                        }, 1000)
+                    }
+                }
+                else {
+                    log(`Fail to save discuss: ${res}`)
+                    $btn.toggleClass("am-btn-success").toggleClass("am-btn-danger")
+                    setTimeout(() => {
+                        $btn.text("保存讨论")
+                        $btn.removeAttr("disabled")
+                        $btn.toggleClass("am-btn-success").toggleClass("am-btn-danger")
+                    }, 1000)
+                }
+            },
+            onerror: (err) => {
+                log(`Error:${err}`)
+                $btn.removeAttr("disabled")
+            }
+        })
+    })
+        .css("margin-top", "5px")
+    const $btn2 = $(`<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://luogulo.gq/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px")
     $("section.lg-summary").find("p").append($(`<br>`)).append($btn).append($("<span>&nbsp;</span>")).append($btn2)
-    if (msto.auto_save_discussion) save_func()
-})
+    if (msto.auto_save_discussion) $btn.click()
+},`
+.am-btn-warning {
+    border-color: rgb(255, 193, 22);
+    background-color: rgb(255, 193, 22);
+    color: #fff;
+}
+`)
 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
@@ -1840,9 +1910,10 @@ mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
     max_discuss : { ty: "number", dft: 12, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
 }, ({ msto }) => {
     let $discuss = undefined
+    if (location.href.includes("blog")) return // Note: 如果是博客就退出
     $(".lg-article").each((i, e, $e = $(e)) => {
         const title = e.childNodes[1]
-        if (title && title.tagName === "H2" && title.innerText.includes("讨论"))
+        if (title && title.tagName.toLowerCase() === "h2" && title.innerText.includes("讨论"))
             $discuss = $e.children(".am-panel")
     })
     $discuss.each((i, e, $e = $(e)) => {
