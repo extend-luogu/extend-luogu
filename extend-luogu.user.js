@@ -670,7 +670,7 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
         { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
     ]
 
-    const emo_url = name => `//图.tk/${name}`
+    const emo_url = name => `http://图.tk/${name}`  // 改为HTTP请求
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
 
@@ -1974,7 +1974,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
         { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto" },
         { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz" },
     ]
-    const $txt = $("#feed-content"), emo_url = name => `//图.tk/${name}`, txt = $txt[0]
+    const $txt = $("#feed-content"), emo_url = name => `http://图.tk/${name}`, txt = $txt[0]  // 改为HTTP请求
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
         $((m.type === "emo")?
