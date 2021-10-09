@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.10
+// @version        2.12.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -1403,6 +1403,48 @@ mod.reg("tasklist-ex", "任务计划ex", "@/", {
     }
 }, `
 .exlg-rand-tasklist-problem-btn {
+    margin-left: 0.5em;
+}
+`)
+
+mod.reg("recommandation-ex", "智能推荐ex", "@/", {
+    auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
+    rand_problem_in_recommandation: { ty: "boolean", dft: true, info: ["Random problem in recommandation", "智能推荐随机跳题"]}
+}, ({ msto }) => {
+    let actRList = []
+    const $el = $("div.tasklist-item").first().siblings()    // 这应该不是最好的实现方式 但我是傻逼
+    $.each($el.filter("div").not(".tasklist-item, .hide-ac"), (_, prob, $e = $(prob)) => {
+        const pid = $e.find("b").first().text()
+
+        if (prob.innerHTML.search(/check/g) === -1) {
+            if (msto.rand_problem_in_recommandation)
+                actRList.push(pid)
+        }
+        if ($e.find("i").hasClass("am-icon-check")) $e.addClass("recommandation-ac-problem")
+    })
+
+    const $toggle_AC = $(`<div class="hide-ac">[<a id="recommandation-toggle-button">隐藏已AC</a>]</div>`)
+    $el.filter("h2").last().after($toggle_AC)
+
+    const $ac_problem = $(".recommandation-ac-problem")
+    const $toggle = $("#recommandation-toggle-button").on("click", () => {
+        $ac_problem.toggle()
+        $toggle.text([ "隐藏", "显示" ][ + (msto.auto_clear = ! msto.auto_clear) ] + "已 AC")
+    })
+
+    if (msto.auto_clear) $toggle.click()
+
+    if (msto.rand_problem_in_recommandation) {
+        let $btn = $(`<button name="recommand-rand" class="am-btn am-btn-sm am-btn-success lg-right">随机</button>`)
+        $el.filter("h2").last().append($btn)
+        $btn.addClass("exlg-rand-recommandation-problem-btn")
+            .click(() => {
+                let tid = ~~ (Math.random() * 1.e6) % actRList.length
+                location.href += `problem/${ actRList[tid] }`
+            })
+    }
+}, `
+.exlg-rand-recommandation-problem-btn {
     margin-left: 0.5em;
 }
 `)
