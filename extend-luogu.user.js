@@ -877,8 +877,8 @@ mod.reg("benben", "全网犇犇", "@/", {
                 } 
                 else {
                     $(e).removeClass("am-disabled")
-                    $("#feed-content").val('')
-                    uindow.switchMode('all-exlg')
+                    $("#feed-content").val("")
+                    uindow.switchMode("all-exlg")
                 }
             }
         })
@@ -1804,17 +1804,17 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
     `)
     const func = () => {
         $verify_pbb.prop("disabled", true)
-        var _feInstance=unsafeWindow._feInstance
-        var slogan=_feInstance.currentUser.slogan
+        const _feInstance=uindow._feInstance
+        const slogan=_feInstance.currentUser.slogan
         alert("请备份签名："+ slogan)
-        fetch('https://www.luogu.com.cn/api/user/updateSlogan', {
-			'headers': {
-				'content-type': 'application/json;charset=UTF-8',
-				'x-csrf-token': document.getElementsByName('csrf-token')[0].content
-			},
-			'body': `{"slogan":"exlg伪犇验证"}`,
-			'method': 'POST',
-		}).then(resp => resp.json()).then(resp => {
+        fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
+            "headers": {
+                "content-type": "application/json;charset=UTF-8",
+                "x-csrf-token": document.getElementsByName("csrf-token")[0].content
+            },
+            "body": `{"slogan":"exlg伪犇验证"}`,
+            "method": "POST",
+        }).then(resp => resp.json()).then(resp => {
              GM_xmlhttpRequest({
                  method: "GET",
                  url: `https://bens.rotriw.com/api/pbb/verify?uid=${_feInstance.currentUser.uid}` ,
@@ -1823,15 +1823,15 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
                      if (res.status === 200)
                      {
                          uindow.exlg.TM_dat.sto["benben"].token=res.response
-                         fetch('https://www.luogu.com.cn/api/user/updateSlogan', {
-                             'headers': {
-                                 'content-type': 'application/json;charset=UTF-8',
-                                 'x-csrf-token': document.getElementsByName('csrf-token')[0].content
+                         fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
+                             "headers": {
+                                 "content-type": "application/json;charset=UTF-8",
+                                 "x-csrf-token": document.getElementsByName("csrf-token")[0].content
                              },
-                             'body': `{"slogan":"${slogan}"}`,
-                             'method': 'POST',
+                             "body": `{"slogan":"${slogan}"}`,
+                             "method": "POST",
                          }).then(res => res.json()).then(res => {
-                             show_alert('提示', `验证成功
+                             show_alert("提示", `验证成功
                              token:${uindow.exlg.TM_dat.sto["benben"].token}
                              请妥善保管`);
                          });
@@ -1855,7 +1855,7 @@ mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" 
             url: `https://luogulo.gq/save.php?url=${window.location.href}`,
             onload: (res) => {
                 if (res.status === 200) {
-                    if (res.response === 'success') {
+                    if (res.response === "success") {
                         log("Discuss saved")
                         $btn.text("保存成功")
                         setTimeout(() => {
