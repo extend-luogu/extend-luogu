@@ -443,14 +443,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         background-color: rgb(231, 76, 60);
         font-style: normal;
     }
-
     .exlg-unselectable {
         -webkit-user-select: none;
         -moz-user-select: none;
         -o-user-select: none;
         user-select: none;
     }
-
     :root {
         --exlg-azure:           #7bb8eb;
         --exlg-aqua:            #03a2e8;
@@ -488,7 +486,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         --argon-green-button:   #2dce89;
         --argon-cyan:           #03acca;
         --argon-yellow:         #ff9d09;
-
         --lg-red-problem:       #fe4c61;
         --lg-orange-problem:    #f39c11;
         --lg-yellow-problem:    #ffc116;
@@ -498,7 +495,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         --lg-black-problem:     #0e1d69;
         --lg-gray-problem:      #bfbfbf;
     }
-
     .exlg-difficulty-color { font-weight: bold; }
     .exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
     .exlg-difficulty-color.color-1 { color: rgb(254, 76, 97)!important; }
@@ -582,7 +578,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     const version = GM_info.script.version
     const fix_html = (str) => {
         let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`
-        str.split('\n').forEach(e => {
+        str.split("\n").forEach(e => {
             res += `<div>${e.replaceAll(" ", "&nbsp;")}</div><br>`
         })
         return res + "</div>"
@@ -862,12 +858,12 @@ mod.reg("benben", "全网犇犇", "@/", {
     let $btu = $("#feed-submit")
     $("#feed").empty()
     $("li[data-mode=watching]").remove()
-    //$("li[data-mode=my]").remove()
+    // $("li[data-mode=my]").remove()
     const oriloadfeed = unsafeWindow.loadFeed
     $btu.after($btu.clone().on("click", function () {
-        $(this).addClass("am-disabled");
-        var content = $('#feed-content').val(), e = this;
-        var data = new FormData();
+        $(this).addClass("am-disabled")
+        let content = $("#feed-content").val(), e = this
+        let data = new FormData()
         data.append("uid",uindow._feInstance.currentUser.uid)
         data.append("token",msto.token)
         data.append("text",content)
@@ -877,12 +873,13 @@ mod.reg("benben", "全网犇犇", "@/", {
             data:data,
             onload:function(res){
                 if(res.status !== 200) {
-                    lg_alert("好像哪里有点问题", res.data);
-                } else {
-                    $(e).removeClass("am-disabled");
-                    $("#feed-content").val('');
-                    uindow.switchMode('all-exlg');
-                 }
+                    lg_alert("好像哪里有点问题", res.data)
+                } 
+                else {
+                    $(e).removeClass("am-disabled")
+                    $("#feed-content").val('')
+                    uindow.switchMode('all-exlg')
+                }
             }
         })
     })).remove()
@@ -1174,7 +1171,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 
     $jump_exrand.on("click", exrand_poi)
 },`
-
 .exlg-rand-settings {
     position: relative;
     display: inline-block;
@@ -2133,4 +2129,3 @@ $(() => {
     log("Launching")
     mod.execute()
 })
-
