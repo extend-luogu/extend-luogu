@@ -1824,17 +1824,17 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
                     {
                         uindow.exlg.TM_dat.sto["benben"].token=res.response
                         fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
-                            "headers": {
+                            headers: {
                                 "content-type": "application/json;charset=UTF-8",
                                 "x-csrf-token": document.getElementsByName("csrf-token")[0].content
                             },
-                            "body": `{"slogan":"${slogan}"}`,
-                            "method": "POST",
-                        }).then(res => res.json()).then(res => {
-                            show_alert("提示", `验证成功
+                            body: `{"slogan":"${slogan}"}`,
+                            method: "POST",
+                        }).then(function() {
+                            lg_alert("提示", `验证成功
                             token:${uindow.exlg.TM_dat.sto["benben"].token}
                             请妥善保管`);
-                        });
+                        })
                     }
                 }
             })
