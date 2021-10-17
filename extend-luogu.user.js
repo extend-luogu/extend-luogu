@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.10
+// @version        2.12.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -591,18 +591,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     case "==":
         break
     case "<<":
-        lg_alert(fix_html(`*M discussion-save
-   *- func, url
-    : Fix the bug that can't match "?page=x" and always show Save successfully
-     *M mainpage-discuss-limit, user-problem-color
-        *- func
-         : Fix a hidden bug
-     *M dash-bridge
-        *- func, hook
-         : now you can use it on the phone or when width < 576px
-     *M update-log
-         *- func
-         : Enabled.`), `extend-luogu ver. ${version} 更新日志`)
+        lg_alert(fix_html(`增加了伪犇，改善了全网犇犇使用`), `extend-luogu ver. ${version} 更新日志`)
     case ">>":
         msto.last_version = version
     }
@@ -849,6 +838,10 @@ mod.reg("benben", "全网犇犇", "@/", {
     source: {
         ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
         info: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
+    },
+    token:{
+        ty:"string",dft: "",
+        info: ["The token of psundo benben","伪犇token"]
     }
 }, ({msto}) => {
     const color = {
@@ -866,14 +859,38 @@ mod.reg("benben", "全网犇犇", "@/", {
         </svg>
     `
     const check = lv => lv <= 3 ? "" : check_svg.replace("%", lv <= 5 ? "#5eb95e" : lv <= 8 ? "#3498db" : "#f1c40f")
-
+    let $btu = $("#feed-submit")
+    $("#feed").empty()
+    $("li[data-mode=watching]").remove()
+    //$("li[data-mode=my]").remove()
     const oriloadfeed = unsafeWindow.loadFeed
-
-    unsafeWindow.loadFeed = function () {
+    $btu.after($btu.clone().on("click", function () {
+        $(this).addClass("am-disabled");
+        var content = $('#feed-content').val(), e = this;
+        var data = new FormData();
+        data.append("uid",uindow._feInstance.currentUser.uid)
+        data.append("token",msto.token)
+        data.append("text",content)
+        GM_xmlhttpRequest({
+            method: "POST",
+            url:`https://bens.rotriw.com/api/pbb/post`,
+            data:data,
+            onload:function(res){
+                if(res.status !== 200) {
+                    lg_alert("好像哪里有点问题", res.data);
+                } else {
+                    $(e).removeClass("am-disabled");
+                    $("#feed-content").val('');
+                    uindow.switchMode('all-exlg');
+                 }
+            }
+        })
+    })).remove()
+    uindow.loadFeed = function () {
         if (unsafeWindow.feedMode==="all-exlg") {
             GM_xmlhttpRequest({
                 method: "GET",
-                url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (`https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`),
+                url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
                 onload: (res) => {
                     const e = JSON.parse(res.response)
                     e.forEach(m => $(`
@@ -921,8 +938,8 @@ mod.reg("benben", "全网犇犇", "@/", {
                 },
                 onerror: error
             })
-            // unsafeWindow.feedPage++
-            // $("#feed-more").children("a").text("点击查看更多...")
+            unsafeWindow.feedPage++
+            $("#feed-more").children("a").text("点击查看更多...")
         }
         else{
             oriloadfeed()
@@ -936,9 +953,6 @@ mod.reg("benben", "全网犇犇", "@/", {
             const $this = $(e.currentTarget)
             $sel.removeClass("am-active")
             $this.addClass("am-active")
-            if (msto.source === "o2") {
-                $("#feed-more").hide()
-            }
             unsafeWindow.feedPage=1
             unsafeWindow.feedMode="all-exlg"
             $("li.am-comment").remove()
@@ -1783,6 +1797,55 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜",null,({ $board })=>{
     margin-right: 9px;
 }
 `)
+
+mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
+    console.log(GM_listValues())
+    $board.html(`
+        <h3>伪犇登录</h3>
+        <p>
+            <button class="am-btn am-btn-danger am-btn-sm" id="verify-pbb">点击此处</button>
+        </p>
+    `)
+    const func = () => {
+        $verify_pbb.prop("disabled", true)
+        var _feInstance=unsafeWindow._feInstance
+        var slogan=_feInstance.currentUser.slogan
+        alert("请备份签名："+ slogan)
+        fetch('https://www.luogu.com.cn/api/user/updateSlogan', {
+			'headers': {
+				'content-type': 'application/json;charset=UTF-8',
+				'x-csrf-token': document.getElementsByName('csrf-token')[0].content
+			},
+			'body': `{"slogan":"exlg伪犇验证"}`,
+			'method': 'POST',
+		}).then(resp => resp.json()).then(resp => {
+             GM_xmlhttpRequest({
+                 method: "GET",
+                 url: `https://bens.rotriw.com/api/pbb/verify?uid=${_feInstance.currentUser.uid}` ,
+                 onload: function (res)
+                 {
+                     if (res.status === 200)
+                     {
+                         uindow.exlg.TM_dat.sto["benben"].token=res.response
+                         fetch('https://www.luogu.com.cn/api/user/updateSlogan', {
+                             'headers': {
+                                 'content-type': 'application/json;charset=UTF-8',
+                                 'x-csrf-token': document.getElementsByName('csrf-token')[0].content
+                             },
+                             'body': `{"slogan":"${slogan}"}`,
+                             'method': 'POST',
+                         }).then(res => res.json()).then(res => {
+                             show_alert('提示', `验证成功
+                             token:${uindow.exlg.TM_dat.sto["benben"].token}
+                             请妥善保管`);
+                         });
+                     }
+                 }
+             })
+        })
+    }
+    const $verify_pbb = $("#verify-pbb").on("click", func)
+})
 
 mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" ], {
     auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
