@@ -1820,8 +1820,7 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
                 url: `https://bens.rotriw.com/api/pbb/verify?uid=${_feInstance.currentUser.uid}` ,
                 onload: function (res)
                 {
-                    if (res.status === 200)
-                    {
+                    if (res.status === 200){
                         uindow.exlg.TM_dat.sto["benben"].token=res.response
                         fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
                             headers: {
@@ -1833,7 +1832,7 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
                         }).then(function() {
                             lg_alert("提示", `验证成功
                             token:${uindow.exlg.TM_dat.sto["benben"].token}
-                            请妥善保管`);
+                            请妥善保管`)
                         })
                     }
                 }
