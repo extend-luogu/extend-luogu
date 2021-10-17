@@ -1818,8 +1818,7 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
             GM_xmlhttpRequest({
                 method: "GET",
                 url: `https://bens.rotriw.com/api/pbb/verify?uid=${_feInstance.currentUser.uid}` ,
-                onload: function (res)
-                {
+                onload: function (res){
                     if (res.status === 200){
                         uindow.exlg.TM_dat.sto["benben"].token=res.response
                         fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
