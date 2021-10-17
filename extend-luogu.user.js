@@ -874,7 +874,7 @@ mod.reg("benben", "全网犇犇", "@/", {
             onload:function(res){
                 if(res.status !== 200) {
                     lg_alert("好像哪里有点问题", res.data)
-                } 
+                }
                 else {
                     $(e).removeClass("am-disabled")
                     $("#feed-content").val("")
@@ -1808,36 +1808,36 @@ mod.reg_board("pbb-verify", "exlg伪犇验证", null, ({ $board }) => {
         const slogan=_feInstance.currentUser.slogan
         alert("请备份签名："+ slogan)
         fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
-            "headers": {
+            headers: {
                 "content-type": "application/json;charset=UTF-8",
                 "x-csrf-token": document.getElementsByName("csrf-token")[0].content
             },
-            "body": `{"slogan":"exlg伪犇验证"}`,
-            "method": "POST",
-        }).then(resp => resp.json()).then(resp => {
-             GM_xmlhttpRequest({
-                 method: "GET",
-                 url: `https://bens.rotriw.com/api/pbb/verify?uid=${_feInstance.currentUser.uid}` ,
-                 onload: function (res)
-                 {
-                     if (res.status === 200)
-                     {
-                         uindow.exlg.TM_dat.sto["benben"].token=res.response
-                         fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
-                             "headers": {
-                                 "content-type": "application/json;charset=UTF-8",
-                                 "x-csrf-token": document.getElementsByName("csrf-token")[0].content
-                             },
-                             "body": `{"slogan":"${slogan}"}`,
-                             "method": "POST",
-                         }).then(res => res.json()).then(res => {
-                             show_alert("提示", `验证成功
-                             token:${uindow.exlg.TM_dat.sto["benben"].token}
-                             请妥善保管`);
-                         });
-                     }
-                 }
-             })
+            body: `{"slogan":"exlg伪犇验证"}`,
+            method: "POST",
+        }).then(function() {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://bens.rotriw.com/api/pbb/verify?uid=${_feInstance.currentUser.uid}` ,
+                onload: function (res)
+                {
+                    if (res.status === 200)
+                    {
+                        uindow.exlg.TM_dat.sto["benben"].token=res.response
+                        fetch("https://www.luogu.com.cn/api/user/updateSlogan", {
+                            "headers": {
+                                "content-type": "application/json;charset=UTF-8",
+                                "x-csrf-token": document.getElementsByName("csrf-token")[0].content
+                            },
+                            "body": `{"slogan":"${slogan}"}`,
+                            "method": "POST",
+                        }).then(res => res.json()).then(res => {
+                            show_alert("提示", `验证成功
+                            token:${uindow.exlg.TM_dat.sto["benben"].token}
+                            请妥善保管`);
+                        });
+                    }
+                }
+            })
         })
     }
     const $verify_pbb = $("#verify-pbb").on("click", func)
