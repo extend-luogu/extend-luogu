@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.12.1
+// @version        2.12.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -830,6 +830,23 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
     }
 `)
 
+mod.reg_chore("benben-ban", "犇犇封禁列表", "3m", "@/.*", {
+    benben_ban: { ty: "string", priv: true }
+}, ({ msto }) => {
+    GM_xmlhttpRequest({
+        method: "GET",
+        url: `https://luogulo.gq/api.php?banlist`,
+        onload: (res) => {
+            console.log(res)
+            msto["benben_ban"] = res.responseText
+            console.log(msto, res.responseText)
+        },
+        onerror: (err) => {
+            error(err)
+        }
+    })
+})
+
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
         ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
@@ -838,7 +855,8 @@ mod.reg("benben", "全网犇犇", "@/", {
     token:{
         ty:"string",dft: "",
         info: ["The token of psundo benben","伪犇token"]
-    }
+    },
+    benben_ban: { ty: "string", priv: true }
 }, ({msto}) => {
     const color = {
         Gray: "gray",
@@ -885,12 +903,13 @@ mod.reg("benben", "全网犇犇", "@/", {
     })).remove()
     uindow.loadFeed = function () {
         if (unsafeWindow.feedMode==="all-exlg") {
+            let bban = sto["^benben-ban"].benben_ban.split(",").slice(0, -1).map(i => parseInt(i))
             GM_xmlhttpRequest({
                 method: "GET",
                 url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
                 onload: (res) => {
                     const e = JSON.parse(res.response)
-                    e.forEach(m => $(`
+                    e.filter(m => !bban.includes(m.user.uid)).forEach(m => $(`
                 <li class="am-comment am-comment-primary feed-li" exlg="exlg">
                     <div class="lg-left">
                         <a href="/user/${ m.user.uid }" class="center">
