@@ -918,7 +918,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                                 </span>
                                 ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
                                 <a name="feed-reply">回复</a>
-                                `+(m.user.uid==uindow._feInstance.currentUser.uid?`<a name="feed-delete" bid="${m.pbbid}">删除</a>`:``)+`
+                                `+(m.user.uid===uindow._feInstance.currentUser.uid?`<a name="feed-delete" bid="${m.pbbid}">删除</a>`:``)+`
                             </div>
                         </header>
                         <div class="am-comment-bd">
