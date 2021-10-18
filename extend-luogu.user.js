@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.12.2
+// @version        2.12.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -587,7 +587,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     case "==":
         break
     case "<<":
-        lg_alert(fix_html(`增加了伪犇，改善了全网犇犇使用`), `extend-luogu ver. ${version} 更新日志`)
+        lg_alert(fix_html(`增加了删除犇犇功能`), `extend-luogu ver. ${version} 更新日志`)
     case ">>":
         msto.last_version = version
     }
@@ -918,6 +918,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                                 </span>
                                 ${ new Date(m.time * 1000).format("yyyy-mm-dd HH:MM") }
                                 <a name="feed-reply">回复</a>
+                                `+(m.user.uid==uindow._feInstance.currentUser.uid?`<a name="feed-delete" bid="${m.pbbid}">删除</a>`:``)+`
                             </div>
                         </header>
                         <div class="am-comment-bd">
@@ -939,6 +940,24 @@ mod.reg("benben", "全网犇犇", "@/", {
                             )
                         })
                     )
+                    $("a[name=feed-delete]").click(function(){
+                        let data = new FormData()
+                        data.append("uid",uindow._feInstance.currentUser.uid)
+                        data.append("token",msto.token)
+                        data.append("pbbid",$(this).attr("pbbid"))
+                        GM_xmlhttpRequest({
+                            method:"POST",
+                            url:`https://bens.rotriw.com/api/pbb/delete`,
+                            onload:function(res){
+                                if(res.status !== 200) {
+                                    uindow.show_alert("好像哪里有点问题", res.response)
+                                }
+                                else{
+                                    lg_alert("删除成功")
+                                }
+                            }
+                        })
+                    })
                 },
                 onerror: error
             })
