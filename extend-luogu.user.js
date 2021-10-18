@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.12.0
+// @version        2.12.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -915,7 +915,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                         </header>
                         <div class="am-comment-bd">
                             <span class="feed-comment">
-                                ${ marked(m.content) }
+                                ${ marked(xss.process(m.content)) }
                             </span>
                         </div>
                     </div>
