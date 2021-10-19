@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.12.1
+// @version        2.12.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -909,6 +909,33 @@ mod.reg("benben", "全网犇犇", "@/", {
                 url: `https://bens.rotriw.com/api/list/proxy?page=${unsafeWindow.feedPage}`,
                 onload: (res) => {
                     const e = JSON.parse(res.response)
+
+                    var xxx = 0;
+                    e.forEach(m => {
+                        var atl = m.content.match(/@(\w+)/g);
+                        if (atl == null) return;
+                        var namelist = [];
+                        var promiseArr = [];
+                        // console.log('@ List: ' + atl);
+                        atl.forEach(name => {
+                            name = name.slice(1);
+                            // console.log(name);
+                            $.ajaxSettings.async = false;
+                            $.get("/api/user/search?keyword=" + name, rres => {
+                                if (rres.users[0]) {
+                                    // console.log('FindUser ' + rres.users[0].uid);
+                                    namelist.push([rres.users[0].uid, name])
+                                }
+                            });
+                        });
+                        // console.log('Name List: ' + namelist);
+                        namelist.forEach(user => {
+                            // console.log(user);
+                            m.content = m.content.replace(/@(\w+)/, '@[' + user[1] + '](/user/' + user[0] + ')');
+                        })
+                        xxx++;
+                    });
+
                     e.filter(m => !bban.includes(m.user.uid)).forEach(m => $(`
                 <li class="am-comment am-comment-primary feed-li" exlg="exlg">
                     <div class="lg-left">
@@ -1983,7 +2010,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
 `)
 
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
-    max_discuss : { ty: "number", dft: 12, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
+    max_discuss : { ty: "number", dft: 16, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
 }, ({ msto }) => {
     let $discuss = undefined
     if (location.href.includes("blog")) return // Note: 如果是博客就退出
