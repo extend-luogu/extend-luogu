@@ -944,10 +944,11 @@ mod.reg("benben", "全网犇犇", "@/", {
                         let data = new FormData()
                         data.append("uid",uindow._feInstance.currentUser.uid)
                         data.append("token",msto.token)
-                        data.append("pbbid",$(this).attr("pbbid"))
+                        data.append("bid",$(this).attr("bid"))
                         GM_xmlhttpRequest({
                             method:"POST",
                             url:`https://bens.rotriw.com/api/pbb/delete`,
+                            data:data,
                             onload:function(res){
                                 if(res.status !== 200) {
                                     uindow.show_alert("好像哪里有点问题", res.response)
