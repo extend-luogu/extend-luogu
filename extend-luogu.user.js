@@ -912,7 +912,7 @@ mod.reg("benben", "全网犇犇", "@/", {
 
                     var xxx = 0;
                     e.forEach(m => {
-                        var atl = m.content.match(/@(\w+)/g);
+                        var atl = m.content.match(/@((\w)|[^\x00-\xff])+/g);
                         if (atl == null) return;
                         var namelist = [];
                         var promiseArr = [];
@@ -931,7 +931,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                         // console.log('Name List: ' + namelist);
                         namelist.forEach(user => {
                             // console.log(user);
-                            m.content = m.content.replace(/@(\w+)/, '@[' + user[1] + '](/user/' + user[0] + ')');
+                            m.content = m.content.replace(/@((\w)|[^\x00-\xff])+/, '@[' + user[1] + '](/user/' + user[0] + ')');
                         })
                         xxx++;
                     });
