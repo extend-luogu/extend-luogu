@@ -18,7 +18,7 @@ ver = input("VER ")
 print("Modifying the version in the script")
 
 fn = "extend-luogu.user.js"
-with open(fn, "r") as js:
+with open(fn, "r", encoding="UTF-8") as js:
     text = js.readlines()
 
 for i, ln in enumerate(text):
@@ -26,7 +26,7 @@ for i, ln in enumerate(text):
         text[i] = "// @version" + " " * (ln.count(" ") - 1) + ver + "\n"
         break
 
-with open(fn, "w+") as js:
+with open(fn, "w+", encoding="UTF-8") as js:
     js.writelines(text)
 
 shell("git add " + fn)

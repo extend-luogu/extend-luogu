@@ -18,7 +18,7 @@ Makes [Luogu](https://www.luogu.com.cn/) more powerful.
 
 Welcome!
 
-- Commits should obey our [Commit Rule](https://github.com/ForkFG/FkGitCommitInfoStd).
+- Commits should obey our [Commit Rule](https://github.com/extend-luogu/ExtendLuoguGitCommitMsgStd).
 - This repository uses [eslint](https://eslint.org/), so please make sure your code will be passed under `.eslintrc.js`.
 
 ## Discussion

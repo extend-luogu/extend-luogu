@@ -11,13 +11,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - name: Install fk-git-commit-msg-std
+      - name: Install exlg-git-commit-msg-std
         run: |
           npm config set registry http://registry.npmjs.org/
           yarn config set registry https://registry.yarnpkg.com
-          yarn add fk-git-commit-msg-std
-      - name: Run fk-git-commit-msg-std
+          yarn add exlg-git-commit-msg-std
+      - name: Run exlg-git-commit-msg-std
         env:
           COMMIT_MSG: ${{ toJson(github.event.commits.*.message) }}
         run: |
-          node ./node_modules/fk-git-commit-msg-std/check.js -c "$PWD/.gitmsgrc.js" -e COMMIT_MSG
+          node ./node_modules/exlg-git-commit-msg-std/check.js -c "$PWD/.gitmsgrc.js" -e COMMIT_MSG

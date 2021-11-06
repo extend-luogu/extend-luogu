@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        2.11.10
+// @version        3.0.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -19,7 +19,7 @@
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
-// @require        https://greasyfork.org/scripts/429255-tm-dat/code/TM%20dat.js?version=955951
+// @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@main/TM-dat.user.js
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
@@ -30,6 +30,16 @@
 // @grant          GM_xmlhttpRequest
 // @grant          unsafeWindow
 // ==/UserScript==
+
+// ==Update==
+
+const update_log = `*M user-problem-color
+ : 调整黑题颜色
+*M update-log
+^< eslint
+*@ commit-std`
+
+// ==/Update==
 
 // ==Utilities==
 
@@ -116,10 +126,37 @@ const lg_alert = uindow.show_alert
             </div></div>`).appendTo($(document.body))
             $(document.body).addClass("lg-alert-built")
         }
-        $("#lg-alert-title").html(title)
-        $("#lg-alert-message").html(msg)
+        $("#exlg-alert-title").html(title)
+        $("#exlg-alert-message").html(msg)
         $("#exlg-alert").modal("open")
     }
+
+/*
+// Note: not implemented yet
+const lg_confirm = (deny, accept, title, msg, callback) => {
+    if (! $(document.body).hasClass("lg-confirm-built")) {
+        $(`<div class="am-modal am-modal-confirm am-modal-out" tabindex="-1" id="exlg-confirm" style="display: none; margin-top: -40px;">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd" id="exlg-confirm-title"></div>
+            <div class="am-modal-bd" id="exlg-confirm-message"></div>
+            <div class="am-modal-footer">
+                <span class="am-modal-btn" id="exlg-confirm-deny" data-am-modal-cancel></span>
+                <span class="am-modal-btn" id="exlg-confirm-accept" data-am-modal-confirm></span>
+            </div>
+        </div></div>`).appendTo($(document.body))
+        $(document.body).addClass("lg-confirm-built")
+    }
+    $("#exlg-confirm-title").html(title)
+    $("#exlg-confirm-message").html(msg)
+    $("#exlg-confirm-deny")
+        .html(deny)
+        .on("click", callback(false))
+    $("#exlg-confirm-accept")
+        .html(accept)
+        .on("click", callback(true))
+    $("#exlg-confirm").modal("open") // Hack: exlg is loaded before boostrap so it'll crash
+}
+*/
 
 const springboard = (param, styl) => {
     const q = new URLSearchParams(); for (let k in param) q.set(k, param[k])
@@ -350,6 +387,52 @@ mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null,
     uindow.parent.postMessage([ document.body.innerText ], "*")
 )
 
+mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
+    msg: {
+        ty: "object",
+        priv: true,
+        lvs: {
+            queue: {
+                ty: "array", itm: {
+                    ty: "object", lvs: {
+                        text: { ty: "string" },
+                        id: { ty: "number" }
+                    }
+                }
+            },
+            last_id: { ty: "number", dft: 0 }
+        }
+    },
+    lang: {
+        ty: "enum", dft: "en", vals: [ "en", "zh" ],
+        info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
+    }
+}, () => {
+    const novogui_modules = [
+        {
+            name: "modules",
+            displayName: "Modules",
+            children: mod._.map(m => ({
+                rawName: m.name,
+                name: m.name.replace(/^[@^]/g, ""),
+                description: m.info,
+                settings: Object.entries(mod.data[m.name].lvs)
+                    .filter(([ k, s ]) => k !== "on" && ! s.priv)
+                    .map(([ k, s ]) => ({
+                        name: k,
+                        displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                        description: s.info,
+                        type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
+                        ...(s.ty === "boolean" && { type: "CHECKBOX" }),
+                        ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
+                        ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
+                    }))
+            }))
+        }
+    ]
+    uindow.novogui.init(novogui_modules)
+})
+
 mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     source: {
         ty: "enum", vals: [ "tcs", "debug", "gh_index", "gh_bundle" ], dft: "tcs",
@@ -510,52 +593,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     .exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
 `)
 
-mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
-    msg: {
-        ty: "object",
-        priv: true,
-        lvs: {
-            queue: {
-                ty: "array", itm: {
-                    ty: "object", lvs: {
-                        text: { ty: "string" },
-                        id: { ty: "number" }
-                    }
-                }
-            },
-            last_id: { ty: "number", dft: 0 }
-        }
-    },
-    lang: {
-        ty: "enum", dft: "en", vals: [ "en", "zh" ],
-        info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
-    }
-}, () => {
-    const novogui_modules = [
-        {
-            name: "modules",
-            displayName: "Modules",
-            children: mod._.map(m => ({
-                rawName: m.name,
-                name: m.name.replace(/^[@^]/g, ""),
-                description: m.info,
-                settings: Object.entries(mod.data[m.name].lvs)
-                    .filter(([ k, s ]) => k !== "on" && ! s.priv)
-                    .map(([ k, s ]) => ({
-                        name: k,
-                        displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
-                        description: s.info,
-                        type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
-                        ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                        ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
-                        ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
-                    }))
-            }))
-        }
-    ]
-    uindow.novogui.init(novogui_modules)
-})
-
 mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
     springboard({ type: "update" }).appendTo($("body")).hide()
     uindow.addEventListener("message", e => {
@@ -576,13 +613,13 @@ mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
 
 // TODO
 mod.reg("update-log", "更新日志显示", "@/.*", {
-    last_version: { ty: "string", priv: true }
+    last_version: { ty: "string", priv: true },
 }, ({ msto }) => {
     if (location.href.includes("blog")) return // Note: 如果是博客就退出
     const version = GM_info.script.version
     const fix_html = (str) => {
         let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`
-        str.split('\n').forEach(e => {
+        str.split("\n").forEach(e => {
             res += `<div>${e.replaceAll(" ", "&nbsp;")}</div><br>`
         })
         return res + "</div>"
@@ -591,18 +628,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     case "==":
         break
     case "<<":
-        lg_alert(fix_html(`*M discussion-save
-   *- func, url
-    : Fix the bug that can't match "?page=x" and always show Save successfully
-     *M mainpage-discuss-limit, user-problem-color
-        *- func
-         : Fix a hidden bug
-     *M dash-bridge
-        *- func, hook
-         : now you can use it on the phone or when width < 576px
-     *M update-log
-         *- func
-         : Enabled.`), `extend-luogu ver. ${version} 更新日志`)
+        lg_alert(fix_html(update_log), `extend-luogu ver. ${version} 更新日志`)
     case ">>":
         msto.last_version = version
     }
@@ -786,7 +812,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
         [ 82, 196, 26 ],
         [ 52, 152, 219 ],
         [ 157, 61, 207 ],
-        [ 0, 0, 0 ]
+        [ 14, 29, 105 ]
     ]
     const _color = id => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`
     args.forEach(arg => {
@@ -1796,7 +1822,7 @@ mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" 
             url: `https://luogulo.gq/save.php?url=${window.location.href}`,
             onload: (res) => {
                 if (res.status === 200) {
-                    if (res.response === 'success') {
+                    if (res.response === "success") {
                         log("Discuss saved")
                         $btn.text("保存成功")
                         setTimeout(() => {
