@@ -870,7 +870,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/.*
 
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
-        ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
+        ty: "enum", dft: "shy", vals: [ "o2", "shy" ],
         info: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
     }
 }, ({msto}) => {
@@ -944,8 +944,10 @@ mod.reg("benben", "全网犇犇", "@/", {
                 },
                 onerror: error
             })
-            // unsafeWindow.feedPage++
-            // $("#feed-more").children("a").text("点击查看更多...")
+            if (msto.source === "shy"){
+                unsafeWindow.feedPage++
+                $("#feed-more").children("a").text("点击查看更多...")
+            }
         }
         else{
             oriloadfeed()
