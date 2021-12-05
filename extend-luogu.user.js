@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.0.0
+// @version        3.0.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
