@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.0.1
+// @version        3.1.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -15,6 +15,9 @@
 // @connect        tencentcs.com
 // @connect        luogulo.gq
 // @connect        bens.rotriw.com
+// @connect        codeforces.ml
+// @connect        codeforces.com
+// @connect        codeforc.es
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -33,8 +36,8 @@
 
 // ==Update==
 
-const update_log = `*M benben
- : 更改八级勾勾颜色`
+const update_log = `新增模块：original-difficulty
+可显示 remoteJudge 原始难度`
 
 // ==/Update==
 
@@ -82,6 +85,10 @@ Date.prototype.format = function (f, UTC) {
 
 String.prototype.toInitialCase = function () {
     return this[0].toUpperCase() + this.slice(1)
+}
+
+Array.prototype.lastElem = function () {
+    return this[this.length-1]
 }
 
 // ==Utilities==Functions==
@@ -1881,6 +1888,47 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
             error(err)
         }
     })
+})
+
+mod.reg("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/problem/AT.*"], {
+    cf_src: { ty: "enum", dft: "codeforces.com", vals: [ "codeforces.com", "codeforces.ml", "codeforc.es" ], info: [
+        "Codeforces problem source", "CF 题目源"
+    ] }
+}, ({ msto }) => {
+    let pn = location.pathname.match(/(CF|AT)([0-9]|[A-Z])*$/g)[0].substring(2)
+    let x = document.querySelectorAll("div.field"), y = x[3].cloneNode(true)
+    x[3].after(y)
+    let t = y.querySelectorAll("span")
+    t[0].innerText = "原始难度"
+    t[1].innerText = "获取中"
+    const putdiff = d => {
+        if (d === "?" || d === "special")
+            d = "不可用"
+        t[1].innerText = d
+    }
+    if (location.pathname.includes("CF")) {
+        let pid = pn.match(/^[0-9]*/g)[0], ops = pn.substring(pid.length)
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: `https://${msto.cf_src}/problemset/problem/${pid}/${ops}`,
+            onload: res => putdiff(res.responseText.match(/\*([0-9]+|special)/g).lastElem().substring(1)),
+            onerror: err => error(err)
+        })
+    }
+    else {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: document.querySelectorAll("div.info-rows>div")[1].querySelector("a").href,
+            onerror: err => {
+                let pid = err.error.match(RegExp("(?<=tasks/)(\-|[a-zA-Z_0-9])+"))[0]
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: `https://service-p42sy9ls-1309069592.gz.apigw.tencentcs.com/release/atdiff/${pid}`,
+                    onload: res => putdiff(res.responseText)
+                })
+            }
+        })
+    }
 })
 
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
