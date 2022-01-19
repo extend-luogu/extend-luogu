@@ -1191,6 +1191,7 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
         //{ type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
         //{ type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
         //{ type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+     //临时把表情转到 啧.tk
     ]
 
     const emo_url = name => `//啧.tk/${name}`
@@ -2611,6 +2612,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
         //{ type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
         //{ type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
         //{ type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+     //临时把表情转到 啧.tk
     ]
     const $txt = $("#feed-content"), emo_url = name => `//啧.tk/${name}`, txt = $txt[0]
     $("#feed-content").before("<div id='emo-lst'></div>")
