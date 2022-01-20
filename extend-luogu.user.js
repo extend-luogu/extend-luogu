@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.2.0
+// @version        3.2.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -34,20 +34,9 @@
 
 // ==Update==
 
-const update_log = `xM original-difficulty
- : 效果太差，以后再补
--- exlg-alert
- : 自行研发了一个，不用看amazeui的脸色了
-*M benben-emoticon, emoticon
- : 美化了一些些
-*M discussion-save, rand-problem-ex, benben
- : 优化小细节。
--M submission-color
- : 它复活啦，哈哈哈哈
--M back-to-contest
- : 舒服多了，话说这次工作量真的大
-^M user-problem-color
- : 现在终于没有在不做题的人那里报错的bug了
+const update_log = `^M 修复表情无法显示。
+ : 将表情连接至 啧.tk，可显示 qq 表情。
+ ! 无法使用 sto orz 等大图。
 `
 
 // ==/Update==
@@ -437,11 +426,11 @@ const mod = {
             </svg>
             `
             let $board = $("#exlg-board")
-            if (! $board.length) 
+            if (! $board.length)
                 $board = $(`
                     <div class="lg-article" id="exlg-board" exlg="exlg"><h2>${icon_b} &nbsp;&nbsp;${GM_info.script.version}</h2></div>
                 `)
-                    .prependTo(".lg-right.am-u-md-4"), 
+                    .prependTo(".lg-right.am-u-md-4"),
                 $board[0].firstChild.style["font-size"]="1em"
             func({ ...arg, $board: $(`<div></div>`).appendTo($board) })
         }, styl
@@ -647,7 +636,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 monbrd = false
                 if (! mondsh) $spn.hide()
             })
-  
         $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;"><svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 0 136.14 30.56">
         <g transform="translate(1.755, 0)" fill="#00a0d8">
             <g>
@@ -732,8 +720,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 $(`<button id="exlg-badge-btn" style="background-color: #ccc;border-color: #666;" class="exlg-windiv-btn" disabled="disabled">提交</button>`).appendTo($span)
             }
         })
-        
-
     }
 }, (e) => {
     const $tmp = $(e.target).find(".user-nav, .nav-container")
@@ -878,7 +864,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         display: inline-block;
     }
     .exlg-windiv-btn {
-        
         font-size: 0.9em;
         /*padding: 0.313em 1em;*/
         display: inline-block;
@@ -894,7 +879,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         border-radius: 5px;
         border: 1px solid;
         margin: 5px 5px;
-        
     }
 `)
 
@@ -936,12 +920,11 @@ mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
      </div>
      <div class="exlg-dialog-body">
          <div id="exlg-dialog-content">
- 
          </div>
      </div>
     </div>
    </div>`).appendTo($(document.body))
-    const wait_time = {"0s": 0, ".2s": 100, ".25s": 250, ".4s": 400 }[msto.animation_speed] 
+    const wait_time = {"0s": 0, ".2s": 100, ".25s": 250, ".4s": 400 }[msto.animation_speed]
     const wrapper = $wrapper[0], container = wrapper.firstElementChild,
         header = container.firstElementChild.firstElementChild.firstElementChild, content = container.lastElementChild.firstElementChild,
         close_btn = container.firstElementChild.lastElementChild
@@ -1143,57 +1126,58 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
     height_limit: { ty: "boolean", dft: true }
 }, ({ msto }) => {
     const emo = [
-        { type: "emo", name: [ "kk" ], slug: "0" },
-        { type: "emo", name: [ "jk" ], slug: "1" },
-        { type: "emo", name: [ "se" ], slug: "2" },
-        { type: "emo", name: [ "qq" ], slug: "3" },
-        { type: "emo", name: [ "xyx" ], slug: "4" },
-        { type: "emo", name: [ "xia" ], slug: "5" },
-        { type: "emo", name: [ "cy" ], slug: "6" },
-        { type: "emo", name: [ "ll" ], slug: "7" },
-        { type: "emo", name: [ "xk" ], slug: "8" },
-        { type: "emo", name: [ "qiao" ], slug: "9" },
-        { type: "emo", name: [ "qiang" ], slug: "a" },
-        { type: "emo", name: [ "ruo" ], slug: "b" },
-        { type: "emo", name: [ "mg" ], slug: "c" },
-        { type: "emo", name: [ "dx" ], slug: "d" },
-        { type: "emo", name: [ "youl" ], slug: "e" },
-        { type: "emo", name: [ "baojin" ], slug: "f" },
-        { type: "emo", name: [ "shq" ], slug: "g" },
-        { type: "emo", name: [ "lb" ], slug: "h" },
-        { type: "emo", name: [ "lh" ], slug: "i" },
-        { type: "emo", name: [ "qd" ], slug: "j" },
-        { type: "emo", name: [ "fad" ], slug: "k" },
-        { type: "emo", name: [ "dao" ], slug: "l" },
-        { type: "emo", name: [ "cd" ], slug: "m" },
-        { type: "emo", name: [ "kun" ], slug: "n" },
-        { type: "emo", name: [ "px" ], slug: "o" },
-        { type: "emo", name: [ "ts" ], slug: "p" },
-        { type: "emo", name: [ "kl" ], slug: "q" },
-        { type: "emo", name: [ "yiw" ], slug: "r" },
-        { type: "emo", name: [ "dk" ], slug: "s" },
-        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
-        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
-        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
-        { type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
-        { type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
-        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
-        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
-        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
-        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
-        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
-        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
-        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
-        { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
-        { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
-        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
-        { type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
-        { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
-        { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
-        { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+        { type: "emo", name: [ "kk" ], slug: "kk" },
+        { type: "emo", name: [ "jk" ], slug: "jk" },
+        { type: "emo", name: [ "se" ], slug: "se" },
+        { type: "emo", name: [ "qq" ], slug: "qq" },
+        { type: "emo", name: [ "xyx" ], slug: "xyx" },
+        { type: "emo", name: [ "xia" ], slug: "xia" },
+        { type: "emo", name: [ "cy" ], slug: "cy" },
+        { type: "emo", name: [ "ll" ], slug: "ll" },
+        { type: "emo", name: [ "xk" ], slug: "xk" },
+        { type: "emo", name: [ "qiao" ], slug: "qiao" },
+        { type: "emo", name: [ "qiang" ], slug: "qiang" },
+        { type: "emo", name: [ "ruo" ], slug: "ruo" },
+        { type: "emo", name: [ "mg" ], slug: "mg" },
+        { type: "emo", name: [ "dx" ], slug: "dx" },
+        { type: "emo", name: [ "youl" ], slug: "youl" },
+        { type: "emo", name: [ "baojin" ], slug: "baojin" },
+        { type: "emo", name: [ "shq" ], slug: "shq" },
+        { type: "emo", name: [ "lb" ], slug: "lb" },
+        { type: "emo", name: [ "lh" ], slug: "lh" },
+        { type: "emo", name: [ "qd" ], slug: "qd" },
+        { type: "emo", name: [ "fad" ], slug: "fad" },
+        { type: "emo", name: [ "dao" ], slug: "dao" },
+        { type: "emo", name: [ "cd" ], slug: "cd" },
+        { type: "emo", name: [ "kun" ], slug: "kun" },
+        { type: "emo", name: [ "px" ], slug: "px" },
+        { type: "emo", name: [ "ts" ], slug: "ts" },
+        { type: "emo", name: [ "kl" ], slug: "kl" },
+        { type: "emo", name: [ "yiw" ], slug: "yiw" },
+        { type: "emo", name: [ "dk" ], slug: "dk" },
+        //{ type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
+        //{ type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
+        //{ type: "txt", name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
+        //{ type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
+        //{ type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
+        //{ type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
+        //{ type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
+        //{ type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
+        //{ type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
+        //{ type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
+        //{ type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
+        //{ type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
+        //{ type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
+        //{ type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
+        //{ type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
+        //{ type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
+        //{ type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
+        //{ type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
+        //{ type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+     //临时把表情转到 啧.tk
     ]
 
-    const emo_url = name => `//图.tk/${name}`
+    const emo_url = name => `//啧.tk/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
 
@@ -1357,7 +1341,6 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
                 }
             })
         }
-        
         $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     }
@@ -2563,56 +2546,57 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
     show: { ty: "boolean", dft: true }
 }, () => {
     const emo = [
-        { type: "emo", name: [ "kk" ], slug: "0" },
-        { type: "emo", name: [ "jk" ], slug: "1" },
-        { type: "emo", name: [ "se" ], slug: "2" },
-        { type: "emo", name: [ "qq" ], slug: "3" },
-        { type: "emo", name: [ "xyx" ], slug: "4" },
-        { type: "emo", name: [ "xia" ], slug: "5" },
-        { type: "emo", name: [ "cy" ], slug: "6" },
-        { type: "emo", name: [ "ll" ], slug: "7" },
-        { type: "emo", name: [ "xk" ], slug: "8" },
-        { type: "emo", name: [ "qiao" ], slug: "9" },
-        { type: "emo", name: [ "qiang" ], slug: "a" },
-        { type: "emo", name: [ "ruo" ], slug: "b" },
-        { type: "emo", name: [ "mg" ], slug: "c" },
-        { type: "emo", name: [ "dx" ], slug: "d" },
-        { type: "emo", name: [ "youl" ], slug: "e" },
-        { type: "emo", name: [ "baojin" ], slug: "f" },
-        { type: "emo", name: [ "shq" ], slug: "g" },
-        { type: "emo", name: [ "lb" ], slug: "h" },
-        { type: "emo", name: [ "lh" ], slug: "i" },
-        { type: "emo", name: [ "qd" ], slug: "j" },
-        { type: "emo", name: [ "fad" ], slug: "k" },
-        { type: "emo", name: [ "dao" ], slug: "l" },
-        { type: "emo", name: [ "cd" ], slug: "m" },
-        { type: "emo", name: [ "kun" ], slug: "n" },
-        { type: "emo", name: [ "px" ], slug: "o" },
-        { type: "emo", name: [ "ts" ], slug: "p" },
-        { type: "emo", name: [ "kl" ], slug: "q" },
-        { type: "emo", name: [ "yiw" ], slug: "r" },
-        { type: "emo", name: [ "dk" ], slug: "s" },
-        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
-        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
-        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
-        { type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
-        { type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
-        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
-        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
-        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
-        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
-        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
-        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
-        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
-        { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
-        { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
-        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
-        { type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
-        { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
-        { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
-        { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+        { type: "emo", name: [ "kk" ], slug: "kk" },
+        { type: "emo", name: [ "jk" ], slug: "jk" },
+        { type: "emo", name: [ "se" ], slug: "se" },
+        { type: "emo", name: [ "qq" ], slug: "qq" },
+        { type: "emo", name: [ "xyx" ], slug: "xyx" },
+        { type: "emo", name: [ "xia" ], slug: "xia" },
+        { type: "emo", name: [ "cy" ], slug: "cy" },
+        { type: "emo", name: [ "ll" ], slug: "ll" },
+        { type: "emo", name: [ "xk" ], slug: "xk" },
+        { type: "emo", name: [ "qiao" ], slug: "qiao" },
+        { type: "emo", name: [ "qiang" ], slug: "qiang" },
+        { type: "emo", name: [ "ruo" ], slug: "ruo" },
+        { type: "emo", name: [ "mg" ], slug: "mg" },
+        { type: "emo", name: [ "dx" ], slug: "dx" },
+        { type: "emo", name: [ "youl" ], slug: "youl" },
+        { type: "emo", name: [ "baojin" ], slug: "baojin" },
+        { type: "emo", name: [ "shq" ], slug: "shq" },
+        { type: "emo", name: [ "lb" ], slug: "lb" },
+        { type: "emo", name: [ "lh" ], slug: "lh" },
+        { type: "emo", name: [ "qd" ], slug: "qd" },
+        { type: "emo", name: [ "fad" ], slug: "fad" },
+        { type: "emo", name: [ "dao" ], slug: "dao" },
+        { type: "emo", name: [ "cd" ], slug: "cd" },
+        { type: "emo", name: [ "kun" ], slug: "kun" },
+        { type: "emo", name: [ "px" ], slug: "px" },
+        { type: "emo", name: [ "ts" ], slug: "ts" },
+        { type: "emo", name: [ "kl" ], slug: "kl" },
+        { type: "emo", name: [ "yiw" ], slug: "yiw" },
+        { type: "emo", name: [ "dk" ], slug: "dk" },
+        //{ type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
+        //{ type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
+        //{ type: "txt", name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
+        //{ type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
+        //{ type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
+        //{ type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
+        //{ type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
+        //{ type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
+        //{ type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
+        //{ type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
+        //{ type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
+        //{ type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
+        //{ type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
+        //{ type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
+        //{ type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
+        //{ type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
+        //{ type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
+        //{ type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
+        //{ type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
+     //临时把表情转到 啧.tk
     ]
-    const $txt = $("#feed-content"), emo_url = name => `//图.tk/${name}`, txt = $txt[0]
+    const $txt = $("#feed-content"), emo_url = name => `//啧.tk/${name}`, txt = $txt[0]
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
         const $emo = $((m.type === "emo")?
@@ -2707,7 +2691,6 @@ $(() => {
         }
     }
     init_sto(1)
-
     log("Launching")
     mod.execute()
 })
