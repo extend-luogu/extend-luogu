@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.2.0
+// @version        3.2.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -34,20 +34,8 @@
 
 // ==Update==
 
-const update_log = `xM original-difficulty
- : 效果太差，以后再补
--- exlg-alert
- : 自行研发了一个，不用看amazeui的脸色了
-*M benben-emoticon, emoticon
- : 美化了一些些
-*M discussion-save, rand-problem-ex, benben
- : 优化小细节。
--M submission-color
- : 它复活啦，哈哈哈哈
--M back-to-contest
- : 舒服多了，话说这次工作量真的大
-^M user-problem-color
- : 现在终于没有在不做题的人那里报错的bug了
+const update_log = `*M benben
+ : 修复了翻页功能
 `
 
 // ==/Update==
@@ -1516,8 +1504,10 @@ mod.reg("benben", "全网犇犇", "@/", {
                 },
                 onerror: error
             })
-            // uindow.feedPage++
-            // $("#feed-more").children("a").text("点击查看更多...")
+            if (msto.source === "shy"){
+                uindow.feedPage++
+                $("#feed-more").children("a").text("点击查看更多...")
+            }
         }
         else{
             oriloadfeed()
