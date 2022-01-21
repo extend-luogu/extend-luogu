@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.1.2
+// @version        4.2.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -37,7 +37,12 @@
 // ==Update==
 
 const update_log = `
-Refix crash when any module throws
+-M virtual-participation
+ : 创建重现赛，仿真测试
+ ! 自己能看到自己创建比赛里的题目
+*M user-problem-color
+ : 加快了比较
+*- 如果洛谷前端加载失败，exlg 将会中止加载
 `.trim()
 
 // ==/Update==
@@ -94,7 +99,7 @@ Array.prototype.lastElem = function () {
 
 // ==Utilities==Functions==
 
-let sto = null
+let sto = null, lg_dat, lg_usr
 
 const version_cmp = (v1, v2) => {
     if (! v1) return "<<"
@@ -144,6 +149,17 @@ const lg_alert = uindow.show_alert
     ? (msg, title = "exlg 提醒您") => uindow.show_alert(title, msg)
     : (msg, title = "exlg 提醒您") => uindow.alert(title + "\n" + msg)
 
+let csrf_token = null
+const lg_post = (url, data) => $.ajax({
+    url: url,
+    data: data,
+    headers: {
+        "x-csrf-token": (csrf_token === null)?
+            (csrf_token = $("meta[name=csrf-token]").attr("content")) : csrf_token,
+        "content-type":"application/json"
+    },
+    method: "post",
+})
 /*
 // Note: not implemented yet
 const lg_confirm = (deny, accept, title, msg, callback) => {
@@ -262,8 +278,8 @@ const register_badge = async () => {
 </div>
     `, title_text, (func_quit) => {
         const $board = $("#exlg-container"), $input =$board.find("input"), $title = $board.find("#exlg-dialog-title")
-        if (uindow._feInjection && uindow._feInjection.currentUser && uindow._feInjection.currentUser.uid && ! $input[0].value)
-            $input[0].value = uindow._feInjection.currentUser.uid
+        if (uindow._feInjection && lg_usr && lg_usr.uid && ! $input[0].value)
+            $input[0].value = lg_usr.uid
         if (! ($input[0].value && $input[1].value && $input[2].value)) {
             $title.html("[Err] 请检查信息是否填写完整")
             setTimeout(() => $title.html(title_text), 1500)
@@ -1014,8 +1030,8 @@ mod.reg("exlg-dialog-board", "exlg_公告板", "@/.*", {
         container.classList.add("container-hide")
         container.classList.remove("container-show")
         setTimeout(() => wrapper.style.display="none", wait_time)
-        header.innerHTML = "&nbsp;"
-        content.innerHTML = ""
+        // header.innerHTML = "&nbsp;"
+        // content.innerHTML = ""
     }
     uindow.exlg_dialog_board.accept_dialog = function () {
         uindow.exlg_dialog_board._ac_func(uindow.exlg_dialog_board.hide_dialog)
@@ -1374,7 +1390,7 @@ mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, null, () => {
     }
 `)
 
-let last_ptr = -1, last_board = "submittedProblems", cosflag = -1
+let last_ptr = -1, last_board = "submittedProblems", cosflag = -1, ta = null, my = null
 mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0-9]{0,}.*", {
     problem_compare: { ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC题目比较"] }
 }, ({ msto, args }) => {
@@ -1389,56 +1405,58 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         [ 14, 29, 105 ]
     ]
     const func = async ($prb, _flag) => {
-        const content = await lg_content(`/user/${ uindow._feInjection.currentUser.uid }`)
-        const my = content.currentData.passedProblems
-        const ta = uindow._feInjection.currentData.passedProblems
+        if (ta === null) {
+            const content = await lg_content(`/user/${ lg_usr.uid }`)
+            ta = lg_dat.passedProblems, my = new Set()
+            content.currentData.passedProblems.forEach((t, _) => my.add(t.pid))
+        }
         let same = 0
         if (_flag) {
             const $ps = $prb[1]
             $ps.find("a").each((d, p, $p = $(p)) => {
-                if (my.some(m => m.pid === ta[d].pid)) {
+                if (d < ta.length && my.has(ta[d].pid)) { // Note: d 在某些情况下会达到 ta.length
                     same ++
                     $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
                 }
             })
         }
 
-        $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
+        $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.size } : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     }
     const _color = id => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`
     if (typeof(args) === "object" && args.message === "Add Compare for 0-0 new user.") {
-        if ((! msto.problem_compare) || uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
+        if ((! msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return
         func([114514, 1919810], false)
         return
     }
     args.forEach(arg => {
         if (arg.target.href === "javascript:void 0") return
         // console.log("arg: ",arg.target, arg)
-        // if (! uindow._feInjection.currentData[arg.board_id][arg.position])
-        arg.target.style.color = _color([uindow._feInjection.currentData[arg.board_id][arg.position].difficulty])
-        if (arg.board_id === "passedProblems" && arg.position === uindow._feInjection.currentData["passedProblems"].length - 1 || (uindow._feInjection.currentData["passedProblems"].length === 0 && arg.board_id === "submittedProblems" && arg.position === uindow._feInjection.currentData["submittedProblems"].length - 1)) { // Note: 染色染到最后一个
+        // if (! lg_dat[arg.board_id][arg.position])
+        arg.target.style.color = _color([lg_dat[arg.board_id][arg.position].difficulty])
+        if (arg.board_id === "passedProblems" && arg.position === lg_dat["passedProblems"].length - 1 || (lg_dat["passedProblems"].length === 0 && arg.board_id === "submittedProblems" && arg.position === lg_dat["submittedProblems"].length - 1)) { // Note: 染色染到最后一个
             $(".exlg-counter").remove()
             const gf = arg.target.parentNode.parentNode.parentNode.parentNode
             const $prb = [$(gf.firstChild.childNodes[2]), $(gf.lastChild.childNodes[2])]
 
             for (let i = 0; i < 2; ++ i) {
                 const $ps = $prb[i]
-                const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
+                const my = lg_dat[ [ "submittedProblems", "passedProblems" ][i] ]
                 $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`))
             }
 
-            if ((! msto.problem_compare) || uindow._feInjection.currentData.user.uid === uindow._feInjection.currentUser.uid) return
+            if ((! msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return
             func($prb, true)
         }
     })
 }, (e) => {
     if (! /.*\/user\/.*#practice/.test(location.href)) return { result: false, args: { message: "Not at practice page." } }
-    if ((! uindow._feInjection.currentData.submittedProblems.length) && !uindow._feInjection.currentData.passedProblems.length) {
+    if ((! lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
         // console.log(e.target)
         if (e.target.className === "card padding-default") {
             if ($(e.target).children(".problems").length) {
-                const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][cosflag] ]
+                const my = lg_dat[ [ "submittedProblems", "passedProblems" ][cosflag] ]
                 $(e.target.firstChild).after(`<span id="exlg-problem-count-${cosflag}" class="exlg-counter" exlg="exlg" style="margin-left: 5px">${ my.length }</span>`)
                 if (++ cosflag > 1) return { result: true, args: { message: "Add Compare for 0-0 new user." } }
             }
@@ -1455,7 +1473,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
     // }
     if (e.target.tagName.toLowerCase() !== "a" || e.target.className !== "color-default" || e.target.href.indexOf("/problem/") === -1)
         return { result: false, args: { message: "It's not a problem element" } }
-    const tar = e.target, _pid = tar.href.slice(33), ucd = uindow._feInjection.currentData,
+    const tar = e.target, _pid = tar.href.slice(33), ucd = lg_dat,
         _onchange = [(ucd.submittedProblems[0]?ucd.submittedProblems[0].pid:"exlg.cc!!"), (ucd.passedProblems[0]?ucd.passedProblems[0].pid:"QAQ")].includes(_pid)
     return {
         result: true,
@@ -1467,13 +1485,13 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         }]
     }
 }, () => {
-    // console.log(uindow._feInjection.currentData.submittedProblems.length, uindow._feInjection.currentData.passedProblems.length)
-    if ((! uindow._feInjection.currentData.submittedProblems.length) && !uindow._feInjection.currentData.passedProblems.length) {
+    // console.log(lg_dat.submittedProblems.length, lg_dat.passedProblems.length)
+    if ((! lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
         $(".exlg-counter").remove()
         const $prb = $(".card.padding-default > .problems")
         for (let i = 0; i < 2; ++ i) {
             const $ps = $($prb[i])
-            const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][i] ]
+            const my = lg_dat[ [ "submittedProblems", "passedProblems" ][i] ]
             $ps.before(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`)
         }
         return { message: "Add Compare for 0-0 new user." }
@@ -1956,7 +1974,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
         .text("随机跳题")
         .addClass("exlg-rand-training-problem-btn")
         .on("click", () => {
-            const tInfo = uindow._feInjection.currentData.training
+            const tInfo = lg_dat.training
             let candProbList = []
 
             tInfo.problems.some(pb => {
@@ -2044,34 +2062,28 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     })
 })
 
-mod.reg("hide-solution", "隐藏题解", "@/problem/solution/.*", {
+mod.reg_pre("hide-solution", "隐藏题解", "@/problem/solution/.*", {
     hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
-}, ({ msto }) => (msto.hidesolu) ? (GM_addStyle(".item-row { display: none; }")) : "memset0珂爱")
+}, async ({ msto }) => (msto.hidesolu) ? (GM_addStyle(".item-row { display: none; }")) : "memset0珂爱", null)
 
 mod.reg_hook_new("back-to-contest", "返回比赛题单", [
-    "@/problem/AT[1-9][0-9]{0,}\\?contestId=[1-9][0-9]{0,}",
-    "@/problem/CF[1-9][0-9]{0,}[A-Z]{1,1}[0-9]{0,1}\\?contestId=[1-9][0-9]{0,}",
-    "@/problem/SP[1-9][0-9]{0,}\\?contestId=[1-9][0-9]{0,}",
-    "@/problem/P[1-9][0-9]{3,}\\?contestId=[1-9][0-9]{0,}",
-    "@/problem/UVA[1-9][0-9]{2,}\\?contestId=[1-9][0-9]{0,}",
-    "@/problem/U[1-9][0-9]{0,}\\?contestId=[1-9][0-9]{0,}",
-    "@/problem/T[1-9][0-9]{0,}\\?contestId=[1-9][0-9]{0,}",
+    "@/problem/[A-Z0-9]+\\?contestId=[1-9][0-9]{0,}",
 ], null, ({ args }) => {
     const $info_rows = args.$info_rows, $pre = $(`<a class="exlg-back-to-contest"></a>`),
         cid = args.cid, pid = args.pid
     if ((! pid) || (! cid)) return
-    console.log(cid, pid, $info_rows)
-    // console.log("114514", $(".info-rows"), $pre[0].childNodes[1])
     $pre.attr("href", `/contest/${ cid }#problems`)
-    $pre.html(`<svg data-v-450d4937="" data-v-303bbf52="" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="door-open" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-door-open fa-w-20"><path data-v-450d4937="" data-v-303bbf52="" fill="currentColor" d="M624 448h-80V113.45C544 86.19 522.47 64 496 64H384v64h96v384h144c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zM312.24 1.01l-192 49.74C105.99 54.44 96 67.7 96 82.92V448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h336V33.18c0-21.58-19.56-37.41-39.76-32.17zM264 288c-13.25 0-24-14.33-24-32s10.75-32 24-32 24 14.33 24 32-10.75 32-24 32z" class=""></path></svg>返回列表`)
-    $pre.appendTo($info_rows)
+        .html(`<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="door-open" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-door-open fa-w-20">
+            <path data-v-450d4937="" data-v-303bbf52="" fill="currentColor" d="M624 448h-80V113.45C544 86.19 522.47 64 496 64H384v64h96v384h144c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zM312.24 1.01l-192 49.74C105.99 54.44 96 67.7 96 82.92V448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h336V33.18c0-21.58-19.56-37.41-39.76-32.17zM264 288c-13.25 0-24-14.33-24-32s10.75-32 24-32 24 14.33 24 32-10.75 32-24 32z"></path>
+            </svg>返回列表`)
+        .appendTo($info_rows)
 }, (e) => {
-    const tar = e.target, cid = uindow._feInjection.currentData.contest.id,
-        pid = uindow._feInjection.currentData.problem.pid
+    const tar = e.target, cid = lg_dat.contest.id,
+        pid = lg_dat.problem.pid
     // console.log(e.target, tar.tagName, tar.href ? tar.href.slice(tar.href.indexOf("/record/list")): "", tar.style)
     // if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) console.log(tar, tar.parentNode)
     return { args: { cid, pid, $info_rows: $(tar.parentNode) } ,result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
-}, () => { return { cid: uindow._feInjection.currentData.contest.id, pid: uindow._feInjection.currentData.problem.pid, $info_rows: $(".info-rows").parent() } }, `
+}, () => { return { cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() } }, `
 .exlg-back-to-contest {
     text-decoration: none;
     float: right;
@@ -2082,10 +2094,89 @@ mod.reg_hook_new("back-to-contest", "返回比赛题单", [
 }
 `)
 
-// let submission_color_tmp = {
-//   complete: true,
-//   difficulty_list: []
-// }
+mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
+    vp_id: { ty: "string", dft: "0", priv: true }
+}, ({ msto }) => {
+    if (lg_dat.contest.id === msto.vp_id) {
+        warn("You cannot vp the virtual contest.")
+        return
+    }
+    if (lg_dat.contest.endTime > new Date().getTime()) {
+        warn("Contest has not started or ended.")
+        return
+    }
+    $("<button />").appendTo($("div.operation"))
+        .text("重现比赛")
+        .attr("id", "exlg-vp")
+        .attr("class", "lfe-form-sz-middle")
+        .click(async () => {
+            uindow.exlg_alert(`<div>
+                <p>设置「${lg_dat.contest.name}」的重现赛
+                <p>开始时间：<input type="date" id="vpTmDt"/> <input type="time" id="vpTmClk"/></p>
+            </div><br>`, "创建重现赛", async () => {
+                let pa = $("#vpTmDt")[0].value.split("-"), pb = $("#vpTmClk")[0].value.split(":")
+                let st = new Date(pa[0], pa[1] - 1, pa[2], pb[0], pb[1], 0, 0), pids = "", scrs = "" // Note: Date 要减一个月
+                st = st.getTime() / 1000
+
+                $.each(lg_dat.contestProblems, (id, vl) => {
+                    if (id)
+                        pids += ",", scrs += ","
+                    pids += "\"" + vl.problem.pid + "\"",
+                    scrs += `"${vl.problem.pid}": ${vl.problem.fullScore}`
+                })
+
+                let newc = (msto.vp_id === "0")
+                msto.vp_id = (await lg_post(`/fe/api/contest/${newc ? "new" : ("edit/" + msto.vp_id)}`,
+                    `{
+                        "settings":{
+                            "name": "Virtual Participation for ${lg_dat.contest.name}",
+                            "description":"",
+                            "visibilityType":5,
+                            "invitationCodeType":1,
+                            "ruleType":${lg_dat.contest.ruleType},
+                            "startTime":${st},
+                            "endTime":${st+lg_dat.contest.endTime - lg_dat.contest.startTime},
+                            "rated":false,
+                            "ratingGroup":null,
+                            "__CLASS_NAME":"Luogu\DataClass\Contest\ContestSetting"
+                        },
+                        "hostID":${lg_usr.uid}
+                    }`
+                )).id.toString()
+                await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
+                    `{
+                        "pids":[${pids}],
+                        "scores":{${scrs}}
+                    }`
+                )
+
+                // Note: 自己创建的比赛自己不会自动加入
+                if (newc) {
+                    let pc = await lg_content(`/contest/edit/${msto.vp_id}`)
+                    lg_post(`/fe/api/contest/join/${msto.vp_id}`, `{"code": "${pc.currentData.contest.joinCode}"}`)
+                }
+                location.href = `https://www.luogu.com.cn/contest/${msto.vp_id}`
+            })
+        })
+}, `
+#exlg-vp {
+    margin-right: .5em;
+    display: inline-block;
+    flex: none;
+    outline: 0;
+    cursor: pointer;
+    color: #fff;
+    font-weight: inherit;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    background: 0 0;
+    border-radius: 3px;
+    border: 1px solid;
+    border-color: #52c41a;
+    background-color: #52c41a;
+}
+`)
 
 mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, async ({ args }) => {
     if (args && args.type === "show") {
@@ -2223,7 +2314,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 c: "/contest/list",
                 r: "/record/list",
                 d: "/discuss/lists",
-                i: "/user/" + uindow._feInjection.currentUser.uid,
+                i: "/user/" + lg_usr.uid,
                 m: "/chat",
                 n: "/user/notification",
             }[name]
@@ -2577,7 +2668,7 @@ mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/p
             }
             else
                 dif = JSON.parse(msto.atdiff)
-            let pid = uindow._feInjection.currentData.problem.description.match(RegExp("^.{22}[-./A-Za-z0-9_]*"))[0].match(RegExp("[^/]*$"))
+            let pid = lg_dat.problem.description.match(RegExp("^.{22}[-./A-Za-z0-9_]*"))[0].match(RegExp("[^/]*$"))
             if (!(pid in dif))
                 resolve("?")
             else
@@ -2764,6 +2855,12 @@ mod.reg("user-css", "自定义样式表", ".*", {
 }, ({ msto }) => GM_addStyle(msto.css)
 )
 
+if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
+    if (uindow._feInjection.code !== 200)
+        error("Luogu failed to load. Exlg stops loading.")
+    lg_dat = uindow._feInjection.currentData
+    lg_usr = uindow._feInjection.currentUser
+}
 log("Exposing")
 
 Object.assign(uindow, {
