@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        3.2.0
+// @version        4.0.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
 // @match          https://www.bilibili.com/robots.txt?*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
-// @match          https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting
-// @match          https://extend-luogu.github.io/exlg-setting/*
+// @match          https://extend-luogu.github.io/exlg-setting-new/*
 // @match          http://localhost:1634/*
+// @match          https://dash.exlg.cc/*
 //
 // @connect        tencentcs.com
 // @connect        luogulo.gq
@@ -34,20 +34,10 @@
 
 // ==Update==
 
-const update_log = `xM original-difficulty
- : 效果太差，以后再补
--- exlg-alert
- : 自行研发了一个，不用看amazeui的脸色了
-*M benben-emoticon, emoticon
- : 美化了一些些
-*M discussion-save, rand-problem-ex, benben
- : 优化小细节。
--M submission-color
- : 它复活啦，哈哈哈哈
--M back-to-contest
- : 舒服多了，话说这次工作量真的大
-^M user-problem-color
- : 现在终于没有在不做题的人那里报错的bug了
+const update_log = `!- dashboard
+ : 全新的 UI
+*< comment
+^< eslint
 `
 
 // ==/Update==
@@ -237,11 +227,11 @@ const register_badge = async () => {
                     console.log(e === f.message, f.errorcode === -1, f)
                     if (e === f.message || f.errorcode === -1) {
                         fres = f.errorcode
-                        $('#exlg-dialog-title').html(f.errorcode ? `[Error] ${f.ontitle}` : f.ontitle)
+                        $("#exlg-dialog-title").html(f.errorcode ? `[Error] ${f.ontitle}` : f.ontitle)
                         log(f.errorcode ? `Illegal Operation in registering badge: ${f.onlog}(#${f.errorcode})` : f.onlog)
                         if(fres === -1 || ! fres) {
                             func_quit()
-                            setTimeout(() => exlg_dialog_board.show_exlg_alert("badge 注册成功!", "exlg 提醒您"), 400)
+                            setTimeout(() => uindow.exlg_alert("badge 注册成功!", "exlg 提醒您"), 400)
                             return
                         }
                     }
@@ -249,8 +239,8 @@ const register_badge = async () => {
             }
         })
     }
-    const title_text = "exlg badge 注册器 ver.5.0" //Note: 说起来这已经是第五代了
-    exlg_dialog_board.show_exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
+    const title_text = "exlg badge 注册器 ver.5.0"
+    uindow.exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
         <div style="display:inline-block;text-align: left;padding-top: 10px;">
             <div style="margin: 5px;"><span style="height: 1.5em;float: left;padding: .1em;width: 5em;">用户uid</span><input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" name="username"></div>
@@ -262,9 +252,9 @@ const register_badge = async () => {
     </div>
 </div>
     `, title_text, (func_quit) => {
-        const $board = $("#exlg-container"), $input =$board.find("input"), $title = $board.find('#exlg-dialog-title')
-        if (_feInjection && _feInjection.currentUser && _feInjection.currentUser.uid && ! $input[0].value)
-            $input[0].value = _feInjection.currentUser.uid
+        const $board = $("#exlg-container"), $input =$board.find("input"), $title = $board.find("#exlg-dialog-title")
+        if (uindow._feInjection && uindow._feInjection.currentUser && uindow._feInjection.currentUser.uid && ! $input[0].value)
+            $input[0].value = uindow._feInjection.currentUser.uid
         if (! ($input[0].value && $input[1].value && $input[2].value)) {
             $title.html("[Err] 请检查信息是否填写完整")
             setTimeout(() => $title.html(title_text), 1500)
@@ -290,7 +280,6 @@ const register_badge = async () => {
     const $title = $("#exlg-alert-title, #lg-alert-title").on("click", () => $title.html(title_text)).addClass("exlg-unselectable")
     const $dimmer = $(".am-dimmer")
     console.log($board, $cancel, $submit, $dimmer, $title, $btn)
-
     const clear_foot = () => setTimeout(() => {
         console.log("tried to clear foot!")
         $cancel.remove()
@@ -329,17 +318,18 @@ const mod = {
 
     path_alias: [
         [ "",        ".*\\.luogu\\.(com\\.cn|org)" ],
-        [ "bili",    "www.bilibili.com" ],
+        [ "dash",    "dash.exlg.cc"],
         [ "cdn",     "cdn.luogu.com.cn" ],
+        [ "bili",    "www.bilibili.com" ],
         [ "tcs1",    "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ],
         [ "tcs2",    "service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com" ],
         [ "tcs3",    "service-otgstbe5-1305163805.sh.apigw.tencentcs.com" ],
         [ "debug",   "localhost:1634" ],
-        [ "ghpage",  "extend-luogu.github.io" ],
+        [ "ghpage",  "extend-luogu.github.io" ]
     ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
 
     path_dash_board: [
-        "@tcs3/release/exlg-setting", "@debug/exlg-setting/((index|bundle).html)?", "@ghpage/exlg-setting/((index|bundle)(.html)?)?"
+        "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting/((index|bundle).html)?"
     ],
 
     reg: (name, info, path, data, func, styl) => {
@@ -437,11 +427,11 @@ const mod = {
             </svg>
             `
             let $board = $("#exlg-board")
-            if (! $board.length) 
+            if (! $board.length)
                 $board = $(`
                     <div class="lg-article" id="exlg-board" exlg="exlg"><h2>${icon_b} &nbsp;&nbsp;${GM_info.script.version}</h2></div>
                 `)
-                    .prependTo(".lg-right.am-u-md-4"), 
+                    .prependTo(".lg-right.am-u-md-4"),
                 $board[0].firstChild.style["font-size"]="1em"
             func({ ...arg, $board: $(`<div></div>`).appendTo($board) })
         }, styl
@@ -497,7 +487,6 @@ const mod = {
 mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.txt?.*" ], null, () => {
     const q = new URLSearchParams(location.search)
     switch (q.get("type")) {
-    // Note: ->
     case "update":
         document.write(`<iframe src="https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen" exlg="exlg"></iframe>`)
         uindow.addEventListener("message", e => {
@@ -510,7 +499,6 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
         if (! q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`))
             document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`
         break
-    // Note: <-
     case "dash":
         break
     }
@@ -547,41 +535,69 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         }
     },
     lang: {
-        ty: "enum", dft: "en", vals: [ "en", "zh" ],
+        ty: "enum", dft: "zh", vals: [ "zh", "en" ],
         info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
     }
 }, () => {
-    const novogui_modules = [
+    const modules = [
         {
-            name: "modules",
-            displayName: "Modules",
-            children: mod._.map(m => ({
-                rawName: m.name,
-                name: m.name.replace(/^[@^]/g, ""),
-                description: m.info,
-                settings: Object.entries(mod.data[m.name].lvs)
-                    .filter(([ k, s ]) => k !== "on" && ! s.priv)
-                    .map(([ k, s ]) => ({
-                        name: k,
-                        displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
-                        description: s.info,
-                        type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
-                        ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                        ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
-                        ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
-                    }))
-            }))
-        }
+            name: "Modules",
+            description: "功能",
+            icon: "tunes",
+            children: mod._
+                .filter(m => ! m.name.startsWith("@"))
+                .map(m => ({
+                    rawName: m.name,
+                    name: m.name.replace(/^[@^]/g, ""),
+                    description: m.info,
+                    settings: Object.entries(mod.data[m.name].lvs)
+                        .filter(([ k, s ]) => k !== "on" && ! s.priv)
+                        .map(([ k, s ]) => ({
+                            name: k,
+                            displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                            description: s.info,
+                            type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
+                            ...(s.ty === "boolean" && { type: "CHECKBOX" }),
+                            ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: s.step }),
+                            ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
+                        }))
+                }))
+        },
+        {
+            name: "Core",
+            description: "核心",
+            icon: "bug_report",
+            children: mod._
+                .filter(m => m.name.startsWith("@"))
+                .map(m => ({
+                    rawName: m.name,
+                    name: m.name.replace(/^[@^]/g, ""),
+                    description: m.info,
+                    settings: Object.entries(mod.data[m.name].lvs)
+                        .filter(([ k, s ]) => k !== "on" && ! s.priv)
+                        .map(([ k, s ]) => ({
+                            name: k,
+                            displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                            description: s.info,
+                            type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
+                            ...(s.ty === "boolean" && { type: "CHECKBOX" }),
+                            ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
+                            ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
+                        }))
+                }))
+        },
     ]
-    uindow.novogui.init(novogui_modules)
+    console.log(modules)
+    uindow.guiStart(modules)
 })
 
 mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     source: {
-        ty: "enum", vals: [ "tcs", "debug", "gh_index", "gh_bundle" ], dft: "tcs",
+        ty: "enum", vals: [ "exlg", "gh_index", "debug"], dft: "exlg",
         info: [ "The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页" ]
     },
     enable_rclick: {
+        priv: true,
         ty: "boolean", dft: true,
         info:[ "Use Right Click to change source", "右键点击按钮换源" ]
     },
@@ -589,23 +605,24 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         ty: "string", dft: "0.0.0"
     }
 }, ({ msto, args }) => {
+    if ([ "exlg", "gh_index", "debug"].indexOf(msto.source) === -1) msto.source = "exlg"
+
     const create_window = ! args.parent().hasClass("mobile-nav-container")
     // console.log(create_window)
     const $spn = $(`<span id="exlg-dash-window" class="exlg-window" style="display: none;width: 300px;"></span>`).css("left", "-125px")
     const $btn = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
         .prependTo(args)
         .css("backgroundColor", {
-            tcs: "cornflowerblue",
-            debug: "steelblue",
+            exlg: "cornflowerblue",
             gh_index: "darkblue",
-            gh_bundle: "darkslateblue"
+            debug: "steelblue"
+            // gh_bundle: "darkslateblue"
         }[msto.source])
         .css("margin-top", args.hasClass("nav-container") ? "5px" : "0px")
     const _jump_settings = () => uindow.exlg.dash = uindow.open({
-        tcs: "https://service-otgstbe5-1305163805.sh.apigw.tencentcs.com/release/exlg-setting",
+        exlg: "https://dash.exlg.cc/index.html",
+        gh_index: "https://extend-luogu.github.io/exlg-setting-new/index.html",
         debug: "localhost:1634/dashboard",
-        gh_index: "https://extend-luogu.github.io/exlg-setting/index.html",
-        gh_bundle: "https://extend-luogu.github.io/exlg-setting/bundle.html",
     }[msto.source])
     if (msto.enable_rclick)
         $btn.bind("contextmenu", () => false)
@@ -614,16 +631,14 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     _jump_settings()
                 else if (e.button === 2) {
                     msto.source = {
-                        tcs: "debug",
-                        debug: "gh_index",
-                        gh_index: "gh_bundle",
-                        gh_bundle: "tcs",
+                        exlg: "gh_index",
+                        gh_index: "debug",
+                        debug: "exlg",
                     }[msto.source]
                     $btn.css("backgroundColor", {
-                        tcs: "cornflowerblue",
-                        debug: "steelblue",
+                        exlg: "cornflowerblue",
                         gh_index: "darkblue",
-                        gh_bundle: "darkslateblue"
+                        debug: "steelblue"
                     }[msto.source])
                 }
             })
@@ -647,7 +662,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 monbrd = false
                 if (! mondsh) $spn.hide()
             })
-  
+
         $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;"><svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 0 136.14 30.56">
         <g transform="translate(1.755, 0)" fill="#00a0d8">
             <g>
@@ -681,10 +696,10 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             ] },
             { tag: "lhyakioi", title: "badge", buttons: [ ] }
         ]
-        _list.forEach((e, _i) => {
+        _list.forEach((e) => {
             const $div = $(`<div id="${ e.tag }-div"><span class="exlg-windiv-left-tag">${ e.title }</span></div>`).appendTo($bdiv),
                 $span = $("<span></span>").appendTo($div)
-            e.buttons.forEach((btn, _i) => {
+            e.buttons.forEach((btn) => {
                 $(`<span class="exlg-windiv-btnspan"></span>`).append($(`<button class="exlg-windiv-btn" style="background-color: ${ btn.col };border-color: ${ btn.col };">${ btn.html }</button>`).on("click", btn.onclick)).appendTo($span)
             })
             if (e.title === "vers") {
@@ -721,23 +736,22 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     })
                 }
                 $check_btn.on("click", _check).appendTo($span)
-                //Note: TODO: 最后放一个按钮查找，加个最新版本忽略机制，每次忽略之后对于小于等于那个版本的都不管
-                //Note: 如果不是最新版本，那么加2个按钮(弹窗通知，忽略，最后一个是查找)
-                //Note: 版本老了红色，版本对了绿色，版本新了蓝色（指测试版
-                //Note: 新版显示提示。
-                //Hack: 已经做完。
+                // Note: TODO: 最后放一个按钮查找，加个最新版本忽略机制，每次忽略之后对于小于等于那个版本的都不管
+                // Note: 如果不是最新版本，那么加2个按钮(弹窗通知，忽略，最后一个是查找)
+                // Note: 版本老了红色，版本对了绿色，版本新了蓝色（指测试版
+                // Note: 新版显示提示。
             }
             if (e.title === "badge") {
                 $(`<input type="text" disabled="disabled" style="width: 60%;" />`).appendTo($span)
                 $(`<button id="exlg-badge-btn" style="background-color: #ccc;border-color: #666;" class="exlg-windiv-btn" disabled="disabled">提交</button>`).appendTo($span)
             }
         })
-        
+
 
     }
 }, (e) => {
     const $tmp = $(e.target).find(".user-nav, .nav-container")
-    if ($tmp.length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName 不知道为什么
+    if ($tmp.length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
 }, () => $("nav.user-nav, div.user-nav > nav, .nav-container"), `
     /* dash */
@@ -789,14 +803,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         background-color: rgb(231, 76, 60);
         font-style: normal;
     }
-
     .exlg-unselectable {
         -webkit-user-select: none;
         -moz-user-select: none;
         -o-user-select: none;
         user-select: none;
     }
-
     :root {
         --exlg-azure:           #7bb8eb;
         --exlg-aqua:            #03a2e8;
@@ -834,7 +846,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         --argon-green-button:   #2dce89;
         --argon-cyan:           #03acca;
         --argon-yellow:         #ff9d09;
-
         --lg-red-problem:       #fe4c61;
         --lg-orange-problem:    #f39c11;
         --lg-yellow-problem:    #ffc116;
@@ -844,7 +855,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         --lg-black-problem:     #0e1d69;
         --lg-gray-problem:      #bfbfbf;
     }
-
     .exlg-difficulty-color { font-weight: bold; }
     .exlg-difficulty-color.color-0 { color: rgb(191, 191, 191)!important; }
     .exlg-difficulty-color.color-1 { color: rgb(254, 76, 97)!important; }
@@ -854,7 +864,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     .exlg-difficulty-color.color-5 { color: rgb(52, 152, 219)!important; }
     .exlg-difficulty-color.color-6 { color: rgb(157, 61, 207)!important; }
     .exlg-difficulty-color.color-7 { color: rgb(14, 29, 105)!important; }
-
     .exlg-window {
         position: absolute;
         top: 35px;
@@ -869,7 +878,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         border-radius: 7px;
         box-shadow: rgb(187 227 255) 0px 0px 7px;
     }
-
     .exlg-windiv-left-tag {
         border-right: 1px solid #eee;
         height: 2em;
@@ -878,7 +886,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         display: inline-block;
     }
     .exlg-windiv-btn {
-        
+
         font-size: 0.9em;
         /*padding: 0.313em 1em;*/
         display: inline-block;
@@ -894,7 +902,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         border-radius: 5px;
         border: 1px solid;
         margin: 5px 5px;
-        
+
     }
 `)
 
@@ -918,7 +926,7 @@ mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
 })
 
 // TODO
-mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
+mod.reg("exlg-dialog-board", "exlg_公告板", "@/.*", {
     animation_speed: {
         ty: "enum", dft: ".4s", vals: [ "0s", ".2s", ".25s", ".4s" ],
         info: [ "Speed of Board Animation", "启动消失动画速度" ]
@@ -936,12 +944,12 @@ mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
      </div>
      <div class="exlg-dialog-body">
          <div id="exlg-dialog-content">
- 
+
          </div>
      </div>
     </div>
    </div>`).appendTo($(document.body))
-    const wait_time = {"0s": 0, ".2s": 100, ".25s": 250, ".4s": 400 }[msto.animation_speed] 
+    const wait_time = {"0s": 0, ".2s": 100, ".25s": 250, ".4s": 400 }[msto.animation_speed]
     const wrapper = $wrapper[0], container = wrapper.firstElementChild,
         header = container.firstElementChild.firstElementChild.firstElementChild, content = container.lastElementChild.firstElementChild,
         close_btn = container.firstElementChild.lastElementChild
@@ -969,8 +977,8 @@ mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
         container.classList.add("container-hide")
         container.classList.remove("container-show")
         setTimeout(() => wrapper.style.display="none", wait_time)
-        header.innerHTML = '&nbsp;'
-        content.innerHTML = ''
+        header.innerHTML = "&nbsp;"
+        content.innerHTML = ""
     }
     uindow.exlg_dialog_board.accept_dialog = function () {
         uindow.exlg_dialog_board._ac_func(uindow.exlg_dialog_board.hide_dialog)
@@ -979,7 +987,7 @@ mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
     container.onclick = (e) => e.stopPropagation()
     close_btn.onclick = btn_cancel.onclick = () => uindow.exlg_dialog_board.hide_dialog()
     btn_accept.onclick =  () => uindow.exlg_dialog_board.accept_dialog()
-    uindow.exlg_dialog_board.show_exlg_alert = function (text = "", title = "exlg 提醒您", onaccepted = (q) => {}, autoquit = true) {
+    uindow.exlg_dialog_board.show_exlg_alert = function (text = "", title = "exlg 提醒您", onaccepted = () => {}, autoquit = true) {
         uindow.exlg_dialog_board.autoquit = autoquit
         uindow.exlg_dialog_board._ac_func = onaccepted
         header.innerHTML = title
@@ -988,10 +996,10 @@ mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
     }
     let _mouse_down_on_wrapper = false
     container.onmousedown = (e) => e.stopPropagation()
-    wrapper.onmousedown = (e) => {
+    wrapper.onmousedown = () => {
         _mouse_down_on_wrapper = true
     }
-    wrapper.onmouseup = (e) => {
+    wrapper.onmouseup = () => {
         if (_mouse_down_on_wrapper) uindow.exlg_dialog_board.hide_dialog()
         _mouse_down_on_wrapper = false
     }
@@ -1125,7 +1133,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     case "==":
         break
     case "<<":
-        exlg_alert(fix_html(update_log), `extend-luogu ver. ${version} 更新日志`)
+        uindow.exlg_alert(fix_html(update_log), `extend-luogu ver. ${version} 更新日志`)
     case ">>":
         msto.last_version = version
     }
@@ -1139,8 +1147,8 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
 `)
 
 mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
-    show: { ty: "boolean", dft: true },
-    height_limit: { ty: "boolean", dft: true }
+    show: { ty: "boolean", dft: true, info: ["Show", "是否显示"] },
+    height_limit: { ty: "boolean", dft: true, info: ["Height limit", "高度上限"] }
 }, ({ msto }) => {
     const emo = [
         { type: "emo", name: [ "kk" ], slug: "0" },
@@ -1357,7 +1365,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
                 }
             })
         }
-        
+
         $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ ta.length } <> ${ my.length } : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     }
@@ -1368,7 +1376,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         return
     }
     args.forEach(arg => {
-        if (arg.target.href === "javascript:void 0") return  // Hack: 这行绝对不能删！！！不知道为什么钩子那里会放 Js void0 过 check 删了就等着当场原地爆炸吧
+        if (arg.target.href === "javascript:void 0") return
         // console.log("arg: ",arg.target, arg)
         // if (! uindow._feInjection.currentData[arg.board_id][arg.position])
         arg.target.style.color = _color([uindow._feInjection.currentData[arg.board_id][arg.position].difficulty])
@@ -1391,7 +1399,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
     if (! /.*\/user\/.*#practice/.test(location.href)) return { result: false, args: { message: "Not at practice page." } }
     if ((! uindow._feInjection.currentData.submittedProblems.length) && !uindow._feInjection.currentData.passedProblems.length) {
         // console.log(e.target)
-        if (e.target.className === 'card padding-default') {
+        if (e.target.className === "card padding-default") {
             if ($(e.target).children(".problems").length) {
                 const my = uindow._feInjection.currentData[ [ "submittedProblems", "passedProblems" ][cosflag] ]
                 $(e.target.firstChild).after(`<span id="exlg-problem-count-${cosflag}" class="exlg-counter" exlg="exlg" style="margin-left: 5px">${ my.length }</span>`)
@@ -1542,7 +1550,7 @@ mod.reg("benben", "全网犇犇", "@/", {
         })
 })
 
-mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
+mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     exrand_difficulty: {
         ty: "tuple",
         lvs: [
@@ -1755,7 +1763,6 @@ mod.reg("rand-problem-ex", "随机跳题ex", "@/", {
 
     $jump_exrand.on("click", exrand_poi)
 },`
-
 .exlg-rand-settings {
     position: relative;
     display: inline-block;
@@ -1904,7 +1911,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
     ] }
 }, ({ msto, args }) => {
     let ptypes = msto.mode.startsWith("unac") + msto.mode.endsWith("only") * (-1) + 2
-    if (! args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE，鬼知道什么 bug
+    if (! args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE
     $(args[0].firstChild).clone(true)
         .appendTo(args)
         .text("随机跳题")
@@ -1923,14 +1930,14 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
             })
 
             if (!tInfo.problemCount)
-                return exlg_alert("题单不能为空")
+                return uindow.exlg_alert("题单不能为空")
             else if (!candProbList.length) {
                 if (ptypes === 1)
-                    return exlg_alert("您已经做完所有新题啦！")
+                    return uindow.exlg_alert("您已经做完所有新题啦！")
                 else if (ptypes === 2)
-                    return exlg_alert("您已经订完所有错题啦！")
+                    return uindow.exlg_alert("您已经订完所有错题啦！")
                 else
-                    return exlg_alert("您已经切完所有题啦！")
+                    return uindow.exlg_alert("您已经切完所有题啦！")
             }
 
             const pid = ~~ (Math.random() * 1.e6) % candProbList.length
@@ -1946,7 +1953,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
 }
 `)
 
-mod.reg("tasklist-ex", "任务计划ex", "@/", {
+mod.reg("tasklist-ex", "任务计划_ex", "@/", {
     auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
     rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"]}
 }, ({ msto }) => {
@@ -2021,7 +2028,7 @@ mod.reg_hook_new("back-to-contest", "返回比赛题单", [
     $pre.appendTo($info_rows)
 }, (e) => {
     const tar = e.target, cid = uindow._feInjection.currentData.contest.id,
-    pid = uindow._feInjection.currentData.problem.pid
+        pid = uindow._feInjection.currentData.problem.pid
     // console.log(e.target, tar.tagName, tar.href ? tar.href.slice(tar.href.indexOf("/record/list")): "", tar.style)
     // if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) console.log(tar, tar.parentNode)
     return { args: { cid, pid, $info_rows: $(tar.parentNode) } ,result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
@@ -2062,7 +2069,7 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
     const tar = e.target
     // console.log(e.target, tar.tagName)
     if (!tar || (! tar.tagName)) return { args: "<!--->", result: false }
-    if (tar.tagName.toLowerCase() === 'a' && (tar.href || "").includes("/problem/")/* && judge_problem(tar.href.slice(tar.href.indexOf("/problem/") + 9))*/ && ` ${ tar.parentNode.parentNode.className } `.includes(" problem ")) { //Note: 如果是标签的话，查看它的父亲是否为最后一个。如果是，更新数据。对于其他的不管。
+    if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/problem/")/* && judge_problem(tar.href.slice(tar.href.indexOf("/problem/") + 9))*/ && ` ${ tar.parentNode.parentNode.className } `.includes(" problem ")) { // Note: 如果是标签的话，查看它的父亲是否为最后一个。如果是，更新数据。对于其他的不管。
         if (! tar.parentNode.parentNode.parentNode.nextSibling) return { args: { type: "modified - update", target: tar.parentNode.parentNode.parentNode.parentNode }, result: true }
         else return { args: { type: "modified - not the last one.", target: null }, result: false }
     }
@@ -2500,7 +2507,6 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
     const add_badge = ($e) => {
         if (! $e || $e.hasClass("exlg-badge-username")) return
-        // Note: 又 tm 重构啊啊啊啊啊啊啊啊啊啊啊 wdnmd
         if (! /\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
         $e.addClass("exlg-badge-username") // Note: 删掉这行会出刷犇犇的bug，一开始我以为每个元素被添加一次所以问题不大 但是事实证明我是傻逼
         const user_uid = $e.attr("href").slice("/user/".length), tag = tag_list[user_uid]
@@ -2512,7 +2518,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         let $tar = $e
         if ($tar.next().length && $tar.next().hasClass("sb_amazeui")) $tar = $tar.next()
         if ($tar.next().length && $tar.next().hasClass("am-badge")) $tar = $tar.next()
-        $tar.after($badge) // Note: 短多了，舒服
+        $tar.after($badge)
     }
     args.each((_, e) => add_badge($(e)))
 }, (e) => {
@@ -2520,7 +2526,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
     return {
         result: $tmp.length,
         args: $tmp
-    } // Note: 我他妈不知道怎么回事我淦但就是要这么写 就 n m 离 谱
+    }
 }, () => $("a[target='_blank'][href]"),`
 .exlg-badge {
     border-radius: 50px;
@@ -2545,7 +2551,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
 `)
 
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
-    max_discuss : { ty: "number", dft: 12, min: 4, max: 16, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
+    max_discuss : { ty: "number", dft: 12, min: 4, max: 16, step: 1, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
 }, ({ msto }) => {
     let $discuss = undefined
     if (location.href.includes("blog")) return // Note: 如果是博客就退出
@@ -2696,12 +2702,12 @@ $(() => {
         }
         catch(err) {
             if (chance) {
-                exlg_alert("存储代理加载失败，清存重试中……")
+                uindow.exlg_alert("存储代理加载失败，清存重试中……")
                 clear_dat()
                 init_sto(chance - 1)
             }
             else {
-                exlg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
+                uindow.exlg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
                 throw err
             }
         }
