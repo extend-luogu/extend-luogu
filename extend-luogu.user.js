@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.0.0
+// @version        4.1.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -15,6 +15,7 @@
 // @connect        tencentcs.com
 // @connect        luogulo.gq
 // @connect        bens.rotriw.com
+// @connect        codeforces.com
 // @connect        codeforces.ml
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
@@ -34,11 +35,12 @@
 
 // ==Update==
 
-const update_log = `!- dashboard
- : 全新的 UI
-*< comment
-^< eslint
-`
+const update_log = `-- reg_pre
+ : 可以设置预先调用内容，加速加载。
+*M original-difficulty
+ : 将难度爬取设为预先调用内容。
+ : 移除 codeforc.es 源。
+ : 简化了 AtCoder 题目名称获取过程。`
 
 // ==/Update==
 
@@ -86,6 +88,10 @@ Date.prototype.format = function (f, UTC) {
 
 String.prototype.toInitialCase = function () {
     return this[0].toUpperCase() + this.slice(1)
+}
+
+Array.prototype.lastElem = function () {
+    return this[this.length-1]
 }
 
 // ==Utilities==Functions==
@@ -356,6 +362,11 @@ const mod = {
         })
     },
 
+    reg_pre : (name, info, path, data, pre, func, styl) => {
+        mod.reg(name, info, path, data, func, styl)
+        mod._.lastElem().pre = pre
+    },
+
     reg_main: (name, info, path, data, func, styl) =>
         mod.reg("@" + name, info, path, data, arg => (func(arg), false), styl),
 
@@ -462,11 +473,30 @@ const mod = {
     disable: name => { mod.find(name).on = false },
     enable: name => { mod.find(name).on = true },
 
+    preload: name => {
+        const exe = (m, named) => {
+            if (! m) error(`Preloading named mod but not found: "${name}"`)
+            log(`Preloading ${ named ? "named " : "" }mod: "${m.name}"`)
+            m.pred = m.pre({ msto: sto[m.name], named })
+        }
+
+        const pn = location.href
+        for (const m of mod._) {
+            if (sto[m.name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
+                m.willrun = true
+                if ("pre" in m)
+                    exe(m)
+            }
+        }
+    },
+
     execute: name => {
         const exe = (m, named) => {
             if (! m) error(`Executing named mod but not found: "${name}"`)
             if (m.styl) GM_addStyle(m.styl)
             log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
+            if ("pred" in m)
+                return m.func({ msto: sto[m.name], named, pred: m.pred })
             return m.func({ msto: sto[m.name], named })
         }
         if (name) {
@@ -474,10 +504,9 @@ const mod = {
             return exe(m, true)
         }
 
-        const pn = location.href
         for (const m of mod._) {
             m.on = sto[m.name].on
-            if (m.on && m.path.some(re => new RegExp(re, "g").test(pn))) {
+            if (m.willrun) {
                 if (exe(m) === false) break
             }
         }
@@ -2500,6 +2529,47 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     })
 })
 
+mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/problem/AT.*"], {
+    cf_src: { ty: "enum", dft: "codeforces.com", vals: [ "codeforces.com", "codeforces.ml" ], info: [
+        "Codeforces problem source", "CF 题目源"
+    ] }
+}, async ({ msto }) => {
+    return new Promise((resolve, reject) => {
+        let pn = location.pathname.match(/(CF|AT)([0-9]|[A-Z])*$/g)[0].substring(2)
+        if (location.pathname.includes("CF")) {
+            let pid = pn.match(/^[0-9]*/g)[0], ops = pn.substring(pid.length)
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://${msto.cf_src}/problemset/problem/${pid}/${ops}`,
+                onload: res => resolve(res.responseText.match(/\*([0-9]+|special)/g).lastElem().substring(1)),
+                onerror: err => {
+                    error(err)
+                    reject(err)
+                }
+            })
+        }
+        else {
+            let pid = uindow._feInjection.currentData.problem.description.match(RegExp("^.{22}[-./A-Za-z0-9_]*"))[0].match(RegExp("[^/]*$"))
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: `https://service-p42sy9ls-1309069592.gz.apigw.tencentcs.com/release/atdiff/${pid}`,
+                onload: res => resolve(res.responseText)
+            })
+        }
+    })
+},({ pred }) => {
+    let x = document.querySelectorAll("div.field"), y = x[3].cloneNode(true)
+    x[3].after(y)
+    let t = y.querySelectorAll("span")
+    t[0].innerText = "原始难度"
+    t[1].innerText = "获取中"
+    pred.then(d => {
+        if (d === "?" || d === "special")
+            d = "不可用"
+        t[1].innerText = d
+    })
+})
+
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
     tag_list: { ty: "string", priv: true }
 }, ({ args }) => {
@@ -2667,53 +2737,55 @@ mod.reg("user-css", "自定义样式表", ".*", {
 }, ({ msto }) => GM_addStyle(msto.css)
 )
 
-$(() => {
-    log("Exposing")
+log("Exposing")
 
-    Object.assign(uindow, {
-        exlg: {
-            mod,
-            log, error,
-            springboard, version_cmp,
-            lg_alert, lg_content, register_badge,
-            TM_dat: {
-                reload_dat: () => {
-                    raw_dat = null
-                    return load_dat(mod.data, {
-                        map: s => {
-                            s.root = ! s.rec
-                            s.itmRoot = s.rec === 2
-                        }
-                    })
-                },
-                type_dat, proxy_dat, load_dat, save_dat, clear_dat, raw_dat
-            }
-        },
-        GM: {
-            GM_info, GM_addStyle, GM_setClipboard, GM_xmlhttpRequest,
-            GM_getValue, GM_setValue, GM_deleteValue, GM_listValues
-        },
-        $$: $, xss, marked
-    })
-
-    const init_sto = chance => {
-        try {
-            sto = uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat()
+Object.assign(uindow, {
+    exlg: {
+        mod,
+        log, error,
+        springboard, version_cmp,
+        lg_alert, lg_content, register_badge,
+        TM_dat: {
+            reload_dat: () => {
+                raw_dat = null
+                return load_dat(mod.data, {
+                    map: s => {
+                        s.root = ! s.rec
+                        s.itmRoot = s.rec === 2
+                    }
+                })
+            },
+            type_dat, proxy_dat, load_dat, save_dat, clear_dat, raw_dat
         }
-        catch(err) {
-            if (chance) {
-                uindow.exlg_alert("存储代理加载失败，清存重试中……")
-                clear_dat()
-                init_sto(chance - 1)
-            }
-            else {
-                uindow.exlg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
-                throw err
-            }
+    },
+    GM: {
+        GM_info, GM_addStyle, GM_setClipboard, GM_xmlhttpRequest,
+        GM_getValue, GM_setValue, GM_deleteValue, GM_listValues
+    },
+    $$: $, xss, marked
+})
+
+const init_sto = chance => {
+    try {
+        sto = uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat()
+    }
+    catch(err) {
+        if (chance) {
+            lg_alert("存储代理加载失败，清存重试中……")
+            clear_dat()
+            init_sto(chance - 1)
+        }
+        else {
+            lg_alert("失败次数过多，自闭中。这里建议联系开发人员呢。")
+            throw err
         }
     }
-    init_sto(1)
+}
+init_sto(1)
 
+mod.preload()
+
+$(() => {
     log("Launching")
     mod.execute()
 })
