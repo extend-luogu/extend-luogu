@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.1.0
+// @version        4.1.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -17,6 +17,7 @@
 // @connect        bens.rotriw.com
 // @connect        codeforces.com
 // @connect        codeforces.ml
+// @connect        kenkoooo.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
@@ -35,12 +36,9 @@
 
 // ==Update==
 
-const update_log = `-- reg_pre
- : 可以设置预先调用内容，加速加载。
-*M original-difficulty
- : 将难度爬取设为预先调用内容。
- : 移除 codeforc.es 源。
- : 简化了 AtCoder 题目名称获取过程。`
+const update_log = `*M original-difficulty
+ : 将 AtCoder 的难度缓存加速访问
+ : 每 10 天重新加载一次`
 
 // ==/Update==
 
@@ -110,6 +108,11 @@ const version_cmp = (v1, v2) => {
     const [ m1, m2 ] = [ n1, n2 ].map(n => n.split("."))
     for (const [ k2, m ] of m1.entries())
         if (m !== m2[k2]) return op(+ m || 0, + m2[k2] || 0)
+}
+
+const cur_time = (ratio = 1) => {
+    let d = new Date()
+    return ~~(d.getTime() / ratio)
 }
 
 const lg_content = url => new Promise((res, rej) =>
@@ -2532,7 +2535,9 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/problem/AT.*"], {
     cf_src: { ty: "enum", dft: "codeforces.com", vals: [ "codeforces.com", "codeforces.ml" ], info: [
         "Codeforces problem source", "CF 题目源"
-    ] }
+    ] },
+    atdiff: { ty: "string", priv: true },
+    atd_lst_upd: { ty: "number", dft: -1, priv: true }
 }, async ({ msto }) => {
     return new Promise((resolve, reject) => {
         let pn = location.pathname.match(/(CF|AT)([0-9]|[A-Z])*$/g)[0].substring(2)
@@ -2549,12 +2554,27 @@ mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/p
             })
         }
         else {
+            let dif = {}
+            if (cur_time(1000) - msto.atd_lst_upd > 864000) {
+                GM_xmlhttpRequest({
+                    method: "GET",
+                    url: "https://kenkoooo.com/atcoder/resources/problem-models.json",
+                    onload: res => {
+                        let rdif = JSON.parse(res.responseText)
+                        for (let ky in rdif)
+                            dif[ky] = rdif[ky].difficulty
+                        msto.atdiff = JSON.stringify(dif)
+                        msto.atd_lst_upd = cur_time(1000)
+                    }
+                })
+            }
+            else
+                dif = JSON.parse(msto.atdiff)
             let pid = uindow._feInjection.currentData.problem.description.match(RegExp("^.{22}[-./A-Za-z0-9_]*"))[0].match(RegExp("[^/]*$"))
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: `https://service-p42sy9ls-1309069592.gz.apigw.tencentcs.com/release/atdiff/${pid}`,
-                onload: res => resolve(res.responseText)
-            })
+            if (!(pid in dif))
+                resolve("?")
+            else
+                resolve(Math.round(dif[pid] >= 400 ? dif[pid] : 400 / Math.exp(1.0 - dif[pid] / 400)))
         }
     })
 },({ pred }) => {
