@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.0.1
+// @version        4.0.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -465,7 +465,13 @@ const mod = {
             if (! m) error(`Executing named mod but not found: "${name}"`)
             if (m.styl) GM_addStyle(m.styl)
             log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
-            return m.func({ msto: sto[m.name], named })
+            try {
+                return m.func({ msto: sto[m.name], named })
+            }
+            catch (err) {
+                error(err)
+                return err
+            }
         }
         if (name) {
             const m = mod.find(name)
