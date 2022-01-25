@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.0.0
+// @version        4.0.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -34,10 +34,8 @@
 
 // ==Update==
 
-const update_log = `!- dashboard
- : 全新的 UI
-*< comment
-^< eslint
+const update_log = `*M benben
+ : 修复了翻页功能
 `
 
 // ==/Update==
@@ -1524,8 +1522,10 @@ mod.reg("benben", "全网犇犇", "@/", {
                 },
                 onerror: error
             })
-            // uindow.feedPage++
-            // $("#feed-more").children("a").text("点击查看更多...")
+            if (msto.source === "shy"){
+                uindow.feedPage++
+                $("#feed-more").children("a").text("点击查看更多...")
+            }
         }
         else{
             oriloadfeed()
