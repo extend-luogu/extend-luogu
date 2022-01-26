@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.0.2
+// @version        4.0.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -18,8 +18,8 @@
 // @connect        codeforces.ml
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
+// @require        https://cdn.jsdelivr.net/gh/leizongmin/js-xss/dist/xss.min.js
+// @require        https://cdn.jsdelivr.net/gh/markedjs/marked/marked.min.js
 // @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@main/TM-dat.user.js
 //
 // @grant          GM_addStyle
@@ -34,8 +34,8 @@
 
 // ==Update==
 
-const update_log = `*M benben
- : 修复了翻页功能
+const update_log = `*# cdn
+ : bootcdn 服务无法连接 改为 jsdelivr
 `
 
 // ==/Update==
