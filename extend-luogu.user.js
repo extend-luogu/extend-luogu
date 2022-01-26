@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.1.1
+// @version        4.1.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -20,8 +20,8 @@
 // @connect        kenkoooo.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
+// @require        https://cdn.jsdelivr.net/gh/leizongmin/js-xss/dist/xss.min.js
+// @require        https://cdn.jsdelivr.net/gh/markedjs/marked/marked.min.js
 // @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@main/TM-dat.user.js
 //
 // @grant          GM_addStyle
@@ -38,7 +38,8 @@
 
 const update_log = `*M original-difficulty
  : 将 AtCoder 的难度缓存加速访问
- : 每 10 天重新加载一次`
+ : 每 10 天重新加载一次
+ `
 
 // ==/Update==
 
@@ -1556,8 +1557,10 @@ mod.reg("benben", "全网犇犇", "@/", {
                 },
                 onerror: error
             })
-            // uindow.feedPage++
-            // $("#feed-more").children("a").text("点击查看更多...")
+            if (msto.source === "shy"){
+                uindow.feedPage++
+                $("#feed-more").children("a").text("点击查看更多...")
+            }
         }
         else{
             oriloadfeed()
