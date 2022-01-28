@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.1.1
+// @version        4.1.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -37,14 +37,7 @@
 // ==Update==
 
 const update_log = `
--- reg_pre
- : 可以设置预先调用内容，加速加载。
-*M original-difficulty
- : 将难度爬取设为预先调用内容。
- : 移除 codeforc.es 源。
- : 简化了 AtCoder 题目名称获取过程。
- : 将 AtCoder 的难度缓存加速访问
- : 每 10 天重新加载一次
+Refix crash when any module throws
 `.trim()
 
 // ==/Update==
@@ -505,9 +498,14 @@ const mod = {
             if (! m) error(`Executing named mod but not found: "${name}"`)
             if (m.styl) GM_addStyle(m.styl)
             log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
-            if ("pred" in m)
-                return m.func({ msto: sto[m.name], named, pred: m.pred })
-            return m.func({ msto: sto[m.name], named })
+            try {
+                if ("pred" in m)
+                    return m.func({ msto: sto[m.name], named, pred: m.pred })
+                return m.func({ msto: sto[m.name], named })
+            }
+            catch (err) {
+                warn(err)
+            }
         }
         if (name) {
             const m = mod.find(name)
@@ -1761,7 +1759,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
         mouse_on_dash = true
 
         $.double(([$p, mproxy]) => {
-            const _$smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
+            // Kill: const _$smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
 
             $.double(([jqstr, bln]) => {
                 $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide()))
@@ -2652,9 +2650,9 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
     max_discuss : { ty: "number", dft: 12, min: 4, max: 16, step: 1, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
 }, ({ msto }) => {
-    let $discuss = undefined
+    let $discuss
     if (location.href.includes("blog")) return // Note: 如果是博客就退出
-    $(".lg-article").each((i, e, $e = $(e)) => {
+    $(".lg-article").each((_, e, $e = $(e)) => {
         const title = e.childNodes[1]
         if (title && title.tagName.toLowerCase() === "h2" && title.innerText.includes("讨论"))
             $discuss = $e.children(".am-panel")
