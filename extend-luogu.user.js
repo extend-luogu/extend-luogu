@@ -1254,7 +1254,7 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
         { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
     ]
 
-    const emo_url = name => `//图.tk/${name}`
+    const emo_url = name => `https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${name}`
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
 
@@ -2803,7 +2803,7 @@ mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
         { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
         { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
     ]
-    const $txt = $("#feed-content"), emo_url = name => `//图.tk/${name}`, txt = $txt[0]
+    const $txt = $("#feed-content"), emo_url = name => `https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${name}`, txt = $txt[0]
     $("#feed-content").before("<div id='emo-lst'></div>")
     emo.forEach(m => {
         const $emo = $((m.type === "emo")?
