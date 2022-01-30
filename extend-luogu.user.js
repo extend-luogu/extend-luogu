@@ -2097,18 +2097,15 @@ mod.reg_hook_new("back-to-contest", "返回比赛题单", [
 mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
     vp_id: { ty: "string", dft: "0", priv: true }
 }, ({ msto }) => {
-    if (lg_dat.contest.id === msto.vp_id) {
+    if (lg_dat.contest.id.toString() === msto.vp_id) {
         warn("You cannot vp the virtual contest.")
         return
     }
-    if (lg_dat.contest.endTime > new Date().getTime()) {
+    if (lg_dat.contest.endTime > cur_time(1000)) {
         warn("Contest has not started or ended.")
         return
     }
-    $("<button />").appendTo($("div.operation"))
-        .text("重现比赛")
-        .attr("id", "exlg-vp")
-        .attr("class", "lfe-form-sz-middle")
+    $("<button id='exlg-vp' class='lfe-form-sz-middle'>重现比赛</button>").appendTo($("div.operation"))
         .click(async () => {
             uindow.exlg_alert(`<div>
                 <p>设置「${lg_dat.contest.name}」的重现赛
@@ -2138,10 +2135,10 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                             "endTime":${st+lg_dat.contest.endTime - lg_dat.contest.startTime},
                             "rated":false,
                             "ratingGroup":null,
-                            "__CLASS_NAME":"Luogu\DataClass\Contest\ContestSetting"
+                            "__CLASS_NAME":"Luogu\\DataClass\\Contest\\ContestSetting"
                         },
                         "hostID":${lg_usr.uid}
-                    }`
+                    }` // Hack: __CLASS_NAME 是复制时复制上的，大概率没用
                 )).id.toString()
                 await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
                     `{
