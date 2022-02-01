@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.2.1
+// @version        4.2.2
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -20,8 +20,8 @@
 // @connect        kenkoooo.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/js-xss/0.3.3/xss.min.js
-// @require        https://cdn.bootcdn.net/ajax/libs/marked/2.0.1/marked.min.js
+// @require        https://cdn.jsdelivr.net/gh/leizongmin/js-xss@1.0.10/dist/xss.min.js
+// @require        https://cdn.jsdelivr.net/gh/markedjs/marked@2.0.1/marked.min.js
 // @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@main/TM-dat.user.js
 //
 // @grant          GM_addStyle
@@ -38,6 +38,7 @@
 
 const update_log = `
 *# cdn
+ : bootcdn 服务无法连接 改为 jsdelivr
 `.trim()
 
 // ==/Update==
