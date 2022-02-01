@@ -1,7 +1,12 @@
 // ==UserScript==
 // @name           extend-luogu
-// @namespace      http://tampermonkey.net/
+// @namespace      http://exlg.cc/
 // @version        4.1.2
+// @icon           https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu@main/favicon.ico
+// @icon64         https://exlg.cc/img/logo.png
+// @homepageURL    https://exlg.cc/
+// @supportURL     https://github.com/extend-luogu/extend-luogu/issues/
+// @description    Makes Luogu more powerful.
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
