@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.2.2
+// @version        4.2.3
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -37,8 +37,14 @@
 // ==Update==
 
 const update_log = `
-*# cdn
- : bootcdn 服务无法连接 改为 jsdelivr
+-M virtual-participation
+ : 创建重现赛，仿真测试
+ ! 自己能看到自己创建比赛里的题目
+*M user-problem-color
+ : 加快了比较
+ *M emoticon, benben-emoticon
+  : 采用 GitHub 源获取表情，提升了稳定性
+*- 如果洛谷前端加载失败，exlg 将会中止加载
 `.trim()
 
 // ==/Update==
@@ -2130,11 +2136,10 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                             "startTime":${st},
                             "endTime":${st+lg_dat.contest.endTime - lg_dat.contest.startTime},
                             "rated":false,
-                            "ratingGroup":null,
-                            "__CLASS_NAME":"Luogu\\DataClass\\Contest\\ContestSetting"
+                            "ratingGroup":null
                         },
                         "hostID":${lg_usr.uid}
-                    }` // Hack: __CLASS_NAME 是复制时复制上的，大概率没用
+                    }`
                 )).id.toString()
                 await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
                     `{
