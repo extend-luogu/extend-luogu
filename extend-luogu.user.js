@@ -2130,11 +2130,10 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                             "startTime":${st},
                             "endTime":${st+lg_dat.contest.endTime - lg_dat.contest.startTime},
                             "rated":false,
-                            "ratingGroup":null,
-                            "__CLASS_NAME":"Luogu\\DataClass\\Contest\\ContestSetting"
+                            "ratingGroup":null
                         },
                         "hostID":${lg_usr.uid}
-                    }` // Hack: __CLASS_NAME 是复制时复制上的，大概率没用
+                    }`
                 )).id.toString()
                 await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
                     `{
