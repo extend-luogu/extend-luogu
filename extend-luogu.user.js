@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.2.3
+// @version        4.2.4
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -42,8 +42,10 @@ const update_log = `
  ! 自己能看到自己创建比赛里的题目
 *M user-problem-color
  : 加快了比较
- *M emoticon, benben-emoticon
-  : 采用 GitHub 源获取表情，提升了稳定性
+*M emoticon, benben-emoticon
+ : 采用 GitHub 源获取表情，提升了稳定性
+*M original-difficulty
+ : 修复了部分题面中有*的题目无法正确显示难度的问题
 *- 如果洛谷前端加载失败，exlg 将会中止加载
 `.trim()
 
@@ -469,6 +471,9 @@ const mod = {
         }, styl
     ),
 
+    /**
+     * @deprecated 请使用 reg_hook_new 来注册钩子
+     */
     reg_hook: (name, info, path, data, func, hook, styl) => mod.reg(
         name, info, path, data,
         arg => {
@@ -1392,7 +1397,18 @@ mod.reg_user_tab("user-intro-ins", "主页指令", "main", null, null, () => {
     }
 `)
 
-let last_ptr = -1, last_board = "submittedProblems", cosflag = -1, ta = null, my = null
+const msg = {
+    NOT_AT_PRACTICE_PAGE: -1,
+    NONE: -2,
+    COMMENT_TAG: -3,
+    NOT_A_PROBLEM_ELEMENT: -4,
+    ADD_COMPARE: 1
+}
+const brds = {
+    SUBMITTED_PROBLEMS: 0,
+    PASSED_PROBLEMS: 1
+}
+let last_ptr = -1, last_board = brds.SUBMITTED_PROBLEMS, cosflag = -1, ta = null, my = null
 mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0-9]{0,}.*", {
     problem_compare: { ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC题目比较"] }
 }, ({ msto, args }) => {
@@ -1415,10 +1431,10 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         let same = 0
         if (_flag) {
             const $ps = $prb[1]
-            $ps.find("a").each((d, p, $p = $(p)) => {
+            $ps.querySelectorAll("a").forEach((p, d) => {
                 if (d < ta.length && my.has(ta[d].pid)) { // Note: d 在某些情况下会达到 ta.length
                     same ++
-                    $p.css("backgroundColor", "rgba(82, 196, 26, 0.3)")
+                    p.style.backgroundColor = "rgba(82, 196, 26, 0.3)"
                 }
             })
         }
@@ -1427,7 +1443,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`)
     }
     const _color = id => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`
-    if (typeof(args) === "object" && args.message === "Add Compare for 0-0 new user.") {
+    if (typeof(args) === "object" && args.message === msg.ADD_COMPARE) {
         if ((! msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return
         func([114514, 1919810], false)
         return
@@ -1436,16 +1452,17 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         if (arg.target.href === "javascript:void 0") return
         // console.log("arg: ",arg.target, arg)
         // if (! lg_dat[arg.board_id][arg.position])
-        arg.target.style.color = _color([lg_dat[arg.board_id][arg.position].difficulty])
-        if (arg.board_id === "passedProblems" && arg.position === lg_dat["passedProblems"].length - 1 || (lg_dat["passedProblems"].length === 0 && arg.board_id === "submittedProblems" && arg.position === lg_dat["submittedProblems"].length - 1)) { // Note: 染色染到最后一个
+        arg.target.style.color = _color([(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty])
+        if ((arg.board_id === brds.PASSED_PROBLEMS && arg.position === lg_dat.passedProblems.length - 1)
+         || (lg_dat.passedProblems.length === 0 && arg.board_id === brds.SUBMITTED_PROBLEMS && arg.position === lg_dat.submittedProblems.length - 1)) { // Note: 染色染到最后一个
             $(".exlg-counter").remove()
             const gf = arg.target.parentNode.parentNode.parentNode.parentNode
-            const $prb = [$(gf.firstChild.childNodes[2]), $(gf.lastChild.childNodes[2])]
+            const $prb = [gf.firstChild.childNodes[2], gf.lastChild.childNodes[2]]
 
             for (let i = 0; i < 2; ++ i) {
                 const $ps = $prb[i]
                 const my = lg_dat[ [ "submittedProblems", "passedProblems" ][i] ]
-                $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`))
+                $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`)[0])
             }
 
             if ((! msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return
@@ -1453,35 +1470,37 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         }
     })
 }, (e) => {
-    if (! /.*\/user\/.*#practice/.test(location.href)) return { result: false, args: { message: "Not at practice page." } }
+    if (location.hash !== "#practice") return { result: false, args: { message: msg.NOT_AT_PRACTICE_PAGE } }
     if ((! lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
         // console.log(e.target)
         if (e.target.className === "card padding-default") {
             if ($(e.target).children(".problems").length) {
                 const my = lg_dat[ [ "submittedProblems", "passedProblems" ][cosflag] ]
                 $(e.target.firstChild).after(`<span id="exlg-problem-count-${cosflag}" class="exlg-counter" exlg="exlg" style="margin-left: 5px">${ my.length }</span>`)
-                if (++ cosflag > 1) return { result: true, args: { message: "Add Compare for 0-0 new user." } }
+                if (++ cosflag > 1) return { result: true, args: { message: msg.ADD_COMPARE } }
             }
             else if($(e.target).children(".difficulty-tags").length) {
                 cosflag = 0
             }
         }
-        return { result: false, args: { message: "None." } }
+        return { result: false, args: { message: msg.NONE } }
     }
-    if (! e.target.tagName) return { result: false, args: { message: "<!--->" } }
+    if (! e.target.tagName) return { result: false, args: { message: msg.COMMENT_TAG } }
     // console.log(last_ptr, last_board, e, e.target)
     // if (typeof(e.target) === "undefined") {
     //     console.log(e.target)
     // }
     if (e.target.tagName.toLowerCase() !== "a" || e.target.className !== "color-default" || e.target.href.indexOf("/problem/") === -1)
-        return { result: false, args: { message: "It's not a problem element" } }
-    const tar = e.target, _pid = tar.href.slice(33), ucd = lg_dat,
-        _onchange = [(ucd.submittedProblems[0]?ucd.submittedProblems[0].pid:"exlg.cc!!"), (ucd.passedProblems[0]?ucd.passedProblems[0].pid:"QAQ")].includes(_pid)
+        return { result: false, args: { message: msg.NOT_A_PROBLEM_ELEMENT } }
+    const gpid = o => (o ? o.pid : undefined)
+    const tar = e.target,
+        _onc = [gpid(lg_dat.submittedProblems[0]), gpid(lg_dat.passedProblems[0])].indexOf(tar.href.slice(33)),
+        _onchange = !(_onc === -1)
     return {
         result: true,
         args: [{
             onchange: _onchange,
-            board_id: ["submittedProblems", "passedProblems"][(_onchange ? (last_board = [(ucd.submittedProblems[0]?ucd.submittedProblems[0].pid:"Why not support Wdoi?qwq"), (ucd.passedProblems[0]?ucd.passedProblems[0].pid:"qwq~ orz cxy")].indexOf(_pid)) : (last_board))],
+            board_id: (_onchange ? (last_board = _onc) : (last_board)),
             position: (_onchange ? (last_ptr = 0) : (++ last_ptr)),
             target: tar
         }]
@@ -1496,7 +1515,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
             const my = lg_dat[ [ "submittedProblems", "passedProblems" ][i] ]
             $ps.before(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${ my.length }</span>`)
         }
-        return { message: "Add Compare for 0-0 new user." }
+        return { message: msg.ADD_COMPARE }
     }
     return []
 },`
@@ -2196,7 +2215,7 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
 }, (e) => {
     const tar = e.target
     // console.log(e.target, tar.tagName)
-    if (!tar || (! tar.tagName)) return { args: "<!--->", result: false }
+    if (!tar || (! tar.tagName)) return { args: msg.COMMENT_TAG, result: false }
     if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/problem/")/* && judge_problem(tar.href.slice(tar.href.indexOf("/problem/") + 9))*/ && ` ${ tar.parentNode.parentNode.className } `.includes(" problem ")) { // Note: 如果是标签的话，查看它的父亲是否为最后一个。如果是，更新数据。对于其他的不管。
         if (! tar.parentNode.parentNode.parentNode.nextSibling) return { args: { type: "modified - update", target: tar.parentNode.parentNode.parentNode.parentNode }, result: true }
         else return { args: { type: "modified - not the last one.", target: null }, result: false }
@@ -2642,7 +2661,10 @@ mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/p
             GM_xmlhttpRequest({
                 method: "GET",
                 url: `https://${msto.cf_src}/problemset/problem/${pid}/${ops}`,
-                onload: res => resolve(res.responseText.match(/\*([0-9]+|special)/g).lastElem().substring(1)),
+                onload: res => {
+                    const rv = $(res.responseText).find("span[title=Difficulty]").text().trim()
+                    resolve(rv ? rv.substring(1) : undefined)
+                },
                 onerror: err => {
                     error(err)
                     reject(err)
@@ -2668,7 +2690,7 @@ mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/p
                 dif = JSON.parse(msto.atdiff)
             let pid = lg_dat.problem.description.match(RegExp("^.{22}[-./A-Za-z0-9_]*"))[0].match(RegExp("[^/]*$"))
             if (!(pid in dif))
-                resolve("?")
+                resolve(undefined)
             else
                 resolve(Math.round(dif[pid] >= 400 ? dif[pid] : 400 / Math.exp(1.0 - dif[pid] / 400)))
         }
@@ -2680,7 +2702,7 @@ mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/p
     t[0].innerText = "原始难度"
     t[1].innerText = "获取中"
     pred.then(d => {
-        if (d === "?" || d === "special")
+        if (d === undefined)
             d = "不可用"
         t[1].innerText = d
     })
