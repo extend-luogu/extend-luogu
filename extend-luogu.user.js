@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.2.4
+// @version        4.2.5
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -39,14 +39,17 @@
 const update_log = `
 -M virtual-participation
  : 创建重现赛，仿真测试
- ! 自己能看到自己创建比赛里的题目
+ : 在开始后再加入题目，尽量模拟真实比赛
 *M user-problem-color
  : 加快了比较
-*M emoticon, benben-emoticon
- : 采用 GitHub 源获取表情，提升了稳定性
+*M emoticon
+ : 加入了 GitHub、啧.tk、妙.tk 源，可手动切换
+ : 啧.tk 不支持热词表情
+xM benben-emoticon
+ : 与 emoticon 合并
 *M original-difficulty
  : 修复了部分题面中有*的题目无法正确显示难度的问题
-*- 如果洛谷前端加载失败，exlg 将会中止加载
+*- 如果洛谷前端加载失败或 Content-Only，exlg 将会中止加载
 `.trim()
 
 // ==/Update==
@@ -70,7 +73,7 @@ const xss = new filterXSS.FilterXSS({
         if (k === "style") return `${k}="${v}"`
     }
 })
-const mdp = uindow.markdownPalettes
+// const mdp = uindow.markdownPalettes
 $.double = (func, first, second) => [func(first), func(second)]
 
 // ==Utilities==Extensions==
@@ -164,33 +167,13 @@ const lg_post = (url, data) => $.ajax({
     },
     method: "post",
 })
-/*
-// Note: not implemented yet
-const lg_confirm = (deny, accept, title, msg, callback) => {
-    if (! $(document.body).hasClass("lg-confirm-built")) {
-        $(`<div class="am-modal am-modal-confirm am-modal-out" tabindex="-1" id="exlg-confirm" style="display: none; margin-top: -40px;">
-        <div class="am-modal-dialog">
-            <div class="am-modal-hd" id="exlg-confirm-title"></div>
-            <div class="am-modal-bd" id="exlg-confirm-message"></div>
-            <div class="am-modal-footer">
-                <span class="am-modal-btn" id="exlg-confirm-deny" data-am-modal-cancel></span>
-                <span class="am-modal-btn" id="exlg-confirm-accept" data-am-modal-confirm></span>
-            </div>
-        </div></div>`).appendTo($(document.body))
-        $(document.body).addClass("lg-confirm-built")
-    }
-    $("#exlg-confirm-title").html(title)
-    $("#exlg-confirm-message").html(msg)
-    $("#exlg-confirm-deny")
-        .html(deny)
-        .on("click", callback(false))
-    $("#exlg-confirm-accept")
-        .html(accept)
-        .on("click", callback(true))
-    $("#exlg-confirm").modal("open") // Hack: exlg is loaded before boostrap so it'll crash
-}
-*/
 
+const cs_get = ({url, onload, onerror = err => error(err)}) => GM_xmlhttpRequest({
+    url: url,
+    method: "GET",
+    onload: onload,
+    onerror: onerror
+})
 
 const springboard = (param, styl) => {
     const q = new URLSearchParams(); for (let k in param) q.set(k, param[k])
@@ -212,62 +195,59 @@ const judge_problem = text => [
 ].some(re => re.test(text))
 
 const register_badge = async () => {
-    const parse_badge = (href, func_quit) => {
-        GM_xmlhttpRequest({
-            method: "GET",
-            url: href,
-            onload: (res) => {
-                let fres = -1
-                const e = res.response
-                const _operations = [
-                    {
-                        errorcode: 0,
-                        message: `"Succeed in creating a new badge!"`,
-                        ontitle: "[exlg] 成功创建 badge",
-                        onlog: "Successfully created a badge!"
-                    },
-                    {
-                        errorcode: 1,
-                        message: `"Wrong active code!"`,
-                        ontitle: "无效激活码",
-                        onlog: "Illegal Active Code"
-                    },
-                    {
-                        errorcode: 2,
-                        message: `"Sorry, but the active code has been used!"`,
-                        ontitle: "激活码已被使用",
-                        onlog: "Expired Active Code"
-                    },
-                    {
-                        errorcode: 3,
-                        message: `"Something went wrong!"`,
-                        ontitle: "非法的 badge 内容",
-                        onlog: "Illegal Badge Text"
-                    },
-                    {
-                        errorcode: -1,
-                        message: `Fuck CCF up`,
-                        ontitle: "未知错误",
-                        onlog: "注册 exlg-badge 时出现未知错误, 请联系开发人员"
-                    },
-                ]
-                _operations.forEach(f => {
-                    if(fres !== -1) return
-                    console.log(e === f.message, f.errorcode === -1, f)
-                    if (e === f.message || f.errorcode === -1) {
-                        fres = f.errorcode
-                        $("#exlg-dialog-title").html(f.errorcode ? `[Error] ${f.ontitle}` : f.ontitle)
-                        log(f.errorcode ? `Illegal Operation in registering badge: ${f.onlog}(#${f.errorcode})` : f.onlog)
-                        if(fres === -1 || ! fres) {
-                            func_quit()
-                            setTimeout(() => uindow.exlg_alert("badge 注册成功!", "exlg 提醒您"), 400)
-                            return
-                        }
+    const parse_badge = (href, func_quit) => cs_get({
+        url: href,
+        onload: res => {
+            let fres = -1
+            const e = res.response
+            const _operations = [
+                {
+                    errorcode: 0,
+                    message: `"Succeed in creating a new badge!"`,
+                    ontitle: "[exlg] 成功创建 badge",
+                    onlog: "Successfully created a badge!"
+                },
+                {
+                    errorcode: 1,
+                    message: `"Wrong active code!"`,
+                    ontitle: "无效激活码",
+                    onlog: "Illegal Active Code"
+                },
+                {
+                    errorcode: 2,
+                    message: `"Sorry, but the active code has been used!"`,
+                    ontitle: "激活码已被使用",
+                    onlog: "Expired Active Code"
+                },
+                {
+                    errorcode: 3,
+                    message: `"Something went wrong!"`,
+                    ontitle: "非法的 badge 内容",
+                    onlog: "Illegal Badge Text"
+                },
+                {
+                    errorcode: -1,
+                    message: `Fuck CCF up`,
+                    ontitle: "未知错误",
+                    onlog: "注册 exlg-badge 时出现未知错误, 请联系开发人员"
+                },
+            ]
+            _operations.forEach(f => {
+                if(fres !== -1) return
+                console.log(e === f.message, f.errorcode === -1, f)
+                if (e === f.message || f.errorcode === -1) {
+                    fres = f.errorcode
+                    $("#exlg-dialog-title").html(f.errorcode ? `[Error] ${f.ontitle}` : f.ontitle)
+                    log(f.errorcode ? `Illegal Operation in registering badge: ${f.onlog}(#${f.errorcode})` : f.onlog)
+                    if(fres === -1 || ! fres) {
+                        func_quit()
+                        setTimeout(() => uindow.exlg_alert("badge 注册成功!", "exlg 提醒您"), 400)
+                        return
                     }
-                })
-            }
-        })
-    }
+                }
+            })
+        }
+    })
     const title_text = "exlg badge 注册器 ver.5.0"
     uindow.exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
@@ -1206,62 +1186,75 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
 }
 `)
 
-mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
-    show: { ty: "boolean", dft: true, info: ["Show", "是否显示"] },
-    height_limit: { ty: "boolean", dft: true, info: ["Height limit", "高度上限"] }
+const emt = {
+    EMO: 1,
+    TXT: 2
+}
+mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
+    benben: { ty: "boolean", dft: true, info: ["Show in benben", "犇犇表情"] },
+    show: { ty: "boolean", dft: true, info: ["Show in default", "是否默认显示表情栏"] },
+    src: { ty: "enum", vals: ["图.tk", "github", "妙.tk", "啧.tk"], dft: "图.tk", info: ["Emoticon Source", "表情源"] },
+    height_limit: { ty: "boolean", dft: true, info: ["Expand in default", "是否默认展开表情"] }
 }, ({ msto }) => {
     const emo = [
-        { type: "emo", name: [ "kk" ], slug: "0" },
-        { type: "emo", name: [ "jk" ], slug: "1" },
-        { type: "emo", name: [ "se" ], slug: "2" },
-        { type: "emo", name: [ "qq" ], slug: "3" },
-        { type: "emo", name: [ "xyx" ], slug: "4" },
-        { type: "emo", name: [ "xia" ], slug: "5" },
-        { type: "emo", name: [ "cy" ], slug: "6" },
-        { type: "emo", name: [ "ll" ], slug: "7" },
-        { type: "emo", name: [ "xk" ], slug: "8" },
-        { type: "emo", name: [ "qiao" ], slug: "9" },
-        { type: "emo", name: [ "qiang" ], slug: "a" },
-        { type: "emo", name: [ "ruo" ], slug: "b" },
-        { type: "emo", name: [ "mg" ], slug: "c" },
-        { type: "emo", name: [ "dx" ], slug: "d" },
-        { type: "emo", name: [ "youl" ], slug: "e" },
-        { type: "emo", name: [ "baojin" ], slug: "f" },
-        { type: "emo", name: [ "shq" ], slug: "g" },
-        { type: "emo", name: [ "lb" ], slug: "h" },
-        { type: "emo", name: [ "lh" ], slug: "i" },
-        { type: "emo", name: [ "qd" ], slug: "j" },
-        { type: "emo", name: [ "fad" ], slug: "k" },
-        { type: "emo", name: [ "dao" ], slug: "l" },
-        { type: "emo", name: [ "cd" ], slug: "m" },
-        { type: "emo", name: [ "kun" ], slug: "n" },
-        { type: "emo", name: [ "px" ], slug: "o" },
-        { type: "emo", name: [ "ts" ], slug: "p" },
-        { type: "emo", name: [ "kl" ], slug: "q" },
-        { type: "emo", name: [ "yiw" ], slug: "r" },
-        { type: "emo", name: [ "dk" ], slug: "s" },
-        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
-        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
-        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
-        { type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
-        { type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
-        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
-        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
-        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
-        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
-        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
-        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
-        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
-        { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
-        { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
-        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
-        { type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
-        { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
-        { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
-        { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
-    ]
+        "kk", "jk", "se", "qq", "xyx", "xia", "cy", "ll", "xk", "qiao", "qiang", "ruo", "mg", "dx", "youl", "baojin", "shq", "lb", "lh", "qd", "fad", "dao", "cd", "kun", "px", "ts", "kl", "yiw", "dk",
+        { name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
+        { name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
+        { name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
+        { name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
+        { name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
+        { name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
+        { name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
+        { name: [ "kg" ], slug: "g3", name_display: "烤咕" },
+        { name: [ "gl" ], slug: "g4", name_display: "盖楼" },
+        { name: [ "wyy" ], slug: "g6", name_display: "无意义" },
+        { name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
+        { name: [ "tt" ], slug: "g8", name_display: "贴贴" },
+        { name: [ "jbl" ], slug: "g9", name_display: "举报了" },
+        { name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
+        { name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
+        { name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
+        { name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
+        { name: [ "zyx" ], slug: "ge", name_display: "致远星" },
+        { name: [ "zh" ], slug: "gf", name_display: "祝好" },
+    ].filter(e => msto.src !== "啧.tk" || typeof e !== "object").map((e, i) => {
+        if (typeof(e) === "string")
+            return {
+                type: emt.EMO,
+                name: [e],
+                slug: (i >= 10) ? String.fromCharCode(0x61 + (i - 10)) : String.fromCharCode(0x30 + i)
+            }
+        return { type: emt.TXT, ...e }
+    })
 
-    const emo_url = name => `https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${name}`
+    const emo_url = (msto.src === "github") ?
+        (({ slug }) => `//cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${slug}`) : ((msto.src === "啧.tk") ?
+            (({ name }) => `//${msto.src}/${name[0]}`) :
+            (({ slug }) => `//${msto.src}/${slug}`))
+
+    if (msto.benben && location.pathname === "/") {
+        const $txt = $("#feed-content"), txt = $txt[0]
+        $("#feed-content").before("<div id='emo-lst'></div>")
+        emo.forEach(m => {
+            const $emo = $((m.type === emt.EMO)?
+                `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`
+                :
+                `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
+            ).on("click", () => {
+                const preval = txt.value
+                const pselstart = txt.selectionStart
+                const str1 = preval.slice(0, pselstart) + `![](${emo_url(m)})`
+                txt.value = (str1 + preval.slice(txt.selectionEnd))
+                txt.focus()
+                txt.setSelectionRange(str1.length, str1.length)
+            }
+            ).appendTo("#emo-lst")
+            if (m.width) $emo.css("width", m.width + "px")
+            else if(m.type === emt.EMO) $emo.css("width", "40px")
+            else $emo.css("width", "83px")
+        })
+        $("#feed-content").before("<br>")
+    }
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
 
@@ -1296,17 +1289,17 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*" ], {
     })
 
     emo.forEach(m => {
-        const $emo = $((m.type === "emo")?
-            `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
+        const $emo = $((m.type === emt.EMO)?
+            `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m)}" /></button>`
             :
             `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
         ).on("click", () => $txt
             .trigger("focus")
-            .val(`![](${emo_url(m.slug)})`)
+            .val(`![](${emo_url(m)})`)
             .trigger("input")
         ).appendTo($emo_menu)
         if (m.width) $emo.css("width", m.width + "px")
-        else if(m.type === "emo") $emo.css("width", "40px")
+        else if(m.type === emt.EMO) $emo.css("width", "40px")
         else $emo.css("width", "83px")
     })
     $emo_menu.append("<div style='height: .35em'></div>")
@@ -1550,8 +1543,7 @@ mod.reg("benben", "全网犇犇", "@/", {
 
     uindow.loadFeed = function () {
         if (uindow.feedMode==="all-exlg") {
-            GM_xmlhttpRequest({
-                method: "GET",
+            cs_get({
                 url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (`https://bens.rotriw.com/api/list/proxy?page=${uindow.feedPage}`),
                 onload: (res) => {
                     const e = JSON.parse(res.response)
@@ -1597,8 +1589,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                             )
                         })
                     )
-                },
-                onerror: error
+                }
             })
             if (msto.source === "shy"){
                 uindow.feedPage++
@@ -2116,10 +2107,26 @@ mod.reg_hook_new("back-to-contest", "返回比赛题单", [
 `)
 
 mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
-    vp_id: { ty: "string", dft: "0", priv: true }
+    vp_id: { ty: "string", dft: "0", priv: true },
+    orig_dat: { ty: "object", priv: true, lvs: {
+        st_tm: { ty: "number" },
+        pids: { ty: "string" },
+        scrs: { ty: "string" }
+    }}
 }, ({ msto }) => {
     if (lg_dat.contest.id.toString() === msto.vp_id) {
         warn("You cannot vp the virtual contest.")
+        if (msto.orig_dat.st_tm <= cur_time(1000) && lg_dat.contestProblems.length === 0) {
+            lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
+                `{
+                    "pids":[${msto.orig_dat.pids}],
+                    "scores":{${msto.orig_dat.scrs}}
+                }`
+            ).then(() => {
+                alert("比赛即将开始，页面将自动重新加载")
+                location.reload()
+            })
+        }
         return
     }
     if (lg_dat.contest.endTime > cur_time(1000)) {
@@ -2133,39 +2140,42 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 <p>开始时间：<input type="date" id="vpTmDt"/> <input type="time" id="vpTmClk"/></p>
             </div><br>`, "创建重现赛", async () => {
                 let pa = $("#vpTmDt")[0].value.split("-"), pb = $("#vpTmClk")[0].value.split(":")
-                let st = new Date(pa[0], pa[1] - 1, pa[2], pb[0], pb[1], 0, 0), pids = "", scrs = "" // Note: Date 要减一个月
+                let st = new Date(pa[0], pa[1] - 1, pa[2], pb[0], pb[1], 0, 0) // Note: Date 要减一个月
                 st = st.getTime() / 1000
 
+                msto.orig_dat.pids = msto.orig_dat.scrs = ""
+                msto.orig_dat.st_tm = st
                 $.each(lg_dat.contestProblems, (id, vl) => {
                     if (id)
-                        pids += ",", scrs += ","
-                    pids += "\"" + vl.problem.pid + "\"",
-                    scrs += `"${vl.problem.pid}": ${vl.problem.fullScore}`
+                        msto.orig_dat.pids += ",", msto.orig_dat.scrs += ","
+                    msto.orig_dat.pids += "\"" + vl.problem.pid + "\"",
+                    msto.orig_dat.scrs += `"${vl.problem.pid}": ${vl.problem.fullScore}`
                 })
 
-                let newc = (msto.vp_id === "0")
-                msto.vp_id = (await lg_post(`/fe/api/contest/${newc ? "new" : ("edit/" + msto.vp_id)}`,
-                    `{
-                        "settings":{
-                            "name": "Virtual Participation for ${lg_dat.contest.name}",
-                            "description":"",
-                            "visibilityType":5,
-                            "invitationCodeType":1,
-                            "ruleType":${lg_dat.contest.ruleType},
-                            "startTime":${st},
-                            "endTime":${st+lg_dat.contest.endTime - lg_dat.contest.startTime},
-                            "rated":false,
-                            "ratingGroup":null
-                        },
-                        "hostID":${lg_usr.uid}
-                    }`
-                )).id.toString()
-                await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
-                    `{
-                        "pids":[${pids}],
-                        "scores":{${scrs}}
-                    }`
-                )
+                let newc = (msto.vp_id === "0"), cdt = `{
+                    "settings":{
+                        "name": "Virtual Participation for ${lg_dat.contest.name}",
+                        "description": ${JSON.stringify(lg_dat.contest.description)},
+                        "visibilityType":5,
+                        "invitationCodeType":1,
+                        "ruleType":${lg_dat.contest.ruleType},
+                        "startTime":${st},
+                        "endTime":${st+lg_dat.contest.endTime - lg_dat.contest.startTime},
+                        "rated":false,
+                        "ratingGroup":null
+                    },
+                    "hostID":${lg_usr.uid}
+                }`, resp = await lg_post(`/fe/api/contest/${newc ? "new" : ("edit/" + msto.vp_id)}`, cdt)
+                switch (resp.status){
+                case 200:
+                    msto.vp_id = resp.id.toString()
+                    break
+                case 404:
+                    msto.vp_id = (await lg_post(`/fe/api/contest/new`, cdt)).id.toString()
+                    newc = true
+                    break
+                }
+                await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,`{"pids":[],"scores":{"P1000":100}}`)
 
                 // Note: 自己创建的比赛自己不会自动加入
                 if (newc) {
@@ -2518,7 +2528,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
 })
 
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
-    show: { ty: "boolean", dft: true }
+    show: { ty: "boolean", dft: true, info: ["Show in default", "是否默认展开"] }
 },({ msto, $board })=>{
     // Note: Add the title.
     $board.html(`<h3 id="bb-rnklst-h2">犇犇排行榜 <span id="bb-rnklst-btn" class="bb-rnklst-span"> [<a>${ msto.show ? "收起" : "展开" }</a>]</span><span style="float: right;" class="bb-rnklst-span"> [<a id="refresh-bbrnk">刷新</a>]</span></h3><div style="display: ${ msto.show ? "block" : "none" }" id="bb-rnklst-div"></div>`)
@@ -2527,8 +2537,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
         $fbtn.text(msto.show ? "收起" : "展开")
         $list.toggle()
     })
-    const refresh = () => GM_xmlhttpRequest({
-        method: "GET",
+    const refresh = cs_get({
         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
         onload: function(res) {
             // console.log($board, $list)
@@ -2572,10 +2581,9 @@ mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" 
     $btn.on("click", () => {
         $btn.prop("disabled", true)
         $btn.text("保存中...")
-        GM_xmlhttpRequest({
-            method: "GET",
+        cs_get({
             url: `https://luogulo.gq/save.php?url=${window.location.href}`,
-            onload: (res) => {
+            onload: res => {
                 if (res.status === 200) {
                     if (res.response === "success") {
                         log("Discuss saved")
@@ -2606,7 +2614,7 @@ mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" 
                     }, 1000)
                 }
             },
-            onerror: (err) => {
+            onerror: err => {
                 log(`Error:${err}`)
                 $btn.removeAttr("disabled")
             }
@@ -2635,31 +2643,39 @@ mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
 }, ({ msto }) => {
-    GM_xmlhttpRequest({
-        method: "GET",
+    cs_get({
         url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
-        onload: (res) => {
+        onload: res => {
             msto["tag_list"] = decodeURIComponent(res.responseText)
-        },
-        onerror: (err) => {
-            error(err)
         }
     })
 })
 
-mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/problem/AT.*"], {
+mod.reg_chore("atdiff-fetch", "获取_AtCoder_难度", "10D", "@/problem/AT.*", {
+    atdiff: { ty: "string", priv: true },
+}, ({ msto }) => {
+    let dif = {}
+    cs_get({
+        url: "https://kenkoooo.com/atcoder/resources/problem-models.json",
+        onload: res => {
+            let rdif = JSON.parse(res.responseText)
+            for (let ky in rdif)
+                dif[ky] = rdif[ky].difficulty
+            msto.atdiff = JSON.stringify(dif)
+        }
+    })
+})
+
+mod.reg_pre("original-difficulty", "显示原始难度", ["@/problem/CF.*", "@/problem/AT.*"], {
     cf_src: { ty: "enum", dft: "codeforces.com", vals: [ "codeforces.com", "codeforces.ml" ], info: [
         "Codeforces problem source", "CF 题目源"
-    ] },
-    atdiff: { ty: "string", priv: true },
-    atd_lst_upd: { ty: "number", dft: -1, priv: true }
+    ]},
 }, async ({ msto }) => {
     return new Promise((resolve, reject) => {
         let pn = location.pathname.match(/(CF|AT)([0-9]|[A-Z])*$/g)[0].substring(2)
         if (location.pathname.includes("CF")) {
             let pid = pn.match(/^[0-9]*/g)[0], ops = pn.substring(pid.length)
-            GM_xmlhttpRequest({
-                method: "GET",
+            cs_get({
                 url: `https://${msto.cf_src}/problemset/problem/${pid}/${ops}`,
                 onload: res => {
                     const rv = $(res.responseText).find("span[title=Difficulty]").text().trim()
@@ -2672,22 +2688,7 @@ mod.reg_pre("original-difficulty", "获取原始难度", ["@/problem/CF.*", "@/p
             })
         }
         else {
-            let dif = {}
-            if (cur_time(1000) - msto.atd_lst_upd > 864000) {
-                GM_xmlhttpRequest({
-                    method: "GET",
-                    url: "https://kenkoooo.com/atcoder/resources/problem-models.json",
-                    onload: res => {
-                        let rdif = JSON.parse(res.responseText)
-                        for (let ky in rdif)
-                            dif[ky] = rdif[ky].difficulty
-                        msto.atdiff = JSON.stringify(dif)
-                        msto.atd_lst_upd = cur_time(1000)
-                    }
-                })
-            }
-            else
-                dif = JSON.parse(msto.atdiff)
+            let dif = JSON.parse(sto["^atdiff-fetch"].atdiff)
             let pid = lg_dat.problem.description.match(RegExp("^.{22}[-./A-Za-z0-9_]*"))[0].match(RegExp("[^/]*$"))
             if (!(pid in dif))
                 resolve(undefined)
@@ -2773,109 +2774,14 @@ mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
     })
 })
 
-mod.reg("benben-emoticon", "犇犇表情输入", [ "@/" ], {
-    show: { ty: "boolean", dft: true }
-}, () => {
-    const emo = [
-        { type: "emo", name: [ "kk" ], slug: "0" },
-        { type: "emo", name: [ "jk" ], slug: "1" },
-        { type: "emo", name: [ "se" ], slug: "2" },
-        { type: "emo", name: [ "qq" ], slug: "3" },
-        { type: "emo", name: [ "xyx" ], slug: "4" },
-        { type: "emo", name: [ "xia" ], slug: "5" },
-        { type: "emo", name: [ "cy" ], slug: "6" },
-        { type: "emo", name: [ "ll" ], slug: "7" },
-        { type: "emo", name: [ "xk" ], slug: "8" },
-        { type: "emo", name: [ "qiao" ], slug: "9" },
-        { type: "emo", name: [ "qiang" ], slug: "a" },
-        { type: "emo", name: [ "ruo" ], slug: "b" },
-        { type: "emo", name: [ "mg" ], slug: "c" },
-        { type: "emo", name: [ "dx" ], slug: "d" },
-        { type: "emo", name: [ "youl" ], slug: "e" },
-        { type: "emo", name: [ "baojin" ], slug: "f" },
-        { type: "emo", name: [ "shq" ], slug: "g" },
-        { type: "emo", name: [ "lb" ], slug: "h" },
-        { type: "emo", name: [ "lh" ], slug: "i" },
-        { type: "emo", name: [ "qd" ], slug: "j" },
-        { type: "emo", name: [ "fad" ], slug: "k" },
-        { type: "emo", name: [ "dao" ], slug: "l" },
-        { type: "emo", name: [ "cd" ], slug: "m" },
-        { type: "emo", name: [ "kun" ], slug: "n" },
-        { type: "emo", name: [ "px" ], slug: "o" },
-        { type: "emo", name: [ "ts" ], slug: "p" },
-        { type: "emo", name: [ "kl" ], slug: "q" },
-        { type: "emo", name: [ "yiw" ], slug: "r" },
-        { type: "emo", name: [ "dk" ], slug: "s" },
-        { type: "txt", name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },
-        { type: "txt", name: [ "orz" ], slug: "gh", name_display: "orz", width: 40 },
-        { type: "txt", name: [ "qwq" ], slug: "g5", name_display: "qwq", width: 40 },
-        { type: "txt", name: [ "hqlm" ], slug: "l0", name_display: "火前留名" },
-        { type: "txt", name: [ "sqlm" ], slug: "l1", name_display: "山前留名" },
-        { type: "txt", name: [ "xbt" ], slug: "g1", name_display: "屑标题" },
-        { type: "txt", name: [ "iee", "wee" ], slug: "g2", name_display: "我谔谔" },
-        { type: "txt", name: [ "kg" ], slug: "g3", name_display: "烤咕" },
-        { type: "txt", name: [ "gl" ], slug: "g4", name_display: "盖楼" },
-        { type: "txt", name: [ "wyy" ], slug: "g6", name_display: "无意义" },
-        { type: "txt", name: [ "wgzs" ], slug: "g7", name_display: "违规紫衫" },
-        { type: "txt", name: [ "tt" ], slug: "g8", name_display: "贴贴" },
-        { type: "txt", name: [ "jbl" ], slug: "g9", name_display: "举报了" },
-        { type: "txt", name: [ "%%%", "mmm" ], slug: "ga", name_display: "%%%" },
-        { type: "txt", name: [ "ngrb" ], slug: "gb", name_display: "你谷日爆" },
-        { type: "txt", name: [ "qpzc", "qp", "zc" ], slug: "gc", name_display: "前排资瓷" },
-        { type: "txt", name: [ "cmzz" ], slug: "gd", name_display: "臭名昭著" },
-        { type: "txt", name: [ "zyx" ], slug: "ge", name_display: "致远星" },
-        { type: "txt", name: [ "zh" ], slug: "gf", name_display: "祝好" },
-    ]
-    const $txt = $("#feed-content"), emo_url = name => `https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${name}`, txt = $txt[0]
-    $("#feed-content").before("<div id='emo-lst'></div>")
-    emo.forEach(m => {
-        const $emo = $((m.type === "emo")?
-            `<button class="exlg-emo-btn" exlg="exlg"><img src="${emo_url(m.slug)}" /></button>`
-            :
-            `<button class="exlg-emo-btn" exlg="exlg">${m.name_display}</button>`
-        ).on("click", () => {
-            const preval = txt.value
-            const pselstart = txt.selectionStart
-            const str1 = preval.slice(0, pselstart) + `![](${emo_url(m.slug)})`
-            txt.value = (str1 + preval.slice(txt.selectionEnd))
-            txt.focus()
-            txt.setSelectionRange(str1.length, str1.length)
-        }
-        ).appendTo("#emo-lst")
-        if (m.width) $emo.css("width", m.width + "px")
-        else if(m.type === "emo") $emo.css("width", "40px")
-        else $emo.css("width", "83px")
-    })
-    $("#feed-content").before("<br>")
-    $txt.on("input", e => {
-        if (e.originalEvent.data === "/")
-            mdp.content = mdp.content.replace(/\/(.{1,5})\//g, (_, emo_txt) =>
-                `![](` + emo_url(emo.find(m => m.name.includes(emo_txt)).slug) + `)`
-            )
-    })
-}, `
-.exlg-emo-btn {
-    position: relative;
-    top: 0px;
-    border: none;
-    background-color: #eee;
-    border-radius: .7em;
-    margin: .1em;
-    transition: all .4s;
-    height: 2em;
-}
-.exlg-emo-btn:hover {
-    background-color: #f3f3f3;
-    top: -3px;
-}
-`)
-
 mod.reg("user-css", "自定义样式表", ".*", {
     css: { ty: "string" }
 }, ({ msto }) => GM_addStyle(msto.css)
 )
 
 if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
+    if (/(\?|&)_contentOnly($|=)/g.test(location.search))
+        error("Content-Only pages.")
     if (uindow._feInjection.code !== 200)
         error("Luogu failed to load. Exlg stops loading.")
     lg_dat = uindow._feInjection.currentData
