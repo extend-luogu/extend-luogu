@@ -9,8 +9,8 @@
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://extend-luogu.github.io/exlg-setting-new/*
-// @match          http://localhost:1634/*
 // @match          https://dash.exlg.cc/*
+// @include        http://localhost:1634/*
 //
 // @connect        tencentcs.com
 // @connect        luogulo.gq
@@ -22,7 +22,7 @@
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.jsdelivr.net/gh/leizongmin/js-xss@1.0.10/dist/xss.min.js
 // @require        https://cdn.jsdelivr.net/gh/markedjs/marked@2.0.1/marked.min.js
-// @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@main/TM-dat.user.js
+// @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@0.8.3/TM-dat.user.js
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue

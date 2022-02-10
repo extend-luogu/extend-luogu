@@ -1,10 +1,12 @@
 {
   "name": "extend-luogu",
-  "version": "3.0.0",
+  "version": "5.0.0",
   "description": "Make luogu more powerful.",
   "main": "./src/main.js",
   "scripts": {
-    "test": "eslint ."
+    "lint": "eslint .",
+    "debug": "node ./src/build.js --debug",
+    "build": "node ./src/build.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
     "eslint-plugin-promise": "^4.3.1"
   },
   "dependencies": {
-    "esbuild": "^0.14.21"
+    "esbuild": "^0.14.21",
+    "minimist": "^1.2.5"
   }
 }
