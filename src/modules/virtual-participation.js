@@ -1,26 +1,27 @@
 import mod from "../core.js"
-import { exlg_alert, lg_dat, lg_post, lg_content, lg_usr, warn, cur_time, $ } from "../utils.js"
+import { exlg_alert, lg_dat, lg_post, lg_content, lg_usr, warn, error, cur_time, $ } from "../utils.js"
 
 mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
     vp_id: { ty: "string", dft: "0", priv: true },
     orig_dat: { ty: "object", priv: true, lvs: {
-        st_tm: { ty: "number" },
         pids: { ty: "string" },
         scrs: { ty: "string" }
     }}
 }, ({ msto }) => {
     if (lg_dat.contest.id.toString() === msto.vp_id) {
         warn("You cannot vp the virtual contest.")
-        if (msto.orig_dat.st_tm <= cur_time(1000) && lg_dat.contestProblems.length === 0) {
-            lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
-                `{
-                    "pids":[${msto.orig_dat.pids}],
-                    "scores":{${msto.orig_dat.scrs}}
-                }`
-            ).then(() => {
-                alert("比赛即将开始，页面将自动重新加载")
-                location.reload()
-            })
+        if (lg_dat.contestProblems.length === 0) {
+            setTimeout(() => {
+                lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,
+                    `{
+                        "pids":[${msto.orig_dat.pids}],
+                        "scores":{${msto.orig_dat.scrs}}
+                    }`
+                ).then(() => {
+                    alert("比赛即将开始，页面将自动重新加载")
+                    location.reload()
+                })
+            }, lg_dat.contest.startTime * 1000 - cur_time() - 500)
         }
         return
     }
@@ -39,7 +40,6 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 st = st.getTime() / 1000
 
                 msto.orig_dat.pids = msto.orig_dat.scrs = ""
-                msto.orig_dat.st_tm = st
                 $.each(lg_dat.contestProblems, (id, vl) => {
                     if (id)
                         msto.orig_dat.pids += ",", msto.orig_dat.scrs += ","
@@ -61,7 +61,7 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                     },
                     "hostID":${lg_usr.uid}
                 }`, resp = await lg_post(`/fe/api/contest/${newc ? "new" : ("edit/" + msto.vp_id)}`, cdt)
-                switch (resp.status){
+                switch (resp.status ?? 200){
                 case 200:
                     msto.vp_id = resp.id.toString()
                     break
@@ -69,6 +69,8 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                     msto.vp_id = (await lg_post(`/fe/api/contest/new`, cdt)).id.toString()
                     newc = true
                     break
+                default:
+                    error(`Failed to modify contest ${msto.vp_id} with status code ${resp.status}.`)
                 }
                 await lg_post(`/fe/api/contest/editProblem/${msto.vp_id}`,`{"pids":[],"scores":{"P1000":100}}`)
 
