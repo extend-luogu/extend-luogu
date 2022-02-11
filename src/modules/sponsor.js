@@ -1,4 +1,4 @@
-import { mod, sto } from "../core.js"
+import mod, { sto } from "../core.js"
 import { $, cs_get, register_badge } from "../utils.js"
 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {

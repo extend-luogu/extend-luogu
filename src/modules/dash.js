@@ -22,54 +22,33 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
     }
 }, () => {
-    const modules = [
-        {
-            name: "Modules",
-            description: "功能",
-            icon: "tunes",
-            children: mod._
-                .filter(m => ! m.name.startsWith("@"))
-                .map(m => ({
-                    rawName: m.name,
-                    name: m.name.replace(/^[@^]/g, ""),
-                    description: m.info,
-                    settings: Object.entries(mod.data[m.name].lvs)
-                        .filter(([ k, s ]) => k !== "on" && ! s.priv)
-                        .map(([ k, s ]) => ({
-                            name: k,
-                            displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
-                            description: s.info,
-                            type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
-                            ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                            ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: s.step }),
-                            ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
-                        }))
-                }))
-        },
-        {
-            name: "Core",
-            description: "核心",
-            icon: "bug_report",
-            children: mod._
-                .filter(m => m.name.startsWith("@"))
-                .map(m => ({
-                    rawName: m.name,
-                    name: m.name.replace(/^[@^]/g, ""),
-                    description: m.info,
-                    settings: Object.entries(mod.data[m.name].lvs)
-                        .filter(([ k, s ]) => k !== "on" && ! s.priv)
-                        .map(([ k, s ]) => ({
-                            name: k,
-                            displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
-                            description: s.info,
-                            type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
-                            ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                            ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: Math.ceil((s.max - s.min) / 50) }),
-                            ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
-                        }))
-                }))
-        },
-    ]
+    const modules = [["Modules", "功能", "tunes", false], ["Core", "核心", "bug_report", true]]
+        .map(([name, description, icon, is_main]) => ({
+            name, description, icon,
+            children: (() => {
+                let arr = []
+                mod._.forEach((m, nm) => {
+                    if (nm.startsWith("@") === is_main)
+                        arr.push({
+                            rawName: nm,
+                            name: nm.replace(/^[@^]/g, ""),
+                            description: m.info,
+                            settings: Object.entries(mod.data[nm].lvs)
+                                .filter(([ k, s ]) => k !== "on" && ! s.priv)
+                                .map(([ k, s ]) => ({
+                                    name: k,
+                                    displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                                    description: s.info,
+                                    type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
+                                    ...(s.ty === "boolean" && { type: "CHECKBOX" }),
+                                    ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: s.step }),
+                                    ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
+                                }))
+                        })
+                })
+                return arr
+            })()
+        }))
     console.log(modules)
     uindow.guiStart(modules)
 })

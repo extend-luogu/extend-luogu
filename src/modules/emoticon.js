@@ -82,7 +82,9 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
     $("<br />").appendTo($menu)
     $(".mp-editor-ground").addClass("exlg-ext")
 
-    const $ground = $(".mp-editor-ground"), $show_hide = $menu.children().first().clone(true).addClass("exlg-unselectable"), $set_height = $menu.children().first().clone(true).addClass("exlg-unselectable")
+    const $ground = $(".mp-editor-ground"),
+        $show_hide = $menu.children().first().clone(true).addClass("exlg-unselectable"),
+        $set_height = $menu.children().first().clone(true).addClass("exlg-unselectable")
     $menu.children().last().before($show_hide)
     $menu.children().last().before($set_height)
     $show_hide.children()[0].innerHTML = (msto.show) ? "隐藏" : "显示"

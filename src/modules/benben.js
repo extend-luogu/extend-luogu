@@ -1,4 +1,4 @@
-import uindow, { cs_get, $ } from "../utils.js"
+import uindow, { xss, cs_get, $ } from "../utils.js"
 import mod from "../core.js"
 
 mod.reg("benben", "全网犇犇", "@/", {
@@ -56,7 +56,7 @@ mod.reg("benben", "全网犇犇", "@/", {
                         </header>
                         <div class="am-comment-bd">
                             <span class="feed-comment">
-                                ${ marked(m.content) }
+                                ${ marked(xss.process(m.content)) }
                             </span>
                         </div>
                     </div>

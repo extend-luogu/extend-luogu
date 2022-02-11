@@ -187,7 +187,7 @@ const mod = {
             if (sto[name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
                 m.willrun = true
                 if ("pre" in m)
-                    m.set(name, exe({name, ...m}))
+                    mod._.set(name, exe({name, ...m}))
             }
         }
     },

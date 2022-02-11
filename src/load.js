@@ -46,5 +46,3 @@ const init_sto = chance => {
     }
 }
 init_sto(1)
-
-mod.preload()

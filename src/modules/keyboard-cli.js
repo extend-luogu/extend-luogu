@@ -50,10 +50,27 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     }
     let cli_lang = cli_langs.indexOf(msto.lang) || 0
 
-    const cmds = {
-        help: (cmd/* string*/) => {
-            /* get the help of <cmd>. or list all cmds. */
-            /* 获取 <cmd> 的帮助。空则列出所有。 */
+    const gcmd = (name, arg, help, fn) => {
+        arg = arg.replace(/ /g, "").split(",").map(e => {
+            let ret = {}
+            if (e[0] === "[") {
+                ret.essential = false
+                e = e.slice(1, -1)
+            }
+            else {
+                ret.essential = true
+            }
+            [ ret.name, ret.type ] = e.split(":")
+            return ret
+        })
+        return { name, arg, help, fn }
+    }
+
+    const cmds = [
+        gcmd("help", "[cmd: string]", [
+            "get the help of <cmd>. or list all cmds.",
+            "获取 <cmd> 的帮助。空则列出所有",
+        ], cmd => {
             if (! cmd)
                 cli_log`exlg cli. current language: ${cli_lang}, available commands: ${ Object.keys(cmds).join(", ") }`
             else {
@@ -66,10 +83,11 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 }).join(" ")
                 cli_log`${cmd} ${arg} ${ f.help[cli_lang] }`
             }
-        },
-        cd: (path/* !string*/) => {
-            /* jump to <path>, relative path is OK. */
-            /* 跳转至 <path>，支持相对路径。 */
+        }),
+        gcmd("cd", "path: string", [
+            "jump to <path>, relative path is OK.",
+            "跳转至 <path>，支持相对路径。",
+        ], path => {
             let tar
             if (path[0] === "/") tar = path
             else {
@@ -83,10 +101,11 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 tar = pn.join("/")
             }
             location.href = location.origin + "/" + tar.replace(/^\/+/, "")
-        },
-        cdd: (forum/* !string*/) => {
-            /* jump to the forum named <forum> of discussion. use all the names you can think of. */
-            /* 跳转至名为 <forum> 的讨论板块，你能想到的名字基本都有用。 */
+        }),
+        gcmd("cdd", "forum: string", [
+            "jump to the forum named <forum> of discussion. use all the names you can think of.",
+            "跳转至名为 <forum> 的讨论板块，你能想到的名字基本都有用。",
+        ], forum => {
             const tar = [
                 [ "relevantaffairs",    "gs", "gsq",    "灌水", "灌水区",               "r", "ra" ],
                 [ "academics",          "xs", "xsb",    "学术", "学术版",               "a", "ac" ],
@@ -96,11 +115,12 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             ]
             forum = tar.find(ns => ns.includes(forum))?.[0]
             if (! tar) return cli_error`cdd: unknown forum "${forum}"`
-            cmds.cd(`/discuss/lists?forumname=${forum}`)
-        },
-        cc: (name/* char*/) => {
-            /* jump to [name], "h|p|c|r|d|i|m|n" stands for home|problem|contest|record|discuss|I myself|message|notification. or jump home. */
-            /* 跳转至 [name]，"h|p|c|r|d|i|m|n" 代表：主页|题目|比赛|评测记录|讨论|个人中心|私信|通知。空则跳转主页。 */
+            cmds.cd.fn(`/discuss/lists?forumname=${forum}`)
+        }),
+        gcmd("cc", "[name: char]", [
+            "jump to <name>, \"h|p|c|r|d|i|m|n\" stands for home|problem|contest|record|discuss|I myself|message|notification. or jump home.",
+            "跳转至 [name]，\"h|p|c|r|d|i|m|n\" 代表：主页|题目|比赛|评测记录|讨论|个人中心|私信|通知。空则跳转主页。",
+        ], name => {
             name = name || "h"
             const tar = {
                 h: "/",
@@ -112,12 +132,13 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 m: "/chat",
                 n: "/user/notification",
             }[name]
-            if (tar) cmds.cd(tar)
+            if (tar) cmds.cd.fn(tar)
             else cli_error`cc: unknown target "${name}"`
-        },
-        mod: (action/* !string*/, name/* string*/) => {
-            /* for <action> "enable|disable|toggle", opearte the mod named <name>. */
-            /* 当 <action> 为 "enable|disable|toggle"，对名为 <name> 的模块执行对应操作：启用|禁用|切换。 */
+        }),
+        gcmd("mod", "action: string, [name: string]", [
+            "for <action> \"enable|disable|toggle\", opearte the mod named <name>.",
+            "当 <action> 为 \"enable|disable|toggle\"，对名为 <name> 的模块执行对应操作：启用|禁用|切换。",
+        ], (action, name) => {
             switch (action) {
             case "enable":
             case "disable":
@@ -130,17 +151,19 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             default:
                 return cli_error`mod: unknown action "${action}"`
             }
-        },
-        dash: (action/* !string*/) => {
-            /* for <action> "show|hide|toggle", opearte the exlg dashboard. */
-            /* 当 <action> 为 "show|hide|toggle", 显示|隐藏|切换 exlg 管理面板。 */
+        }),
+        gcmd("dash", "action: string", [
+            "for <action> \"show|hide|toggle\", opearte the exlg dashboard.",
+            "当 <action> 为 \"show|hide|toggle\", 显示|隐藏|切换 exlg 管理面板。",
+        ], action => {
             if (! [ "show", "hide", "toggle" ].includes(action))
                 return cli_error`dash: unknown action "${action}"`
             $("#exlg-dash-window")[action]()
-        },
-        lang: (lang/* !string*/) => {
-            /* for <lang> "en|zh" switch current cli language. */
-            /* 当 <lang> 为 "en|zh"，切换当前语言。 */
+        }),
+        gcmd("lang", "lang: string", [
+            "for <lang> \"en|zh\" switch current cli language.",
+            "当 <lang> 为 \"en|zh\"，切换当前语言。",
+        ], lang => {
             try {
                 msto.lang = lang
                 cli_lang = cli_langs.indexOf(lang)
@@ -148,33 +171,27 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             catch {
                 return cli_error`lang: unknown language ${lang}`
             }
-        },
-        uid: (uid/* !integer*/) => {
-            /* jumps to homepage of user whose uid is <uid>. */
-            /* 跳转至 uid 为 <uid> 的用户主页。 */
-            location.href = `/user/${uid}`
-        },
-        un: (name/* !string*/) => {
-            /* jumps to homepage of user whose username is like <name>. */
-            /* 跳转至用户名与 <name> 类似的用户主页。 */
+        }),
+        gcmd("uid", "uid: integer", [
+            "jumps to homepage of user whose uid is <uid>.",
+            "跳转至 uid 为 <uid> 的用户主页。",
+        ], uid => location.href = `/user/${uid}`),
+        gcmd("un", "name: string", [
+            "jumps to homepage of user whose username is like <name>.",
+            "跳转至用户名与 <name> 类似的用户主页。",
+        ], name => {
             $.get("/api/user/search?keyword=" + name, res => {
                 if (! res.users[0])
                     cli_error`un: unknown user "${name}".`
                 else
                     location.href = "/user/" + res.users[0].uid
             })
-        }
-    }
-    for (const f of Object.values(cmds)) {
-        [ , f.arg, f.help ] = f.toString().match(/^\((.*?)\) => {((?:\n +\/\*.+?\*\/)+)/)
-        f.arg = f.arg.split(", ").map(a => {
-            const [ , name, type ] = a.match(/([a-z_]+)\/\* (.+)\*\//)
-            return {
-                name, essential: type[0] === "!", type: type.replace(/^!/, "")
-            }
-        })
-        f.help = f.help.trim().split("\n").map(s => s.match(/\/\* (.+) \*\//)[1])
-    }
+        }),
+    ].reduce((tot, cmd) => {
+        tot[cmd.name] = cmd
+        return tot
+    }, {})
+
     const parse = cmd => {
         log(`Parsing command: "${cmd}"`)
 
@@ -195,7 +212,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             else return cli_error`${n}: illegal param "${a}", expected type ${t}.`
         }
         if (f.arg[i + 1]?.essential) return cli_error`${n}: lost essential param "${ f.arg[i + 1].name }"`
-        f(...tk)
+        f.fn(...tk)
     }
 
     $cli_input.on("keydown", e => {
