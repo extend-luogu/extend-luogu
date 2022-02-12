@@ -11,6 +11,7 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
     src: { ty: "enum", vals: ["图.tk", "github", "妙.tk", "啧.tk"], dft: "图.tk", info: ["Emoticon Source", "表情源"] },
     height_limit: { ty: "boolean", dft: true, info: ["Expand in default", "是否默认展开表情"] }
 }, ({ msto }) => {
+    // console.log(msto)
     const emo = [
         "kk", "jk", "se", "qq", "xyx", "xia", "cy", "ll", "xk", "qiao", "qiang", "ruo", "mg", "dx", "youl", "baojin", "shq", "lb", "lh", "qd", "fad", "dao", "cd", "kun", "px", "ts", "kl", "yiw", "dk",
         { name: [ "sto" ], slug: "gg", name_display: "sto", width: 40 },

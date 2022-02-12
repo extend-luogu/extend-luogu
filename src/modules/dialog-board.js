@@ -42,8 +42,8 @@ mod.reg("exlg-dialog-board", "exlg_公告板", "@/.*", {
     else
         footer.appendChild(btn_accept), footer.appendChild(btn_cancel)
     container.onclick = (e) => e.stopPropagation()
-    close_btn.onclick = btn_cancel.onclick = exlg_dialog_board.hide_dialog
-    btn_accept.onclick = exlg_dialog_board.accept_dialog
+    close_btn.onclick = btn_cancel.onclick = () => exlg_dialog_board.hide_dialog() // Note: 不这么写 this 会变化
+    btn_accept.onclick = () => exlg_dialog_board.accept_dialog()
 
     let _mouse_down_on_wrapper = false
     container.onmousedown = (e) => e.stopPropagation()

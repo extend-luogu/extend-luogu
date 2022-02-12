@@ -4,7 +4,7 @@
   "description": "Make luogu more powerful.",
   "main": "./src/main.js",
   "scripts": {
-    "lint": "eslint ."
+    "test": "eslint ."
   },
   "repository": {
     "type": "git",

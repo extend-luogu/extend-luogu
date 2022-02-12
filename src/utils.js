@@ -152,26 +152,26 @@ const exlg_dialog_board = {
     header: null,
     content: null,
     autoquit: true,
-    show_dialog: function() {
+    show_dialog() {
         this.wrapper.style.display="flex"
         setTimeout(() => {
             this.container.classList.remove("container-hide")
             this.container.classList.add("container-show")
         }, 50)
     },
-    hide_dialog: function() {
+    hide_dialog() {
         this.container.classList.add("container-hide")
         this.container.classList.remove("container-show")
         setTimeout(() => this.wrapper.style.display="none", this.wait_time)
         // header.innerHTML = "&nbsp;"
         // content.innerHTML = ""
     },
-    accept_dialog: function() {
+    accept_dialog() {
         this._ac_func(this.hide_dialog)
         if (this.autoquit)
             this.hide_dialog()
     },
-    show_exlg_alert: function(text = "", title = "exlg 提醒您", onaccepted = () => {}, autoquit = true) {
+    show_exlg_alert(text = "", title = "exlg 提醒您", onaccepted = () => {}, autoquit = true) {
         this.autoquit = autoquit
         this._ac_func = onaccepted
         this.header.innerHTML = title
@@ -179,7 +179,7 @@ const exlg_dialog_board = {
         this.show_dialog()
     },
 }
-const exlg_alert = () => exlg_dialog_board.show_exlg_alert()
+const exlg_alert = (...arg) => exlg_dialog_board.show_exlg_alert(...arg)
 
 const register_badge = async () => {
     const parse_badge = (href, func_quit) => cs_get({
