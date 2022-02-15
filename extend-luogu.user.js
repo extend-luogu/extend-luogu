@@ -9,7 +9,7 @@
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://extend-luogu.github.io/exlg-setting-new/*
-// @match          http://localhost:1634/*
+// @include        http://localhost:1634/*
 // @match          https://dash.exlg.cc/*
 //
 // @connect        tencentcs.com
