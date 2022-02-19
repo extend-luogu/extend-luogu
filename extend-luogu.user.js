@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        4.2.5
+// @version        4.2.6
+// @description    Makes Luogu more powerful
+// @icon           https://exlg.cc/img/logo.png
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -37,19 +39,8 @@
 // ==Update==
 
 const update_log = `
--M virtual-participation
- : 创建重现赛，仿真测试
- : 在开始后再加入题目，尽量模拟真实比赛
-*M user-problem-color
- : 加快了比较
-*M emoticon
- : 加入了 GitHub、啧.tk、妙.tk 源，可手动切换
- : 啧.tk 不支持热词表情
-xM benben-emoticon
- : 与 emoticon 合并
-*M original-difficulty
- : 修复了部分题面中有*的题目无法正确显示难度的问题
-*- 如果洛谷前端加载失败或 Content-Only，exlg 将会中止加载
+*M search-user
+ : 搜索用户自动忽略其中的空白字符（通常出现在从外面复制名字的时候）
 `.trim()
 
 // ==/Update==
@@ -2515,7 +2506,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
     `)
     const func = () => {
         $search_user.prop("disabled", true)
-        $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
+        $.get("/api/user/search?keyword=" + $("[name=username]").val().replace(/\s/g, ''), res => {
             if (! res.users[0]) {
                 $search_user.prop("disabled", false)
                 lg_alert("无法找到指定用户")
