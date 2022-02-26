@@ -38,7 +38,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     const version = GM_info.script.version
     const fix_html = (str) => {
         let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`
-        str.forEach(e => {
+        str.split("\n").forEach(e => {
             res += `<div>${e.replaceAll(" ", "&nbsp;")}</div><br>`
         })
         return res + "</div>"
