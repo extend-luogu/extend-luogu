@@ -1,21 +1,11 @@
 import uindow, { $, exlg_alert, springboard, version_cmp, log } from "../utils.js"
 import mod, { sto } from "../core.js"
 
-const update_log = [
-    "-M virtual-participation",
-    " : 创建重现赛，仿真测试",
-    " : 在开始后再加入题目，尽量模拟真实比赛",
-    "*M user-problem-color",
-    " : 加快了比较",
-    "*M emoticon",
-    " : 加入了 GitHub、啧.tk、妙.tk 源，可手动切换",
-    " : 啧.tk 不支持热词表情",
-    "xM benben-emoticon",
-    " : 与 emoticon 合并",
-    "*M original-difficulty",
-    " : 修复了部分题面中有*的题目无法正确显示难度的问题",
-    "*- 如果洛谷前端加载失败或 Content-Only，exlg 将会中止加载",
-]
+const update_log = `
+*M virtual-participation
+ : 修复了无法跳转的 bug
+ : 优化了体验
+`.trim()
 
 mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null, () =>
     uindow.parent.postMessage([ document.body.innerText ], "*")
