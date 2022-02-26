@@ -2,7 +2,7 @@
   "name": "extend-luogu",
   "version": "3.0.0",
   "description": "Make luogu more powerful.",
-  "main": "extend-luogu.user.js",
+  "main": "./src/main.js",
   "scripts": {
     "test": "eslint ."
   },
@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/extend-luogu/extend-luogu/issues"
   },
-  "homepage": "https://github.com/extend-luogu/extend-luogu#readme",
+  "homepage": "https://exlg.cc",
   "devDependencies": {
     "eslint": "^7.22.0",
     "eslint-config-standard": "^16.0.2",
@@ -23,5 +23,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "esbuild": "^0.14.21"
+  }
 }
