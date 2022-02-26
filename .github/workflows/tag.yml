@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Tagger
 
 # Controls when the workflow will run
 on:
@@ -24,4 +24,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Tag from package version
-        uses: suceda/tag-from-version@v0.1.0
+        uses: Klemensas/action-autotag@1.2.3
+        with: 
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          
