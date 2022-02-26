@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.0.0
+// @version        5.0.1
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -9,8 +9,8 @@
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://extend-luogu.github.io/exlg-setting-new/*
-// @match          http://localhost:1634/*
 // @match          https://dash.exlg.cc/*
+// @include        http://localhost:1634/*
 //
 // @connect        tencentcs.com
 // @connect        luogulo.gq
@@ -2320,21 +2320,11 @@ body {
 `);
 
   // modules/update.js
-  var update_log = [
-    "-M virtual-participation",
-    " : 创建重现赛，仿真测试",
-    " : 在开始后再加入题目，尽量模拟真实比赛",
-    "*M user-problem-color",
-    " : 加快了比较",
-    "*M emoticon",
-    " : 加入了 GitHub、啧.tk、妙.tk 源，可手动切换",
-    " : 啧.tk 不支持热词表情",
-    "xM benben-emoticon",
-    " : 与 emoticon 合并",
-    "*M original-difficulty",
-    " : 修复了部分题面中有*的题目无法正确显示难度的问题",
-    "*- 如果洛谷前端加载失败或 Content-Only，exlg 将会中止加载"
-  ];
+  var update_log = `
+*M virtual-participation
+ : 修复了无法跳转的 bug
+ : 优化了体验
+`.trim();
   mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null, () => uindow.parent.postMessage([document.body.innerText], "*"));
   mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
     $("#exlg-update").remove();
@@ -2356,7 +2346,7 @@ body {
     const version = GM_info.script.version;
     const fix_html = (str) => {
       let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`;
-      str.forEach((e) => {
+      str.split("\n").forEach((e) => {
         res += `<div>${e.replaceAll(" ", "&nbsp;")}</div><br>`;
       });
       return res + "</div>";

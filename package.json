@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint .",
     "debug": "node ./src/build.js --debug",
-    "build": "node ./src/build.js"
+    "build": "node ./src/build.js",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -20,13 +21,13 @@
   "homepage": "https://exlg.cc",
   "devDependencies": {
     "eslint": "^7.22.0",
+    "husky": "^7.0.0",
+    "esbuild": "^0.14.21",
+    "minimist": "^1.2.5",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1"
   },
-  "dependencies": {
-    "esbuild": "^0.14.21",
-    "minimist": "^1.2.5"
-  }
+  "dependencies": {}
 }
