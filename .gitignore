@@ -6,6 +6,8 @@ exlg-setting/
 
 package-lock.json
 
+dist/extend-luogu.bundled.js
+
 # Node
 
 # Logs
