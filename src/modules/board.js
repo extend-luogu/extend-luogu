@@ -13,7 +13,7 @@ mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
     `)
     const func = () => {
         $search_user.prop("disabled", true)
-        $.get("/api/user/search?keyword=" + $("[name=username]").val(), res => {
+        $.get("/api/user/search?keyword=" + $("[name=username]").val().trim(), res => {
             if (! res.users[0]) {
                 $search_user.prop("disabled", false)
                 lg_alert("无法找到指定用户")
