@@ -8,9 +8,9 @@
 
 ## 安装
 
-1. （更推荐）请直接访问 [jsdelivr 下载链接](https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.js) 来使用 [TamperMonkey](https://www.tampermonkey.net) 安装脚本。_[它坏了]_
-2. 将 `extend-luogu.min.js` 的完整代码复制到 TamperMonkey 的 `Create a new script` 页面，然后 `Ctrl + S` （或者 macOS 用户 `⌘ + S`）保存。如果控制台报错 `SyntaxError` 那多半是没复制全。
-3. 脚本会在有更新时提醒。_[它也坏了]_
+1. （更推荐）请直接访问 [jsdelivr 下载链接](https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js) 来使用 [TamperMonkey](https://www.tampermonkey.net) 安装脚本。
+2. 将 `/dist/extend-luogu.min.user.js` 的完整代码复制到 TamperMonkey 的 `Create a new script` 页面，然后 `Ctrl + S` （或者 macOS 用户 `⌘ + S`）保存。如果控制台报错 `SyntaxError` 那多半是没复制全。
+3. 脚本会在有更新时提醒。_[它坏了]_
 
 ### 开发、自行搭建
 #### 前置要求
@@ -27,7 +27,7 @@ yarn run build
 # Or build for debug(not minified)
 yarn run debug
 ```
-3. See `dist/extend-luogu.xxx.js` according to your command.
+3. See `dist/extend-luogu.xxx.user.js` according to your command.
 
 ## 贡献
 

@@ -6,9 +6,9 @@ Makes [Luogu](https://www.luogu.com.cn/) more powerful. _[Request new slogan]_
 
 ## Installation
 
-1. (recommended) Visit [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/main/dist/extend-luogu.min.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/). _[Failed, Cannot Recongize]_
-2. Copy **whole** text of `extend-luogu.min.js` into `Tampermonkey > Create a new script` page, then save it.
-3. You will be automatically notified when there's a update. _[Failed, api breaks down]_
+1. (recommended) Visit [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/main/dist/extend-luogu.min.user.js) to directly install/update your local script by [TamperMonkey](https://www.tampermonkey.net/).
+2. Copy **whole** text of `/dist/extend-luogu.min.user.js` into `Tampermonkey > Create a new script` page, then save it.
+3. You will be automatically notified when there's a update. _[WIP]_
 
 ### Development / Build
 
@@ -27,7 +27,7 @@ yarn run build
 # Or build for debug(not minified)
 yarn run debug
 ```
-3. See `dist/extend-luogu.xxx.js` according to your command.
+3. See `dist/extend-luogu.xxx.user.js` according to your command.
 
 ## Contribution
 
@@ -35,7 +35,7 @@ Welcome!
 
 - Commits should obey our [Commit Rule](https://github.com/extend-luogu/ExtendLuoguGitCommitMsgStd). _[Need updating]_
 - This repository uses [eslint](https://eslint.org/), so please make sure your code passed under `.eslintrc.js`.
-- See more [Rules on Code](https://github.com/orgs/extend-luogu/projects/1)
+- See more [Rules on Code](https://github.com/orgs/extend-luogu/projects/1).
 
 ## Discussion
 
