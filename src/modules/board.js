@@ -35,7 +35,7 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
         $fbtn.text(msto.show ? "收起" : "展开")
         $list.toggle()
     })
-    const refresh = cs_get({
+    const refresh = () => cs_get({
         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
         onload: function(res) {
             // console.log($board, $list)

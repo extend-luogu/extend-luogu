@@ -6,7 +6,7 @@ exlg-setting/
 
 package-lock.json
 
-dist/extend-luogu.bundled.js
+dist/extend-luogu.bundled.user.js
 
 # Node
 

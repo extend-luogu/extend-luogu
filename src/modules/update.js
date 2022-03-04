@@ -7,11 +7,7 @@ const update_log = `
  : 优化了体验
 `.trim()
 
-mod.reg_main("version-data", "版本数据", "@tcs2/release/exlg-nextgen", null, () =>
-    uindow.parent.postMessage([ document.body.innerText ], "*")
-)
-
-mod.reg_chore("update", "检查更新", "1D", mod.path_dash_board, null, () => {
+mod.reg_chore("update", "检查更新", "1D", ".*", null, () => {
     $("#exlg-update").remove()
     springboard({ type: "update" }).appendTo($("body")).hide()
     uindow.addEventListener("message", e => {
