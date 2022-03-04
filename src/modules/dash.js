@@ -140,9 +140,9 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         const _list = [
             { tag: "vers", title: "vers", buttons: [ ] },
             { tag: "source", title: "Source", buttons: [
-                { col: "#66ccff", html: "JsDelivr", onclick: () => uindow.location.href = "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/extend-luogu.user.js" },
-                { col: "#66ccff", html: "Raw", onclick: () => uindow.location.href = "https://github.com/extend-luogu/extend-luogu/raw/main/extend-luogu.user.js" },
-                { col: "#66ccff", html: "FastGit", onclick: () => uindow.location.href = "https://hub.fastgit.org/extend-luogu/extend-luogu/raw/main/extend-luogu.user.js" }
+                { col: "#66ccff", html: "JsDelivr", onclick: () => uindow.location.href = "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js" },
+                { col: "#66ccff", html: "Raw", onclick: () => uindow.location.href = "https://github.com/extend-luogu/extend-luogu/raw/main/dist/extend-luogu.min.user.js" },
+                { col: "#66ccff", html: "FastGit", onclick: () => uindow.location.href = "https://hub.fastgit.org/extend-luogu/extend-luogu/raw/main/dist/extend-luogu.min.user.js" }
             ] },
             { tag: "link", title: "Link", buttons: [
                 { col: "#66ccff", html: "Web", onclick: () => uindow.location.href = "https://exlg.cc" },
