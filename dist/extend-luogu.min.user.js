@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
-// @version        5.0.2
+// @version        5.1.0
 //
 // @match          https://*.luogu.com.cn/*
 // @match          https://*.luogu.org/*
@@ -630,9 +630,13 @@ body {
     margin-left: 0.5em;
 }
 `);var se=`
-*M virtual-participation
- : 修复了无法跳转的 bug
- : 优化了体验
+*M user-search
+ : Trim the username,
+ : considering that copied usernames are often with spaces.
+-< 将 dist/extend-luogu.bundled.js 加入 .gitignore
+x@ tagger 在 PR 时不再运行
+*? readme
+ : 修了 typo, 加上了 dev guide
 `.trim();c.reg_chore("update","检查更新","1D",".*",null,()=>{o("#exlg-update").remove(),I({type:"update"}).appendTo(o("body")).hide(),h.addEventListener("message",e=>{if(e.data[0]!=="update")return;e.data.shift();let t=e.data[0],r=GM_info.script.version,n=R(r,t),l=`Comparing version: ${r} ${n} ${t}`;$(l)})});c.reg("update-log","更新日志显示","@/.*",{last_version:{ty:"string",priv:!0}},({msto:e})=>{if(location.href.includes("blog"))return;let t=GM_info.script.version,r=n=>{let l=`<div class="exlg-update-log-text" style="font-family: ${L["code-block-ex"].copy_code_font};">`;return n.split(`
 `).forEach(i=>{l+=`<div>${i.replaceAll(" ","&nbsp;")}</div><br>`}),l+"</div>"};switch(R(e.last_version,t)){case"==":break;case"<<":A(r(se),`extend-luogu ver. ${t} 更新日志`);case">>":e.last_version=t}},`
 .exlg-update-log-text {

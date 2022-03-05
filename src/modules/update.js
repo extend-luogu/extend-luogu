@@ -2,9 +2,13 @@ import uindow, { $, exlg_alert, springboard, version_cmp, log } from "../utils.j
 import mod, { sto } from "../core.js"
 
 const update_log = `
-*M virtual-participation
- : 修复了无法跳转的 bug
- : 优化了体验
+*M user-search
+ : Trim the username,
+ : considering that copied usernames are often with spaces.
+-< 将 dist/extend-luogu.bundled.js 加入 .gitignore
+x@ tagger 在 PR 时不再运行
+*? readme
+ : 修了 typo, 加上了 dev guide
 `.trim()
 
 mod.reg_chore("update", "检查更新", "1D", ".*", null, () => {
