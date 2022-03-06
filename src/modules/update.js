@@ -39,7 +39,7 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     const fix_html = (str) => {
         let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`
         str.split("\n").forEach(e => {
-            res += `<div>${e.replaceAll(" ", "&nbsp;")}</div><br>`
+            res += `<div>${e.replaceAll(" ", "&nbsp;")}</div>`
         })
         return res + "</div>"
     }
@@ -56,6 +56,6 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     overflow-x: auto;
     white-space: nowrap;
     text-align: left;
-    border: 1px solid #dedede;
+    /* border: 1px solid #dedede; */
 }
 `)

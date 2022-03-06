@@ -153,16 +153,16 @@ const exlg_dialog_board = {
     content: null,
     autoquit: true,
     show_dialog() {
-        this.wrapper.style.display="flex"
+        this.wrapper.css("display", "flex")
         setTimeout(() => {
-            this.container.classList.remove("container-hide")
-            this.container.classList.add("container-show")
+            this.container.removeClass("container-hide")
+            this.container.addClass("container-show")
         }, 50)
     },
     hide_dialog() {
-        this.container.classList.add("container-hide")
-        this.container.classList.remove("container-show")
-        setTimeout(() => this.wrapper.style.display="none", this.wait_time)
+        this.container.addClass("container-hide")
+        this.container.removeClass("container-show")
+        setTimeout(() => this.wrapper.hide(), this.wait_time)
         // header.innerHTML = "&nbsp;"
         // content.innerHTML = ""
     },
@@ -174,8 +174,8 @@ const exlg_dialog_board = {
     show_exlg_alert(text = "", title = "exlg 提醒您", onaccepted = () => {}, autoquit = true) {
         this.autoquit = autoquit
         this._ac_func = onaccepted
-        this.header.innerHTML = title
-        this.content.innerHTML = text
+        this.header.text(title)
+        this.content.html(text)
         this.show_dialog()
     },
 }
