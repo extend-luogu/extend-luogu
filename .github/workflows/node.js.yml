@@ -3,13 +3,13 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Check & Build
 
 on: [push, pull_request]
 
 jobs:
-  lint:
 
+  check:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,52 @@ jobs:
         with:
           node-version: 16.x
           cache: 'yarn'
-      - run: yarn
-      - run: yarn lint
+      - run: yarn --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Run exlg-git-commit-msg-std
+        env:
+          COMMIT_MSG: ${{ toJson(github.event.commits.*.message) }}
+        run: |
+          node ./node_modules/exlg-git-commit-msg-std/check.js -c "$PWD/.gitmsgrc.js" -e COMMIT_MSG
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [check]
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+      - run: yarn --frozen-lockfile
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - env:
+          MSG: ${{ github.event.commits[0].message }}
+        run: |
+          import os
+          from json import loads
+          b, rb = "", os.environ['MSG'].split('^[^\n]\n\n')
+          if len(rb) >= 2:
+            b = rb[1]
+          open("./src/update_log.js", "w").write("export default `{}`".format(b))
+          a = loads(open("./package.json").read())["version"]
+          os.system("""
+          yarn run build
+          git add .
+          HUSKY=0 git commit -m "release {}"
+          """.format(a))
+          os.system("git tag {}".format(a))
+        shell: python
+
+      - name: Push commits
+        run: |
+          git push origin main:latest --tags -f

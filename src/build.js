@@ -13,4 +13,6 @@ require("esbuild").buildSync({
     charset: "utf8",
 })
 console.log(`Build extend-luogu.${isdebug? "bundled" : "min"}.user.js successfully.`)
+if (!isdebug)
+    require("fs").copyFileSync("../dist/extend-luogu.min.user.js", "../extend-luogu.user.js")
 process.exit()
