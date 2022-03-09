@@ -19,7 +19,6 @@ module.exports = {
     "no-trailing-spaces": 2,
     "key-spacing": 0,
     "space-before-function-paren": 0,
-    "space-unary-ops": [ 2, { words: true, nonwords: true } ],
 
     "camelcase": 0,
     "spaced-comment": 2,
