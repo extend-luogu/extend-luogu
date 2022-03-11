@@ -1,16 +1,6 @@
 import uindow, { $, exlg_alert, springboard, version_cmp, log } from "../utils.js"
 import mod, { sto } from "../core.js"
-import update_log from "../update_log.js"
-
-// const update_log = `
-// *M user-search
-//  : Trim the username,
-//  : considering that copied usernames are often with spaces.
-// -< 将 dist/extend-luogu.bundled.js 加入 .gitignore
-// x@ tagger 在 PR 时不再运行
-// *? readme
-//  : 修了 typo, 加上了 dev guide
-// `.trim()
+import update_log from "../resources/update-log.js"
 
 mod.reg_chore("update", "检查更新", "1D", ".*", null, () => {
     $("#exlg-update").remove()
