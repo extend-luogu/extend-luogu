@@ -6,7 +6,7 @@ require("esbuild").buildSync({
     entryPoints: [ "main.js" ],
     outfile: `../dist/extend-luogu.${isdebug? "bundled" : "min"}.user.js`,
     banner: {
-        js: require("fs").readFileSync("tm-headers.js", "utf8").replace("CUR_VER", process.env.npm_package_version) + "\n;",
+        js: require("fs").readFileSync("resources/tm-headers.js", "utf8").replace("CUR_VER", process.env.npm_package_version) + "\n;",
     },
     bundle: true,
     minify: !isdebug,
