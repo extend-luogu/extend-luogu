@@ -6,6 +6,8 @@ exlg-setting/
 
 package-lock.json
 
+src/resources/update-log.js
+
 # Node
 
 # Logs

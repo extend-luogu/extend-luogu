@@ -19,12 +19,13 @@ jobs:
         with:
           node-version: 16.x
           cache: 'yarn'
-      - run: yarn --frozen-lockfile
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
 
       - name: Lint
         run: yarn lint
 
-      - name: Run exlg-git-commit-msg-std
+      - name: Check commit messages
         env:
           COMMIT_MSG: ${{ toJson(github.event.commits.*.message) }}
         run: |
@@ -42,20 +43,24 @@ jobs:
         with:
           node-version: 16.x
           cache: 'yarn'
-      - run: yarn --frozen-lockfile
-      - run: |
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Config bot & tags
+        run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git fetch origin --tags
 
-      - env:
-          MSG: ${{ github.event.commits[0].message }}
+      - name: Build & tag
+        env:
+          MSG: ${{ toJSON(github.event.commits.*.message) }}
         run: |
           import os
           from json import loads
-          b, rb = "", os.environ['MSG'].split('^[^\n]\n\n')
-          if len(rb) >= 2:
-            b = rb[1]
-          open("./src/resources/update_log.js", "w").write("export default `{}`".format(b.replace("`", "\\`")))
+          from re import split
+          rb = split('^[^\n]+\n\n', loads(os.environ['MSG'])[-1])
+          b = rb[1] if len(rb) > 1 else rb[0]
+          open("./src/resources/update-log.js", "w").write("export default `{}`".format(b.replace("`", "\\`")))
           a = loads(open("./package.json").read())["version"]
           os.system("""
           yarn run build
