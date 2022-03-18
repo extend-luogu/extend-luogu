@@ -141,7 +141,8 @@ const judge_problem = text => [
     /^P[1-9][0-9]{3,}$/i,
     /^UVA[1-9][0-9]{2,}$/i,
     /^U[1-9][0-9]{0,}$/i,
-    /^T[[1-9][0-9]{0,}$/i
+    /^T[1-9][0-9]{0,}$/i,
+    /^B[2-9][0-9]{3,}$/i
 ].some(re => re.test(text))
 
 const exlg_dialog_board = {
