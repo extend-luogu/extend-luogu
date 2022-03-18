@@ -17,7 +17,7 @@ mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(
         if (text.match("taskkill")) behavior.push("危险 关闭进程")
     }
     if (st >= 3) {
-        if (text.match("windows.h")) behavior.push("可疑 关闭进程")
+        if (text.match("windows.h")) behavior.push("可疑 引用 windows.h")
         if (text.match("system")) {
             behavior.push("可疑 调用系统函数")
             system = true
