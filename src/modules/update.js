@@ -59,22 +59,24 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
         let res = `<div class="exlg-update-log-text" style="font-family: ${sto["code-block-ex"].copy_code_font};">`
         str.split("\n").forEach(e => {
             let trmde = e.trimStart()
-            if (!msto.keep_dev) {
-                if (trmde[0] === ":") {
-                    if (!lstdo)
+            if (trmde.length) {
+                if (!msto.keep_dev) {
+                    if (trmde[0] === ":") {
+                        if (!lstdo)
+                            return
+                    }
+                    else if (dev_op.some((v, i) => v.includes(trmde[i]))) {
+                        lstdo = false
                         return
-                }
-                else if (dev_op.some((v, i) => v.some(c => (trmde[i] === c)))) {
-                    lstdo = false
-                    return
+                    }
+                    else
+                        lstdo = true
                 }
                 else
-                    lstdo = true
+                    lstdo = false
+                if (msto.style === 1 && trmde[0] !== ":")
+                    e = " ".repeat(e.length - trmde.length) + human_lang.Ty[trmde[0]] + human_lang.Op[trmde[1]] + trmde.substring(2)
             }
-            else
-                lstdo = false
-            if (msto.style === 1 && trmde[0] !== ":")
-                e = " ".repeat(e.length - trmde.length) + human_lang.Ty[trmde[0]] + human_lang.Op[trmde[1]] + trmde.substring(2)
             res += `<div>${e.replace(/ /g, "&nbsp;")}</div>` // Note: 为了兼容不用 replaceAll
         })
         return res + "</div>"
