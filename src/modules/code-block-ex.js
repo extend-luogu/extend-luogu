@@ -2,7 +2,6 @@ import { $ } from "../utils.js"
 import mod from "../core.js"
 
 mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
-    show_code_lang : { ty: "boolean", dft: true, strict: true, info: [ "Show Language Before Codeblocks", "显示代码块语言" ] },
     copy_code_position : { ty: "enum", vals: [ "left", "right" ], dft: "left", info: [ "Copy Button Position", "复制按钮对齐方式" ] },
     code_block_title : { ty: "string", dft: "源代码 - ${lang}", info: [ "Custom Code Title", "自定义代码块标题" ] },
     copy_code_font : { ty: "string", dft: "'Fira Code', Consolas, monospace", info: [ "Code Block Font", "代码块字体" ], strict: true },
@@ -45,7 +44,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
         $btn.addClass(`exlg-copy-${msto.copy_code_position}`)
 
         const lang = get_lang($code)
-        const title_text = ((msto.show_code_lang && lang) ? ( msto.code_block_title.replace("${lang}", lang)) : ("源代码"))
+        const title_text = msto.code_block_title.replace("${lang}", (lang ? lang : "Text"))
         const $title = isRecord ? $(".lfe-h3").text(title_text) : $(`<h3 class="exlg-code-title" style="width: 100%;">${title_text}</h3>`)
 
         if (! isRecord) $pre.before($title.append($btn))
