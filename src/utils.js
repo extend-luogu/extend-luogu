@@ -168,8 +168,9 @@ const exlg_dialog_board = {
     },
     accept_dialog() {
         this._ac_func(this.hide_dialog)
-        if (this.autoquit)
+        if (this.autoquit) {
             this.hide_dialog()
+        }
     },
     show_exlg_alert(text = "", title = "exlg 提醒您", onaccepted = () => {}, autoquit = true) {
         this.autoquit = autoquit
