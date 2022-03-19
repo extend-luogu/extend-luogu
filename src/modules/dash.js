@@ -1,5 +1,6 @@
-import uindow, { $, springboard, version_cmp, log } from "../utils.js"
+import uindow, { $, springboard, version_cmp, log, register_badge, exlg_alert } from "../utils.js"
 import mod from "../core.js"
+import logo from "../resources/logo.js"
 
 mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     msg: {
@@ -70,8 +71,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     if ([ "exlg", "gh_index", "debug"].indexOf(msto.source) === -1) msto.source = "exlg"
 
     const create_window = ! args.parent().hasClass("mobile-nav-container")
-    // console.log(create_window)
-    const $spn = $(`<span id="exlg-dash-window" class="exlg-window" style="display: none;width: 300px;"></span>`).css("left", "-125px")
+    const $spn = $(`<span id="exlg-dash-window" class="exlg-window" style="display: none;"></span>`).css("left", "-125px")
     const $btn = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
         .prependTo(args)
         .css("backgroundColor", {
@@ -125,50 +125,53 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 if (! mondsh) $spn.hide()
             })
 
-        $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;"><svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 0 136.14 30.56">
-        <g transform="translate(1.755, 0)" fill="#00a0d8">
-            <g>
-                <path d="M5.02-33.80L34.56-33.80L34.07-28.62L16.96-28.62L15.93-21.92L31.97-21.92L31.48-16.74L14.85-16.74L13.82-8.42L31.97-8.42L31.48-3.24L2.43-3.24L6.59-31.75L5.02-33.80Z" transform="translate(-4.14, 33.9)"></path>
-                <path d="M7.34-32.29L5.78-33.80L16.63-33.80L21.33-25.00L27.54-32.78L26.51-33.80L38.93-33.80L25.49-18.79L34.78-3.24L24.41-3.24L19.76-12.58L11.99-3.24L1.62-3.24L15.12-18.79L7.34-32.29Z" transform="translate(27.23, 33.9)"></path>
-                <path d="M4.00-33.80L16.42-33.80L12.80-8.42L32.99-8.42L32.51-3.24L5.56-3.24Q4.00-3.24 3.21-4.27Q2.43-5.29 2.43-6.86L2.43-6.86L5.56-31.75L4.00-33.80Z" transform="translate(63.8, 33.9)"></path>
-                <path d="M38.83-33.80L37.80-25.00L27.43-25.00L27.92-28.62L15.50-28.62L12.91-8.42L25.33-8.42L25.87-14.63L22.73-19.82L36.72-19.82L34.67-3.24L5.62-3.24Q4.86-3.24 4.21-3.51Q3.56-3.78 3.10-4.27Q2.65-4.75 2.48-5.43Q2.32-6.10 2.54-6.86L2.54-6.86L6.16-33.80L38.83-33.80Z" transform="translate(95.6, 33.9)"></path>
-            </g>
-        </g>
-</svg></h2>`).appendTo($spn)
+        $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;">${logo}</h2>`).appendTo($spn)
         const $bdiv = $(`<div id="exlg-windiv"></div>`).appendTo($spn)
 
         const _list = [
-            { tag: "vers", title: "vers", buttons: [ ] },
-            { tag: "source", title: "Source", buttons: [
-                { col: "#66ccff", html: "JsDelivr", onclick: () => uindow.location.href = "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js" },
-                { col: "#66ccff", html: "Raw", onclick: () => uindow.location.href = "https://github.com/extend-luogu/extend-luogu/raw/main/dist/extend-luogu.min.user.js" },
-                { col: "#66ccff", html: "FastGit", onclick: () => uindow.location.href = "https://hub.fastgit.org/extend-luogu/extend-luogu/raw/main/dist/extend-luogu.min.user.js" }
+            { tag: "vers", title: "版本", buttons: [ ] },
+            { tag: "source", title: "源码", buttons: [
+                { html: "JsDelivr", url: "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js" },
+                { html: "Raw", url: "https://github.com/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" },
+                { html: "FastGit", url: "https://hub.fastgit.xyz/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" }
             ] },
-            { tag: "link", title: "Link", buttons: [
-                { col: "#66ccff", html: "Web", onclick: () => uindow.location.href = "https://exlg.cc" },
+            { tag: "link", title: "链接", buttons: [
+                { html: "官网", url: "https://exlg.cc" },
                 { col: "#666", html: `<a style="height: 8px;width: 8px;"><svg aria-hidden="true" height="12" viewBox="0 0 16 16" version="1.1" width="12" data-view-component="true" class="octicon octicon-mark-github">
                 <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-            </svg></a>Github`, onclick: () => uindow.location.href = "https://github.com/extend-luogu/extend-luogu" },
-                { col: "#66ccff", html: "aifadian", onclick: () => uindow.location.href = "https://afdian.net/@extend-luogu" }
+            </svg></a>Github`, url: "https://github.com/extend-luogu/extend-luogu" },
+                { html: "爱发电", url: "https://afdian.net/@extend-luogu" }
             ] },
-            { tag: "help", title: "Help", buttons: [
-                { col: "#66ccff", html: "fx", onclick: () => uindow.location.href = "https://www.luogu.com.cn/blog/100250/extend-luogu-si-yong-zhi-na" },
-                { col: "#66ccff", html: "int128", onclick: () => uindow.location.href = "https://www.luogu.com.cn/blog/NaCl7/extend-luogu-usage" },
-                { col: "#66ccff", html: "用户协议", onclick: () => uindow.location.href = "https://www.luogu.com.cn/paste/3f7anw16" }
+            { tag: "help", title: "帮助", buttons: [
+                { html: "fx", url: "https://www.luogu.com.cn/blog/100250/extend-luogu-si-yong-zhi-na" },
+                { html: "int128", url: "https://www.luogu.com.cn/blog/NaCl7/extend-luogu-usage" },
+                { html: "用户协议", url: "https://www.luogu.com.cn/paste/3f7anw16" }
             ] },
-            { tag: "lhyakioi", title: "badge", buttons: [ ] }
+            { tag: "lhyakioi", title: "badge", buttons: [
+                { html: "注册", onclick: register_badge },
+                { html: "修改", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") },
+            ] }
         ]
         _list.forEach((e) => {
             const $div = $(`<div id="${ e.tag }-div"><span class="exlg-windiv-left-tag">${ e.title }</span></div>`).appendTo($bdiv),
                 $span = $("<span></span>").appendTo($div)
             e.buttons.forEach((btn) => {
-                $(`<span class="exlg-windiv-btnspan"></span>`).append($(`<button class="exlg-windiv-btn" style="background-color: ${ btn.col };border-color: ${ btn.col };">${ btn.html }</button>`).on("click", btn.onclick)).appendTo($span)
+                let col = btn.col ?? "#66ccff"
+                $(`<span class="exlg-windiv-btnspan"></span>`)
+                    .append($(`<button class="exlg-windiv-btn" style="background-color: ${ col };border-color: ${ col };">${ btn.html }</button>`)
+                        .on("click", btn.onclick ?? (() => location.href = btn.url)))
+                    .appendTo($span)
             })
-            if (e.title === "vers") {
-                $span.append($(`<span id="version-text" style="min-width: 60%;"><span>${ GM_info.script.version }</span><span id="vers-comp-operator" style="margin-left: 10px;"></span><span id="latest-version" style="margin-left: 10px;"></span><span id="annoyingthings"></span></span>"`))
-                const $check_btn = $(`<button class="exlg-windiv-btn" style="background-color: red;border-color: red;float: right;margin: 0 10px 0 0;">刷新</button>`),
+            if (e.tag === "vers") {
+                $span.append($(`<span id="version-text" style="min-width: 60%; margin-left: 5px;">
+    <span title="当前版本">${ GM_info.script.version }</span>
+    <span id="vers-comp-operator" style="margin-left: 5px;"></span>
+    <span id="latest-version" style="margin-left: 5px;"></span>
+    <span id="annoyingthings"></span></span>"`))
+                const $check_btn = $(`<button class="exlg-windiv-btn" style="background-color: red;border-color: red;float: right;margin: 0 20px 0 0;">刷新</button>`),
                     $operator = $span.find("#vers-comp-operator"), $latest = $span.find("#latest-version"), $fuckingdots = $span.find("#annoyingthings")
                 const _check = () => {
+                    $operator.text(""), $latest.text(""), $fuckingdots.html("")
                     $("#exlg-update").remove()
                     springboard({ type: "update" }).appendTo($("body")).hide()
                     uindow.addEventListener("message", e => {
@@ -184,7 +187,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                         log(l)
 
                         $operator.html(op).css("color", { "<<": "#fe4c61", "==": "#52c41a", ">>": "#3498db" }[op])
-                        $latest.html(latest)
+                        $latest.text(latest).attr("title", "最新版本")
                         $fuckingdots.html({ "<<": `<i class="exlg-icon exlg-info" name="有新版本"></i>`, ">>": `<i class="exlg-icon exlg-info" name="内测中！"></i>`}[op] || "").children().css("cssText", "position: absolute;display: inline-block;")
                         if (op === "<<" && version_cmp(msto.latest_ignore, latest) === "<<") {
                             const $ignore_vers = $(`<span style="color: red;margin-left: 30px;"><svg class="icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446"><path d="M512 128c-211.7 0-384 172.3-384 384s172.3 384 384 384 384-172.3 384-384-172.3-384-384-384z m0 717.4c-183.8 0-333.4-149.6-333.4-333.4S328.2 178.6 512 178.6 845.4 328.2 845.4 512 695.8 845.4 512 845.4zM651.2 372.8c-9.9-9.9-25.9-9.9-35.8 0L512 476.2 408.6 372.8c-9.9-9.9-25.9-9.9-35.8 0-9.9 9.9-9.9 25.9 0 35.8L476.2 512 372.8 615.4c-9.9 9.9-9.9 25.9 0 35.8 4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4L512 547.8l103.4 103.4c4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4c9.9-9.9 9.9-25.9 0-35.8L547.8 512l103.4-103.4c9.9-9.9 9.9-25.9 0-35.8z" p-id="5447"></path></svg></span>`).on("click", () => {
@@ -202,10 +205,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 // Note: 如果不是最新版本，那么加2个按钮(弹窗通知，忽略，最后一个是查找)
                 // Note: 版本老了红色，版本对了绿色，版本新了蓝色（指测试版
                 // Note: 新版显示提示。
-            }
-            if (e.title === "badge") {
-                $(`<input type="text" disabled="disabled" style="width: 60%;" />`).appendTo($span)
-                $(`<button id="exlg-badge-btn" style="background-color: #ccc;border-color: #666;" class="exlg-windiv-btn" disabled="disabled">提交</button>`).appendTo($span)
             }
         })
 
@@ -332,20 +331,21 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         left: 0px;
         z-index: 65536;
         display: none;
-        width: 250px;
-        height: 300px;
-        padding: 5px;
+        width: 300px;
+        /* height: 300px; */
+        padding: 15px;
         background: white;
         color: black;
         border-radius: 7px;
         box-shadow: rgb(187 227 255) 0px 0px 7px;
     }
     .exlg-windiv-left-tag {
-        border-right: 1px solid #eee;
+        /* border-right: 1px solid #eee; */
         height: 2em;
         width: 18%;
-        margin-right: 5px;
+        margin-right: 10px;
         display: inline-block;
+        text-align: center;
     }
     .exlg-windiv-btn {
 
@@ -363,7 +363,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         background: 0 0;
         border-radius: 5px;
         border: 1px solid;
-        margin: 5px 5px;
+        margin: 4px;
 
     }
 `)
