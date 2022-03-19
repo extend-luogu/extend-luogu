@@ -4,10 +4,10 @@
   "description": "Make luogu more powerful.",
   "main": "./src/main.js",
   "scripts": {
-    "lint": "eslint .",
-    "debug": "node ./src/build.js --debug",
     "build": "node ./src/build.js",
-    "prepare": "husky install"
+    "lint": "eslint .",
+    "prepare": "husky install",
+    "test": "node ./src/build.js -d build -b"
   },
   "repository": "git+https://github.com/extend-luogu/extend-luogu.git",
   "author": "extend-luogu-dev",

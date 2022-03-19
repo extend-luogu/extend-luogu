@@ -1,18 +1,18 @@
 /* eslint-env node */
 
 process.chdir("src")
-const isdebug = require("minimist")(process.argv.slice(2)).debug
+const parg = require("minimist")(process.argv.slice(2)),
+    minify = parg.m ?? !parg.b,
+    outfn = require("path").join("..", parg.d ?? "dist", parg.o ?? "extend-luogu.user.js")
 require("esbuild").buildSync({
     entryPoints: [ "main.js" ],
-    outfile: `../dist/extend-luogu.${isdebug? "bundled" : "min"}.user.js`,
+    outfile: outfn,
     banner: {
         js: require("fs").readFileSync("resources/tm-headers.js", "utf8").replace("CUR_VER", process.env.npm_package_version) + "\n;",
     },
     bundle: true,
-    minify: !isdebug,
     charset: "utf8",
+    minify
 })
-console.log(`Build extend-luogu.${isdebug? "bundled" : "min"}.user.js successfully.`)
-if (!isdebug)
-    require("fs").copyFileSync("../dist/extend-luogu.min.user.js", "../extend-luogu.user.js")
+console.log(`Build ${require("path").basename(outfn)} successfully.`)
 process.exit()

@@ -63,7 +63,7 @@ jobs:
           open("./src/resources/update-log.js", "w").write("export default `{}`".format(b.replace("`", "\\`")))
           a = loads(open("./package.json").read())["version"]
           os.system("""
-          yarn run build
+          yarn run build -o extend-luogu.min.user.js
           git add .
           HUSKY=0 git commit -m "release {}"
           """.format(a))
