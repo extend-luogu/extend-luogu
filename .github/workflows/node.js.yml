@@ -65,7 +65,7 @@ jobs:
           os.system("""
           yarn run build -o extend-luogu.min.user.js
           git add .
-          HUSKY=0 git commit -m "release {}"
+          git commit -m "release {}"
           """.format(a))
           os.system("git tag {}".format(a))
         shell: python
