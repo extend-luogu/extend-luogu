@@ -76,19 +76,15 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
 
     if (! $menu.length) return
 
-    const $emo_menu = $menu.clone().addClass("exlg-emo")
-    $menu.after($emo_menu)
-    $emo_menu[0].innerHTML = ""
+    const $emo_menu = $menu.clone().addClass("exlg-emo").text("")
+    $menu.after($emo_menu).append("<br />")
 
-    $("<br />").appendTo($menu)
-    $(".mp-editor-ground").addClass("exlg-ext")
-
-    const $ground = $(".mp-editor-ground"),
+    const $ground = $(".mp-editor-ground").addClass("exlg-ext"),
         $show_hide = $menu.children().first().clone(true).addClass("exlg-unselectable"),
         $set_height = $menu.children().first().clone(true).addClass("exlg-unselectable")
     $menu.children().last().before($show_hide)
     $menu.children().last().before($set_height)
-    $show_hide.children()[0].innerHTML = (msto.show) ? "隐藏" : "显示"
+    $show_hide.children().attr("title", "").text((msto.show) ? "隐藏" : "显示")
     if (msto.show) $emo_menu.addClass("exlg-show-emo"), $ground.addClass("exlg-show-emo")
     $show_hide.on("click", () => {
         $show_hide.children()[0].innerHTML = ["显示", "隐藏"][["隐藏", "显示"].indexOf($show_hide.children()[0].innerHTML)]
@@ -96,7 +92,7 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
         $ground.toggleClass("exlg-show-emo")
         msto.show = ! msto.show
     })
-    $set_height.children()[0].innerHTML = (msto.height_limit) ? "展开" : "收起"
+    $set_height.children().attr("title", "").text((msto.height_limit) ? "展开" : "收起")
     if (msto.height_limit) $emo_menu.addClass("exlg-show-emo-short"), $ground.addClass("exlg-show-emo-short")
     else $emo_menu.addClass("exlg-show-emo-long"), $ground.addClass("exlg-show-emo-long")
     $set_height.on("click", () => {

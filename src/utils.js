@@ -19,14 +19,15 @@ if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
 
 // ==Utilities==Libraries==
 
-const $ = jQuery
+const $ = jQuery.extend({
+    double: (func, first, second) => [func(first), func(second)]
+})
 const xss = new filterXSS.FilterXSS({
     onTagAttr: (_, k, v) => {
         if (k === "style") return `${k}="${v}"`
     }
 })
 // const mdp = uindow.markdownPalettes
-$.double = (func, first, second) => [func(first), func(second)]
 
 // ==Utilities==Extensions==
 

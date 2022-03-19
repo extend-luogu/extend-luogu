@@ -7,11 +7,10 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     cs_get({
         url: `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/get/0/0/`,
         onload: res => {
-            msto["tag_list"] = decodeURIComponent(res.responseText)
+            msto.tag_list = decodeURIComponent(res.responseText)
         }
     })
 })
-
 
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
     tag_list: { ty: "string", priv: true }
@@ -24,10 +23,13 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         $e.addClass("exlg-badge-username") // Note: 删掉这行会出刷犇犇的bug，一开始我以为每个元素被添加一次所以问题不大 但是事实证明我是傻逼
         const user_uid = $e.attr("href").slice("/user/".length), tag = tag_list[user_uid]
         if (! tag) return
-        const $badge = $(user_uid === "100250" ? `<span class="am-badge am-radius lg-bg-red" style="margin-left: 4px;">${ tag }</span>` : `<span class="exlg-badge">${ tag }</span>`).off("contextmenu").on("contextmenu", () => false).on("mousedown", (e) => {
-            if (e.button === 2) location.href = "https://www.luogu.com.cn/paste/asz40850"
-            else if (e.button === 0) register_badge()
-        })
+        const $badge = $(user_uid === "100250" ? `<span class="am-badge am-radius lg-bg-red" style="margin-left: 4px;">${ tag }</span>` : `<span class="exlg-badge">${ tag }</span>`)
+            .off("contextmenu")
+            .on("contextmenu", () => false)
+            .on("mousedown", (e) => {
+                if (e.button === 2) location.href = "https://www.luogu.com.cn/paste/asz40850"
+                else if (e.button === 0) register_badge()
+            })
         let $tar = $e
         if ($tar.next().length && $tar.next().hasClass("sb_amazeui")) $tar = $tar.next()
         if ($tar.next().length && $tar.next().hasClass("am-badge")) $tar = $tar.next()
