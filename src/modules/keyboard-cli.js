@@ -278,6 +278,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         border: none;
         outline: none;
         font-family: "Fira Code", "consolas", "Courier New", monospace;
+        color: #000;
     }
     #exlg-cli-input.error {
         background-color: indianred;
