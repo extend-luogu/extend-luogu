@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# pwd
+COMMIT_MSG=[\"$(node ./scripts/escape-msg.js $1)\"] node ./node_modules/exlg-git-commit-msg-std/check.js -c .gitmsgrc.js -e COMMIT_MSG
