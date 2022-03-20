@@ -28,9 +28,9 @@ mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(
     }
     if (behavior.length !== 0) {
         debugger
-        exlg_alert(behavior.join("</br>").replace("高危", `<a class = "exlg-high-risk">[高危]</a>`)
-            .replace("危险", `<a class = "exlg-med-risk">[危险]</a>`)
-            .replace("可疑", `<a class = "exlg-low-risk">[可疑]</a>`), "发现有害代码")
+        exlg_alert(behavior.join("</br>").replaceAll("高危", `<a class = "exlg-high-risk">[高危]</a>`)
+            .replaceAll("危险", `<a class = "exlg-med-risk">[危险]</a>`)
+            .replaceAll("可疑", `<a class = "exlg-low-risk">[可疑]</a>`), "发现有害代码")
     }
 }, `
 .exlg-high-risk {
