@@ -1,25 +1,10 @@
-import uindow, { $, exlg_alert, springboard, version_cmp, log } from "../utils.js"
+import { exlg_alert, version_cmp, get_latest } from "../utils.js"
 import mod, { sto } from "../core.js"
 import update_log from "../resources/update-log.js"
 
 mod.reg_chore("update", "检查更新", "1D", ".*", null, () => {
-    $("#exlg-update").remove()
-    springboard({ type: "update" }).appendTo($("body")).hide()
-    uindow.addEventListener("message", e => {
-        if (e.data[0] !== "update") return
-        e.data.shift()
-
-        const
-            latest = e.data[0],
-            version = GM_info.script.version,
-            op = version_cmp(version, latest)
-
-        const l = `Comparing version: ${version} ${op} ${latest}`
-        log(l)
-
-        // if (uindow.novogui) uindow.novogui.msg(l)
-        // Note: NovoGUI 不用力
-    })
+    get_latest(ver => exlg_alert(`<p>检测到新版本 ${ver}，点击确定将安装。</p>`, "检测到新版本",
+        () => location.href = `https://hub.fastgit.xyz/extend-luogu/extend-luogu/raw/${ver}/dist/extend-luogu.min.user.js`))
 })
 
 const dev_op = ["$", "#<@"].map(s => s.split(""))

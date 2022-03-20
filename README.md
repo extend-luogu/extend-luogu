@@ -12,7 +12,7 @@
 2. 访问这两个链接中的一个。如果没有自动安装，请复制 __全部__ 内容到您的脚本管理器中；
     - 最新版: [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js)
     - 稳定版: [jsDelivr](https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js)
-3. 脚本会在有更新时提醒。_【它坏了】_
+3. 脚本会在有更新时提醒。
 
 ## 开发、自行搭建
 ### 前置要求

@@ -10,7 +10,7 @@ Makes [Luogu](https://www.luogu.com.cn/) more powerful.
 2. Visit one of the following links. If it doesn't install automatically, copy the __whole__ text into your userscript manager.
     - Latest: [GitHub Raw](https://github.com/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js)
     - Stable: [jsDelivr](https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js)
-3. You will be automatically notified when there's an update. _[WIP]_
+3. You will be automatically notified when there's an update.
 
 ## Development / Build
 

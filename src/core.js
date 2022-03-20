@@ -197,7 +197,7 @@ const mod = {
         }
         if (name) {
             const m = mod.find(name)
-            return exe(m, true)
+            return exe({name, ...m}, true)
         }
 
         for (const [name, m] of mod._.entries()) {

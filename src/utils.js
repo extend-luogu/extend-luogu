@@ -73,6 +73,42 @@ const version_cmp = (v1, v2) => {
         if (m !== m2[k2]) return op(+ m || 0, + m2[k2] || 0)
 }
 
+const springboard = (param, styl) => {
+    const q = new URLSearchParams(); for (let k in param) q.set(k, param[k])
+    const $sb = $(`
+        <iframe id="exlg-${param.type}" src=" https://www.bilibili.com/robots.txt?${q}" style="${styl}" exlg="exlg"></iframe>
+    `)
+    log("Building springboard: %o", $sb[0])
+    return $sb
+}
+
+const cs_get = ({url, onload, onerror = err => error(err)}) => GM_xmlhttpRequest({
+    url: url,
+    method: "GET",
+    onload: onload,
+    onerror: onerror
+})
+
+const get_latest = callbackfn => {
+    cs_get({
+        url: "https://api.github.com/repos/extend-luogu/extend-luogu/tags?per_page=1",
+        onload: resp => {
+            const
+                latest = JSON.parse(resp.responseText)[0].name,
+                version = GM_info.script.version,
+                op = version_cmp(version, latest)
+
+            const l = `Comparing version: ${version} ${op} ${latest}`
+            log(l)
+
+            callbackfn && callbackfn(latest, op)
+
+            // if (uindow.novogui) uindow.novogui.msg(l)
+            // Note: NovoGUI 不用力
+        }
+    })
+}
+
 const cur_time = (ratio = 1) => {
     let d = new Date()
     return ~~(d.getTime() / ratio)
@@ -118,22 +154,6 @@ const lg_post = (url, data) => $.ajax({
     },
     method: "post",
 })
-
-const cs_get = ({url, onload, onerror = err => error(err)}) => GM_xmlhttpRequest({
-    url: url,
-    method: "GET",
-    onload: onload,
-    onerror: onerror
-})
-
-const springboard = (param, styl) => {
-    const q = new URLSearchParams(); for (let k in param) q.set(k, param[k])
-    const $sb = $(`
-        <iframe id="exlg-${param.type}" src=" https://www.bilibili.com/robots.txt?${q}" style="${styl}" exlg="exlg"></iframe>
-    `)
-    log("Building springboard: %o", $sb[0])
-    return $sb
-}
 
 const judge_problem = text => [
     /^AT[1-9][0-9]{0,}$/i,
@@ -309,5 +329,5 @@ const register_badge = async () => {
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
     lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, springboard, $,
-    judge_problem, register_badge, exlg_dialog_board, exlg_alert
+    judge_problem, register_badge, get_latest, exlg_dialog_board, exlg_alert
 }

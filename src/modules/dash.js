@@ -1,4 +1,4 @@
-import uindow, { $, springboard, version_cmp, log, register_badge, exlg_alert } from "../utils.js"
+import uindow, { version_cmp, get_latest, register_badge, exlg_alert } from "../utils.js"
 import mod from "../core.js"
 import logo from "../resources/logo.js"
 
@@ -172,20 +172,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     $operator = $span.find("#vers-comp-operator"), $latest = $span.find("#latest-version"), $fuckingdots = $span.find("#annoyingthings")
                 const _check = () => {
                     $operator.text(""), $latest.text(""), $fuckingdots.html("")
-                    $("#exlg-update").remove()
-                    springboard({ type: "update" }).appendTo($("body")).hide()
-                    uindow.addEventListener("message", e => {
-                        if (e.data[0] !== "update") return
-                        e.data.shift()
-
-                        const
-                            latest = e.data[0],
-                            version = GM_info.script.version,
-                            op = version_cmp(version, latest)
-
-                        const l = `Comparing version: ${version} ${op} ${latest}`
-                        log(l)
-
+                    get_latest((latest, op) => {
                         $operator.html(op).css("color", { "<<": "#fe4c61", "==": "#52c41a", ">>": "#3498db" }[op])
                         $latest.text(latest).attr("title", "最新版本")
                         $fuckingdots.html({ "<<": `<i class="exlg-icon exlg-info" name="有新版本"></i>`, ">>": `<i class="exlg-icon exlg-info" name="内测中！"></i>`}[op] || "").children().css("cssText", "position: absolute;display: inline-block;")
@@ -196,8 +183,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                             }).appendTo($fuckingdots)
                         }
                         if (op === "==") msto.latest_ignore = GM_info.script.version
-
-                        if (uindow.novogui) uindow.novogui.msg(l)
                     })
                 }
                 $check_btn.on("click", _check).appendTo($span)
