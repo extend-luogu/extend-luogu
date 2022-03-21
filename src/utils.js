@@ -102,9 +102,6 @@ const get_latest = callbackfn => {
             log(l)
 
             callbackfn && callbackfn(latest, op)
-
-            // if (uindow.novogui) uindow.novogui.msg(l)
-            // Note: NovoGUI 不用力
         }
     })
 }
