@@ -7,22 +7,24 @@ mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(
     const text = $("code").text().toLowerCase()
     const st = msto.strength
     let behavior = []
-    let system = false
+    let system = text.match("system") && !(text.match("System.out") || text.match("import java"))
     if (st >= 1) {
-        if (text.match("net user")) behavior.push("高危 操作用户")
-        if (text.match("shutdown")) behavior.push("高危 关机")
-        if (text.match("socksorkstation")) behavior.push("高危 锁定桌面")
+        if (system && text.match("net user")) behavior.push("高危 操作用户")
+        if (system && text.match("shutdown")) behavior.push("高危 关机")
+        if (system && text.match("socksorkstation")) behavior.push("高危 锁定桌面")
+        if (system && text.match("reg add")) behavior.push("高危 注册进程")
     }
     if (st >= 2) {
-        if (text.match("taskkill")) behavior.push("危险 关闭进程")
+        if (system && text.match("taskkill")) behavior.push("危险 关闭进程")
+        if (system && text.match("setcursorpos")) behavior.push("危险 修改光标")
     }
     if (st >= 3) {
         if (text.match("windows.h")) behavior.push("可疑 引用 windows.h")
-        if (text.match("system")) {
+        if (system) {
             behavior.push("可疑 调用系统函数")
             system = true
         }
-        if (text.match("encode") && system) {
+        if (system && (text.match("encode") || text.match("decode"))) {
             behavior.push("高危 存在加密字符串")
         }
     }
