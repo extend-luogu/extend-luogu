@@ -4,7 +4,6 @@ import { exlg_alert, lg_dat, lg_post, lg_content, lg_usr, warn, error, cur_time,
 mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
 }, () => {
     if (lg_dat.contest.name.match("Virtual Participation")) {
-        debugger
         const $tabs = $(".items")
         const work = () => {
             if ((location.hash || "#main") === "#problems") {
@@ -25,7 +24,6 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
         warn("Contest has not started or ended.")
         return
     }
-    debugger
     $("<button id='exlg-vp' class='lfe-form-sz-middle'>重现比赛</button>").appendTo($("div.operation"))
         .click(async () => {
             exlg_alert(`<div>
