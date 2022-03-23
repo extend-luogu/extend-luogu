@@ -143,8 +143,13 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 { html: "爱发电", url: "https://afdian.net/@extend-luogu" }
             ] },
             { tag: "help", title: "帮助", buttons: [
-                { html: "fx", url: "https://www.luogu.com.cn/blog/100250/extend-luogu-si-yong-zhi-na" },
-                { html: "int128", url: "https://www.luogu.com.cn/blog/NaCl7/extend-luogu-usage" },
+                { html: "Github", url: "https://github.com/extend-luogu/extend-luogu/blob/main/README.md" },
+                { html: "FastGit", url: "https://hub.fastgit.xyz/extend-luogu/extend-luogu/blob/main/README.md" },
+                { html: "用户协议", url: "https://www.luogu.com.cn/paste/3f7anw16" }
+            ] },
+            { tag: "outdated", title: "过时", buttons: [
+                { html: "fx(仅供参考)", url: "https://www.luogu.com.cn/blog/100250/extend-luogu-si-yong-zhi-na" },
+                { html: "int128(仅供参考)", url: "https://www.luogu.com.cn/blog/NaCl7/extend-luogu-usage" },
                 { html: "用户协议", url: "https://www.luogu.com.cn/paste/3f7anw16" }
             ] },
             { tag: "lhyakioi", title: "badge", buttons: [
