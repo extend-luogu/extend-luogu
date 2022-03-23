@@ -4,7 +4,7 @@ import mod from "../core.js"
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
         ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
-        info: [ "Switch the way of fetching benben", "切换全网犇犇获取方式" ]
+        info: [ "Source", "切换全网犇犇获取方式" ]
     }
 }, ({msto}) => {
     const color = {

@@ -1,7 +1,7 @@
 import mod from "../core.js"
 import { $, cs_get, lg_alert } from "../utils.js"
 
-mod.reg_board("search-user", "查找用户名", null, ({ $board }) => {
+mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
     $board.html(`
         <h3>查找用户</h3>
         <div class="am-input-group am-input-group-primary am-input-group-sm">
