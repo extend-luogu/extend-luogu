@@ -1,4 +1,4 @@
-/* eslint-env node */
+import { readFileSync } from "fs"
 
 process.stdout.write(
     readFileSync(process.argv[2], { encoding: "utf8" })

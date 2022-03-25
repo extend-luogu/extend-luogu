@@ -2,12 +2,16 @@
   "name": "extend-luogu",
   "version": "5.4.1",
   "description": "Make luogu more powerful.",
+  "type": "module",
+  "engines": {
+    "node": ">=16"
+  },
   "main": "./src/main.js",
   "scripts": {
-    "build": "node ./src/build.js",
+    "build": "node ./scripts/build.js",
     "lint": "eslint .",
     "prepare": "husky install",
-    "test": "node ./src/build.js -d build -b"
+    "test": "node ./scripts/build.js -d build -b"
   },
   "repository": "git+https://github.com/extend-luogu/extend-luogu.git",
   "author": "extend-luogu-dev",
@@ -26,6 +30,5 @@
     "exlg-git-commit-msg-std": "^0.0.2",
     "husky": "^7.0.0",
     "minimist": "^1.2.5"
-  },
-  "dependencies": {}
+  }
 }
