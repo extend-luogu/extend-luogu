@@ -1,4 +1,4 @@
-import uindow, { version_cmp, get_latest, exlg_alert } from "../utils.js"
+import uindow, { $, version_cmp, get_latest, exlg_alert } from "../utils.js"
 import mod from "../core.js"
 import logo from "../resources/logo.js"
 

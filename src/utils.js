@@ -226,6 +226,7 @@ const exlg_dialog_board = {
 }
 const exlg_alert = (...arg) => exlg_dialog_board.show_exlg_alert(...arg)
 
+// Note: 它坏了
 const register_badge = async () => {
     const parse_badge = (href, func_quit) => cs_get({
         url: href,

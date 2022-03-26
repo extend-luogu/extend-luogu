@@ -136,6 +136,8 @@ const mod = {
         arg => {
             func({...arg, ...{ result: false, args: darg() }})
             $("body").bind("DOMNodeInserted", (e) => {
+                if (! e.target.tagName)
+                    return false
                 const res = hook(e)
                 return res.result && func({...arg, ...res})
             })
