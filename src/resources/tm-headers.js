@@ -1,6 +1,10 @@
 // ==UserScript==
 // @name           extend-luogu
 // @namespace      http://tampermonkey.net/
+// @description    Make luogu more powerful.
+// @description:zh 使洛谷拥有更多功能
+// @iconURL        https://raw.fastgit.org/extend-luogu/extend-luogu/main/favicon.ico
+// @icon64URL      https://exlg.cc/img/logo.png
 // @version        CUR_VER
 //
 // @match          https://*.luogu.com.cn/*
