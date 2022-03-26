@@ -92,3 +92,7 @@ mod.reg("user-css", "自定义样式表", ".*", {
     css: { ty: "string" }
 }, ({ msto }) => GM_addStyle(msto.css)
 )
+
+mod.reg("benben-quickpost", "CtrlEnter 发送犇犇", "@/", null, () =>
+    $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").click())
+)

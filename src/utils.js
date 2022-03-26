@@ -19,9 +19,34 @@ if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
 
 // ==Utilities==Libraries==
 
+// [Ctrl][Shift][Alt] + Key
+const toKeyCode = e => [
+    e.ctrlKey ? "Ctrl" : "",
+    e.shiftKey ? "Shift" : "",
+    e.altKey ? "Alt" : "",
+    e.key.toInitialCase()
+].join("")
+
 const $ = jQuery.extend({
     double: (func, first, second) => [func(first), func(second)]
 })
+jQuery.fn.extend({
+    whenKey: function(a, b) {
+        if (typeof a === "object") {
+            this.on("keydown", e => {
+                let y = a[toKeyCode(e)]
+                y && y(e)
+            })
+        }
+        else {
+            this.on("keydown", e => {
+                if (toKeyCode(e) === a)
+                    b(e)
+            })
+        }
+    }
+})
+
 const xss = new filterXSS.FilterXSS({
     onTagAttr: (_, k, v) => {
         if (k === "style") return `${k}="${v}"`
@@ -269,7 +294,7 @@ const register_badge = async () => {
 </div>
     `, title_text, (func_quit) => {
         const $board = $("#exlg-container"), $input =$board.find("input"), $title = $board.find("#exlg-dialog-title")
-        if (uindow._feInjection && lg_usr && lg_usr.uid && ! $input[0].value)
+        if (lg_usr?.uid && ! $input[0].value)
             $input[0].value = lg_usr.uid
         if (! ($input[0].value && $input[1].value && $input[2].value)) {
             $title.html("[Err] 请检查信息是否填写完整")
