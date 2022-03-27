@@ -7,6 +7,9 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
 }, ({ msto, result, args }) => {
     if (!result) {
         cmts = JSON.parse(msto.comments)
+        for (let [i, v] of Object.entries(cmts))
+            if (v === null || v === "")
+                delete cmts[i]
     }
     args.forEach(arg => {
         let $arg = $(arg), uid = arg.href.split("/").lastElem(), un = $arg.text().trim()
@@ -18,14 +21,16 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
             if (e.button === 2) {
                 $.get(`https://www.luogu.com.cn/api/user/search?keyword=${uid}`, res => {
                     let orin = res.users[0].name, nn = prompt(`请设置用户 ${orin}（uid: ${uid}）的备注名，留空则删除备注`, cmts[uid] ?? un)
-                    if (nn === "") {
-                        delete cmts[uid]
-                        nn = orin
+                    if (nn !== null) {
+                        if (nn === "") {
+                            delete cmts[uid]
+                            nn = orin
+                        }
+                        else
+                            cmts[uid] = nn
+                        $(`a[href="/user/${uid}"][target=_blank]`).text(nn)
+                        msto.comments = JSON.stringify(cmts)
                     }
-                    else
-                        cmts[uid] = nn
-                    $(`a[href="/user/${uid}"][target=_blank]`).text(nn)
-                    msto.comments = JSON.stringify(cmts)
                 })
             }
             return false
