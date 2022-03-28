@@ -2,6 +2,7 @@
 - [获取 AtCoder 难度](./atdiff-fetch.md)
 - [返回比赛列表](./back-to-contest.md)
 - [犇犇龙王排行榜](./benben-ranklist.md)
+- [CtrlEnter 发送犇犇](./benben-quickpost.md)
 - [全网犇犇](./benben.md)
 - [代码块优化](./code-block-ex.md)
 - [控制面板](./dash-board.md)
