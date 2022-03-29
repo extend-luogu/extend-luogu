@@ -115,7 +115,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             ]
             forum = tar.find(ns => ns.includes(forum))?.[0]
             if (! tar) return cli_error`cdd: unknown forum "${forum}"`
-            cmds.cd.fn(`/discuss/lists?forumname=${forum}`)
+            location.href = `https://www.luogu.com.cn/discuss/lists?forumname=${forum}`
         }),
         gcmd("cc", "[name: char]", [
             "jump to <name>, \"h|p|c|r|d|i|m|n\" stands for home|problem|contest|record|discuss|I myself|message|notification. or jump home.",
