@@ -23,6 +23,7 @@
 // @connect        codeforces.ml
 // @connect        kenkoooo.com
 // @connect        api.github.com
+// @connect        luogu-captcha-bypass.piterator.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 // @require        https://cdn.jsdelivr.net/gh/leizongmin/js-xss@1.0.10/dist/xss.min.js
