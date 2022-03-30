@@ -5,6 +5,7 @@
 - [CtrlEnter 发送犇犇](./benben-quickpost.md)
 - [全网犇犇](./benben.md)
 - [博客 Ex](./blog.md)
+- [验证码自动填充](./captcha.md)
 - [代码块优化](./code-block-ex.md)
 - [控制面板](./dash-board.md)
 - [控制桥](./dash-bridge.md)
