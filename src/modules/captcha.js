@@ -13,7 +13,7 @@ mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+"], nu
             url: "https://luogu-captcha-bypass.piterator.com/predict/",
             data: canvas.toDataURL("image/jpeg"),
             onload: (res) => {
-                const input = $("input[placeholder='右侧图形验证码'],#editor")[0]
+                const input = $("input[placeholder$='验证码']")[0]
                 input.value = res.responseText
                 input.dispatchEvent(new Event("input"))
             }
