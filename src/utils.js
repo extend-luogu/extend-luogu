@@ -114,6 +114,14 @@ const cs_get = ({url, onload, onerror = err => error(err)}) => GM_xmlhttpRequest
     onerror: onerror
 })
 
+const cs_post = ({url, data, onload, onerror = err => error(err)}) => GM_xmlhttpRequest({
+    url: url,
+    method: "POST",
+    data: data,
+    onload: onload,
+    onerror: onerror
+})
+
 const get_latest = callbackfn => {
     cs_get({
         url: "https://api.github.com/repos/extend-luogu/extend-luogu/tags?per_page=1",
@@ -351,6 +359,6 @@ const register_badge = async () => {
 
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
-    lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, springboard, $,
+    lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, cs_post, springboard, $,
     judge_problem, register_badge, get_latest, exlg_dialog_board, exlg_alert
 }
