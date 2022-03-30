@@ -1,5 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-git rm -f --ignore-unmatch ./dist/* extend-luogu.user.js
 yarn lint
