@@ -1,7 +1,8 @@
 import { readFileSync } from "fs"
 
-process.stdout.write(JSON.stringify([
+process.stdout.write(
     readFileSync(process.argv[2], { encoding: "utf8" })
         .replace(/(\n|^)#[^\n]*/g, "")
         .trim()
-]))
+        .replace(/\n/g, "\\n")
+)
