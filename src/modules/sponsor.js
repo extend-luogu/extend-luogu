@@ -1,5 +1,5 @@
 import mod, { sto } from "../core.js"
-import { $, cs_get, register_badge } from "../utils.js"
+import { $, cs_get, register_badge, exlg_alert } from "../utils.js"
 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
@@ -28,7 +28,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             .on("contextmenu", () => false)
             .on("mousedown", (e) => {
                 if (e.button === 2) location.href = "https://www.luogu.com.cn/paste/asz40850"
-                else if (e.button === 0) register_badge()
+                else if (e.button === 0) exlg_alert("暂未实现，请加群根据群公告操作。")
             })
         let $tar = $e
         if ($tar.next().length && $tar.next().hasClass("sb_amazeui")) $tar = $tar.next()
