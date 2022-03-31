@@ -11,7 +11,7 @@ mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+"], nu
         canvas.height = img[0].height
         canvas.getContext("2d").drawImage(img[0], 0, 0)
         let filled = false
-        $(".CodeMirror-wrap").on("input", () => {
+        $(".CodeMirror-wrap,.lfe-form-sz-middle").on("input", () => {
             if (filled) return
             $("input[placeholder$='将自动填写']").removeAttr("disabled")
             cs_post({

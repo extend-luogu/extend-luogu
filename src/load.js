@@ -1,4 +1,4 @@
-import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content, register_badge } from "./utils.js"
+import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content } from "./utils.js"
 import mod from "./core.js"
 
 log("Exposing")
@@ -8,7 +8,7 @@ Object.assign(uindow, {
         mod,
         log, error,
         springboard, version_cmp,
-        lg_alert, lg_content, register_badge,
+        lg_alert, lg_content,
         TM_dat: {
             reload_dat: () => {
                 raw_dat = null
