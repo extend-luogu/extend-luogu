@@ -356,7 +356,7 @@ const register_badge = async () => {
     })
         .appendTo($btn.parent())
     $submit.on("click", ).appendTo($btn.parent())*/
-//}
+// }
 
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
