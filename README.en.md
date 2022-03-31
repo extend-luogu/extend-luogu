@@ -2,7 +2,7 @@
 
 Makes [Luogu](https://www.luogu.com.cn/) more powerful.
 
-[简体中文]](./README.md) | English
+[简体中文](./README.md) | English
 
 ## Documents
 
