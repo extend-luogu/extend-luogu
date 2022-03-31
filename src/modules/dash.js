@@ -150,6 +150,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             { tag: "lhyakioi", title: "badge", buttons: [
                 { html: "注册", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") }, // todo: 自动注册 badge
                 { html: "修改", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") },
+
                 { html: "刷新", onclick: () => {
                     mod.execute("^sponsor-list")
                     unsafeWindow.location.reload()
@@ -205,7 +206,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     }
 }, (e) => {
     const $tmp = $(e.target).find(".user-nav, .nav-container")
-    if ($tmp.length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
+    if ($tmp.length && !$("#exlg-dash-window").length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
 }, () => $("nav.user-nav, div.user-nav > nav, .nav-container"), `
     /* dash */

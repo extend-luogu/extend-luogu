@@ -12,7 +12,7 @@ import parser from "minimist"
 
 const parg = parser(process.argv.slice(2)),
     minify = parg.m ?? !parg.b,
-    outfn = join(parg.d ?? "dist", parg.o ?? "extend-luogu.user.js")
+    outfn = join(parg.d ?? "build", parg.o ?? "extend-luogu.user.js")
 buildSync({
     entryPoints: [ "./src/main.js" ],
     outfile: outfn,
