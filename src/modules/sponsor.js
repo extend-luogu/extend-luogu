@@ -1,5 +1,5 @@
 import mod, { sto } from "../core.js"
-import { $, cs_get, register_badge, exlg_alert } from "../utils.js"
+import { $, cs_get, exlg_alert } from "../utils.js"
 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
