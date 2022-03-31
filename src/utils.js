@@ -235,6 +235,7 @@ const exlg_dialog_board = {
 const exlg_alert = (...arg) => exlg_dialog_board.show_exlg_alert(...arg)
 
 // Note: 它坏了
+/*
 const register_badge = async () => {
     const parse_badge = (href, func_quit) => cs_get({
         url: href,
@@ -355,10 +356,10 @@ const register_badge = async () => {
     })
         .appendTo($btn.parent())
     $submit.on("click", ).appendTo($btn.parent())*/
-}
+// }
 
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
     lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, cs_post, springboard, $,
-    judge_problem, register_badge, get_latest, exlg_dialog_board, exlg_alert
+    judge_problem, get_latest, exlg_dialog_board, exlg_alert
 }

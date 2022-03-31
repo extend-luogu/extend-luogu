@@ -150,6 +150,10 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             { tag: "lhyakioi", title: "badge", buttons: [
                 { html: "注册", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") }, // todo: 自动注册 badge
                 { html: "修改", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") },
+                { html: "刷新", onclick: () => {
+                    mod.execute("^sponsor-list")
+                    unsafeWindow.location.reload()
+                } },
             ] },
             { tag: "outdated", title: "过时文档", buttons: [
                 { html: "fx", url: "https://www.luogu.com.cn/blog/100250/extend-luogu-si-yong-zhi-na" },
