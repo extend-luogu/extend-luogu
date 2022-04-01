@@ -1,10 +1,9 @@
 import mod from "../core.js"
 import { $, cs_post } from "../utils.js"
 
-mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+"], null, () => {
-    const img = $("img[data-v-3e1b4641],#verify_img")
-    img.click()
-    img[0].onload = () => {
+mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+", "@/image"], null, () => {
+    let img = $("img[data-v-3e1b4641],#verify_img")
+    const autofill = () => {
         const canvas = document.createElement("canvas")
         canvas.width = img[0].width
         canvas.height = img[0].height
@@ -17,6 +16,16 @@ mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+"], nu
                 input.value = res.responseText
                 input.dispatchEvent(new Event("input"))
             }
+        })
+    }
+    if (img.length) {  // /auth/login and /discuss/*
+        img.click()
+        img[0].onload = autofill
+    }
+    else {  // /image
+        $(document).on("focus", "input[placeholder$='验证码']", () => {
+            img = $("#--swal-image-hosting-upload-captcha")
+            img[0].onload = autofill
         })
     }
 })
