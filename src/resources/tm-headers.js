@@ -3,8 +3,9 @@
 // @namespace      http://tampermonkey.net/
 // @description    Make luogu more powerful.
 // @description:zh 使洛谷拥有更多功能
-// @iconURL        https://raw.fastgit.org/extend-luogu/extend-luogu/main/favicon.ico
-// @icon64URL      https://exlg.cc/img/logo.png
+// @icon           https://raw.fastgit.org/extend-luogu/extend-luogu/main/favicon.ico
+// @icon64         https://exlg.cc/img/logo.png
+// @homepage       https://exlg.cc
 // @version        CUR_VER
 //
 // @match          https://*.luogu.com.cn/*

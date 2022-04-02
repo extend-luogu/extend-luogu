@@ -16,7 +16,7 @@ mod.reg_pre("hide-solution", "隐藏题解", "@/problem/solution/.*", {
     hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
 }, async ({ msto }) => (msto.hidesolu) ? (GM_addStyle(".item-row { display: none; }")) : "memset0珂爱", null)
 
-mod.reg_hook_new("back-to-contest", "返回比赛题单", [
+mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     "@/problem/[A-Z0-9]+\\?contestId=[1-9][0-9]{0,}",
 ], null, ({ args }) => {
     const $info_rows = args.$info_rows, $pre = $(`<a class="exlg-back-to-contest"></a>`),

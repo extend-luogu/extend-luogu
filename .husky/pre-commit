@@ -2,3 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 yarn lint
+node ./scripts/check-doc.js
+git add ./doc/module/module.md

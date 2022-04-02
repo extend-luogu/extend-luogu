@@ -5,6 +5,9 @@ mod.reg("benben", "全网犇犇", "@/", {
     source: {
         ty: "enum", dft: "o2", vals: [ "o2", "shy" ],
         info: [ "Source", "切换全网犇犇获取方式" ]
+    },
+    reply_with_md: {
+        ty: "boolean", dft: false, info: [ "Reply with markdown", "回复时附上原 markdown" ]
     }
 }, ({msto}) => {
     const color = {
@@ -31,7 +34,10 @@ mod.reg("benben", "全网犇犇", "@/", {
                 url: (msto.source === "o2") ? (`https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121`) : (`https://bens.rotriw.com/api/list/proxy?page=${uindow.feedPage}`),
                 onload: (res) => {
                     const e = JSON.parse(res.response)
-                    e.forEach(m => $(`
+                    e.forEach(m => {
+                        let tmpval = marked(xss.process(m.content))
+                        console.log(tmpval)
+                        $(`
                 <li class="am-comment am-comment-primary feed-li" exlg="exlg">
                     <div class="lg-left">
                         <a href="/user/${ m.user.uid }" class="center">
@@ -56,23 +62,23 @@ mod.reg("benben", "全网犇犇", "@/", {
                         </header>
                         <div class="am-comment-bd">
                             <span class="feed-comment">
-                                ${ marked(xss.process(m.content)) }
+                                ${ tmpval }
                             </span>
                         </div>
                     </div>
                 </li>
             `)
-                        .appendTo($("ul#feed"))
-                        .find("a[name=feed-reply]").on("click", () => {
-                            scrollToId("feed-content")
-                            setTimeout(
-                                () => $("textarea")
-                                    .trigger("focus").val(` || @${ m.user.name } : ${ m.content }`)
-                                    .trigger("input"),
-                                50
-                            )
-                        })
-                    )
+                            .appendTo($("ul#feed"))
+                            .find("a[name=feed-reply]").on("click", () => {
+                                scrollToId("feed-content")
+                                setTimeout(
+                                    () => $("textarea")
+                                        .trigger("focus").val(` || @${ m.user.name } : ${ msto.reply_with_md ? m.content : $(tmpval).text() }`)
+                                        .trigger("input"),
+                                    50
+                                )
+                            })
+                    })
                 }
             })
             if (msto.source === "shy"){

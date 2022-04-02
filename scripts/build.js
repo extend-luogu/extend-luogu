@@ -1,6 +1,6 @@
 process.chdir("src")
 
-import { existsSync, readFileSync, writeFileSync } from "fs"
+import { readdirSync, existsSync, readFileSync, writeFileSync } from "fs"
 import { join, basename } from "path"
 import { buildSync } from "esbuild"
 import parser from "minimist"
@@ -9,6 +9,7 @@ import parser from "minimist"
     if (!existsSync(fn))
         writeFileSync(fn, val)
 })(["./resources/update-log.js", "export default ``"])
+writeFileSync("./all-modules.js", readdirSync("./modules").map(s => `import "./modules/${s}"`).join("\n"))
 
 const parg = parser(process.argv.slice(2)),
     minify = parg.m ?? !parg.b,
