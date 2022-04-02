@@ -1,5 +1,7 @@
 import "./modules/benben.js"
+import "./modules/blog.js"
 import "./modules/board.js"
+import "./modules/captcha.js"
 import "./modules/code-block-ex.js"
 import "./modules/dash.js"
 import "./modules/discussion-save.js"

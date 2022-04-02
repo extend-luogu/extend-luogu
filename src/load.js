@@ -1,5 +1,7 @@
-import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content, register_badge } from "./utils.js"
+import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content } from "./utils.js"
+import register_badge from "./components/register-badge.js"
 import mod from "./core.js"
+import compo from "./compo-core.js"
 
 log("Exposing")
 
@@ -10,9 +12,10 @@ Object.assign(uindow, {
         springboard, version_cmp,
         lg_alert, lg_content, register_badge,
         TM_dat: {
-            reload_dat: () => {
+            reload_dat: sch => {
                 raw_dat = null
-                return load_dat(mod.data, {
+                console.log(sch)
+                return load_dat(sch, {
                     map: s => {
                         s.root = ! s.rec
                         s.itmRoot = s.rec === 2
@@ -31,7 +34,11 @@ Object.assign(uindow, {
 
 const init_sto = chance => {
     try {
-        mod.fake_sto = uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat()
+        uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat({
+            ...mod.data,
+            ...compo.data,
+        })
+        mod.fake_sto = compo.sto = uindow.exlg.TM_dat.sto
     }
     catch(err) {
         if (chance) {
