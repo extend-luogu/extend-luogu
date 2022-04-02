@@ -53,7 +53,6 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     console.log(modules)
     uindow.guiStart(modules)
 })
-
 mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     source: {
         ty: "enum", vals: [ "exlg", "gh_index", "debug"], dft: "exlg",
@@ -70,17 +69,30 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
 }, ({ msto, args }) => {
     if ([ "exlg", "gh_index", "debug"].indexOf(msto.source) === -1) msto.source = "exlg"
 
-    const create_window = ! args.parent().hasClass("mobile-nav-container")
+    const $tar = args.$tar
+    console.log(args, $tar)
+    const _right_svg = `<svg class="icon" style="width: 1.2em;height: 1.2em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697"><path d="M644.266667 494.933333l-192 192-29.866667-29.866666 162.133333-162.133334-162.133333-162.133333 29.866667-29.866667 192 192z" fill="#444444" p-id="1698"></path></svg>`
+    const __renew_alink = (_i, e, _$e = $(e)) => {
+        console.log(e, e.innerHTML)
+        e.className += " exlg-dash-options"
+        e.innerHTML = `<div class="link-title">${e.innerHTML}</div> ${_right_svg}`
+    }
+    if (args.type === 2) {
+        __renew_alink(114514, $tar[0], $tar)
+        return
+    }
+
+    const create_window = ! $tar.parent().hasClass("mobile-nav-container")
     const $spn = $(`<span id="exlg-dash-window" class="exlg-window" style="display: none;"></span>`).css("left", "-125px")
     const $btn = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
-        .prependTo(args)
+        .prependTo($tar)
         .css("backgroundColor", {
             exlg: "cornflowerblue",
             gh_index: "darkblue",
             debug: "steelblue"
             // gh_bundle: "darkslateblue"
         }[msto.source])
-        .css("margin-top", args.hasClass("nav-container") ? "5px" : "0px")
+        .css("margin-top", $tar.hasClass("nav-container") ? "5px" : "0px")
     const _jump_settings = () => uindow.exlg.dash = uindow.open({
         exlg: "https://dash.exlg.cc/index.html",
         gh_index: "https://extend-luogu.github.io/exlg-setting-new/index.html",
@@ -106,8 +118,41 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             })
     else $btn.on("click", _jump_settings)
 
+    const renew_dropdown = ($board, $cb) => {
+        const _cuser = uindow._feInjection.currentUser
+        $board.children(".header").after(`
+        <div>
+            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.follower">
+                <span class="value">${_cuser.followingCount}</span>
+                <span data-v-3c4577b8="" class="key">关注</span>
+            </a>
+            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.following">
+                <span class="value">${_cuser.followerCount}</span>
+                <span data-v-3c4577b8="" class="key">粉丝</span>
+            </a>
+            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/notification">
+                <span class="value">${_cuser.unreadNoticeCount + _cuser.unreadMessageCount}</span>
+                <span data-v-3c4577b8="" class="key">动态</span>
+            </a>
+        </div>
+        `)
+        $board.children(".header").after(`
+        <div class="exlg-dropdown field">
+            <span data-v-3c4577b8="" class="key-small">CCF 评级: <strong>${_cuser.ccfLevel}</strong></span>
+            <span data-v-3c4577b8="" class="key-small">咕值排行: <strong>${_cuser.ranking}</strong></span>
+        </div>
+        `)
+        $cb.each(__renew_alink)
+        const $exlg = $($cb[5]).clone().attr("href", "javascript:void 0")
+        $exlg.on("click", _jump_settings)
+        $($cb[5]).after($exlg)
+        $exlg.children("div.link-title").html(`<svg data-v-a97ae32a="" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="code" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-code fa-w-20"><path data-v-a97ae32a="" fill="currentColor" d="M278.9 511.5l-61-17.7c-6.4-1.8-10-8.5-8.2-14.9L346.2 8.7c1.8-6.4 8.5-10 14.9-8.2l61 17.7c6.4 1.8 10 8.5 8.2 14.9L293.8 503.3c-1.9 6.4-8.5 10.1-14.9 8.2zm-114-112.2l43.5-46.4c4.6-4.9 4.3-12.7-.8-17.2L117 256l90.6-79.7c5.1-4.5 5.5-12.3.8-17.2l-43.5-46.4c-4.5-4.8-12.1-5.1-17-.5L3.8 247.2c-5.1 4.7-5.1 12.8 0 17.5l144.1 135.1c4.9 4.6 12.5 4.4 17-.5zm327.2.6l144.1-135.1c5.1-4.7 5.1-12.8 0-17.5L492.1 112.1c-4.8-4.5-12.4-4.3-17 .5L431.6 159c-4.6 4.9-4.3 12.7.8 17.2L523 256l-90.6 79.7c-5.1 4.5-5.5 12.3-.8 17.2l43.5 46.4c4.5 4.9 12.1 5.1 17 .6z" class=""></path></svg> 插件设置`)
+    }
+    window.renew_dropdown = () => renew_dropdown($tar.find(".dropdown > .center"), $tar.find(".ops > a"))
+    // log($tar.hasClass("user-nav") || $tar.parent().hasClass("user-nav"), $tar.find(".dropdown > .center"))
+    if ($tar.hasClass("user-nav") || $tar.parent().hasClass("user-nav")) renew_dropdown($tar.find(".dropdown > .center"), $tar.find(".ops > a"))
     if (create_window) {
-        $spn.prependTo(args)
+        $spn.prependTo($tar)
         let mondsh = false, monbrd = false
         $btn.on("mouseenter", () => {
             mondsh = true, $spn.show()
@@ -196,10 +241,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
 
     }
 }, (e) => {
+    if (e.target.tagName.toLowerCase() === "a" && e.target.className === "color-none" && e.target.parentNode.className === "ops")
+        return { result: 2, args: { $tar: $(e.target), type: 2 } }
     const $tmp = $(e.target).find(".user-nav, .nav-container")
     if ($tmp.length && !$("#exlg-dash-window").length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
-}, () => $("nav.user-nav, div.user-nav > nav, .nav-container"), `
+}, () => { return { $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 } }, `
     /* dash */
     #exlg-dash {
         margin-right: 5px;
@@ -351,4 +398,80 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         margin: 4px;
 
     }
+
+    .dropdown > .center {
+        padding: 0 24px 18px;
+    }
+    .ops>a>.link-title {
+        display: flex;
+        align-items: center;
+    }
+    .ops>a>.link-title>svg {
+        margin-right: 8px;
+        width: 16px;
+    }
+    .ops>a[class] {
+        width: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        color: var(--text2);
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color .3s;
+        margin-bottom: 0.4em;
+        margin-top: 0.4em;
+    }
+    .ops>a:hover {
+        background-color: rgb(227,229,231);
+    }
+
+    .exlg-dropdown.field {
+        display: inline-block;
+        border-left: none;
+        padding: 0 .8em;
+    }
+    .exlg-dropdown.field:hover {
+        color: #00aeec!important;
+    }
+    .exlg-dropdown.field:hover > .value {
+        color: #00aeec!important;
+    }
+    .exlg-dropdown.field:hover > .key {
+        color: #00aeec!important;
+    }
+    .exlg-dropdown.field > .value {
+        display: block;
+        text-align: center;
+        line-height: 1.5;
+        font-weight: 700;
+        
+        color: #6c757d;
+        font-size: 18px;
+        transition: color .2s;
+    }
+    .exlg-dropdown.field > .key {
+        display: block;
+        text-align: center;
+        /* font-size: 0.5em; */
+
+        color: #9499a0;
+        font-weight: 400;
+        font-size: 12px;
+        transition: color .2s;
+    }
+    .exlg-dropdown.field > .key-small {
+        display: block;
+        text-align: center;
+        /* font-size: 0.5em; */
+
+        color: #9499a0;
+        font-weight: 400;
+        font-size: 8px;
+        transition: color .2s;
+    }
+    
 `)

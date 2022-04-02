@@ -1,5 +1,5 @@
 import mod from "../core.js"
-import { $, cs_get, lg_alert } from "../utils.js"
+import { $, cs_get, exlg_alert } from "../utils.js"
 
 mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
     $board.html(`
@@ -16,7 +16,7 @@ mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
         $.get("/api/user/search?keyword=" + $("[name=username]").val().trim(), res => {
             if (! res.users[0]) {
                 $search_user.prop("disabled", false)
-                lg_alert("无法找到指定用户")
+                exlg_alert("无法找到指定用户")
             }
             else location.href = "/user/" + res.users[0].uid
         })

@@ -108,7 +108,7 @@ body {
     opacity: 0.75;
     background: rgba(204, 204, 204, 0.20);
     width: 500px;
-    /* min-height: 300px; */
+    min-height: 300px;
     border-radius: 5px;
     margin: 0 auto;
     box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
