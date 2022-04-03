@@ -4,17 +4,23 @@ import { $, exlg_alert } from "../utils.js"
 let cmts = null
 // mod.reg("user-comment-modifier", "修改用户备注", "")
 mod.reg_hook_new("user-comment", "用户备注", ".*", {
-    comments: { ty: "string", dft: "{}", priv: true } // Note: string 只是替代方案，换用 dict 是迟早的
+    comments: { ty: "string", dft: "{}", priv: true }, // Note: string 只是替代方案，换用 dict 是迟早的
+    direct_display: { ty: "boolean", dft: true, info: [ "Directly replace username", "直接替换用户名" ] },
 }, ({ msto, result, args }) => { // Note: 你他妈也知道替代方案是吧
-    const _setcomment = ($nm, _com = "") => {
-        if (! _com || !$nm) return
+    const _setcomment = ($nm, com) => {
+        if (! com || !$nm) return
         if (! $nm.length) return
         if ($nm.length !== 1) {
-            $nm.each((_i, e, $e = $e) => _setcomment($e))
+            $nm.each((_i, e) => _setcomment($(e), com))
             return
         }
-        if ($nm.children("span[style]")) $nm = $nm.children("span[style]")
-        $nm.text(_com).css("white-space", "pre")
+        if ($nm.children("span[style]").length) $nm = $nm.children("span[style]")
+
+        $nm.css("white-space", "pre")
+        if (msto.direct_display)
+            $nm.text(com)
+        else
+            $nm.append(`<span class="exlg-usercmt exlg-usercom-tag">(${com})</span>`)
     }
     if (!result) {
         cmts = JSON.parse(msto.comments)
@@ -50,12 +56,14 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         }
     }
     args.forEach(arg => {
-        let $arg = $(arg), uid = arg.href.split("/").lastElem(), _un = $arg.text().trim()
+        let $arg = $(arg), uid = arg.href.split("/").lastElem()
         if ($arg.hasClass("exlg-usercmt"))
             return
         $arg.addClass("exlg-usercmt")
-        if (uid in cmts)
-            _setcomment(cmts[uid])// $arg.text(cmts[uid])
+        if (uid in cmts) {
+            _setcomment($arg, cmts[uid])
+            // Kill: $arg.text(cmts[uid])
+        }
     })
 }, e => {
     let tmp = e.target.querySelectorAll("a[href^=\"/user\"][target=_blank]")
@@ -71,5 +79,13 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
 .exlg-usercom-edit:hover {
     transition: all .4s;
     opacity: 0.8;
+}
+.exlg-usercom-tag {
+    color: #8a7b7b;
+    font-weight: lighter;
+    font-size: .9em;
+    margin-left: .3em;
+    line-height: 1em;
+    font-family: Consolas
 }
 `)

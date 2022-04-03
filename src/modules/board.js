@@ -38,7 +38,6 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
     const refresh = () => cs_get({
         url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
         onload: function(res) {
-            // console.log($board, $list)
             // let s=`<h3 id="bb-rnklst-h2">犇犇排行榜 <span id="bb-rnklst-btn" class="bb-rnklst-span"> [<a>${ msto.show ? "收起" : "展开" }</a>]</span><span style="float: right;" class="bb-rnklst-span"> [<a id="refresh-bbrnk">刷新</a>]</span></h3>`
             $(JSON.parse(res.response)).each((index, obj) => {
                 $(`<div class="bb-rnklst-${index + 1}">

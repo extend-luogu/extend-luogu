@@ -14,7 +14,6 @@ Object.assign(uindow, {
         TM_dat: {
             reload_dat: sch => {
                 raw_dat = null
-                console.log(sch)
                 return load_dat(sch, {
                     map: s => {
                         s.root = ! s.rec

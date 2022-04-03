@@ -48,7 +48,6 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
     }
     args.forEach(arg => {
         if (arg.target.href === "javascript:void 0") return
-        // console.log("arg: ",arg.target, arg)
         // if (! lg_dat[arg.board_id][arg.position])
         arg.target.style.color = _color([(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty])
         if ((arg.board_id === brds.PASSED_PROBLEMS && arg.position === lg_dat.passedProblems.length - 1)
@@ -70,7 +69,6 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
 }, (e) => {
     if (location.hash !== "#practice") return { result: false, args: { message: msg.NOT_AT_PRACTICE_PAGE } }
     if ((! lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
-        // console.log(e.target)
         if (e.target.className === "card padding-default") {
             if ($(e.target).children(".problems").length) {
                 const my = lg_dat[ [ "submittedProblems", "passedProblems" ][cosflag] ]
@@ -84,10 +82,6 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         return { result: false, args: { message: msg.NONE } }
     }
     if (! e.target.tagName) return { result: false, args: { message: msg.COMMENT_TAG } }
-    // console.log(last_ptr, last_board, e, e.target)
-    // if (typeof(e.target) === "undefined") {
-    //     console.log(e.target)
-    // }
     if (e.target.tagName.toLowerCase() !== "a" || e.target.className !== "color-default" || e.target.href.indexOf("/problem/") === -1)
         return { result: false, args: { message: msg.NOT_A_PROBLEM_ELEMENT } }
     const gpid = o => (o ? o.pid : undefined)
@@ -104,7 +98,6 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         }]
     }
 }, () => {
-    // console.log(lg_dat.submittedProblems.length, lg_dat.passedProblems.length)
     if ((! lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
         $(".exlg-counter").remove()
         const $prb = $(".card.padding-default > .problems")

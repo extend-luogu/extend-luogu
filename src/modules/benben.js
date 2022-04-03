@@ -36,7 +36,6 @@ mod.reg("benben", "全网犇犇", "@/", {
                     const e = JSON.parse(res.response)
                     e.forEach(m => {
                         let tmpval = marked(xss.process(m.content))
-                        console.log(tmpval)
                         $(`
                 <li class="am-comment am-comment-primary feed-li" exlg="exlg">
                     <div class="lg-left">

@@ -31,8 +31,6 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
 }, (e) => {
     const tar = e.target, cid = lg_dat.contest.id,
         pid = lg_dat.problem.pid
-    // console.log(e.target, tar.tagName, tar.href ? tar.href.slice(tar.href.indexOf("/record/list")): "", tar.style)
-    // if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) console.log(tar, tar.parentNode)
     return { args: { cid, pid, $info_rows: $(tar.parentNode) } ,result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
 }, () => { return { cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() } }, `
 .exlg-back-to-contest {
@@ -64,7 +62,6 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
     })
 }, (e) => {
     const tar = e.target
-    // console.log(e.target, tar.tagName)
     if (!tar || (! tar.tagName)) return { args: msg.COMMENT_TAG, result: false }
     if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/problem/")/* && judge_problem(tar.href.slice(tar.href.indexOf("/problem/") + 9))*/ && ` ${ tar.parentNode.parentNode.className } `.includes(" problem ")) { // Note: 如果是标签的话，查看它的父亲是否为最后一个。如果是，更新数据。对于其他的不管。
         if (! tar.parentNode.parentNode.parentNode.nextSibling) return { args: { type: "modified - update", target: tar.parentNode.parentNode.parentNode.parentNode }, result: true }

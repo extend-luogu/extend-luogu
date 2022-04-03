@@ -10,7 +10,6 @@ readdirSync("./src/modules")
             return x[0]
         })))
 
-// console.log(mods)
 readdirSync("./doc/module")
     .forEach(v => {
         let p = v.slice(0, -3)
