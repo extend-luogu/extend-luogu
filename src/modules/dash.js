@@ -72,9 +72,9 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     const $tar = args.$tar
     // console.log(args, $tar)
     const _right_svg = `<svg class="icon" style="width: 1.2em;height: 1.2em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697"><path d="M644.266667 494.933333l-192 192-29.866667-29.866666 162.133333-162.133334-162.133333-162.133333 29.866667-29.866667 192 192z" fill="#444444" p-id="1698"></path></svg>`
-    const __renew_alink = (_i, e, _$e = $(e)) => {
+    const __renew_alink = (_i, e, $e = $(e)) => {
         // console.log(e, e.innerHTML)
-        e.className += " exlg-dash-options"
+        $e.addClass("exlg-dash-options")
         e.innerHTML = `<div class="link-title">${e.innerHTML}</div> ${_right_svg}`
     }
     if (args.type === 2) {
@@ -241,10 +241,11 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
 
     }
 }, (e) => {
-    if (e.target.tagName.toLowerCase() === "a" && e.target.className === "color-none" && e.target.parentNode.className === "ops")
+    const $etar = $(e.target)
+    if (e.target.tagName.toLowerCase() === "a" && $etar.hasClass("color-none") && $etar.parent().hasClass("ops") && (! $etar.hasClass("exlg-dash-options")))
         return { result: 2, args: { $tar: $(e.target), type: 2 } }
-    const $tmp = $(e.target).find(".user-nav, .nav-container")
-    if ($tmp.length && !$("#exlg-dash-window").length) return { result: ($tmp.length), args: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp) } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
+    const $tmp = $etar.find(".user-nav, .nav-container")
+    if ($tmp.length/* && !$("#exlg-dash-window").length */) return { result: ($tmp.length), args: { $tar: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp), type: 1 } } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
 }, () => { return { $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 } }, `
     /* dash */
