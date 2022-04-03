@@ -36,7 +36,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
                     if ($btn.text() !== "复制") return // Note: Debounce
                     $btn.text("复制成功").toggleClass("exlg-copied")
                     setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800)
-                    GM_setClipboard($pre.text(), { type: "text", mimetype: "text/plain" })
+                    GM_setClipboard($pre.text(), "text/plain")
                 })
 
         const $code = $pre.children("code")
