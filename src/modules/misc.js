@@ -12,9 +12,18 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     })
 })
 
-mod.reg_pre("hide-solution", "隐藏题解", "@/problem/solution/.*", {
-    hidesolu: { ty: "boolean", dft: false, info: ["Hide Solution", "隐藏题解"] }
-}, async ({ msto }) => (msto.hidesolu) ? (GM_addStyle(".item-row { display: none; }")) : "memset0珂爱", null)
+mod.reg("hide-solution", "隐藏题解", [ "@/problem/[A-Z0-9]+", "@/problem/solution/.*" ], { // Note: 为了避免识别成题目列表
+    on: { ty: "boolean", dft: false }
+}, () => /@\/problem\/[A-Z0-9]+/g.test(location.href) && $("a[href^=\"/problem/solution\"]").addClass("sol-btn"), `
+a.sol-btn {
+    transition: opacity 2s cubic-bezier(0.8, 0, 0.9, -0.03);
+    opacity: 0;
+}
+a.sol-btn:hover {
+    opacity: 1;
+}
+.item-row { display: none; }
+`)
 
 mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     "@/problem/[A-Z0-9]+\\?contestId=[1-9][0-9]{0,}",

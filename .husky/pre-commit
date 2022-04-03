@@ -3,4 +3,4 @@
 
 yarn lint
 node ./scripts/check-doc.js
-git add ./doc/module/module.md
+git add ./doc/module/module.md ./src/all-modules.js

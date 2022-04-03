@@ -21,7 +21,7 @@ const mod = {
     ].map(([ alias, path ]) => [ new RegExp(`^@${alias}/`), path ]),
 
     path_dash_board: [
-        "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting/((index|bundle).html)?"
+        "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting-new/((index|bundle).html)?"
     ],
 
     reg: (name, info, path, data, func, styl) => {
@@ -37,11 +37,10 @@ const mod = {
 
         mod.data[name] = {
             ty: "object",
-            lvs: {
-                ...data,
-                on: { ty: "boolean", dft: true }
-            }
+            lvs: data ? data : {}
         }
+        if (! ("on" in mod.data[name].lvs))
+            mod.data[name].lvs.on = { ty: "boolean", dft: true }
 
         mod._.set(name, { info, path, func, styl })
     },
