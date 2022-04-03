@@ -243,7 +243,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     if (e.target.tagName.toLowerCase() === "a" && $etar.hasClass("color-none") && $etar.parent().hasClass("ops") && (! $etar.hasClass("exlg-dash-options")))
         return { result: 2, args: { $tar: $(e.target), type: 2 } }
     const $tmp = $etar.find(".user-nav, .nav-container")
-    if ($tmp.length/* && !$("#exlg-dash-window").length */) return { result: ($tmp.length), args: { $tar: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp), type: 1 } } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
+    if ($tmp.length && (! $tmp.find("#exlg-dash-window").length)) return { result: ($tmp.length), args: { $tar: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp), type: 1 } } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
 }, () => { return { $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 } }, `
     /* dash */
