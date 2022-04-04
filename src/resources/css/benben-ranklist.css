@@ -1,0 +1,18 @@
+.bb-rnklst-1 > .bb-rnklst-ind {
+    color: var(--lg-red);
+    font-weight: 900;
+}
+.bb-rnklst-2 > .bb-rnklst-ind {
+    color: var(--lg-orange);
+    font-weight: 900;
+}
+.bb-rnklst-3 > .bb-rnklst-ind {
+    color: var(--lg-yellow);
+    font-weight: 900;
+}
+.bb-rnklst-ind.bb-top-ten {
+    margin-right: 9px;
+}
+.bb-rnklst-span {
+    font-size: 1em;font-weight: normal;
+}

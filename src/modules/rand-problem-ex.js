@@ -1,5 +1,6 @@
 import uindow, { $, judge_problem, lg_content } from "../utils.js"
 import mod from "../core.js"
+import css from "../resources/css/rand-problem-ex.css"
 
 mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     exrand_difficulty: {
@@ -178,43 +179,4 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     }
 
     $jump_exrand.on("click", exrand_poi)
-},`
-.exlg-rand-settings {
-    position: relative;
-    display: inline-block;
-    padding: 1px 5px 1px 5px;
-    background-color: white;
-    border: 1px solid #6495ED;
-    color: cornflowerblue;
-    border-radius: 6px;
-    font-size: 12px;
-    position: relative;
-    top: -2px;
-}
-.exlg-rand-settings.selected {
-    background-color: cornflowerblue;
-    border: 1px solid #6495ED;
-    color: white;
-}
-.exlg-rand-settings:hover {
-    box-shadow: 0 0 7px dodgerblue;
-}
-.exlg-smallbtn {
-    position: relative;
-    display: inline-block;
-    padding: 1px 5px 1px;
-    color: white;
-    border-radius: 6px;
-    font-size: 12px;
-    margin-left: 1px;
-    margin-right: 1px;
-}
-.exrand-enabled{
-    width: 49%;
-    float: left;
-}
-.exrand-disabled{
-    width: 49%;
-    float: right;
-}
-`)
+}, css)

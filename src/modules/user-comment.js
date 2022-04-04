@@ -1,5 +1,6 @@
 import mod from "../core.js"
 import { $, exlg_alert } from "../utils.js"
+import css from "../resources/css/user-comment.css"
 
 let cmts = null
 // mod.reg("user-comment-modifier", "修改用户备注", "")
@@ -71,21 +72,4 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         result: (tmp.length > 0),
         args: tmp,
     }
-}, () => document.querySelectorAll("a[href^=\"/user\"][target=_blank]"), `
-.exlg-usercom-edit {
-    transition: all .4s;
-    opacity: 0;
-}
-.exlg-usercom-edit:hover {
-    transition: all .4s;
-    opacity: 0.8;
-}
-.exlg-usercom-tag {
-    color: #8a7b7b;
-    font-weight: lighter;
-    font-size: .9em;
-    margin-left: .3em;
-    line-height: 1em;
-    font-family: Consolas
-}
-`)
+}, () => document.querySelectorAll("a[href^=\"/user\"][target=_blank]"), css)

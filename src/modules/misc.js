@@ -2,6 +2,9 @@ import mod from "../core.js"
 import { msg } from "../defs.js"
 import { $, judge_problem, lg_dat, lg_content } from "../utils.js"
 
+import hidesol_css from "../resources/css/hide-solution.css"
+import backtocont_css from "../resources/css/back-to-contest.css"
+
 mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
     $(document).on("dblclick", e => {
         const pid = window.getSelection().toString().trim().toUpperCase()
@@ -14,16 +17,7 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
 
 mod.reg("hide-solution", "隐藏题解", [ "@/problem/[A-Z0-9]+", "@/problem/solution/.*" ], { // Note: 为了避免识别成题目列表
     on: { ty: "boolean", dft: false }
-}, () => /@\/problem\/[A-Z0-9]+/g.test(location.href) && $("a[href^=\"/problem/solution\"]").addClass("sol-btn"), `
-a.sol-btn {
-    transition: opacity 2s cubic-bezier(0.8, 0, 0.9, -0.03);
-    opacity: 0;
-}
-a.sol-btn:hover {
-    opacity: 1;
-}
-.item-row { display: none; }
-`)
+}, () => /@\/problem\/[A-Z0-9]+/g.test(location.href) && $("a[href^=\"/problem/solution\"]").addClass("sol-btn"), hidesol_css)
 
 mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     "@/problem/[A-Z0-9]+\\?contestId=[1-9][0-9]{0,}",
@@ -41,16 +35,7 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     const tar = e.target, cid = lg_dat.contest.id,
         pid = lg_dat.problem.pid
     return { args: { cid, pid, $info_rows: $(tar.parentNode) } ,result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
-}, () => { return { cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() } }, `
-.exlg-back-to-contest {
-    text-decoration: none;
-    float: right;
-    color: rgb(231, 76, 60);
-}
-.exlg-back-to-contest:hover {
-    color: rgb(231, 76, 60);
-}
-`)
+}, () => { return { cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() } }, backtocont_css)
 
 mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, async ({ args }) => {
     if (args && args.type === "show") {

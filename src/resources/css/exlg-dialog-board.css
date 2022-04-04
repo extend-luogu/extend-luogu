@@ -1,0 +1,112 @@
+/* input for our badge register */
+input[exlg-badge-register] {
+    outline: none;
+    display: inline-block;
+    width: auto;
+    padding: 0.5em;
+    /* font-size: 1.6rem; */
+    line-height: 1.2;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    -webkit-appearance: none;
+    -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+input[exlg-badge-register]:focus {
+    border: 1px solid #3bb4f2;
+}
+body {
+    margin: 0px;
+}
+.exlg-dialog-footer {
+    bottom: 0px;
+    position: absolute;
+    right: 0px;
+    padding: 10px 6px;
+}
+/*
+.exlg-dialog-container.container-show:hover > .exlg-dialog-btn.exlg-dialog-btn-confirm {
+    background: rgba(30, 140, 200, 0.80);
+}
+.exlg-dialog-btn.exlg-dialog-btn-confirm {
+    background: rgba(30, 140, 200, 0.20);
+}
+*/
+.exlg-dialog-container.container-show:hover > .exlg-dialog-btn {
+    background: rgba(255, 255, 255, 0.80);
+}
+.exlg-dialog-btn {
+    margin: 0px 4px;
+    /* display: inline-block; */
+    float: right;
+    color: #666;
+    min-width: 75px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.20);
+    padding: 7px 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+.exlg-dialog-container.container-hide {
+    opacity: 0;
+}
+.exlg-dialog-container.container-show:hover {
+    background: rgba(250, 250, 250, 0.80);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 40%);
+    opacity: 1;
+}
+.exlg-dialog-container {
+    filter: blur(0);
+    position: relative;
+    opacity: 0.75;
+    background: rgba(204, 204, 204, 0.20);
+    width: 500px;
+    min-height: 300px;
+    border-radius: 5px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+    font-size: 16px;
+    line-height: 1.5;
+    /* transition: all .4s; */
+    backdrop-filter: blur(20px);
+}
+.exlg-dialog-wrapper {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    background: rgba(0, 0, 0, 0);
+    width: 100%;
+    height: 100%;
+    /* opacity: 0.2;*/
+    /* vertical-align: middle; */
+    align-items: center;
+    display: table-cell;
+    z-index: 10;
+}
+.exlg-dialog-header {
+    height: auto;
+    border-bottom: 1px solid #eee;
+    padding: 11px 20px;
+}
+.exlg-dialog-body {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 20px 30px;
+    padding-bottom: 10px;
+    line-height: 2;
+}
+#header-right {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0);
+    color: red;
+    right: 10px;
+    top: 10px;
+    text-align: center;
+}

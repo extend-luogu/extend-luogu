@@ -1,5 +1,6 @@
 import { $, springboard, xss } from "../utils.js"
 import mod from "../core.js"
+import css from "../resources/css/user-intro-ins.css"
 
 mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, null, () => {
     $(".introduction > *").each((_, e, $e = $(e)) => {
@@ -26,12 +27,4 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
             break
         }
     })
-}, `
-    iframe {
-        border: none;
-        display: block;
-    }
-    iframe::-webkit-scrollbar {
-        display: none;
-    }
-`)
+}, css)

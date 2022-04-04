@@ -1,5 +1,6 @@
 import { $, exlg_alert, lg_dat } from "../utils.js"
 import mod from "../core.js"
+import css from "../resources/css/rand-training-problem.css"
 
 mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*)?", {
     mode: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
@@ -42,9 +43,4 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
 }, (e) => {
     const $tmp = $(e.target).find("div.operation")
     return { result: $tmp.length > 0, args: $tmp }
-}, () => $("div.operation"), `
-.exlg-rand-training-problem-btn {
-    border-color: rgb(52, 52, 52);
-    background-color: rgb(52, 52, 52);
-}
-`)
+}, () => $("div.operation"), css)

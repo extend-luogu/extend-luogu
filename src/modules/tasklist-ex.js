@@ -1,5 +1,6 @@
 import mod from "../core.js"
 import { $ } from "../utils.js"
+import css from "../resources/css/tasklist-ex.css"
 
 mod.reg("tasklist-ex", "任务计划_ex", "@/", {
     auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
@@ -37,8 +38,4 @@ mod.reg("tasklist-ex", "任务计划_ex", "@/", {
                 location.href += `problem/${ actTList[tid] }`
             })
     }
-}, `
-.exlg-rand-tasklist-problem-btn {
-    margin-left: 0.5em;
-}
-`)
+}, css)

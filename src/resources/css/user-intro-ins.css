@@ -1,0 +1,7 @@
+iframe {
+	border: none;
+	display: block;
+}
+iframe::-webkit-scrollbar {
+	display: none;
+}

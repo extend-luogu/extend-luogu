@@ -1,0 +1,8 @@
+a.sol-btn {
+    transition: opacity 2s cubic-bezier(0.8, 0, 0.9, -0.03);
+    opacity: 0;
+}
+a.sol-btn:hover {
+    opacity: 1;
+}
+.item-row { display: none; }

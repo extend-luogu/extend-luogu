@@ -1,5 +1,6 @@
 import uindow from "../utils.js"
 import mod from "../core.js"
+import css from "../resources/css/springboard.css"
 
 mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.txt?.*" ], null, () => {
     const q = new URLSearchParams(location.search)
@@ -18,14 +19,4 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
     case "dash":
         break
     }
-}, `
-    iframe {
-        border: none;
-        display: block;
-        width: 100%;
-        height: 100%;
-    }
-    iframe::-webkit-scrollbar {
-        display: none;
-    }
-`)
+}, css)

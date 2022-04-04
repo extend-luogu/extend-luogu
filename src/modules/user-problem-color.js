@@ -1,6 +1,7 @@
 import { $, lg_dat, lg_usr, lg_content } from "../utils.js"
 import mod from "../core.js"
 import { msg } from "../defs.js"
+import css from "../resources/css/user-problem-color.css"
 
 const brds = {
     SUBMITTED_PROBLEMS: 0,
@@ -109,8 +110,4 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         return { message: msg.ADD_COMPARE }
     }
     return []
-},`
-    .main > .card > h3 {
-        display: inline-block;
-    }
-`)
+}, css)

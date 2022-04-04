@@ -1,0 +1,44 @@
+.exlg-copy {
+    position: relative;
+    display: inline-block;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    background-color: rgba(52, 152, 219, 0);
+    color: #3498db;
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Noto Sans", "Noto Sans CJK SC", "Noto Sans CJK", "Source Han Sans", "PingFang SC", "Segoe UI", "Microsoft YaHei", sans-serif;
+    flex: none;
+    outline: 0;
+    cursor: pointer;
+    font-weight: normal;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    background: 0 0;
+    font-size: 12px;
+    padding: 0 5px;
+    margin-left: 1px;
+}
+.exlg-copy.exlg-copy-right {
+    float: right;
+}
+.exlg-copy:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+div.exlg-copied {
+    background-color: rgba(52, 152, 219, 0.9)!important;
+    color: white!important;
+}
+.copy-btn {
+    font-size: .8em;
+    padding: 0 5px;
+}
+.lfe-form-sz-middle {
+    font-size: 0.875em;
+    padding: 0.313em 1em;
+}
+.exlg-code-title {
+    margin: 0;
+    font-family: inherit;
+    font-size: 1.125em;
+    color: inherit;
+}

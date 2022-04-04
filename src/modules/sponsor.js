@@ -1,6 +1,7 @@
 import mod, { sto } from "../core.js"
 import { $, cs_get } from "../utils.js"
 import register_badge from "../components/register-badge.js"
+import css from "../resources/css/sponsor-tag.css"
 
 mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
     tag_list: { ty: "string", priv: true }
@@ -43,25 +44,4 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         result: $tmp.length,
         args: $tmp
     }
-}, () => $("a[target='_blank'][href]"),`
-.exlg-badge {
-    border-radius: 50px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    transition: all .15s;
-    display: inline-block;
-    min-width: 10px;
-    font-size: 1em;
-    font-weight: 700;
-    background-color: mediumturquoise;
-    color: #fff;
-    line-height: 1;
-    vertical-align: baseline;
-    white-space: nowrap;
-    cursor: pointer;
-    margin-left: 2px;
-    margin-right: 2px;
-}
-`)
+}, () => $("a[target='_blank'][href]"), css)

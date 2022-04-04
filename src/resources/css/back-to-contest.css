@@ -1,0 +1,8 @@
+.exlg-back-to-contest {
+    text-decoration: none;
+    float: right;
+    color: rgb(231, 76, 60);
+}
+.exlg-back-to-contest:hover {
+    color: rgb(231, 76, 60);
+}

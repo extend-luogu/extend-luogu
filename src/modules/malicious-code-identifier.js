@@ -1,5 +1,6 @@
 import mod from "../core.js"
 import { $, exlg_alert } from "../utils.js"
+import css from "../resources/css/malicious-code-identifier.css"
 
 mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" ], {
     strength : { ty: "number", dft: 3, min: 1, max: 5, step: 1, info: [ "Strength", "强度" ], strict: true }
@@ -33,14 +34,4 @@ mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(
             .replaceAll("危险", `<a class = "exlg-med-risk">[危险]</a>`)
             .replaceAll("可疑", `<a class = "exlg-low-risk">[可疑]</a>`), "发现有害代码")
     }
-}, `
-.exlg-high-risk {
-    color: #dd514c;
-}
-.exlg-med-risk {
-    color: #ff5722;
-}
-.exlg-low-risk {
-    color: #8c8c8c;
-}
-`)
+}, css)

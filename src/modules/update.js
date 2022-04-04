@@ -1,6 +1,7 @@
 import { exlg_alert, version_cmp, get_latest } from "../utils.js"
 import mod, { sto } from "../core.js"
-import update_log from "../resources/update-log.js"
+import update_log from "../resources/update-log.txt"
+import css from "../resources/css/update-log.css"
 
 mod.reg_chore("update", "检查更新", "1D", ".*", null, () => {
     get_latest((ver, op) => op === "<<" && exlg_alert(`<p>检测到新版本 ${ver}，点击确定将安装。</p>`, "检测到新版本",
@@ -74,11 +75,4 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     case ">>":
         msto.last_version = version
     }
-}, `
-.exlg-update-log-text {
-    overflow-x: auto;
-    white-space: nowrap;
-    text-align: left;
-    /* border: 1px solid #dedede; */
-}
-`)
+}, css)

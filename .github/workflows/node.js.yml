@@ -60,7 +60,7 @@ jobs:
           from re import split
           rb = split('^[^\n]+\n\n', loads(os.environ['MSG'])[-1])
           b = rb[1] if len(rb) > 1 else rb[0]
-          open("./src/resources/update-log.js", "w").write("export default `{}`".format(b.replace("`", "\\`")))
+          open("./src/resources/update-log.txt", "w").write(b)
           a = loads(open("./package.json").read())["version"]
           os.system("""
           yarn run build -d dist -o extend-luogu.min.user.js

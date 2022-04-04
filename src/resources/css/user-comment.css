@@ -1,0 +1,16 @@
+.exlg-usercom-edit {
+    transition: all .4s;
+    opacity: 0;
+}
+.exlg-usercom-edit:hover {
+    transition: all .4s;
+    opacity: 0.8;
+}
+.exlg-usercom-tag {
+    color: #8a7b7b;
+    font-weight: lighter;
+    font-size: .9em;
+    margin-left: .3em;
+    line-height: 1em;
+    font-family: Consolas
+}

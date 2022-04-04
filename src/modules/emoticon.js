@@ -1,5 +1,6 @@
 import mod from "../core.js"
 import { $ } from "../utils.js"
+import css from "../resources/css/emoticon.css"
 
 const emt = {
     EMO: 1,
@@ -126,44 +127,4 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
     })
     */
     // Hack: 监听输入/，类似qq的表情快捷键功能。但是锅了，所以删掉力
-}, `
-    .mp-editor-ground.exlg-ext.exlg-show-emo.exlg-show-emo-long {
-        top: 8.25em !important;
-    }
-    .mp-editor-ground.exlg-ext.exlg-show-emo.exlg-show-emo-short {
-        top: 4.75em !important;
-    }
-    .mp-editor-menu > br ~ li {
-        position: relative;
-        display: inline-block;
-        margin: 0;
-        padding: 5px 1px;
-    }
-    .mp-editor-menu.exlg-show-emo.exlg-show-emo-long {
-        height: 6em !important;
-        overflow: auto;
-        background-color: #fff;
-    }
-    .mp-editor-menu.exlg-show-emo.exlg-show-emo-short {
-        height: 2.5em !important;
-        overflow: auto;
-        background-color: #fff;
-    }
-    .exlg-emo-btn {
-        position: relative;
-        top: 0px;
-        border: none;
-        background-color: #eee;
-        border-radius: .7em;
-        margin: .1em;
-        transition: all .4s;
-        height: 2em;
-    }
-    .exlg-emo-btn:hover {
-        background-color: #f3f3f3;
-        top: -3px;
-    }
-    .exlg-emo, .exlg-ext {
-        transition: all .15s;
-    }
-`)
+}, css)

@@ -1,5 +1,6 @@
 import uindow, { $, warn, log, lg_usr } from "../utils.js"
 import mod, { sto } from "../core.js"
+import css from "../resources/css/keyboard-and-cli.css"
 
 mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
     lang: { ty: "enum", dft: "en", vals: [ "en", "zh" ] }
@@ -260,27 +261,4 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         else if ($act.is("[name=captcha]") && e.key === "Enter")
             $("#submitpost, #submit-reply")[0].click()
     })
-}, `
-    #exlg-cli {
-        position: fixed;
-        top: 0;
-        z-index: 65536;
-        display: none;
-        width: 100%;
-        height: 40px;
-        background-color: white;
-        box-shadow: 0 0 7px dodgerblue;
-    }
-    #exlg-cli-input {
-        display: block;
-        height: 100%;
-        width: 100%;
-        border: none;
-        outline: none;
-        font-family: "Fira Code", "consolas", "Courier New", monospace;
-        color: #000;
-    }
-    #exlg-cli-input.error {
-        background-color: indianred;
-    }
-`)
+}, css)

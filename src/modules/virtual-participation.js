@@ -1,5 +1,6 @@
 import mod from "../core.js"
 import { exlg_alert, lg_dat, lg_post, lg_content, lg_usr, warn, error, cur_time, $ } from "../utils.js"
+import css from "../resources/css/virtual-participation.css"
 
 mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
 }, () => {
@@ -88,22 +89,4 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 })
             }, false)
         })
-}, `
-#exlg-vp {
-    margin-right: .5em;
-    display: inline-block;
-    flex: none;
-    outline: 0;
-    cursor: pointer;
-    color: #fff;
-    font-weight: inherit;
-    line-height: 1.5;
-    text-align: center;
-    vertical-align: middle;
-    background: 0 0;
-    border-radius: 3px;
-    border: 1px solid;
-    border-color: #52c41a;
-    background-color: #52c41a;
-}
-`)
+}, css)

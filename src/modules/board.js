@@ -1,5 +1,6 @@
 import mod from "../core.js"
 import { $, cs_get, exlg_alert } from "../utils.js"
+import css from "../resources/css/benben-ranklist.css"
 
 mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
     $board.html(`
@@ -50,23 +51,4 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
     })
     $board.find("#refresh-bbrnk").on("click", () => { $list.html(""), refresh() })
     refresh()
-},`
-.bb-rnklst-1 > .bb-rnklst-ind {
-    color: var(--lg-red);
-    font-weight: 900;
-}
-.bb-rnklst-2 > .bb-rnklst-ind {
-    color: var(--lg-orange);
-    font-weight: 900;
-}
-.bb-rnklst-3 > .bb-rnklst-ind {
-    color: var(--lg-yellow);
-    font-weight: 900;
-}
-.bb-rnklst-ind.bb-top-ten {
-    margin-right: 9px;
-}
-.bb-rnklst-span {
-    font-size: 1em;font-weight: normal;
-}
-`)
+}, css)

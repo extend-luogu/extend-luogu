@@ -1,0 +1,13 @@
+.am-btn-warning {
+    border-color: rgb(255, 193, 22);
+    background-color: rgb(255, 193, 22);
+    color: #fff;
+}
+.am-btn-warning:hover {
+    border-color: #f37b1d;
+    background-color: #f37b1d;
+    color: #fff;
+}
+.am-btn {
+    outline: none;
+}
