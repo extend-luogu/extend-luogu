@@ -8,6 +8,10 @@ const tmpd = "_tmp",
     minify = parg.m ?? !parg.b,
     outfn = join(parg.d ?? "build", parg.o ?? "extend-luogu.user.js")
 
+;(([fn, val]) => {
+    if (!existsSync(fn))
+        writeFileSync(fn, val)
+})(["./src/resources/update-log.txt", ""])
 writeFileSync("./src/all-modules.js", readdirSync("./src/modules").map(s => `import "./modules/${s}"`).join("\n"))
 
 let tmpcss = {}, trklist = []
