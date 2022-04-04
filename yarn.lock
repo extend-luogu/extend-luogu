@@ -607,10 +607,10 @@ esutils@^2.0.2:
   resolved "https://registry.npm.taobao.org/esutils/download/esutils-2.0.3.tgz"
   integrity sha1-dNLrTeC42hKTcRkQ1Qd1ubcQ72Q=
 
-exlg-git-commit-msg-std@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.npmmirror.com/exlg-git-commit-msg-std/-/exlg-git-commit-msg-std-0.0.2.tgz#44d89f92547c9b8b8368ad45bac221ff1130a5f8"
-  integrity sha512-E9cByDPwROJHeODNwpHhYjmnR1a/hAetX6FtViSeJrgUz0QiOGzOUXmubYuc7dD6qkgu6N9jsJKhJW8G8n1Vtw==
+exlg-git-commit-msg-std@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.npmmirror.com/exlg-git-commit-msg-std/-/exlg-git-commit-msg-std-0.0.3.tgz#3808b6d33d313206e0a07b590545d4b207442fe2"
+  integrity sha512-rPlFzI7scJjXeH4U0uV0qx1BbfuFuTtNFXCNjMpgjs8NOzmNxpO353sYFoYwVMReKCScnw+tDpcGHIqgtfM7+w==
   dependencies:
     minimist "^1.2.5"
 
