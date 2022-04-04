@@ -1,4 +1,4 @@
-import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content } from "./utils.js"
+import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content, lg_post } from "./utils.js"
 import register_badge from "./components/register-badge.js"
 import mod from "./core.js"
 import compo from "./compo-core.js"
@@ -10,7 +10,7 @@ Object.assign(uindow, {
         mod,
         log, error,
         springboard, version_cmp,
-        lg_alert, lg_content, register_badge,
+        lg_alert, lg_content, register_badge, lg_post,
         TM_dat: {
             reload_dat: sch => {
                 raw_dat = null

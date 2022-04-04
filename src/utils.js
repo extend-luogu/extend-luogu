@@ -114,6 +114,14 @@ const cs_get = ({url, onload, onerror = err => error(err)}) => GM_xmlhttpRequest
     onerror: onerror
 })
 
+// Note: cs_get 的 Promise 版本
+const cs_get2 = url => new Promise((resolve, reject) => GM_xmlhttpRequest({
+    url: url,
+    method: "GET",
+    onload: e => resolve(e),
+    onerror: e => reject(e)
+}))
+
 const cs_post = ({url, data, onload, onerror = err => error(err)}) => GM_xmlhttpRequest({
     url: url,
     method: "POST",
@@ -219,7 +227,7 @@ const exlg_dialog_board = {
         // content.innerHTML = ""
     },
     accept_dialog() {
-        this._ac_func(this.hide_dialog)
+        this._ac_func(() => this.hide_dialog()) // Note: 一样的问题
         if (this.autoquit) {
             this.hide_dialog()
         }
@@ -236,6 +244,6 @@ const exlg_alert = (...arg) => exlg_dialog_board.show_exlg_alert(...arg)
 
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
-    lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, cs_post, springboard, $,
+    lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, cs_get2, cs_post, springboard, $,
     judge_problem, get_latest, exlg_dialog_board, exlg_alert
 }
