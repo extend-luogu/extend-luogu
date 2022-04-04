@@ -16,6 +16,7 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
 })
 
 mod.reg("hide-solution", "隐藏题解", [ "@/problem/[A-Z0-9]+", "@/problem/solution/.*" ], { // Note: 为了避免识别成题目列表
+    hidesolu: { ty: "boolean", dft: false, priv: true },
     on: { ty: "boolean", dft: false }
 }, () => /@\/problem\/[A-Z0-9]+/g.test(location.href) && $("a[href^=\"/problem/solution\"]").addClass("sol-btn"), hidesol_css)
 
