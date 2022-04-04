@@ -1,6 +1,7 @@
-import uindow, { $, version_cmp, get_latest, exlg_alert } from "../utils.js"
+import uindow, { $, version_cmp, get_latest } from "../utils.js"
 import mod from "../core.js"
 import logo from "../resources/logo.js"
+import register_badge from "../components/register-badge.js"
 
 mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     msg: {
@@ -191,8 +192,8 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 { html: "用户协议", url: "https://www.luogu.com.cn/paste/3f7anw16" }
             ] },
             { tag: "lhyakioi", title: "badge", buttons: [
-                { html: "注册", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") }, // todo: 自动注册 badge
-                { html: "修改", onclick: () => exlg_alert("暂未实现，请加群根据群公告操作。") },
+                { html: "注册", onclick: () => register_badge(false) },
+                { html: "修改", onclick: () => register_badge(true) },
             ] }
         ]
         _list.forEach((e) => {
