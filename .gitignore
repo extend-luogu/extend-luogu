@@ -8,6 +8,10 @@ package-lock.json
 
 src/resources/update-log.txt
 
+_tmp/
+
+.DS_Store
+
 # Node
 
 # Logs
