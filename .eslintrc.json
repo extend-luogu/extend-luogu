@@ -11,6 +11,8 @@
     },
     "rules": {
         "no-tabs": 0,
+        "no-debugger": 2,
+        "arrow-body-style": [ 2, "as-needed" ],
         "indent": [
             2,
             4
@@ -46,6 +48,24 @@
             "consistent-as-needed"
         ],
         "comma-dangle": 0,
+        "comma-spacing": [
+            2,
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "block-spacing": [
+            2,
+            "always"
+        ],
+        "arrow-spacing": [
+            2,
+            {
+                "before": true,
+                "after": true
+            }
+        ],
         "no-sequences": 0,
         "no-var": 2,
         "one-var": 0,
@@ -59,7 +79,14 @@
         "no-undef": 2,
         "no-case-declarations": 0,
         "no-fallthrough": 0,
-        "array-bracket-spacing": 0,
+        "array-bracket-spacing": [
+            2,
+            "always",
+            {
+                "objectsInArrays": false,
+                "arraysInArrays": false
+            }
+        ],
         "template-curly-spacing": 0,
         "computed-property-spacing": [
             0,
@@ -81,7 +108,13 @@
             }
         ],
         "no-mixed-operators": 0,
-        "space-unary-ops": 0,
+        "space-unary-ops": [
+            2,
+            {
+                "words": true,
+                "nonwords": false
+            }
+        ],
         "operator-linebreak": 0,
         "no-extend-native": 0
     },

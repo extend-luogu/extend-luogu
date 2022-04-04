@@ -12,11 +12,11 @@ const compo = {
                 lvs: data,
             }
         compo._.set(name, { info, func, styl })
-        return (...args) => func(...((data ? [compo.sto[name]] : []).concat(args)))
+        return (...args) => func(...((data ? [ compo.sto[name] ] : []).concat(args)))
     },
 
     ready: () => {
-        for (const [nm, co] of compo._.entries()) {
+        for (const [ nm, co ] of compo._.entries()) {
             if (co.styl)
                 GM_addStyle(co.styl)
             log(`Preparing component: ${nm}`)

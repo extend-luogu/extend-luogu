@@ -9,8 +9,8 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
     direct_display: { ty: "boolean", dft: true, info: [ "Directly replace username", "直接替换用户名" ] },
 }, ({ msto, result, args }) => { // Note: 你他妈也知道替代方案是吧
     const _setcomment = ($nm, com) => {
-        if (! com || !$nm) return
-        if (! $nm.length) return
+        if (!com || !$nm) return
+        if (!$nm.length) return
         if ($nm.length !== 1) {
             $nm.each((_i, e) => _setcomment($(e), com))
             return
@@ -25,7 +25,7 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
     }
     if (!result) {
         cmts = JSON.parse(msto.comments)
-        for (let [i, v] of Object.entries(cmts))
+        for (let [ i, v ] of Object.entries(cmts))
             if (v === null || v === "")
                 delete cmts[i]
         if (/^\/user\/[1-9][0-9]{0,}$/.test(location.pathname)) {

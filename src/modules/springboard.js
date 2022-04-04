@@ -13,7 +13,7 @@ mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.t
         break
     case "page":
         const url = q.get("url")
-        if (! q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`))
+        if (!q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`))
             document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`
         break
     case "dash":

@@ -19,7 +19,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     }
 }, ({msto}) => {
     const dif_list = [
-        ["入门", "red"], ["普及-", "orange"], ["普及/提高-", "yellow"], ["普及+/提高", "green"], ["提高+/省选-", "blue"], ["省选/NOI-", "purple"], ["NOI/NOI+/CTSC", "black"], ["暂无评定", "gray"]
+        [ "入门", "red" ], [ "普及-", "orange" ], [ "普及/提高-", "yellow" ], [ "普及+/提高", "green" ], [ "提高+/省选-", "blue" ], [ "省选/NOI-", "purple" ], [ "NOI/NOI+/CTSC", "black" ], [ "暂无评定", "gray" ]
     ].map((e, i, arr) => ({
         text: e[0],
         color: e[1],
@@ -106,43 +106,43 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     $entries[0].after($(`<span class="exlg-unselectable">&nbsp;&nbsp;</span>`))
     $entries[0].addClass("selected").css("margin-right", "38px")
 
-    $.double(([$entry, $div]) => {
+    $.double(([ $entry, $div ]) => {
         $entry.on("click", () => {
             $(".exrand-entry").removeClass("selected")
             $entry.addClass("selected")
             $(".smallbtn-list").hide()
             $div.show()
         })
-    }, [$entries[0], $exrand_diff], [$entries[1], $exrand_srce])
+    }, [ $entries[0], $exrand_diff ], [ $entries[1], $exrand_srce ])
 
-    $.double(([$parent, obj_list, msto_proxy]) => {
-        const $lists = $.double(([classname, desctext]) => $(`<span class="${classname}">
+    $.double(([ $parent, obj_list, msto_proxy ]) => {
+        const $lists = $.double(([ classname, desctext ]) => $(`<span class="${classname}">
         <span class="lg-small lg-inline-up exlg-unselectable">${desctext}</span>
         <br>
-        </span>`).appendTo($parent), ["exrand-enabled", "已选择"], ["exrand-disabled", "未选择"])
+        </span>`).appendTo($parent), [ "exrand-enabled", "已选择" ], [ "exrand-disabled", "未选择" ])
         obj_list.forEach((obj, index) => {
             const $btn = $.double(($p) => $(`<div class="exlg-smallbtn exlg-unselectable">${obj.text}</div>`).css("background-color", `var(--lg-${obj.color}-problem)`).appendTo($p), $lists[0], $lists[1])
             $.double((b) => {
                 $btn[b].on("click", () => {
                     $btn[b].hide()
                     $btn[1 - b].show()
-                    msto_proxy[index] = !! b
+                    msto_proxy[index] = !!b
                 })
-                if (msto_proxy[index] === (!! b)) $btn[b].hide()
+                if (msto_proxy[index] === (!!b)) $btn[b].hide()
             }, 0, 1)
         })
-    }, [$exrand_diff, dif_list, msto.exrand_difficulty], [$exrand_srce, src_list, msto.exrand_source])
+    }, [ $exrand_diff, dif_list, msto.exrand_difficulty ], [ $exrand_srce, src_list, msto.exrand_source ])
 
     $("#exlg-dash-0").on("mouseenter", () => {
         mouse_on_dash = true
 
-        $.double(([$p, mproxy]) => {
+        $.double(([ $p, mproxy ]) => {
             // Kill: const _$smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
 
-            $.double(([jqstr, bln]) => {
+            $.double(([ jqstr, bln ]) => {
                 $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => (mproxy[i] === bln) ? ($e.show()) : ($e.hide()))
-            }, [".exrand-enabled", true], [".exrand-disabled", false])
-        }, [$exrand_diff, msto.exrand_difficulty], [$exrand_srce, msto.exrand_source]) // Hack: 防止开两个页面瞎玩的情况
+            }, [ ".exrand-enabled", true ], [ ".exrand-disabled", false ])
+        }, [ $exrand_diff, msto.exrand_difficulty ], [ $exrand_srce, msto.exrand_source ]) // Hack: 防止开两个页面瞎玩的情况
         $board.show() // Hack: 鼠标放在dash上开window
     })
         .on("mouseleave", () => {
@@ -155,14 +155,14 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
         })
 
     const exrand_poi = async () => { // Note: 异步写法（用到了lg_content）
-        const result = $.double(([l, msto_proxy, _empty]) => {
+        const result = $.double(([ l, msto_proxy, _empty ]) => {
             let g = []
             l.forEach((e, i) => {
                 if (msto_proxy[i]) g.push(e.id)
             })
             if (!g.length) g = _empty
             return g[Math.floor(Math.random() * g.length)]
-        }, [dif_list, msto.exrand_difficulty, [0, 1, 2, 3, 4, 5, 6, 7]], [src_list, msto.exrand_source, ["P"]])
+        }, [ dif_list, msto.exrand_difficulty, [ 0, 1, 2, 3, 4, 5, 6, 7 ]], [ src_list, msto.exrand_source, [ "P" ]])
         let res = await lg_content(`/problem/list?difficulty=${result[0]}&type=${result[1]}&page=1`)
 
         const

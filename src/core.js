@@ -10,7 +10,7 @@ const mod = {
 
     path_alias: [
         [ "",        ".*\\.luogu\\.(com\\.cn|org)" ],
-        [ "dash",    "dash.exlg.cc"],
+        [ "dash",    "dash.exlg.cc" ],
         [ "cdn",     "cdn.luogu.com.cn" ],
         [ "bili",    "www.bilibili.com" ],
         [ "tcs1",    "service-ig5px5gh-1305163805.sh.apigw.tencentcs.com" ],
@@ -25,21 +25,21 @@ const mod = {
     ],
 
     reg: (name, info, path, data, func, styl) => {
-        if (! Array.isArray(path)) path = [ path ]
+        if (!Array.isArray(path)) path = [ path ]
         path.forEach((p, i) => {
             mod.path_alias.some(([ re, url ]) => {
                 if (p.match(re))
                     return path[i] = p.replace(re, url + "/"), true
             })
 
-            if (! p.endsWith("$")) path[i] += "$"
+            if (!p.endsWith("$")) path[i] += "$"
         })
 
         mod.data[name] = {
             ty: "object",
             lvs: data ? data : {}
         }
-        if (! ("on" in mod.data[name].lvs))
+        if (!("on" in mod.data[name].lvs))
             mod.data[name].lvs.on = { ty: "boolean", dft: true }
 
         mod._.set(name, { info, path, func, styl })
@@ -70,13 +70,13 @@ const mod = {
 
     reg_chore: (name, info, period, path, data, func, styl) => {
         if (typeof period === "string") {
-            const num = + period.slice(0, -1), unit = {
+            const num = +period.slice(0, -1), unit = {
                 s: 1000,
                 m: 1000 * 60,
                 h: 1000 * 60 * 60,
                 D: 1000 * 60 * 60 * 24
             }[ period.slice(-1) ]
-            if (! isNaN(num) && unit) period = num * unit
+            if (!isNaN(num) && unit) period = num * unit
             else error(`Parsing period failed: "${period}"`)
         }
 
@@ -92,7 +92,7 @@ const mod = {
                 const last = sto[name].last_chore, now = Date.now()
 
                 let nostyl = true
-                if (arg.named || ! last || now - last > period) {
+                if (arg.named || !last || now - last > period) {
                     if (nostyl) {
                         GM_addStyle(styl)
                         nostyl = false
@@ -109,7 +109,7 @@ const mod = {
         name, info, "@/", data,
         arg => {
             let $board = $("#exlg-board")
-            if (! $board.length)
+            if (!$board.length)
                 $board = $(`
                     <div class="lg-article" id="exlg-board" exlg="exlg"><h2>${icon_b} &nbsp;&nbsp;${GM_info.script.version}</h2></div>
                 `)
@@ -135,7 +135,7 @@ const mod = {
         arg => {
             func({...arg, ...{ result: false, args: darg() }})
             $("body").bind("DOMNodeInserted", (e) => {
-                if (! e.target.tagName)
+                if (!e.target.tagName)
                     return false
                 const res = hook(e)
                 return res.result && func({...arg, ...res})
@@ -161,7 +161,7 @@ const mod = {
         if (sto === null)
             sto = mod.fake_sto // Hack: 替代方案，变量还是没法 export 后修改
         const exe = (m, named) => {
-            if (! m) error(`Preloading named mod but not found: "${name}"`)
+            if (!m) error(`Preloading named mod but not found: "${name}"`)
             log(`Preloading ${ named ? "named " : "" }mod: "${m.name}"`)
             try {
                 return { pred: m.pre({ msto: sto[m.name], named }), ...m}
@@ -173,7 +173,7 @@ const mod = {
         }
 
         const pn = location.href
-        for (const [name, m] of mod._.entries()) {
+        for (const [ name, m ] of mod._.entries()) {
             if (sto[name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
                 m.willrun = true
                 if ("pre" in m)
@@ -184,7 +184,7 @@ const mod = {
 
     execute: name => {
         const exe = (m, named) => {
-            if (! m) error(`Executing named mod but not found: "${name}"`)
+            if (!m) error(`Executing named mod but not found: "${name}"`)
             if (m.styl) GM_addStyle(m.styl)
             log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
             try {
@@ -201,7 +201,7 @@ const mod = {
             return exe({name, ...m}, true)
         }
 
-        for (const [name, m] of mod._.entries()) {
+        for (const [ name, m ] of mod._.entries()) {
             m.on = sto[name].on
             if (m.willrun) {
                 if (exe({name, ...m}) === false) break

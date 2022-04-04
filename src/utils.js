@@ -28,7 +28,7 @@ const toKeyCode = e => [
 ].join("")
 
 const $ = jQuery.extend({
-    double: (func, first, second) => [func(first), func(second)]
+    double: (func, first, second) => [ func(first), func(second) ]
 })
 jQuery.fn.extend({
     whenKey: function(a, b) {
@@ -85,17 +85,17 @@ Array.prototype.lastElem = function () {
 // ==Utilities==Functions==
 
 const version_cmp = (v1, v2) => {
-    if (! v1) return "<<"
+    if (!v1) return "<<"
 
     const op = (x1, x2) => x1 === x2 ? "==" : x1 < x2 ? "<<" : ">>"
     const exs = [ "pre", "alpha", "beta" ]
 
-    const [ [ n1, e1 ], [ n2, e2 ] ] = [ v1, v2 ].map(v => v.split(" "))
+    const [[ n1, e1 ], [ n2, e2 ]] = [ v1, v2 ].map(v => v.split(" "))
     if (n1 === n2) return op(...[ e1, e2 ].map(e => e ? exs.findIndex(ex => ex === e) : Infinity))
 
     const [ m1, m2 ] = [ n1, n2 ].map(n => n.split("."))
     for (const [ k2, m ] of m1.entries())
-        if (m !== m2[k2]) return op(+ m || 0, + m2[k2] || 0)
+        if (m !== m2[k2]) return op(+m || 0, +m2[k2] || 0)
 }
 
 const springboard = (param, styl) => {

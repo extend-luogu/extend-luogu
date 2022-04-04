@@ -1,6 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-yarn lint
+yarn lint --fix
 node ./scripts/check-doc.js
 git add ./doc/module/module.md ./src/all-modules.js

@@ -20,11 +20,11 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
     // $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
     const tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
     const add_badge = ($e) => {
-        if (! $e || $e.hasClass("exlg-badge-username")) return
-        if (! /\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
+        if (!$e || $e.hasClass("exlg-badge-username")) return
+        if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
         $e.addClass("exlg-badge-username") // Note: 删掉这行会出刷犇犇的bug，一开始我以为每个元素被添加一次所以问题不大 但是事实证明我是傻逼
         const user_uid = $e.attr("href").slice("/user/".length), tag = tag_list[user_uid]
-        if (! tag) return
+        if (!tag) return
         const $badge = $(user_uid === "100250" ? `<span class="am-badge am-radius lg-bg-red" style="margin-left: 4px;">${ tag }</span>` : `<span class="exlg-badge">${ tag }</span>`)
             .off("contextmenu")
             .on("contextmenu", () => false)

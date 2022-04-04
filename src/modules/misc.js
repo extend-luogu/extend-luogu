@@ -25,7 +25,7 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
 ], null, ({ args }) => {
     const $info_rows = args.$info_rows, $pre = $(`<a class="exlg-back-to-contest"></a>`),
         cid = args.cid, pid = args.pid
-    if ((! pid) || (! cid)) return
+    if ((!pid) || (!cid)) return
     if ($info_rows.children(".exlg-back-to-contest").length > 0) return // Note: 防止重复
     $pre.attr("href", `/contest/${ cid }#problems`)
         .html(`<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="door-open" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-door-open fa-w-20">
@@ -35,12 +35,12 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
 }, (e) => {
     const tar = e.target, cid = lg_dat.contest.id,
         pid = lg_dat.problem.pid
-    return { args: { cid, pid, $info_rows: $(tar.parentNode) } ,result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
-}, () => { return { cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() } }, backtocont_css)
+    return { args: { cid, pid, $info_rows: $(tar.parentNode) }, result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
+}, () => ({ cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() }), backtocont_css)
 
 mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, async ({ args }) => {
     if (args && args.type === "show") {
-        if ($("div.problem > div > a > span.pid").length && ! $(".exlg-difficulty-color").length) {
+        if ($("div.problem > div > a > span.pid").length && !$(".exlg-difficulty-color").length) {
             const u = await lg_content(location.href)
             const dif = u.currentData.records.result.map((u) => u.problem.difficulty)
             $("div.problem > div > a > span.pid").each((i, e, $e = $(e)) => {
@@ -57,13 +57,13 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
     })
 }, (e) => {
     const tar = e.target
-    if (!tar || (! tar.tagName)) return { args: msg.COMMENT_TAG, result: false }
+    if (!tar || (!tar.tagName)) return { args: msg.COMMENT_TAG, result: false }
     if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/problem/")/* && judge_problem(tar.href.slice(tar.href.indexOf("/problem/") + 9))*/ && ` ${ tar.parentNode.parentNode.className } `.includes(" problem ")) { // Note: 如果是标签的话，查看它的父亲是否为最后一个。如果是，更新数据。对于其他的不管。
-        if (! tar.parentNode.parentNode.parentNode.nextSibling) return { args: { type: "modified - update", target: tar.parentNode.parentNode.parentNode.parentNode }, result: true }
+        if (!tar.parentNode.parentNode.parentNode.nextSibling) return { args: { type: "modified - update", target: tar.parentNode.parentNode.parentNode.parentNode }, result: true }
         else return { args: { type: "modified - not the last one.", target: null }, result: false }
     }
     return { args: { type: "modified - not that one.", target: null }, result: false }
-}, () => { return { type: "show" } }, ``
+}, () => ({ type: "show" }), ``
 )
 
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {

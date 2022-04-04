@@ -1,7 +1,7 @@
 import mod from "../core.js"
 import { $, cs_post } from "../utils.js"
 
-mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+", "@/image"], null, () => {
+mod.reg("captcha", "验证码自动填充", [ "@/auth/login", "@/discuss/.+", "@/image" ], null, () => {
     let img = $("img[data-v-3e1b4641],#verify_img")
     const autofill = () => {
         const canvas = document.createElement("canvas")

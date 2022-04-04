@@ -29,14 +29,14 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, is_edit
             $title.html(e)
             setTimeout(() => $title.html(title_text), 1500)
         }
-        if (lg_usr?.uid && ! $input[0].value)
+        if (lg_usr?.uid && !$input[0].value)
             $input[0].value = lg_usr.uid
-        if (! $input.get().some(e => e.value)) {
+        if (!$input.get().some(e => e.value)) {
             gerr("[Err] 请检查信息是否填写完整")
             return
         }
         let res = await $.get("/api/user/search?keyword=" + $input[0].value)
-        if (! res.users[0]) {
+        if (!res.users[0]) {
             gerr("[Err] 无法找到指定用户")
             return
         }

@@ -8,7 +8,7 @@ mod.reg_chore("update", "检查更新", "1D", ".*", null, () => {
         () => location.href = `https://hub.fastgit.xyz/extend-luogu/extend-luogu/raw/${ver}/dist/extend-luogu.min.user.js`))
 })
 
-const dev_op = ["$", "#<@"].map(s => s.split(""))
+const dev_op = [ "$", "#<@" ].map(s => s.split(""))
 const human_lang = {
     Ty: {
         "-": "添加",
@@ -31,7 +31,7 @@ const human_lang = {
 }
 mod.reg("update-log", "更新日志显示", "@/.*", {
     last_version: { ty: "string", priv: true },
-    style: { ty: "enum", vals: ["Commit Message", "自然语言"], get: "id", info: [
+    style: { ty: "enum", vals: [ "Commit Message", "自然语言" ], get: "id", info: [
         "The way to display log", "显示 Log 的方式"
     ]},
     keep_dev: { ty: "boolean", dft: true, info: [

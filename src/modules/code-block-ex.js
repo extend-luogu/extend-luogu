@@ -42,7 +42,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
 
         const $code = $pre.children("code")
         $code.css("font-family", msto.copy_code_font || undefined)
-        if (! $code.hasClass("hljs")) $code.addClass("hljs").css("background", "white")
+        if (!$code.hasClass("hljs")) $code.addClass("hljs").css("background", "white")
         $btn.addClass(`exlg-copy-${msto.copy_code_position}`)
 
         const lang = get_lang($code)
@@ -50,7 +50,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
         const title_text = lang ? msto.code_block_title.replace("${lang}", lang) : msto.code_block_title_nolang
         const $title = isRecord ? $(".lfe-h3").text(title_text) : $(`<h3 class="exlg-code-title" style="/*width: 100%;*/">${title_text}</h3>`)
 
-        if (! isRecord) $pre.before($title.append($btn))
+        if (!isRecord) $pre.before($title.append($btn))
     })
 }, (e) => {
     const $tar = $(e.target).find("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])")

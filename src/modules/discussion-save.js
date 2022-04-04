@@ -3,7 +3,7 @@ import css from "../resources/css/discussion-save.css"
 import { $, log, cs_get } from "../utils.js"
 
 mod.reg("discussion-save", "讨论保存", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" ], {
-    auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: ["Discussion Auto Save", "自动保存讨论"] }
+    auto_save_discussion : { ty: "boolean", dft: false, strict: true, info: [ "Discussion Auto Save", "自动保存讨论" ] }
 }, ({ msto }) => {
     const $btn = $(`<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>`)
     $btn.on("click", () => {

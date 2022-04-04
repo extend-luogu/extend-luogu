@@ -35,7 +35,7 @@ mod.reg("exlg-dialog-board", "exlg_公告板", "@/.*", {
             _mouse_down_on_wrapper = false
         })
         .appendTo($(document.body))
-    const [wrapper, container, header, content] = [$wrap, $cont, $head, $main]
+    const [ wrapper, container, header, content ] = [ $wrap, $cont, $head, $main ]
 
     Object.assign(exlg_dialog_board, {
         wrapper, container, header, content,

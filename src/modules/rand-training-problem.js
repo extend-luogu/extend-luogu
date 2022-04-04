@@ -3,12 +3,12 @@ import mod from "../core.js"
 import css from "../resources/css/rand-training-problem.css"
 
 mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[0-9]+(#.*)?", {
-    mode: { ty: "enum", vals: ["unac only", "unac and new", "new only"], dft : "unac and new", info: [
+    mode: { ty: "enum", vals: [ "unac only", "unac and new", "new only" ], dft : "unac and new", info: [
         "Preferences about problem choosing", "随机跳题的题目种类"
     ] }
 }, ({ msto, args }) => {
     let ptypes = msto.mode.startsWith("unac") + msto.mode.endsWith("only") * (-1) + 2
-    if (! args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE
+    if (!args.length) return // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE
     $(args[0].firstChild).clone(true)
         .appendTo(args)
         .text("随机跳题")
@@ -37,7 +37,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
                     return exlg_alert("您已经切完所有题啦！")
             }
 
-            const pid = ~~ (Math.random() * 1.e6) % candProbList.length
+            const pid = ~~(Math.random() * 1.e6) % candProbList.length
             location.href = "https://www.luogu.com.cn/problem/" + candProbList[pid]
         })
 }, (e) => {

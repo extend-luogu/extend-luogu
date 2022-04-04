@@ -25,8 +25,8 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
     }
 }, () => {
-    const modules = [["Modules", "功能", "tunes", false], ["Core", "核心", "bug_report", true]]
-        .map(([name, description, icon, is_main]) => ({
+    const modules = [[ "Modules", "功能", "tunes", false ], [ "Core", "核心", "bug_report", true ]]
+        .map(([ name, description, icon, is_main ]) => ({
             name, description, icon,
             children: (() => {
                 let arr = []
@@ -37,7 +37,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                             name: nm.replace(/^[@^]/g, ""),
                             description: m.info,
                             settings: Object.entries(mod.data[nm].lvs)
-                                .filter(([ k, s ]) => k !== "on" && ! s.priv)
+                                .filter(([ k, s ]) => k !== "on" && !s.priv)
                                 .map(([ k, s ]) => ({
                                     name: k,
                                     displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
@@ -57,7 +57,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
 })
 mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     source: {
-        ty: "enum", vals: [ "exlg", "gh_index", "debug"], dft: "exlg",
+        ty: "enum", vals: [ "exlg", "gh_index", "debug" ], dft: "exlg",
         info: [ "The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页" ]
     },
     enable_rclick: {
@@ -69,7 +69,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         ty: "string", dft: "0.0.0"
     }
 }, ({ msto, args }) => {
-    if ([ "exlg", "gh_index", "debug"].indexOf(msto.source) === -1) msto.source = "exlg"
+    if ([ "exlg", "gh_index", "debug" ].indexOf(msto.source) === -1) msto.source = "exlg"
 
     const $tar = args.$tar
     const _right_svg = `<svg class="icon" style="width: 1.2em;height: 1.2em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697"><path d="M644.266667 494.933333l-192 192-29.866667-29.866666 162.133333-162.133334-162.133333-162.133333 29.866667-29.866667 192 192z" fill="#444444" p-id="1698"></path></svg>`
@@ -82,7 +82,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         return
     }
 
-    const create_window = ! $tar.parent().hasClass("mobile-nav-container")
+    const create_window = !$tar.parent().hasClass("mobile-nav-container")
     const $spn = $(`<span id="exlg-dash-window" class="exlg-window" style="display: none;"></span>`).css("left", "-125px")
     const $btn = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
         .prependTo($tar)
@@ -101,7 +101,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     if (msto.enable_rclick)
         $btn.bind("contextmenu", () => false)
             .on("mousedown", (e) => {
-                if (! e.button)
+                if (!e.button)
                     _jump_settings()
                 else if (e.button === 2) {
                     msto.source = {
@@ -167,7 +167,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         $spn.on("mouseenter", () => { monbrd = true })
             .on("mouseleave", () => {
                 monbrd = false
-                if (! mondsh) $spn.hide()
+                if (!mondsh) $spn.hide()
             })
 
         $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;">${logo}</h2>`).appendTo($spn)
@@ -242,9 +242,9 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     }
 }, (e) => {
     const $etar = $(e.target)
-    if (e.target.tagName.toLowerCase() === "a" && $etar.hasClass("color-none") && $etar.parent().hasClass("ops") && (! $etar.hasClass("exlg-dash-options")))
+    if (e.target.tagName.toLowerCase() === "a" && $etar.hasClass("color-none") && $etar.parent().hasClass("ops") && (!$etar.hasClass("exlg-dash-options")))
         return { result: 2, args: { $tar: $(e.target), type: 2 } }
     const $tmp = $etar.find(".user-nav, .nav-container")
-    if ($tmp.length && (! $tmp.find("#exlg-dash-window").length)) return { result: ($tmp.length), args: { $tar: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp), type: 1 } } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
+    if ($tmp.length && (!$tmp.find("#exlg-dash-window").length)) return { result: ($tmp.length), args: { $tar: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp), type: 1 } } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
-}, () => { return { $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 } }, css)
+}, () => ({ $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 }), css)

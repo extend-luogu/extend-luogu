@@ -72,11 +72,11 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             "get the help of <cmd>. or list all cmds.",
             "获取 <cmd> 的帮助。空则列出所有",
         ], cmd => {
-            if (! cmd)
+            if (!cmd)
                 cli_log`exlg cli. current language: ${cli_lang}, available commands: ${ Object.keys(cmds).join(", ") }`
             else {
                 const f = cmds[cmd]
-                if (! f) return cli_error`help: unknown command "${cmd}"`
+                if (!f) return cli_error`help: unknown command "${cmd}"`
 
                 const arg = f.arg.map(a => {
                     const i = a.name + ": " + a.type
@@ -115,7 +115,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 [ "service",            "fk", "fksqgd", "反馈", "反馈、申请、工单专版",      "se" ]
             ]
             forum = tar.find(ns => ns.includes(forum))?.[0]
-            if (! tar) return cli_error`cdd: unknown forum "${forum}"`
+            if (!tar) return cli_error`cdd: unknown forum "${forum}"`
             location.href = `https://www.luogu.com.cn/discuss/lists?forumname=${forum}`
         }),
         gcmd("cc", "[name: char]", [
@@ -146,7 +146,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             case "toggle":
                 if (!mod.has(name)) return cli_error`mod: unknown mod "${name}"`
                 sto[name].on = {
-                    enable: () => true, disable: () => false, toggle: now => ! now
+                    enable: () => true, disable: () => false, toggle: now => !now
                 }[action](sto[name].on)
                 break
             default:
@@ -157,7 +157,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             "for <action> \"show|hide|toggle\", opearte the exlg dashboard.",
             "当 <action> 为 \"show|hide|toggle\", 显示|隐藏|切换 exlg 管理面板。",
         ], action => {
-            if (! [ "show", "hide", "toggle" ].includes(action))
+            if (![ "show", "hide", "toggle" ].includes(action))
                 return cli_error`dash: unknown action "${action}"`
             $("#exlg-dash-window")[action]()
         }),
@@ -182,7 +182,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             "跳转至用户名与 <name> 类似的用户主页。",
         ], name => {
             $.get("/api/user/search?keyword=" + name, res => {
-                if (! res.users[0])
+                if (!res.users[0])
                     cli_error`un: unknown user "${name}".`
                 else
                     location.href = "/user/" + res.users[0].uid
@@ -198,16 +198,16 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
 
         const tk = cmd.trim().replace(/^\//, "").split(" ")
         const n = tk.shift()
-        if (! n) return
+        if (!n) return
         const f = cmds[n]
-        if (! f) return cli_error`exlg: unknown command "${n}"`
+        if (!f) return cli_error`exlg: unknown command "${n}"`
         let i = -1, a; for ([ i, a ] of tk.entries()) {
             const t = f.arg[i].type
-            if (t === "number" || t === "integer") tk[i] = + a
+            if (t === "number" || t === "integer") tk[i] = +a
             if (
                 t === "char" && a.length === 1 ||
-                t === "number" && ! isNaN(tk[i]) ||
-                t === "integer" && ! isNaN(tk[i]) && ! (tk[i] % 1) ||
+                t === "number" && !isNaN(tk[i]) ||
+                t === "integer" && !isNaN(tk[i]) && !(tk[i] % 1) ||
                 t === "string"
             ) ;
             else return cli_error`${n}: illegal param "${a}", expected type ${t}.`
@@ -224,7 +224,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             cli_history.push(cmd)
             cli_history_index = cli_history.length
             parse(cmd)
-            if (! cli_is_log) return cli_clean()
+            if (!cli_is_log) return cli_clean()
             break
         case "/":
             if (cli_is_log) cli_clean()

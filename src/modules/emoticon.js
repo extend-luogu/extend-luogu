@@ -7,10 +7,10 @@ const emt = {
     TXT: 2
 }
 mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
-    benben: { ty: "boolean", dft: true, info: ["Show in benben", "犇犇表情"] },
-    show: { ty: "boolean", dft: true, info: ["Show in default", "是否默认显示表情栏"] },
-    src: { ty: "enum", vals: ["图.tk", "github", "妙.tk", "啧.tk"], dft: "图.tk", info: ["Emoticon Source", "表情源"] },
-    height_limit: { ty: "boolean", dft: true, info: ["Expand in default", "是否默认展开表情"] }
+    benben: { ty: "boolean", dft: true, info: [ "Show in benben", "犇犇表情" ] },
+    show: { ty: "boolean", dft: true, info: [ "Show in default", "是否默认显示表情栏" ] },
+    src: { ty: "enum", vals: [ "图.tk", "github", "妙.tk", "啧.tk" ], dft: "图.tk", info: [ "Emoticon Source", "表情源" ] },
+    height_limit: { ty: "boolean", dft: true, info: [ "Expand in default", "是否默认展开表情" ] }
 }, ({ msto }) => {
     const emo = [
         "kk", "jk", "se", "qq", "xyx", "xia", "cy", "ll", "xk", "qiao", "qiang", "ruo", "mg", "dx", "youl", "baojin", "shq", "lb", "lh", "qd", "fad", "dao", "cd", "kun", "px", "ts", "kl", "yiw", "dk",
@@ -34,10 +34,10 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
         { name: [ "zyx" ], slug: "ge", name_display: "致远星" },
         { name: [ "zh" ], slug: "gf", name_display: "祝好" },
     ].filter(e => msto.src !== "啧.tk" || typeof e !== "object").map((e, i) => {
-        if (typeof(e) === "string")
+        if (typeof (e) === "string")
             return {
                 type: emt.EMO,
-                name: [e],
+                name: [ e ],
                 slug: (i >= 10) ? String.fromCharCode(0x61 + (i - 10)) : String.fromCharCode(0x30 + i)
             }
         return { type: emt.TXT, ...e }
@@ -74,7 +74,7 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
     const $menu = $(".mp-editor-menu"),
         $txt = $(".CodeMirror-wrap textarea")
 
-    if (! $menu.length) return
+    if (!$menu.length) return
 
     const $emo_menu = $menu.clone().addClass("exlg-emo").text("")
     $menu.after($emo_menu).append("<br />")
@@ -87,19 +87,19 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
     $show_hide.children().attr("title", "").text((msto.show) ? "隐藏" : "显示")
     if (msto.show) $emo_menu.addClass("exlg-show-emo"), $ground.addClass("exlg-show-emo")
     $show_hide.on("click", () => {
-        $show_hide.children()[0].innerHTML = ["显示", "隐藏"][["隐藏", "显示"].indexOf($show_hide.children()[0].innerHTML)]
+        $show_hide.children()[0].innerHTML = [ "显示", "隐藏" ][[ "隐藏", "显示" ].indexOf($show_hide.children()[0].innerHTML)]
         $emo_menu.toggleClass("exlg-show-emo")
         $ground.toggleClass("exlg-show-emo")
-        msto.show = ! msto.show
+        msto.show = !msto.show
     })
     $set_height.children().attr("title", "").text((msto.height_limit) ? "展开" : "收起")
     if (msto.height_limit) $emo_menu.addClass("exlg-show-emo-short"), $ground.addClass("exlg-show-emo-short")
     else $emo_menu.addClass("exlg-show-emo-long"), $ground.addClass("exlg-show-emo-long")
     $set_height.on("click", () => {
-        $set_height.children()[0].innerHTML = ["收起", "展开"][["展开", "收起"].indexOf($set_height.children()[0].innerHTML)]
+        $set_height.children()[0].innerHTML = [ "收起", "展开" ][[ "展开", "收起" ].indexOf($set_height.children()[0].innerHTML)]
         $emo_menu.toggleClass("exlg-show-emo-short").toggleClass("exlg-show-emo-long")
         $ground.toggleClass("exlg-show-emo-short").toggleClass("exlg-show-emo-long")
-        msto.height_limit = ! msto.height_limit
+        msto.height_limit = !msto.height_limit
     })
 
     emo.forEach(m => {

@@ -3,8 +3,8 @@ import { $ } from "../utils.js"
 import css from "../resources/css/tasklist-ex.css"
 
 mod.reg("tasklist-ex", "任务计划_ex", "@/", {
-    auto_clear: { ty: "boolean", dft: true, info: ["Hide accepted problems", "隐藏已经 AC 的题目"] },
-    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: ["Random problem in tasklist", "任务计划随机跳题"]}
+    auto_clear: { ty: "boolean", dft: true, info: [ "Hide accepted problems", "隐藏已经 AC 的题目" ] },
+    rand_problem_in_tasklist: { ty: "boolean", dft: true, info: [ "Random problem in tasklist", "任务计划随机跳题" ]}
 }, ({ msto }) => {
     /* const _$board = $("button[name=task-edit]").parent().parent() // Note: 如果直接$div:has(.tasklist-item) 那么当任务计划为空.. */
     let actTList = []
@@ -24,7 +24,7 @@ mod.reg("tasklist-ex", "任务计划_ex", "@/", {
     const $ac_problem = $(".tasklist-ac-problem")
     const $toggle = $("#toggle-button").on("click", () => {
         $ac_problem.toggle()
-        $toggle.text([ "隐藏", "显示" ][ + (msto.auto_clear = ! msto.auto_clear) ] + "已 AC")
+        $toggle.text([ "隐藏", "显示" ][ +(msto.auto_clear = !msto.auto_clear) ] + "已 AC")
     })
 
     if (msto.auto_clear) $toggle.click()
@@ -34,7 +34,7 @@ mod.reg("tasklist-ex", "任务计划_ex", "@/", {
         $("button[name='task-edit']").before($btn)
         $btn.addClass("exlg-rand-tasklist-problem-btn")
             .click(() => {
-                let tid = ~~ (Math.random() * 1.e6) % actTList.length
+                let tid = ~~(Math.random() * 1.e6) % actTList.length
                 location.href += `problem/${ actTList[tid] }`
             })
     }

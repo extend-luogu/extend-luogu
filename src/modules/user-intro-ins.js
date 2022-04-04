@@ -6,7 +6,7 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
     $(".introduction > *").each((_, e, $e = $(e)) => {
         const t = $e.text()
         let [ , , ins, arg ] = t.match(/^(exlg.|%)([a-z]+):([^]+)$/) ?? []
-        if (! ins) return
+        if (!ins) return
 
         arg = arg.split(/(?<!!)%/g).map(s => s.replace(/!%/g, "%"))
         const $blog = $($(".user-action").children()[0])

@@ -16,7 +16,7 @@ Object.assign(uindow, {
                 raw_dat = null
                 return load_dat(sch, {
                     map: s => {
-                        s.root = ! s.rec
+                        s.root = !s.rec
                         s.itmRoot = s.rec === 2
                     }
                 })
