@@ -180,6 +180,11 @@
 	background-color: rgb(227,229,231);
 }
 
+.wrapper.hover>.dropdown>.center {
+	font-size: 1.1em;
+	width: 18.18em;
+}
+
 .exlg-dropdown.field {
 	display: inline-block;
 	border-left: none;
@@ -201,7 +206,7 @@
 	font-weight: 700;
 
 	color: #6c757d;
-	font-size: 18px;
+	font-size: 1.1em;
 	transition: color .2s;
 }
 .exlg-dropdown.field > .key {
@@ -211,7 +216,7 @@
 
 	color: #9499a0;
 	font-weight: 400;
-	font-size: 12px;
+	font-size: .75em;
 	transition: color .2s;
 }
 .exlg-dropdown.field > .key-small {
@@ -221,6 +226,6 @@
 
 	color: #9499a0;
 	font-weight: 400;
-	font-size: 8px;
+	font-size: .5em;
 	transition: color .2s;
 }
