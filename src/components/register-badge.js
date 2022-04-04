@@ -105,7 +105,7 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, is_edit
         await lg_post("/api/feed/postBenben", JSON.stringify({ content: bbv }))
         let e2 = await cs_get2(e.match(/visit.*$/g)[0].slice(6)), msg = e2.responseText.slice(1, -1)
         if (msg.startsWith("Error")) {
-            log(e), gerr(e)
+            log(msg), gerr(msg)
             return
         }
 
