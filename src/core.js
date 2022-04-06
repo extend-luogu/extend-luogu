@@ -88,7 +88,7 @@ const mod = {
 
         mod.reg(
             name, info, path, data,
-            arg => {
+            async arg =>  {
                 const last = sto[name].last_chore, now = Date.now()
 
                 let nostyl = true
@@ -97,8 +97,10 @@ const mod = {
                         GM_addStyle(styl)
                         nostyl = false
                     }
-                    func(arg)
-                    sto[name].last_chore = Date.now()
+                    if (await func(arg))
+                        warn(`Chore failed: "${name}"`)
+                    else
+                        sto[name].last_chore = Date.now()
                 }
                 else log(`Pending chore: "${name}"`)
             }
