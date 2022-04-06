@@ -122,13 +122,14 @@ const cs_get2 = url => new Promise((resolve, reject) => GM_xmlhttpRequest({
     onerror: e => reject(e)
 }))
 
-const cs_post = ({url, data, onload, onerror = err => error(err)}) => GM_xmlhttpRequest({
+const cs_post = ({url, data, type}) => new Promise((resolve, reject) => GM_xmlhttpRequest({
     url: url,
     method: "POST",
     data: data,
-    onload: onload,
-    onerror: onerror
-})
+    headers: { "Content-Type": type },
+    onload: e => resolve(e),
+    onerror: e => reject(e)
+}))
 
 const get_latest = callbackfn => {
     cs_get({
