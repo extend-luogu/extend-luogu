@@ -27,6 +27,7 @@
 - [跨域跳板](./springboard.md)
 - [记录难度可视化](./submission-color.md)
 - [任务计划 ex](./tasklist-ex.md)
+- [EXLG 令牌](./token.md)
 - [检查更新](./update.md)
 - [更新日志显示](./update-log.md)
 - [用户备注](./user-comment.md)
