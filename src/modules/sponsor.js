@@ -15,9 +15,8 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 })
 
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
-    use_new: { ty: "boolean", dft: false, info: [ "Enable new", "启用新版后端（测试）" ] },
-    endpoint: { ty: "string", dft: "https://exlg.piterator.com/badge/mget/", info: [ "API Endpoint", "API 端点（仅限新版）" ] },
-    cache: { ty: "string", dft: "3600", info: [ "Cache time", "缓存时间（秒）" ] },
+    use_new: { ty: "boolean", dft: false, info: [ "Enable new", "启用新版后端（实验性）" ] },
+    cache: { ty: "string", dft: "3600", info: [ "Cache time", "缓存时间（秒）（仅限新版）" ] },
     tag_list: { ty: "string", priv: true },
     tag_cache: { ty: "string", priv: true }
 }, async ({ msto, args }) => {
@@ -34,25 +33,25 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
             $e.addClass("exlg-badge-required-username")
             const user_uid = $e.attr("href").slice("/user/".length)
-            if( !Object.keys(cache).includes(user_uid) || Date.now()/1000 - cache[user_uid].ts > Number(msto.cache) ) {
+            if( !(user_uid in cache) || Date.now()/1000 - cache[user_uid].ts > Number(msto.cache) ) {
                 tag_uid_list.push(user_uid)
             }
             else {
                 // console.log("hit: ", user_uid)
-                if ( Object.keys(cache[user_uid]).includes("text") ) {
+                if ( "text" in cache[user_uid] ) {
                     tag_list[user_uid] = cache[user_uid].text
                 }
             }
         }
         args.each((_, e) => require_badge($(e)))
         const res = (await cs_post({
-            url: msto.endpoint,
+            url: "https://exlg.piterator.com/badge/mget/",
             data: JSON.stringify(tag_uid_list),
             type: "application/json"
         })).responseText
         const tag_list_response = JSON.parse(decodeURIComponent(res))
         for (const [ key, value ] of Object.entries(tag_list_response)) {
-            if ( Object.keys(value).includes("text") ) {
+            if ( "text" in value ) {
                 tag_list[key] = value.text
                 cache[key] = {}
                 cache[key].text = value.text
