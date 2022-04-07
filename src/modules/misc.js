@@ -37,10 +37,15 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     return { args: { cid, pid, $info_rows: $(tar.parentNode) }, result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
 }, () => ({ cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() }), backtocont_css)
 
-mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, ((data) => async ({ args }) => {
+mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", {
+    reload: { ty: "boolean", dft: true, info: [ "Always reload data", "翻页时总是重新加载数据" ] }
+}, ((data) => async ({ msto, args }) => {
     if (args) {
-        if (!(location.href in data)) // Note: 如果当前页面未曾加载数据
+        if (!(location.href in data)) { // Note: 如果当前页面未曾加载数据
+            if (msto.reload)
+                Object.getOwnPropertyNames(data).forEach((prop) => delete data[prop]) // Note: 清空所有数据
             data[location.href] = lg_content(location.href) // Note: 则创建异步 AJAX 任务
+        }
         $(args.pid).addClass("exlg-difficulty-color").addClass(`color-${
             (await data[location.href]).currentData.records.result.filter( // Note: 等待异步获取完成
                 record => record.problem.pid === args.pid.innerText.trim() // Note: 根据 PID 筛选当前题目
