@@ -1,5 +1,4 @@
 import mod from "../core.js"
-import { msg } from "../defs.js"
 import { $, judge_problem, lg_dat, lg_content } from "../utils.js"
 
 import hidesol_css from "../resources/css/hide-solution.css"
@@ -38,32 +37,26 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     return { args: { cid, pid, $info_rows: $(tar.parentNode) }, result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
 }, () => ({ cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() }), backtocont_css)
 
-mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, async ({ args }) => {
-    if (args && args.type === "show") {
-        if ($("div.problem > div > a > span.pid").length && !$(".exlg-difficulty-color").length) {
-            const u = await lg_content(location.href)
-            const dif = u.currentData.records.result.map((u) => u.problem.difficulty)
-            $("div.problem > div > a > span.pid").each((i, e, $e = $(e)) => {
-                $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`)
-            })
-        }
-        return
+mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, ((data) => async ({ args }) => {
+    if (args) {
+        if (!(location.href in data)) // Note: 如果当前页面未曾加载数据
+            data[location.href] = lg_content(location.href) // Note: 则创建异步 AJAX 任务
+        $(args.pid).addClass("exlg-difficulty-color").addClass(`color-${
+            (await data[location.href]).currentData.records.result.filter( // Note: 等待异步获取完成
+                record => record.problem.pid === args.pid.innerText.trim() // Note: 根据 PID 筛选当前题目
+            )[0].problem.difficulty
+        }`)
     }
-    if ($(".exlg-difficulty-color").length) return
-    const u = await lg_content(location.href)
-    const dif = u.currentData.records.result.map((u) => u.problem.difficulty)
-    $(args.target).find("div.problem > div > a > span.pid").each((i, e, $e = $(e)) => {
-        $e.addClass("exlg-difficulty-color").addClass(`color-${dif[i]}`)
-    })
-}, (e) => {
-    const tar = e.target
-    if (!tar || (!tar.tagName)) return { args: msg.COMMENT_TAG, result: false }
-    if (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/problem/")/* && judge_problem(tar.href.slice(tar.href.indexOf("/problem/") + 9))*/ && ` ${ tar.parentNode.parentNode.className } `.includes(" problem ")) { // Note: 如果是标签的话，查看它的父亲是否为最后一个。如果是，更新数据。对于其他的不管。
-        if (!tar.parentNode.parentNode.parentNode.nextSibling) return { args: { type: "modified - update", target: tar.parentNode.parentNode.parentNode.parentNode }, result: true }
-        else return { args: { type: "modified - not the last one.", target: null }, result: false }
-    }
-    return { args: { type: "modified - not that one.", target: null }, result: false }
-}, () => ({ type: "show" }), ``
+})({
+    [location.href]: unsafeWindow._feInjection // Note: 初始数据位于 feInjection，当前页不必通过 AJAX 获取
+}), (e) => {
+    if (
+        e.target && e.target.tagName.toLowerCase() === "a"
+        && /^\/problem\/[A-Z][A-Z0-9]+$/.exec(new URL(e.target.href).pathname) // Note: 如果插入的是题目链接
+    )
+        return { result: true, args: { pid: e.target.firstChild } }
+    return { result: false }
+}, () => null
 )
 
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
