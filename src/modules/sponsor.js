@@ -34,7 +34,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
             $e.addClass("exlg-badge-required-username")
             const user_uid = $e.attr("href").slice("/user/".length)
-            if( !Object.keys(cache).includes(user_uid) || Date.now() - cache[user_uid].ts > Number(msto.cache) ) {
+            if( !Object.keys(cache).includes(user_uid) || Date.now()/1000 - cache[user_uid].ts > Number(msto.cache) ) {
                 tag_uid_list.push(user_uid)
             }
             else {
