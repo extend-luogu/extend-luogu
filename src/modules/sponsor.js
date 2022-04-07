@@ -57,7 +57,8 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
                 cache[key] = {}
                 cache[key].text = value.text
                 cache[key].ts = Date.now()/1000
-            } else {
+            }
+            else {
                 cache[key] = {}
                 cache[key].ts = Date.now()/1000
             }
