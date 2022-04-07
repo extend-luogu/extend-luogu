@@ -17,7 +17,7 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
     use_new: { ty: "boolean", dft: false, info: [ "Enable new", "启用新版后端（测试）" ] },
     endpoint: { ty: "string", dft: "https://exlg.piterator.com/badge/mget/", info: [ "API Endpoint", "API 端点（仅限新版）" ] },
-    cache: { ty: "string", dft: "86400", info: [ "Cache time", "缓存时间（秒）" ] },
+    cache: { ty: "string", dft: "3600", info: [ "Cache time", "缓存时间（秒）" ] },
     tag_list: { ty: "string", priv: true },
     tag_cache: { ty: "string", priv: true }
 }, async ({ msto, args }) => {
@@ -26,7 +26,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         if ( typeof (msto.tag_cache) === "undefined" ) {
             msto.tag_cache = "{}"
         }
-        console.log(msto.tag_cache)
+        // console.log(msto.tag_cache)
         let cache = JSON.parse(msto.tag_cache)
         let tag_uid_list = []
         const require_badge = ($e) => {
@@ -38,7 +38,10 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
                 tag_uid_list.push(user_uid)
             }
             else {
-                tag_list[user_uid] = cache[user_uid].text
+                // console.log("hit: ", user_uid)
+                if ( Object.keys(cache[user_uid]).includes("text") ) {
+                    tag_list[user_uid] = cache[user_uid].text
+                }
             }
         }
         args.each((_, e) => require_badge($(e)))
@@ -49,11 +52,15 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         })).responseText
         const tag_list_response = JSON.parse(decodeURIComponent(res))
         for (const [ key, value ] of Object.entries(tag_list_response)) {
-            if ( !Object.keys(value).includes("text") ) continue
-            tag_list[key] = value.text
-            cache[key] = {}
-            cache[key].text = value.text
-            cache[key].ts = Date.now()/1000
+            if ( Object.keys(value).includes("text") ) {
+                tag_list[key] = value.text
+                cache[key] = {}
+                cache[key].text = value.text
+                cache[key].ts = Date.now()/1000
+            } else {
+                cache[key] = {}
+                cache[key].ts = Date.now()/1000
+            }
         }
         msto.tag_cache = JSON.stringify(cache)
     }
