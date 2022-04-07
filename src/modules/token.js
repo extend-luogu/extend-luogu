@@ -4,8 +4,6 @@ import { cs_get2, cs_post, $ } from "../utils.js"
 mod.reg_chore("token", "EXLG 令牌", "1D", "@/.*", {
     token: { ty: "string", priv: true }
 }, async ({ msto }) => {
-// mod.reg("token", "EXLG 令牌", "@/", null, async () => {
-    console.log(unsafeWindow)
     if (unsafeWindow._feInjection.currentUser) {
         const paste_id = JSON.parse((await cs_post({
             url: "https://www.luogu.com.cn/paste/new?_contentOnly",
