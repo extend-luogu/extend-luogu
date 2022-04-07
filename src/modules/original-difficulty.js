@@ -1,7 +1,7 @@
 import { $, cs_get, error, lg_dat } from "../utils.js"
 import mod, { sto } from "../core.js"
 
-mod.reg_chore("atdiff-fetch", "获取_AtCoder_难度", "10D", "@/problem/AT.*", {
+mod.reg_chore("atdiff-fetch", "获取 AtCoder 难度", "10D", "@/problem/AT.*", {
     atdiff: { ty: "string", priv: true },
 }, ({ msto }) => {
     let dif = {}

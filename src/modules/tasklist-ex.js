@@ -2,7 +2,7 @@ import mod from "../core.js"
 import { $ } from "../utils.js"
 import css from "../resources/css/tasklist-ex.css"
 
-mod.reg("tasklist-ex", "任务计划_ex", "@/", {
+mod.reg("tasklist-ex", "任务计划 ex", "@/", {
     auto_clear: { ty: "boolean", dft: true, info: [ "Hide accepted problems", "隐藏已经 AC 的题目" ] },
     rand_problem_in_tasklist: { ty: "boolean", dft: true, info: [ "Random problem in tasklist", "任务计划随机跳题" ]}
 }, ({ msto }) => {

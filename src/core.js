@@ -42,6 +42,8 @@ const mod = {
         if (!("on" in mod.data[name].lvs))
             mod.data[name].lvs.on = { ty: "boolean", dft: true }
 
+        info = info.replaceAll(" ", "_")
+
         mod._.set(name, { info, path, func, styl })
     },
 

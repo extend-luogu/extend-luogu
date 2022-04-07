@@ -2,7 +2,7 @@ import { $, exlg_dialog_board } from "../utils.js"
 import mod from "../core.js"
 import css from "../resources/css/exlg-dialog-board.css"
 
-mod.reg("exlg-dialog-board", "exlg_公告板", "@/.*", {
+mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
     animation_speed: {
         ty: "enum", dft: ".4s", vals: [ "0s", ".2s", ".25s", ".4s" ],
         info: [ "Speed of Board Animation", "启动消失动画速度" ]
