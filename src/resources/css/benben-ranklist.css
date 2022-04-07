@@ -1,18 +1,28 @@
-.bb-rnklst-1 > .bb-rnklst-ind {
+.bb-rnkitm:nth-child(1)::marker {
     color: var(--lg-red);
     font-weight: 900;
 }
-.bb-rnklst-2 > .bb-rnklst-ind {
+
+.bb-rnkitm:nth-child(2)::marker {
     color: var(--lg-orange);
     font-weight: 900;
 }
-.bb-rnklst-3 > .bb-rnklst-ind {
+
+.bb-rnkitm:nth-child(3)::marker {
     color: var(--lg-yellow);
     font-weight: 900;
 }
-.bb-rnklst-ind.bb-top-ten {
-    margin-right: 9px;
+
+.bb-rnkitm > span {
+    display: flex;
+    flex-wrap: wrap;
 }
+
+.bb-rnkitm > span > span {
+    margin-left: auto;
+}
+
 .bb-rnklst-span {
-    font-size: 1em;font-weight: normal;
+    font-size: 1em;
+    font-weight: normal;
 }
