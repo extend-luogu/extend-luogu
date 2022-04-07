@@ -1,4 +1,4 @@
-## 验证码自动填充 / CAPTCHA Autofilling
+## EXLG 令牌 / token
 
 ### 分类
 定时任务
