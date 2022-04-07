@@ -17,7 +17,7 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
     use_new: { ty: "boolean", dft: false, info: [ "Enable new", "启用新版后端（测试）" ] },
     endpoint: { ty: "string", dft: "https://exlg.piterator.com/badge/mget/", info: [ "API Endpoint", "API 端点（仅限新版）" ] },
-    cache: { ty: "number", dft: "86400", info: [ "Cache time", "缓存时间（秒）" ] },
+    cache: { ty: "string", dft: "86400", info: [ "Cache time", "缓存时间（秒）" ] },
     tag_list: { ty: "string", priv: true },
     tag_cache: { ty: "string", priv: true }
 }, async ({ msto, args }) => {
@@ -34,7 +34,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
             $e.addClass("exlg-badge-required-username")
             const user_uid = $e.attr("href").slice("/user/".length)
-            if( !Object.keys(cache).includes(user_uid) || Date.now() - cache[user_uid].ts > msto.cache ) {
+            if( !Object.keys(cache).includes(user_uid) || Date.now() - cache[user_uid].ts > Number(msto.cache) ) {
                 tag_uid_list.push(user_uid)
             }
             else {
