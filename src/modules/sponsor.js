@@ -15,19 +15,31 @@ mod.reg_chore("sponsor-list", "获取标签列表", "1D", "@/.*", {
 })
 
 mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*" ], {
-    use_new: { ty: "boolean", dft: false, info: ["Enable new", "启用新版后端（测试）"] },
-    endpoint: { ty: "string", dft: "https://exlg.piterator.com/badge/mget/", info: ["API Endpoint", "API 端点（仅限新版）"] },
-    tag_list: { ty: "string", priv: true }
+    use_new: { ty: "boolean", dft: false, info: [ "Enable new", "启用新版后端（测试）" ] },
+    endpoint: { ty: "string", dft: "https://exlg.piterator.com/badge/mget/", info: [ "API Endpoint", "API 端点（仅限新版）" ] },
+    cache: { ty: "number", dft: "86400", info: [ "Cache time", "缓存时间（秒）" ] },
+    tag_list: { ty: "string", priv: true },
+    tag_cache: { ty: "string", priv: true }
 }, async ({ msto, args }) => {
     let tag_list = {}
     if ( msto.use_new ) {
+        if ( typeof (msto.tag_cache) === "undefined" ) {
+            msto.tag_cache = "{}"
+        }
+        console.log(msto.tag_cache)
+        let cache = JSON.parse(msto.tag_cache)
         let tag_uid_list = []
         const require_badge = ($e) => {
             if (!$e || $e.hasClass("exlg-badge-required-username")) return
             if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
             $e.addClass("exlg-badge-required-username")
             const user_uid = $e.attr("href").slice("/user/".length)
-            tag_uid_list.push(user_uid)
+            if( !Object.keys(cache).includes(user_uid) || Date.now() - cache[user_uid].ts > msto.cache ) {
+                tag_uid_list.push(user_uid)
+            }
+            else {
+                tag_list[user_uid] = cache[user_uid].text
+            }
         }
         args.each((_, e) => require_badge($(e)))
         const res = (await cs_post({
@@ -36,11 +48,16 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             type: "application/json"
         })).responseText
         const tag_list_response = JSON.parse(decodeURIComponent(res))
-        for (const [key, value] of Object.entries(tag_list_response)) {
+        for (const [ key, value ] of Object.entries(tag_list_response)) {
             if ( !Object.keys(value).includes("text") ) continue
             tag_list[key] = value.text
+            cache[key] = {}
+            cache[key].text = value.text
+            cache[key].ts = Date.now()/1000
         }
-    } else {
+        msto.tag_cache = JSON.stringify(cache)
+    }
+    else {
         // $("span.wrapper:has(a[target='_blank'][href]) > span:has(a[target='_blank'][href]):not(.hover):not(.exlg-sponsor-tag)").addClass("exlg-sponsor-tag") // Note: usernav的span大钩钩
         tag_list = JSON.parse(sto["^sponsor-list"].tag_list)
     }
