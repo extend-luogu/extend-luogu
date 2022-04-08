@@ -21,12 +21,11 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
     tag_cache: { ty: "string", priv: true }
 }, async ({ msto, args }) => {
     let tag_list = {}
+    if ( typeof (msto.tag_cache) === "undefined" ) {
+        msto.tag_cache = "{}"
+    }
+    let cache = JSON.parse(msto.tag_cache)
     if ( msto.use_new ) {
-        if ( typeof (msto.tag_cache) === "undefined" ) {
-            msto.tag_cache = "{}"
-        }
-        // console.log(msto.tag_cache)
-        let cache = JSON.parse(msto.tag_cache)
         let tag_uid_list = []
         const require_badge = ($e) => {
             if (!$e || $e.hasClass("exlg-badge-required-username")) return
@@ -37,7 +36,6 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
                 tag_uid_list.push(user_uid)
             }
             else {
-                // console.log("hit: ", user_uid)
                 if ( "text" in cache[user_uid] ) {
                     tag_list[user_uid] = cache[user_uid].text
                 }
@@ -55,6 +53,8 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
                 tag_list[key] = value.text
                 cache[key] = {}
                 cache[key].text = value.text
+                if ( "bg" in value ) cache[key].bg = value.bg
+                if ( "fg" in value ) cache[key].fg = value.fg
                 cache[key].ts = Date.now()/1000
             }
             else {
@@ -82,6 +82,16 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
                 if (e.button === 2) location.href = "https://www.luogu.com.cn/paste/asz40850"
                 else if (e.button === 0) register_badge()
             })
+        if (user_uid !== "100250" && msto.use_new) {
+            $badge
+                .css("background", "bg" in cache[user_uid] ? cache[user_uid].bg : "mediumturquoise")
+                .css("color", "fg" in cache[user_uid] ? cache[user_uid].fg : "#fff")
+        }
+        else if (user_uid !== "100250") {
+            $badge
+                .css("background", "mediumturquoise")
+                .css("color", "#fff")
+        }
         let $tar = $e
         if ($tar.next().length && $tar.next().hasClass("sb_amazeui")) $tar = $tar.next()
         if ($tar.next().length && $tar.next().hasClass("am-badge")) $tar = $tar.next()
