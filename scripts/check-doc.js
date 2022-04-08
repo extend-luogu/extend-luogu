@@ -22,6 +22,6 @@ if (!mods.length) {
 }
 
 writeFileSync("./doc/module/module.md", "## 模块\n" + Object.entries(entl)
-    .sort(([a, ], [b, ]) => a.localeCompare(b))
+    .sort(([ a, ], [ b, ]) => a.localeCompare(b))
     .map(x => x[1].replaceAll("_", " "))
     .join("\n"))
