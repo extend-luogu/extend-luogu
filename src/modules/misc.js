@@ -40,18 +40,22 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
 mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", {
     reload: { ty: "boolean", dft: true, info: [ "Always reload data", "翻页时总是重新加载数据" ] }
 }, ((data) => async ({ msto, args }) => {
-    if (args) {
+    const load = async (pid_tag) => {
         if (!(location.href in data)) { // Note: 如果当前页面未曾加载数据
             if (msto.reload)
                 Object.getOwnPropertyNames(data).forEach((prop) => delete data[prop]) // Note: 清空所有数据
             data[location.href] = lg_content(location.href) // Note: 则创建异步 AJAX 任务
         }
-        $(args.pid).addClass("exlg-difficulty-color").addClass(`color-${
+        $(pid_tag).addClass("exlg-difficulty-color").addClass(`color-${
             (await data[location.href]).currentData.records.result.filter( // Note: 等待异步获取完成
-                record => record.problem.pid === args.pid.innerText.trim() // Note: 根据 PID 筛选当前题目
+                record => record.problem.pid === pid_tag.innerText.trim() // Note: 根据 PID 筛选当前题目
             )[0].problem.difficulty
         }`)
     }
+    if (args) // Note: 标签插入时
+        load(args.pid_tag)
+    else // Note: 页面加载完成时
+        $(".pid").each((i, tag) => load(tag))
 })({
     [location.href]: unsafeWindow._feInjection // Note: 初始数据位于 feInjection，当前页不必通过 AJAX 获取
 }), (e) => {
@@ -59,7 +63,7 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
         e.target && e.target.tagName.toLowerCase() === "a"
         && /^\/problem\/[A-Z][A-Z0-9]+$/.exec(new URL(e.target.href).pathname) // Note: 如果插入的是题目链接
     )
-        return { result: true, args: { pid: e.target.firstChild } }
+        return { result: true, args: { pid_tag: e.target.firstChild } }
     return { result: false }
 }, () => null
 )
