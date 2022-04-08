@@ -1,6 +1,7 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs"
 import { join, basename } from "path"
 import { buildSync } from "esbuild"
+import { execFileSync } from "child_process"
 import parser from "minimist"
 
 const tmpd = "_tmp",
@@ -8,11 +9,15 @@ const tmpd = "_tmp",
     minify = parg.m ?? !parg.b,
     outfn = join(parg.d ?? "build", parg.o ?? "extend-luogu.user.js")
 
-;(([ fn, val ]) => {
-    if (!existsSync(fn))
-        writeFileSync(fn, val)
-})([ "./src/resources/update-log.txt", "" ])
-// writeFileSync("./src/all-modules.js", readdirSync("./src/modules").map(s => `import "./modules/${s}"`).join("\n"))
+if (parg.G) {
+    writeFileSync("./src/all-modules.js", readdirSync("./src/modules").map(
+        s => `import "./modules/${s}"`).join("\n"))
+    ;(([ fn, val ]) => {
+        if (!existsSync(fn))
+            writeFileSync(fn, val)
+    })([ "./src/resources/update-log.txt", "" ])
+    execFileSync(`git add ${[ "./src/resources/update-log.txt", "./src/all-modules.js" ].join(" ")}`)
+}
 
 let tmpcss = {}, trklist = []
 const chk = dn => readdirSync(dn, { encoding: "utf8", withFileTypes: true }).forEach(fn => {
