@@ -1,4 +1,4 @@
-import uindow, { $, version_cmp, get_latest, lg_usr } from "../utils.js"
+import uindow, { $, version_cmp, get_latest } from "../utils.js"
 import mod from "../core.js"
 import logo from "../resources/logo.js"
 import register_badge from "../components/register-badge.js"
@@ -119,14 +119,14 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     else $btn.on("click", _jump_settings)
 
     const renew_dropdown = ($board, $cb) => {
-        const _cuser = lg_usr
+        const _cuser = uindow._feInjection.currentUser
         $board.children(".header").after(`
         <div>
-            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.following">
+            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.follower">
                 <span class="value">${_cuser.followingCount}</span>
                 <span data-v-3c4577b8="" class="key">关注</span>
             </a>
-            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.follower">
+            <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.following">
                 <span class="value">${_cuser.followerCount}</span>
                 <span data-v-3c4577b8="" class="key">粉丝</span>
             </a>
