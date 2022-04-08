@@ -12,7 +12,7 @@ const tmpd = "_tmp",
     if (!existsSync(fn))
         writeFileSync(fn, val)
 })([ "./src/resources/update-log.txt", "" ])
-writeFileSync("./src/all-modules.js", readdirSync("./src/modules").map(s => `import "./modules/${s}"`).join("\n"))
+// writeFileSync("./src/all-modules.js", readdirSync("./src/modules").map(s => `import "./modules/${s}"`).join("\n"))
 
 let tmpcss = {}, trklist = []
 const chk = dn => readdirSync(dn, { encoding: "utf8", withFileTypes: true }).forEach(fn => {
