@@ -34,7 +34,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [check]
-    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'VER ')
+    if: github.event_name == 'push' && startsWith( github.event.head_commit.message, 'VER' )
 
     steps:
       - uses: actions/checkout@v2
@@ -62,7 +62,12 @@ jobs:
           git tag $VER
           echo "VER=$VER" >> $GITHUB_ENV
 
-      - name: Push commits
+      - name: Push preview
+        run: |
+          git push origin main:preivew --tags -f
+
+      - name: Push latest
+        if: "!contains( env.VER, '-' )"  # Neither `-pre` nor `-rc`
         run: |
           git push origin main:latest --tags -f
 
@@ -71,4 +76,5 @@ jobs:
         with:
           tag_name: ${{ env.VER }}
           body_path: src/resources/update-log.txt
+          prerelease: ${{ contains( env.VER, '-' ) }}
           files: dist/extend-luogu.min.user.js
