@@ -1,5 +1,6 @@
 import { cur_time, log, warn, error, $ } from "./utils.js"
 import icon_b from "./resources/logo.js"
+import category from "./category.js"
 
 export let sto = null
 const mod = {
@@ -24,7 +25,7 @@ const mod = {
         "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting-new/((index|bundle).html)?"
     ],
 
-    reg: (name, info, path, data, func, styl) => {
+    reg: (name, info, path, data, func, styl, cate) => {
         if (!Array.isArray(path)) path = [ path ]
         path.forEach((p, i) => {
             mod.path_alias.some(([ re, url ]) => {
@@ -34,28 +35,28 @@ const mod = {
 
             if (!p.endsWith("$")) path[i] += "$"
         })
-
-        mod.data[name] = {
+        const rawName = category.alias(cate) + name
+        mod.data[rawName] = {
             ty: "object",
             lvs: data ? data : {}
         }
-        if (!("on" in mod.data[name].lvs))
-            mod.data[name].lvs.on = { ty: "boolean", dft: true }
+        if (!("on" in mod.data[rawName].lvs))
+            mod.data[rawName].lvs.on = { ty: "boolean", dft: true }
 
         info = info.replaceAll(" ", "_")
 
-        mod._.set(name, { info, path, func, styl })
+        mod._.set(name, { info, path, func, styl, cate })
     },
 
-    reg_pre : (name, info, path, data, pre, func, styl) => {
-        mod.reg(name, info, path, data, func, styl)
+    reg_pre : (name, info, path, data, pre, func, styl, cate) => {
+        mod.reg(name, info, path, data, func, styl, cate)
         mod._.set(name, { pre, ...mod._.get(name) })
     },
 
     reg_main: (name, info, path, data, func, styl) =>
-        mod.reg("@" + name, info, path, data, arg => (func(arg), false), styl),
+        mod.reg(name, info, path, data, arg => (func(arg), false), styl, "core"),
 
-    reg_user_tab: (name, info, tab, vars, data, func, styl) =>
+    reg_user_tab: (name, info, tab, vars, data, func, styl, cate) =>
         mod.reg(
             name, info, "@/user/.*", data,
             arg => {
@@ -67,7 +68,7 @@ const mod = {
                 }
                 $tabs.on("click", work)
                 work()
-            }, styl
+            }, styl, cate
         ),
 
     reg_chore: (name, info, period, path, data, func, styl) => {
@@ -82,7 +83,6 @@ const mod = {
             else error(`Parsing period failed: "${period}"`)
         }
 
-        name = "^" + name
         data = {
             ...data,
             last_chore: { ty: "number", dft: -1, priv: true }
@@ -105,11 +105,12 @@ const mod = {
                         sto[name].last_chore = cur_time(1)
                 }
                 else log(`Pending chore: "${name}"`)
-            }
+            }, `
+            `, "chore"
         )
     },
 
-    reg_board: (name, info, data, func, styl) => mod.reg(
+    reg_board: (name, info, data, func, styl, cate) => mod.reg(
         name, info, "@/", data,
         arg => {
             let $board = $("#exlg-board")
@@ -120,21 +121,21 @@ const mod = {
                     .prependTo(".lg-right.am-u-md-4"),
                 $board[0].firstChild.style["font-size"]="1em"
             func({ ...arg, $board: $(`<div></div>`).appendTo($board) })
-        }, styl
+        }, styl, cate
     ),
 
     /**
      * @deprecated 请使用 reg_hook_new 来注册钩子
      */
-    reg_hook: (name, info, path, data, func, hook, styl) => mod.reg(
+    reg_hook: (name, info, path, data, func, hook, styl, cate) => mod.reg(
         name, info, path, data,
         arg => {
             func(arg)
             $("body").bind("DOMNodeInserted", e => hook(e) && func(arg))
-        }, styl
+        }, styl, cate
     ),
 
-    reg_hook_new: (name, info, path, data, func, hook, darg, styl) => mod.reg(
+    reg_hook_new: (name, info, path, data, func, hook, darg, styl, cate) => mod.reg(
         name, info, path, data,
         arg => {
             func({...arg, ...{ result: false, args: darg() }})
@@ -144,7 +145,7 @@ const mod = {
                 const res = hook(e)
                 return res.result && func({...arg, ...res})
             })
-        }, styl
+        }, styl, cate
     ),
 
     find: name => mod._.get(name),
@@ -168,7 +169,7 @@ const mod = {
             if (!m) error(`Preloading named mod but not found: "${name}"`)
             log(`Preloading ${ named ? "named " : "" }mod: "${m.name}"`)
             try {
-                return { pred: m.pre({ msto: sto[m.name], named }), ...m}
+                return { pred: m.pre({ msto: sto[category.alias(m.cate) + m.name], named }), ...m}
             }
             catch (err) {
                 warn(err)
@@ -178,7 +179,8 @@ const mod = {
 
         const pn = location.href
         for (const [ name, m ] of mod._.entries()) {
-            if (sto[name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
+            console.log(m.cate, name)
+            if (sto[category.alias(m.cate) + name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
                 m.willrun = true
                 if ("pre" in m)
                     mod._.set(name, exe({name, ...m}))
@@ -193,8 +195,8 @@ const mod = {
             log(`Executing ${ named ? "named " : "" }mod: "${m.name}"`)
             try {
                 if ("pred" in m)
-                    return m.func({ msto: sto[m.name], named, pred: m.pred })
-                return m.func({ msto: sto[m.name], named })
+                    return m.func({ msto: sto[category.alias(m.cate) + m.name], named, pred: m.pred })
+                return m.func({ msto: sto[category.alias(m.cate) + m.name], named })
             }
             catch (err) {
                 warn(err)
@@ -206,7 +208,7 @@ const mod = {
         }
 
         for (const [ name, m ] of mod._.entries()) {
-            m.on = sto[name].on
+            m.on = sto[category.alias(m.cate) + name].on
             if (m.willrun) {
                 if (exe({name, ...m}) === false) break
             }

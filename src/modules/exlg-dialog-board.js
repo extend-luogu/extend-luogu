@@ -41,4 +41,4 @@ mod.reg("exlg-dialog-board", "exlg 公告板", "@/.*", {
         wrapper, container, header, content,
         wait_time: {"0s": 0, ".2s": 100, ".25s": 250, ".4s": 400 }[msto.animation_speed],
     })
-}, css)
+}, css, "component")

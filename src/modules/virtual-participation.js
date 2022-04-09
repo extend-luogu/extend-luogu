@@ -89,4 +89,4 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 })
             }, false)
         })
-}, css)
+}, css, "module")

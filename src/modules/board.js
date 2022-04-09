@@ -24,7 +24,8 @@ mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
     }
     const $search_user = $("#search-user").on("click", func)
     $("#search-user-input").keydown(e => { e.key === "Enter" && func() })
-})
+}, `
+`, "module")
 
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
     show: { ty: "boolean", dft: true, info: [ "Show in default", "是否默认展开" ] }
@@ -52,4 +53,4 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
     })
     $board.find("#refresh-bbrnk").on("click", () => { $list.html(""), refresh() })
     refresh()
-}, css)
+}, css, "module")

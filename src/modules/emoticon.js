@@ -127,4 +127,4 @@ mod.reg("emoticon", "表情输入", [ "@/paste", "@/discuss/.*", "@/" ], {
     })
     */
     // Hack: 监听输入/，类似qq的表情快捷键功能。但是锅了，所以删掉力
-}, css)
+}, css, "module")

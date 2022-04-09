@@ -38,4 +38,4 @@ mod.reg("tasklist-ex", "任务计划 ex", "@/", {
                 location.href += `problem/${ actTList[tid] }`
             })
     }
-}, css)
+}, css, "module")

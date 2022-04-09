@@ -87,4 +87,4 @@ catch(err) {
 }
 
 // Note: Migrate settings: hide-solution.hidesolu -> hide-solution.on
-uindow.exlg.TM_dat.sto["hide-solution"].on &= uindow.exlg.TM_dat.sto["hide-solution"].hidesolu
+// uindow.exlg.TM_dat.sto["hide-solution"].on &= uindow.exlg.TM_dat.sto["hide-solution"].hidesolu

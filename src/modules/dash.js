@@ -3,6 +3,7 @@ import mod from "../core.js"
 import logo from "../resources/logo.js"
 import register_badge from "../components/register-badge.js"
 import css from "../resources/css/dash-bridge.css"
+import category from "../category.js"
 
 mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     msg: {
@@ -25,33 +26,34 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         info: [ "Language of descriptions in the dashboard", "控制面板提示语言" ]
     }
 }, () => {
-    const modules = [[ "Modules", "功能", "tunes", false ], [ "Core", "核心", "bug_report", true ]]
-        .map(([ name, description, icon, is_main ]) => ({
-            name, description, icon,
-            children: (() => {
-                let arr = []
-                mod._.forEach((m, nm) => {
-                    if (nm.startsWith("@") === is_main)
-                        arr.push({
-                            rawName: nm,
-                            name: nm.replace(/^[@^]/g, ""),
-                            description: m.info,
-                            settings: Object.entries(mod.data[nm].lvs)
-                                .filter(([ k, s ]) => k !== "on" && !s.priv)
-                                .map(([ k, s ]) => ({
-                                    name: k,
-                                    displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
-                                    description: s.info,
-                                    type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
-                                    ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                                    ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: s.step }),
-                                    ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
-                                }))
-                        })
-                })
-                return arr
-            })()
-        }))
+    const modules = [ ...category._ ]
+        .map(([ name, {description, alias, icon, unclosable}]) => (
+            { name, description, icon,
+                children: (() => {
+                    let arr = []
+                    mod._.forEach((m, nm) => {
+                        if (m.cate === name)
+                            arr.push({
+                                rawName: alias + nm,
+                                name: nm,
+                                description: m.info,
+                                unclosable: unclosable,
+                                settings: Object.entries(mod.data[alias + nm].lvs)
+                                    .filter(([ k, s ]) => k !== "on" && !s.priv)
+                                    .map(([ k, s ]) => ({
+                                        name: k,
+                                        displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                                        description: s.info,
+                                        type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
+                                        ...(s.ty === "boolean" && { type: "CHECKBOX" }),
+                                        ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: s.step }),
+                                        ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
+                                    }))
+                            })
+                    })
+                    return arr
+                })()
+            }))
     console.log(modules)
     uindow.guiStart(modules)
 })
@@ -245,4 +247,4 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     const $tmp = $etar.find(".user-nav, .nav-container")
     if ($tmp.length && (!$tmp.find("#exlg-dash-window").length)) return { result: ($tmp.length), args: { $tar: ($tmp[0].tagName === "DIV" ? $($tmp[0].firstChild) : $tmp), type: 1 } } // Note: 直接用三目运算符不用 if 会触发 undefined 的 tagName
     else return { result: 0 } // Note: 上一行的 div 判断是用来防止变成两行的
-}, () => ({ $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 }), css)
+}, () => ({ $tar: $("nav.user-nav, div.user-nav > nav, .nav-container"), type: 0 }), css, "core")

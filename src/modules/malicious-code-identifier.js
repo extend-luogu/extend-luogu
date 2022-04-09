@@ -34,4 +34,4 @@ mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(
             .replaceAll("危险", `<a class = "exlg-med-risk">[危险]</a>`)
             .replaceAll("可疑", `<a class = "exlg-low-risk">[可疑]</a>`), "发现有害代码")
     }
-}, css)
+}, css, "module")

@@ -75,4 +75,4 @@ mod.reg("update-log", "更新日志显示", "@/.*", {
     case ">>":
         msto.last_version = version
     }
-}, css)
+}, css, "module")

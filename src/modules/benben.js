@@ -106,8 +106,10 @@ mod.reg("benben", "全网犇犇", "@/", {
 
             uindow.loadFeed()
         })
-})
+}, `
+`, "module")
 
 mod.reg("benben-quickpost", "CtrlEnter发送犇犇", "@/", null, () =>
     $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").click())
-)
+, `
+`, "module")

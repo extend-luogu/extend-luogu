@@ -104,4 +104,4 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         result: $tmp.length,
         args: $tmp
     }
-}, () => $("a[target='_blank'][href]"), css)
+}, () => $("a[target='_blank'][href]"), css, "module")

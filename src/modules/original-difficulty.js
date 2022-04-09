@@ -55,4 +55,5 @@ mod.reg_pre("original-difficulty", "显示原始难度", [ "@/problem/CF.*", "@/
             d = "不可用"
         t[1].innerText = d
     })
-})
+}, `
+`, "module")

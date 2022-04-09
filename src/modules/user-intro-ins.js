@@ -27,4 +27,4 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
             break
         }
     })
-}, css)
+}, css, "module")

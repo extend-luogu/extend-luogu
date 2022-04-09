@@ -2,7 +2,7 @@ import uindow from "../utils.js"
 import mod from "../core.js"
 import { $ } from "../utils.js"
 
-mod.reg("blog", "博客Ex", "@/blogAdmin/article/edit/.*", {
+mod.reg("blog", "博客 ex", "@/blogAdmin/article/edit/.*", {
     format: { ty: "boolean", dft: true, info: [ "Enable format", "显示格式化按钮" ] },
     hotkeys: { ty: "boolean", dft: true, info: [ "Enable hotkeys", "快捷键" ] }
 }, ({ msto }) => {
@@ -26,4 +26,5 @@ mod.reg("blog", "博客Ex", "@/blogAdmin/article/edit/.*", {
             CtrlShiftX: () => $("a[title='删除线']")[0].click()
         })
     }
-})
+}, `
+`, "module")

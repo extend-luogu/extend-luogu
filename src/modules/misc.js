@@ -12,12 +12,13 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
             : "https://www.luogu.com.cn/problem/"
         if (judge_problem(pid)) window.open(url + pid)
     })
-})
+}, `
+`, "module")
 
 mod.reg("hide-solution", "隐藏题解", [ "@/problem/[A-Z0-9]+", "@/problem/solution/.*" ], { // Note: 为了避免识别成题目列表
     hidesolu: { ty: "boolean", dft: false, priv: true },
     on: { ty: "boolean", dft: false }
-}, () => /@\/problem\/[A-Z0-9]+/g.test(location.href) && $("a[href^=\"/problem/solution\"]").addClass("sol-btn"), hidesol_css)
+}, () => /@\/problem\/[A-Z0-9]+/g.test(location.href) && $("a[href^=\"/problem/solution\"]").addClass("sol-btn"), hidesol_css, "module")
 
 mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     "@/problem/[A-Z0-9]+\\?contestId=[1-9][0-9]{0,}",
@@ -35,7 +36,7 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     const tar = e.target, cid = lg_dat.contest.id,
         pid = lg_dat.problem.pid
     return { args: { cid, pid, $info_rows: $(tar.parentNode) }, result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${ pid }&contestId=${ cid }`) }
-}, () => ({ cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() }), backtocont_css)
+}, () => ({ cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() }), backtocont_css, "module")
 
 mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", {
     reload: { ty: "boolean", dft: true, info: [ "Always reload data", "翻页时总是重新加载数据" ] }
@@ -65,8 +66,8 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
     )
         return { result: true, args: { pid_tag: e.target.firstChild } }
     return { result: false }
-}, () => null
-)
+}, () => null, `
+`, "module")
 
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
     max_discuss : { ty: "number", dft: 12, min: 4, max: 16, step: 1, info: [ "Max Discussions On Show", "主页讨论显示上限" ], strict: true }
@@ -81,9 +82,10 @@ mod.reg("mainpage-discuss-limit", "主页讨论个数限制", [ "@/" ], {
     $discuss.each((i, e, $e = $(e)) => {
         if (i >= msto.max_discuss) $e.hide()
     })
-})
+}, `
+`, "module")
 
 mod.reg("user-css", "自定义样式表", ".*", {
     css: { ty: "string" }
-}, ({ msto }) => GM_addStyle(msto.css)
-)
+}, ({ msto }) => GM_addStyle(msto.css), `
+`, "module")

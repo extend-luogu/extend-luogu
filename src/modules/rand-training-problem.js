@@ -43,4 +43,4 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
 }, (e) => {
     const $tmp = $(e.target).find("div.operation")
     return { result: $tmp.length > 0, args: $tmp }
-}, () => $("div.operation"), css)
+}, () => $("div.operation"), css, "module")

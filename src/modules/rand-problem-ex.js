@@ -179,4 +179,4 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     }
 
     $jump_exrand.on("click", exrand_poi)
-}, css)
+}, css, "module")

@@ -72,4 +72,4 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         result: (tmp.length > 0),
         args: tmp,
     }
-}, () => document.querySelectorAll("a[href^=\"/user\"][target=_blank]"), css)
+}, () => document.querySelectorAll("a[href^=\"/user\"][target=_blank]"), css, "module")

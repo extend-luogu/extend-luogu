@@ -1,3 +1,4 @@
+import "./category.js"
 import "./all-modules.js"
 import "./load.js"
 import { $, log } from "./utils.js"

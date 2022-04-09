@@ -58,4 +58,4 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
         result: $tar.length,
         args: $tar
     }
-}, () => $("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])"), css)
+}, () => $("pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])"), css, "module")

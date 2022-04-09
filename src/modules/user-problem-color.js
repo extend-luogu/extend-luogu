@@ -110,4 +110,4 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         return { message: msg.ADD_COMPARE }
     }
     return []
-}, css)
+}, css, "module")

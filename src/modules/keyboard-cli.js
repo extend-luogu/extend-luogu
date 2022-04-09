@@ -261,4 +261,4 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         else if ($act.is("[name=captcha]") && e.key === "Enter")
             $("#submitpost, #submit-reply")[0].click()
     })
-}, css)
+}, css, "module")
