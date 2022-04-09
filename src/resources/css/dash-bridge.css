@@ -147,11 +147,10 @@
 	border-radius: 5px;
 	border: 1px solid;
 	margin: 4px;
-
 }
 
 .dropdown > .center {
-	padding: 0 24px 18px;
+	padding: 4px 1px 10px;
 }
 .ops>a>.link-title {
 	display: flex;
@@ -173,8 +172,8 @@
 	font-size: 14px;
 	cursor: pointer;
 	transition: background-color .3s;
-	margin-bottom: 0.4em;
-	margin-top: 0.4em;
+	margin-bottom: 0.2em;
+	margin-top: 0.2em;
 }
 .ops>a:hover {
 	background-color: rgb(227,229,231);
@@ -182,7 +181,7 @@
 
 .wrapper.hover>.dropdown>.center {
 	font-size: 1.1em;
-	width: 18.18em;
+	width: 13em;
 }
 
 .exlg-dropdown.field {
@@ -228,4 +227,12 @@
 	font-weight: 400;
 	font-size: .5em;
 	transition: color .2s;
+}
+
+.ops[data-v-78704ac9] {
+	padding: .5em .9em;
+}
+
+.header[data-v-78704ac9] {
+	margin-bottom: -0.6em;
 }

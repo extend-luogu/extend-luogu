@@ -61,7 +61,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         info: [ "The website to open when clicking the exlg button", "点击 exlg 按钮时打开的网页" ]
     },
     enable_rclick: {
-        priv: true,
         ty: "boolean", dft: true,
         info:[ "Use Right Click to change source", "右键点击按钮换源" ]
     },
@@ -121,7 +120,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     const renew_dropdown = ($board, $cb) => {
         const _cuser = lg_usr
         $board.children(".header").after(`
-        <div>
+        <div style="margin-top: 0.4em;">
             <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.following">
                 <span class="value">${_cuser.followingCount}</span>
                 <span data-v-3c4577b8="" class="key">关注</span>
@@ -138,8 +137,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         `)
         $board.children(".header").after(`
         <div class="exlg-dropdown field">
-            <span data-v-3c4577b8="" class="key-small">CCF 评级: <strong>${_cuser.ccfLevel}</strong></span>
-            <span data-v-3c4577b8="" class="key-small">咕值排行: <strong>${_cuser.ranking}</strong></span>
+            <span data-v-3c4577b8="" class="key-small">CCF 评级: <strong>${_cuser.ccfLevel}</strong> | 咕值排行: <strong>${_cuser.ranking}</strong></span>
         </div>
         `)
         $cb.each(__renew_alink)
