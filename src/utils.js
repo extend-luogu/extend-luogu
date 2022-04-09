@@ -153,10 +153,7 @@ const get_latest = callbackfn => {
     })
 }
 
-const cur_time = (ratio = 1) => {
-    let d = new Date()
-    return ~~(d.getTime() / ratio)
-}
+const cur_time = (ratio = 1000) => ~~(Date.now() / ratio)
 
 const lg_content = url => new Promise((res, rej) =>
     $.get(url + (url.includes("?") ? "&" : "?") + "_contentOnly=1", data => {

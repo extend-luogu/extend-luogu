@@ -1,4 +1,4 @@
-import { $, log, exlg_alert, lg_usr, cs_get2, cs_post, lg_post } from "../utils.js"
+import { $, cur_time, log, exlg_alert, lg_usr, cs_get2, cs_post, lg_post } from "../utils.js"
 import compo from "../compo-core.js"
 import mod, { sto } from "../core.js"
 
@@ -70,7 +70,7 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, is_edit
             else {
                 sto["sponsor-tag"].tag_cache = JSON.stringify(JSON.parse(sto["sponsor-tag"].tag_cache)[ $input[0].value ] = {
                     text: res_json[ $input[0].value ].text,
-                    ts: Date.now()/1000
+                    ts: cur_time()
                 })
                 $title.html("成功")
                 exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload() })

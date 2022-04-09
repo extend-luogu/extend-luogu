@@ -1,5 +1,5 @@
 import mod, { sto } from "../core.js"
-import { $, cs_get, cs_post } from "../utils.js"
+import { $, cur_time, cs_get, cs_post } from "../utils.js"
 import register_badge from "../components/register-badge.js"
 import css from "../resources/css/sponsor-tag.css"
 
@@ -32,7 +32,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
             $e.addClass("exlg-badge-required-username")
             const user_uid = $e.attr("href").slice("/user/".length)
-            if( !(user_uid in cache) || Date.now()/1000 - cache[user_uid].ts > Number(msto.cache) ) {
+            if( !(user_uid in cache) || cur_time() - cache[user_uid].ts > Number(msto.cache) ) {
                 tag_uid_list.push(user_uid)
             }
             else {
@@ -55,11 +55,11 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
                 cache[key].text = value.text
                 if ( "bg" in value ) cache[key].bg = value.bg
                 if ( "fg" in value ) cache[key].fg = value.fg
-                cache[key].ts = Date.now()/1000
+                cache[key].ts = cur_time()
             }
             else {
                 cache[key] = {}
-                cache[key].ts = Date.now()/1000
+                cache[key].ts = cur_time()
             }
         }
         msto.tag_cache = JSON.stringify(cache)

@@ -8,7 +8,7 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
         const $tabs = $(".items")
         const work = () => {
             if ((location.hash || "#main") === "#problems") {
-                if ($(".pid").length !== 0 && lg_dat.contest.startTime > cur_time(1000)) {
+                if ($(".pid").length !== 0 && lg_dat.contest.startTime > cur_time()) {
                     $("a.title.color-default").on("click", () => {
                         exlg_alert("比赛尚未开始, 请开始后再查看题目")
                         return
@@ -21,7 +21,7 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
         work()
         return
     }
-    if (lg_dat.contest.endTime > cur_time(1000)) {
+    if (lg_dat.contest.endTime > cur_time()) {
         warn("Contest has not started or ended.")
         return
     }
