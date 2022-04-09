@@ -5,6 +5,20 @@ mod.reg_chore("token", "EXLG 令牌", "1D", "@/.*", {
     token: { ty: "string", priv: true }
 }, async ({ msto }) => {
     if (unsafeWindow._feInjection.currentUser) {
+        if (msto.token) { // Note: token exists
+            const ttl = await cs_post({
+                url: "https://exlg.piterator.com/token/ttl/",
+                data: JSON.stringify({
+                    uid: unsafeWindow._feInjection.currentUser.uid,
+                    token: msto.token,
+                }),
+                type: "application/json",
+            })
+            if ( // Note: Expires in more than one day
+                ttl.status !== 401 && JSON.parse(ttl.responseText) >= 60 * 60 * 25
+            )
+                return false
+        }
         const paste_id = JSON.parse((await cs_post({
             url: "https://www.luogu.com.cn/paste/new?_contentOnly",
             data: JSON.stringify({
