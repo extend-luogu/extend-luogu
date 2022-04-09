@@ -64,7 +64,7 @@ jobs:
 
       - name: Push preview
         run: |
-          git push origin main:preivew --tags -f
+          git push origin main:preview --tags -f
 
       - name: Push latest
         if: "!contains( env.VER, '-' )"  # Neither `-pre` nor `-rc`
