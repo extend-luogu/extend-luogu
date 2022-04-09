@@ -1,7 +1,7 @@
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs"
 import { join, basename } from "path"
 import { buildSync } from "esbuild"
-import { execFileSync } from "child_process"
+import { execSync } from "child_process"
 import parser from "minimist"
 
 const tmpd = "_tmp",
@@ -16,7 +16,7 @@ if (parg.G) {
         if (!existsSync(fn))
             writeFileSync(fn, val)
     })([ "./src/resources/update-log.txt", "" ])
-    execFileSync(`git add ${[ "./src/resources/update-log.txt", "./src/all-modules.js" ].join(" ")}`)
+    execSync(`git add ./src/all-modules.js`)
 }
 
 let tmpcss = {}, trklist = []
