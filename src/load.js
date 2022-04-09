@@ -1,4 +1,4 @@
-import uindow, { $, log, error, xss, springboard, version_cmp, lg_alert, lg_content, lg_post } from "./utils.js"
+import uindow, { $, log, warn, error, xss, springboard, version_cmp, lg_alert, lg_content, lg_post } from "./utils.js"
 import register_badge from "./components/register-badge.js"
 import mod from "./core.js"
 import compo from "./compo-core.js"
@@ -51,7 +51,40 @@ const init_sto = chance => {
         }
     }
 }
-init_sto(1)
+try {
+    init_sto(1)
+}
+catch(err) {
+    warn(err)
+    const dftsto = rt => {
+        switch (rt.ty) {
+        case "number":
+        case "string":
+        case "boolean":
+            return rt.dft
+
+        case "object":
+            return dftsto(rt.lvs)
+
+        case "enum":
+            return rt.get === "id" ? rt.vals[rt.dft] : rt.dft
+
+        case "array":
+            return []
+
+        case "tuple":
+            return rt.lvs.map(dftsto)
+        }
+        return Object.fromEntries(
+            Object.entries(rt)
+                .map(([ a, b ]) => ([ a, dftsto(b) ]))
+        )
+    }
+    mod.fake_sto = compo.sto = dftsto({
+        ...mod.data,
+        ...compo.data,
+    })
+}
 
 // Note: Migrate settings: hide-solution.hidesolu -> hide-solution.on
 uindow.exlg.TM_dat.sto["hide-solution"].on &= uindow.exlg.TM_dat.sto["hide-solution"].hidesolu
