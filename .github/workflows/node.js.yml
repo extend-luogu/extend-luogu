@@ -34,7 +34,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [check]
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && startsWith(github.event.head_commit.message, 'VER ')
 
     steps:
       - uses: actions/checkout@v2
@@ -47,29 +47,28 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Config bot & tags
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git fetch origin --tags
 
       - name: Build & tag
         env:
           MSG: ${{ toJSON(github.event.commits.*.message) }}
         run: |
-          import os
-          from json import loads
-          from re import split
-          rb = split('^[^\n]+\n\n', loads(os.environ['MSG'])[-1])
-          b = rb[1] if len(rb) > 1 else rb[0]
-          open("./src/resources/update-log.txt", "w").write(b)
-          a = loads(open("./package.json").read())["version"]
-          os.system("""
+          export VER=$(./scripts/tag.py)
           yarn run build -d dist -o extend-luogu.min.user.js
           git add .
-          HUSKY=0 git commit -m "release {}"
-          """.format(a))
-          os.system("git tag {}".format(a))
-        shell: python
+          HUSKY=0 git commit -m "Build $VER"
+          git tag $VER
+          echo "VER=$VER" >> $GITHUB_ENV
 
       - name: Push commits
         run: |
           git push origin main:latest --tags -f
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VER }}
+          body_path: src/resources/update-log.txt
+          files: dist/extend-luogu.min.user.js
