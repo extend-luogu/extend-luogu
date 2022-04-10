@@ -69,8 +69,9 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, null, i
                 exlg_alert(res_json["error"], "激活 badge 出错")
             }
             else {
+                const res_json_data = res_json.data
                 sto["sponsor-tag"].tag_cache = JSON.stringify(JSON.parse(sto["sponsor-tag"].tag_cache)[ $input[0].value ] = {
-                    text: res_json[ $input[0].value ].text,
+                    text: res_json_data[ $input[0].value ].text,
                     ts: cur_time()
                 })
                 $title.html("成功")

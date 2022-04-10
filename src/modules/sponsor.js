@@ -47,7 +47,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             data: JSON.stringify(tag_uid_list),
             type: "application/json"
         })).responseText
-        const tag_list_response = JSON.parse(decodeURIComponent(res))
+        const tag_list_response = JSON.parse(decodeURIComponent(res)).data
         for (const [ key, value ] of Object.entries(tag_list_response)) {
             if ( "text" in value ) {
                 tag_list[key] = value.text
