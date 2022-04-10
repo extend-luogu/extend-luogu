@@ -46,7 +46,7 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, null, i
             // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
             const badge = is_edit ? $input[1].value : $input[2].value
             $title.html("获取并验证令牌...")
-            mod.execute("^token")
+            mod.execute("token")
             let request = {
                 uid: $input[0].value,
                 token: sto["^token"].token,
