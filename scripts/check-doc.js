@@ -17,8 +17,10 @@ readdirSync("./doc/module")
     .forEach(v => {
         let p = v.slice(0, -3)
         if (v !== "module.md") {
-            if (!mods.some((m, i, a) => (p === m) && a.splice(i, 1)))
-                console.warn(`warn: unknown doc ${v}`)
+            if (!mods.some((m, i, a) => (p === m) && a.splice(i, 1))) {
+                console.error(`error: unknown doc ${v}`)
+                process.exit(1)
+            }
             hsdm.push(p)
         }
     })
@@ -46,5 +48,21 @@ readFileSync("./doc/module/module.md", { encoding: "utf8" }).replaceAll("\r\n", 
     })
 if (hsdm.length) {
     console.error(`error: no doc for mod[s] in module.md: ${hsdm.join(", ")}`)
+    process.exit(1)
+}
+
+// Check docs for components
+
+let cdcs = readdirSync("./doc/component").map(s => s.slice(0, -3))
+readdirSync("./src/components").forEach(s => {
+    let tmp = cdcs.indexOf(s.slice(0, -3))
+    if (tmp === -1) {
+        console.error(`error: no doc for component ${s}`)
+        process.exit(1)
+    }
+    cdcs.splice(tmp, 1)
+})
+if (cdcs.length) {
+    console.error(`error: unknown doc[s]: ${cdcs.join(", ")}`)
     process.exit(1)
 }

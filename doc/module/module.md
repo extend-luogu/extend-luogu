@@ -12,7 +12,6 @@
 - [双击题号跳题](./dbc-jump.md)
 - [讨论保存](./discussion-save.md)
 - [表情输入](./emoticon.md)
-- [exlg 公告板](./exlg-dialog-board.md)
 - [隐藏题解](./hide-solution.md)
 - [键盘操作与命令行](./keyboard-and-cli.md)
 - [主页讨论个数限制](./mainpage-discuss-limit.md)
