@@ -27,33 +27,27 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     }
 }, () => {
     const modules = [ ...category._ ]
-        .map(([ name, {description, alias, icon, unclosable}]) => (
-            { name, description, icon,
-                children: (() => {
-                    let arr = []
-                    mod._.forEach((m, nm) => {
-                        if (m.cate === name)
-                            arr.push({
-                                rawName: alias + nm,
-                                name: nm,
-                                description: m.info,
-                                unclosable: unclosable,
-                                settings: Object.entries(mod.data[alias + nm].lvs)
-                                    .filter(([ k, s ]) => k !== "on" && !s.priv)
-                                    .map(([ k, s ]) => ({
-                                        name: k,
-                                        displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
-                                        description: s.info,
-                                        type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "" }[s.ty],
-                                        ...(s.ty === "boolean" && { type: "CHECKBOX" }),
-                                        ...(s.ty === "number"  && { type: "SLIDER", minValue: s.min, maxValue: s.max, increment: s.step }),
-                                        ...(s.ty === "enum"    && { type: "SELECTBOX", acceptableValues: s.vals })
-                                    }))
-                            })
-                    })
-                    return arr
-                })()
-            }))
+        .map(([ name, { description, alias, icon, unclosable }]) => ({
+            name, description, icon,
+            children: [ ...mod._ ]
+                .filter(([ , m ]) => m.cate === name)
+                .map(([ nm, m ]) => ({
+                    rawName: alias + nm,
+                    name: nm,
+                    description: m.info,
+                    unclosable,
+                    settings: Object.entries(mod.data[alias + nm].lvs)
+                        .filter(([ k, s ]) => k !== "on" && !s.priv)
+                        .map(([ k, s ]) => ({
+                            name: k,
+                            displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
+                            description: s.info,
+                            type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "SELECTBOX" }[s.ty],
+                            ...(s.ty === "number"  && { minValue: s.min, maxValue: s.max, increment: s.step }),
+                            ...(s.ty === "enum"    && { acceptableValues: s.vals })
+                        }))
+                }))
+        }))
     console.log(modules)
     uindow.guiStart(modules)
 })
