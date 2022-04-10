@@ -17,7 +17,7 @@ mod.reg("benben", "全网犇犇", "@/", {
         Orange: "orange lg-bold",
         Red: "red lg-bold",
         Purple: "purple lg-bold",
-        Brown: "brown lg-bold",
+        Cheater: "brown lg-bold",
     }
     const check_svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="%" style="margin-bottom: -3px;" exlg="exlg">
