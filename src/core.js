@@ -91,7 +91,7 @@ const mod = {
         mod.reg(
             name, info, path, data,
             async arg =>  {
-                const last = sto[name].last_chore, now = cur_time(1)
+                const last = sto["^" + name].last_chore, now = cur_time(1)
 
                 let nostyl = true
                 if (arg.named || !last || now - last > period) {
@@ -102,7 +102,7 @@ const mod = {
                     if (await func(arg))
                         warn(`Chore failed: "${name}"`)
                     else
-                        sto[name].last_chore = cur_time(1)
+                        sto["^" + name].last_chore = cur_time(1)
                 }
                 else log(`Pending chore: "${name}"`)
             }, `
