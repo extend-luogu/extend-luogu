@@ -2,12 +2,13 @@ import uindow, { $, log, warn, error, xss, springboard, version_cmp, lg_alert, l
 import register_badge from "./components/register-badge.js"
 import mod from "./core.js"
 import compo from "./compo-core.js"
+import { datas } from "./storage.js"
 
 log("Exposing")
 
 Object.assign(uindow, {
     exlg: {
-        mod,
+        mod, compo, datas,
         log, error,
         springboard, version_cmp,
         lg_alert, lg_content, register_badge, lg_post,
@@ -33,10 +34,7 @@ Object.assign(uindow, {
 
 const init_sto = chance => {
     try {
-        uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat({
-            ...mod.data,
-            ...compo.data,
-        })
+        uindow.exlg.TM_dat.sto = uindow.exlg.TM_dat.reload_dat(datas)
         mod.fake_sto = compo.sto = uindow.exlg.TM_dat.sto
     }
     catch(err) {
@@ -80,10 +78,7 @@ catch(err) {
                 .map(([ a, b ]) => ([ a, dftsto(b) ]))
         )
     }
-    mod.fake_sto = compo.sto = dftsto({
-        ...mod.data,
-        ...compo.data,
-    })
+    mod.fake_sto = compo.sto = dftsto(datas)
 }
 
 // Note: Migrate settings: hide-solution.hidesolu -> hide-solution.on

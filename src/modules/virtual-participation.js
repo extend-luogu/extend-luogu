@@ -1,6 +1,7 @@
 import mod from "../core.js"
-import { exlg_alert, lg_dat, lg_post, lg_content, lg_usr, warn, error, cur_time, $ } from "../utils.js"
+import { lg_dat, lg_post, lg_content, lg_usr, warn, error, cur_time, $ } from "../utils.js"
 import css from "../resources/css/virtual-participation.css"
+import exlg_alert from "../components/exlg-dialog-board.js"
 
 mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
 }, () => {

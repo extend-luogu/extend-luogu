@@ -1,6 +1,7 @@
 import mod from "../core.js"
-import { $, cs_get, exlg_alert } from "../utils.js"
+import { $, cs_get } from "../utils.js"
 import css from "../resources/css/benben-ranklist.css"
+import exlg_alert from "../components/exlg-dialog-board.js"
 
 mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
     $board.html(`

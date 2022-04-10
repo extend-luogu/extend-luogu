@@ -1,8 +1,9 @@
-import { $, cur_time, log, exlg_alert, lg_usr, cs_get2, cs_post, lg_post } from "../utils.js"
+import { $, cur_time, log, lg_usr, cs_get2, cs_post, lg_post } from "../utils.js"
+import exlg_alert from "../components/exlg-dialog-board.js"
 import compo from "../compo-core.js"
 import mod, { sto } from "../core.js"
 
-const register_badge = compo.reg("register-badge", "Badge_注册", null, is_edit => {
+const register_badge = compo.reg("register-badge", "Badge_注册", null, null, is_edit => {
     const title_text = `exlg badge ${ is_edit ? "修改" : "注册" }器`
     exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
@@ -190,6 +191,6 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, is_edit
     })
         .appendTo($btn.parent())
     $submit.on("click", ).appendTo($btn.parent())*/
-}, null)
+})
 
 export default register_badge

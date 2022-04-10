@@ -207,46 +207,8 @@ const judge_problem = text => [
     /^B[2-9][0-9]{3,}$/i
 ].some(re => re.test(text))
 
-const exlg_dialog_board = {
-    _ac_func: null,
-    wrapper: null,
-    container: null,
-    wait_time: null,
-    header: null,
-    content: null,
-    autoquit: true,
-    show_dialog() {
-        this.wrapper.css("display", "flex")
-        setTimeout(() => {
-            this.container.removeClass("container-hide")
-            this.container.addClass("container-show")
-        }, 50)
-    },
-    hide_dialog() {
-        this.container.addClass("container-hide")
-        this.container.removeClass("container-show")
-        setTimeout(() => this.wrapper.hide(), this.wait_time)
-        // header.innerHTML = "&nbsp;"
-        // content.innerHTML = ""
-    },
-    accept_dialog() {
-        this._ac_func(() => this.hide_dialog()) // Note: 一样的问题
-        if (this.autoquit) {
-            this.hide_dialog()
-        }
-    },
-    show_exlg_alert(text = "", title = "exlg 提醒您", onaccepted = () => {}, autoquit = true) {
-        this.autoquit = autoquit
-        this._ac_func = onaccepted
-        this.header.text(title)
-        this.content.html(text)
-        this.show_dialog()
-    },
-}
-const exlg_alert = (...arg) => exlg_dialog_board.show_exlg_alert(...arg)
-
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
     lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, cs_get2, cs_post, springboard, $,
-    judge_problem, get_latest, exlg_dialog_board, exlg_alert
+    judge_problem, get_latest
 }

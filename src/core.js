@@ -1,6 +1,7 @@
 import { cur_time, log, warn, error, $ } from "./utils.js"
 import icon_b from "./resources/logo.js"
 import category from "./category.js"
+import { datas } from "./storage.js"
 
 export let sto = null
 const mod = {
@@ -42,6 +43,7 @@ const mod = {
         }
         if (!("on" in mod.data[rawName].lvs))
             mod.data[rawName].lvs.on = { ty: "boolean", dft: true }
+        datas[rawName] = mod.data[rawName]
 
         info = info.replaceAll(" ", "_")
 
@@ -179,7 +181,6 @@ const mod = {
 
         const pn = location.href
         for (const [ name, m ] of mod._.entries()) {
-            console.log(m.cate, name)
             if (sto[category.alias(m.cate) + name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
                 m.willrun = true
                 if ("pre" in m)

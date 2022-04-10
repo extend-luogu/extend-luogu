@@ -1,6 +1,7 @@
 import mod from "../core.js"
-import { $, exlg_alert } from "../utils.js"
+import { $ } from "../utils.js"
 import css from "../resources/css/user-comment.css"
+import exlg_alert from "../components/exlg-dialog-board.js"
 
 let cmts = null
 // mod.reg("user-comment-modifier", "修改用户备注", "")

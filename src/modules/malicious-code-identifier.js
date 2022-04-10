@@ -1,6 +1,7 @@
 import mod from "../core.js"
-import { $, exlg_alert } from "../utils.js"
+import { $ } from "../utils.js"
 import css from "../resources/css/malicious-code-identifier.css"
+import exlg_alert from "../components/exlg-dialog-board.js"
 
 mod.reg("malicious-code-identifier", "有害代码检查器", [ "@/discuss/\\d+(\\?page\\=\\d+)*$" ], {
     strength : { ty: "number", dft: 3, min: 1, max: 5, step: 1, info: [ "Strength", "强度" ], strict: true }

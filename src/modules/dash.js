@@ -4,6 +4,8 @@ import logo from "../resources/logo.js"
 import register_badge from "../components/register-badge.js"
 import css from "../resources/css/dash-bridge.css"
 import category from "../category.js"
+import compo from "../compo-core.js"
+import { datas } from "../storage.js"
 
 mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     msg: {
@@ -29,14 +31,13 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     const modules = [ ...category._ ]
         .map(([ name, { description, alias, icon, unclosable }]) => ({
             name, description, icon,
-            children: [ ...mod._ ]
-                .filter(([ , m ]) => m.cate === name)
+            children: (name === "component" ? [ ...compo._ ] : [ ...mod._ ].filter(([ , m ]) => m.cate === name))
                 .map(([ nm, m ]) => ({
                     rawName: alias + nm,
                     name: nm,
                     description: m.info,
                     unclosable,
-                    settings: Object.entries(mod.data[alias + nm].lvs)
+                    settings: Object.entries(datas[alias + nm]?.lvs ?? {})
                         .filter(([ k, s ]) => k !== "on" && !s.priv)
                         .map(([ k, s ]) => ({
                             name: k,
