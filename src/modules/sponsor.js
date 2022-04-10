@@ -43,7 +43,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         }
         args.each((_, e) => require_badge($(e)))
         const res = (await cs_post({
-            url: "https://exlg.piterator.com/badge/mget/",
+            url: "https://exlg.piterator.com/badge/mget",
             data: JSON.stringify(tag_uid_list),
             type: "application/json"
         })).responseText

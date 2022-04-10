@@ -59,7 +59,7 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, null, i
             }
             $title.html("请求中...")
             const res = (await cs_post({
-                url: "https://exlg.piterator.com/badge/set/",
+                url: "https://exlg.piterator.com/badge/set",
                 data: JSON.stringify(request),
                 type: "application/json"
             })).responseText
