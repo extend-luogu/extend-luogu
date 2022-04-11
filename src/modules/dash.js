@@ -43,7 +43,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                             name: k,
                             displayName: k.split("_").map(t => t.toInitialCase()).join(" "),
                             description: s.info,
-                            type: { number: "SILDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "SELECTBOX" }[s.ty],
+                            type: { number: "SLIDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "SELECTBOX" }[s.ty],
                             ...(s.ty === "number"  && { minValue: s.min, maxValue: s.max, increment: s.step }),
                             ...(s.ty === "enum"    && { acceptableValues: s.vals })
                         }))
