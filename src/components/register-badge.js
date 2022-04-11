@@ -1,9 +1,9 @@
-import { $, cur_time, log, lg_usr, cs_get2, cs_post, lg_post } from "../utils.js"
+import { $, cur_time, lg_usr, cs_post } from "../utils.js"
 import exlg_alert from "../components/exlg-dialog-board.js"
 import compo from "../compo-core.js"
 import mod, { sto } from "../core.js"
 
-const register_badge = compo.reg("register-badge", "Badge_注册", null, null, is_edit => {
+const register_badge = compo.reg("register-badge", "badge 注册", null, null, is_edit => {
     const title_text = `exlg badge ${ is_edit ? "修改" : "注册" }器`
     exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
@@ -24,7 +24,7 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, null, i
         <small>Powered by <s>Amaze UI</s> 自行研发，去他妈的 Amaze UI</small>
     </div>
 </div>
-    `, title_text, async (func_quit) => {
+    `, title_text, async () => {
         const $board = $("#exlg-container"), $input = $board.find("input"), $title = $board.find("#exlg-dialog-title")
         const gerr = e => {
             $title.html(e)
@@ -36,127 +36,42 @@ const register_badge = compo.reg("register-badge", "Badge_注册", null, null, i
             gerr("[Err] 请检查信息是否填写完整")
             return
         }
-        let res = await $.get("/api/user/search?keyword=" + $input[0].value)
-        if (!res.users[0]) {
-            gerr("[Err] 无法找到指定用户")
-            return
-        }
 
-        if ( sto["sponsor-tag"].use_new ) {
-            // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
-            const badge = is_edit ? $input[1].value : $input[2].value
-            $title.html("获取并验证令牌...")
-            mod.execute("token")
-            let request = {
-                uid: $input[0].value,
-                token: sto["^token"].token,
-                data: {
-                    text: badge
-                }
+        // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
+        const badge = is_edit ? $input[1].value : $input[2].value
+        $title.html("获取并验证令牌...")
+        mod.execute("token")
+        let request = {
+            uid: $input[0].value,
+            token: sto["^token"].token,
+            data: {
+                text: badge,
+                bg: "mediumturquoise",
+                fg: "#fff"
             }
-            if ( !is_edit ) {
-                request["activation"] = $input[1].value
-            }
-            $title.html("请求中...")
-            const res = (await cs_post({
-                url: "https://exlg.piterator.com/badge/set",
-                data: JSON.stringify(request),
-                type: "application/json"
-            })).responseText
-            const res_json = JSON.parse(decodeURIComponent(res))
-            if ( "error" in res_json ) {
-                $title.html("失败")
-                exlg_alert(res_json["error"], "激活 badge 出错")
-            }
-            else {
-                const res_json_data = res_json.data
-                sto["sponsor-tag"].tag_cache = JSON.stringify(JSON.parse(sto["sponsor-tag"].tag_cache)[ $input[0].value ] = {
-                    text: res_json_data[ $input[0].value ].text,
-                    ts: cur_time()
-                })
-                $title.html("成功")
-                exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload() })
-            }
+        }
+        if ( !is_edit ) {
+            request["activation"] = $input[1].value
+        }
+        $title.html("请求中...")
+        const res = (await cs_post({
+            url: "https://exlg.piterator.com/badge/set",
+            data: JSON.stringify(request),
+            type: "application/json"
+        })).responseText
+        const res_json = JSON.parse(decodeURIComponent(res))
+        if ( "error" in res_json ) {
+            $title.html("[Err] 失败")
+            exlg_alert(res_json["error"], "激活 badge 出错")
         }
         else {
-            $input[0].value = res.users[0].uid
-            $title.html("请求中...")
-            const e = (await cs_get2(is_edit ?
-                `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/edit/${ $input[0].value }/${ $input[1].value }/`
-                : `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/${$input[1].value}/${$input[0].value}/${$input[2].value}/`)).responseText.slice(1, -1)
-            /*
-            let fres = -1
-            const _operations = [
-                {
-                    errorcode: 0,
-                    message: `"Succeed in creating a new badge!"`,
-                    ontitle: "[exlg] 成功创建 badge",
-                    onlog: "Successfully created a badge!"
-                },
-                {
-                    errorcode: 1,
-                    message: `"Wrong active code!"`,
-                    ontitle: "无效激活码",
-                    onlog: "Illegal Active Code"
-                },
-                {
-                    errorcode: 2,
-                    message: `"Sorry, but the active code has been used!"`,
-                    ontitle: "激活码已被使用",
-                    onlog: "Expired Active Code"
-                },
-                {
-                    errorcode: 3,
-                    message: `"Something went wrong!"`,
-                    ontitle: "非法的 badge 内容",
-                    onlog: "Illegal Badge Text"
-                },
-                {
-                    errorcode: -1,
-                    message: `Fuck CCF up`,
-                    ontitle: "未知错误",
-                    onlog: "注册 exlg-badge 时出现未知错误, 请联系开发人员"
-                },
-            ]
-            _operations.forEach(f => {
-                if(fres !== -1) return
-                console.log(e === f.message, f.errorcode === -1, f)
-                if (e === f.message || f.errorcode === -1) {
-                    fres = f.errorcode
-                    $("#exlg-dialog-title").html(f.errorcode ? `[Error] ${f.ontitle}` : f.ontitle)
-                    log(f.errorcode ? `Illegal Operation in registering badge: ${f.onlog}(#${f.errorcode})` : f.onlog)
-                    if(fres === -1 || ! fres) {
-                        func_quit()
-                        setTimeout(() => exlg_alert("badge 注册成功!", "exlg 提醒您"), 400)
-                        return
-                    }
-                }
+            const res_json_data = res_json.data
+            sto["sponsor-tag"].tag_cache = JSON.stringify(JSON.parse(sto["sponsor-tag"].tag_cache)[ $input[0].value ] = {
+                text: res_json_data[ $input[0].value ].text,
+                ts: cur_time()
             })
-            */
-            if (e.startsWith("Error")) {
-                log(e), gerr(e)
-                return
-            }
-
-            $title.html("验证中...")
-            let bbv = e.match(/content.*?'.*?'/g)[0].slice(9, -1)
-            await lg_post("/api/feed/postBenben", JSON.stringify({ content: bbv }))
-            let e2 = await cs_get2(e.match(/visit.*$/g)[0].slice(6)), msg = e2.responseText.slice(1, -1)
-            if (msg.startsWith("Error")) {
-                log(msg), gerr(msg)
-                return
-            }
-
-            $title.html("就要好了...")
-            let e3 = $(await $.get("https://www.luogu.com.cn/feed/my?page=1"))
-            e3.find("div.am-comment-main").each((_, e) =>
-                ($(e).find("span.feed-comment").text().trim() === bbv)
-                    && lg_post("https://www.luogu.com.cn/api/feed/delete/" + $(e).find("a[name='feed-delete']").attr("data-feed-id"), "{}")) // Hack: application/json 我爱（hen）你
-            func_quit()
-            setTimeout(() => exlg_alert("点击确定将自动重新刷新 badge", `badge ${ is_edit ? "修改" : "注册" }成功!`, () => {
-                mod.execute("^sponsor-list")
-                location.reload()
-            }, 400))
+            $title.html("成功")
+            exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload() })
         }
     }, false)/*
     const $board = $("#exlg-alert, #lg-alert")

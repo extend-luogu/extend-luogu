@@ -171,6 +171,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         const _list = [
             { tag: "vers", title: "版本", buttons: [ ] },
             { tag: "source", title: "源码", buttons: [
+                { html: "OSS", url: "https://exlg.oss-cn-shanghai.aliyuncs.com/latest/extend-luogu.min.user.js" },
                 { html: "JsDelivr", url: "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js" },
                 { html: "Raw", url: "https://github.com/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" },
                 { html: "FastGit", url: "https://hub.fastgit.xyz/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" }

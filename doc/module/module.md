@@ -20,7 +20,6 @@
 - [随机跳题 ex](./rand-problem-ex.md)
 - [题单内随机跳题](./rand-training-problem.md)
 - [用户查找](./search-user.md)
-- [获取标签列表](./sponsor-list.md)
 - [标签显示](./sponsor-tag.md)
 - [跨域跳板](./springboard.md)
 - [记录难度可视化](./submission-color.md)
