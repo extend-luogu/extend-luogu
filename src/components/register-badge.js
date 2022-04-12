@@ -65,11 +65,9 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
             exlg_alert(res_json["error"], "激活 badge 出错")
         }
         else {
-            const res_json_data = res_json.data
-            sto["sponsor-tag"].tag_cache = JSON.stringify(JSON.parse(sto["sponsor-tag"].tag_cache)[ $input[0].value ] = {
-                text: res_json_data[ $input[0].value ].text,
-                ts: cur_time()
-            })
+            const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data)
+            badges[$input[0].value].ts = cur_time()
+            sto["sponsor-tag"].badges = JSON.stringify(badges)
             $title.html("成功")
             exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload() })
         }
