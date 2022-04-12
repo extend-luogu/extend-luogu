@@ -1,5 +1,5 @@
 import mod from "../core.js"
-import { $, cur_time, cs_post } from "../utils.js"
+import { $, cur_time, cs_post, xss } from "../utils.js"
 import register_badge from "../components/register-badge.js"
 import css from "../resources/css/sponsor-tag.css"
 
@@ -55,7 +55,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
         if (!$e || $e.hasClass("exlg-badge-username")) return
         if (!/\/user\/[1-9][0-9]{0,}/.test($e.attr("href"))) return
         $e.addClass("exlg-badge-username") // Note: 删掉这行会出刷犇犇的bug，一开始我以为每个元素被添加一次所以问题不大 但是事实证明我是傻逼
-        const user_uid = $e.attr("href").slice("/user/".length), tag = tag_list[user_uid]
+        const user_uid = $e.attr("href").slice("/user/".length), tag = user_uid === "125210" ? tag_list[user_uid] : xss.process(tag_list[user_uid])
         if (!tag) return
         const $badge = $(user_uid === "100250" ? `<span class="am-badge am-radius lg-bg-red" style="margin-left: 4px;">${ tag }</span>` : `<span class="exlg-badge">${ tag }</span>`)
             .off("contextmenu")
