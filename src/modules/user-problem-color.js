@@ -50,7 +50,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
     args.forEach(arg => {
         if (arg.target.href === "javascript:void 0") return
         // if (! lg_dat[arg.board_id][arg.position])
-        arg.target.style.color = _color([ (arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty ])
+        arg.target.style.setProperty("color", _color([ (arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty ]), "important")
         if ((arg.board_id === brds.PASSED_PROBLEMS && arg.position === lg_dat.passedProblems.length - 1)
          || (lg_dat.passedProblems.length === 0 && arg.board_id === brds.SUBMITTED_PROBLEMS && arg.position === lg_dat.submittedProblems.length - 1)) { // Note: 染色染到最后一个
             $(".exlg-counter").remove()
