@@ -116,8 +116,8 @@ mod.reg("benben-quickpost", "CtrlEnter发送犇犇", "@/", null, () =>
 `, "module")
 
 mod.reg("benben-delete", "一键删犇", "@/", null, () => {
-    delete_ben = function() {
-        var l=$("#feed>li>div.am-comment-main>header>div>a:nth-child(2)");
+    var delete_ben = function() {
+        var l=$("#feed>li>div.am-comment-main>header>div>a:nth-child(2)")
         function f(i){
             $.ajax(
                 {
@@ -125,25 +125,25 @@ mod.reg("benben-delete", "一键删犇", "@/", null, () => {
                     url:"/api/feed/delete/"+$(l[i]).attr("data-feed-id"),
                     headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content},
                     success:function (){
-                        console.log(i);
-                        if(i<l.length-1) setTimeout(function(){f(i+1)}, 200);
+                        console.log(i)
+                        if(i<l.length-1) setTimeout(function(){ f(i+1) }, 200)
                         else {
-                            exlg_alert("删犇完成！3秒后自动刷新！");
-                            setTimeout(function(){location.reload();}, 3000);
+                            exlg_alert("删犇完成！3秒后自动刷新！")
+                            setTimeout(function(){ location.reload() }, 3000)
                         }
                     }
                 }
-            );
+            )
         }
-        f(0);
+        f(0)
     }
 
-    find_ben = function() { // Note: Loading bens
-        switchMode("my");
+    var find_ben = function() { // Note: Loading bens
+        switchMode("my"); var feedPage, feedMode, $feed;
         function load(){
-            console.log("page "+feedPage);
-            $.get("/feed/"+feedMode+"?page="+feedPage,function(resp){
-                $feed.append(resp);
+            console.log("page "+feedPage)
+            $.get("/feed/"+feedMode+"?page="+feedPage, function(resp){
+                $feed.append(resp)
                 $("#feed-more").children("a").text("点击查看更多...")
                 $("[name=feed-delete]").click(function(){
                     $.ajax(
@@ -152,28 +152,28 @@ mod.reg("benben-delete", "一键删犇", "@/", null, () => {
                             url:"/api/feed/delete/"+$(this).attr("data-feed-id"),
                             headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content},
                             success:function (){
-                                switchMode("all");
+                                switchMode("all")
                             }
                         }
-                    );
-                });feedPage++;
-                if(resp.indexOf("没有更多动态了")!=-1) {
-                    console.log("finished");
-                    delete_ben();
+                    )
+                }); feedPage++
+                if(resp.indexOf("没有更多动态了")!==-1) {
+                    console.log("finished")
+                    delete_ben()
                 }
-                else setTimeout(load, 200);
-            });
+                else setTimeout(load, 200)
+            })
         }
-        setTimeout(load, 1000);
+        setTimeout(load, 1000)
     }
-    var locations = document.getElementById("feed-submit").parentNode;
-    var button = document.createElement("button");
-    button.className = "am-btn am-btn-danger am-btn-sm";
-    button.name = "del_ben";
-    button.id = "del_ben";
-    button.innerHTML = "　一键删犇！　";
-    button.onclick = function(){find_ben();};
-    locations.appendChild(button);
+    let locations = document.getElementById("feed-submit").parentNode
+    let button = document.createElement("button")
+    button.className = "am-btn am-btn-danger am-btn-sm"
+    button.name = "del_ben"
+    button.id = "del_ben"
+    button.innerHTML = "　一键删犇！　"
+    button.onclick = function(){ find_ben() }
+    locations.appendChild(button)
 }
 , `
 `, "module")
