@@ -117,18 +117,18 @@ mod.reg("benben-quickpost", "CtrlEnter发送犇犇", "@/", null, () =>
 
 mod.reg("benben-delete", "一键删犇", "@/", null, () => {
     delete_ben = function() {
-        var l=$('#feed>li>div.am-comment-main>header>div>a:nth-child(2)');
+        var l=$("#feed>li>div.am-comment-main>header>div>a:nth-child(2)");
         function f(i){
             $.ajax(
                 {
-                    type:'post',
-                    url:"/api/feed/delete/"+$(l[i]).attr('data-feed-id'),
-                    headers:{'x-csrf-token':document.querySelector("meta[name=csrf-token]").content},
+                    type:"post",
+                    url:"/api/feed/delete/"+$(l[i]).attr("data-feed-id"),
+                    headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content},
                     success:function (){
                         console.log(i);
                         if(i<l.length-1) setTimeout(function(){f(i+1)}, 200);
                         else {
-                            exlg_alert('删犇完成！3秒后自动刷新！');
+                            exlg_alert("删犇完成！3秒后自动刷新！");
                             setTimeout(function(){location.reload();}, 3000);
                         }
                     }
@@ -139,26 +139,26 @@ mod.reg("benben-delete", "一键删犇", "@/", null, () => {
     }
 
     find_ben = function() { // Note: Loading bens
-        switchMode('my');
+        switchMode("my");
         function load(){
-            console.log('page '+feedPage);
+            console.log("page "+feedPage);
             $.get("/feed/"+feedMode+"?page="+feedPage,function(resp){
                 $feed.append(resp);
                 $("#feed-more").children("a").text("点击查看更多...")
                 $("[name=feed-delete]").click(function(){
                     $.ajax(
                         {
-                            type:'post',
-                            url:"/api/feed/delete/"+$(this).attr('data-feed-id'),
-                            headers:{'x-csrf-token':document.querySelector("meta[name=csrf-token]").content},
+                            type:"post",
+                            url:"/api/feed/delete/"+$(this).attr("data-feed-id"),
+                            headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content},
                             success:function (){
-                                switchMode('all');
+                                switchMode("all");
                             }
                         }
                     );
                 });feedPage++;
-                if(resp.indexOf('没有更多动态了')!=-1) {
-                    console.log('finished');
+                if(resp.indexOf("没有更多动态了")!=-1) {
+                    console.log("finished");
                     delete_ben();
                 }
                 else setTimeout(load, 200);
