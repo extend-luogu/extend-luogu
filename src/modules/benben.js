@@ -139,7 +139,6 @@ mod.reg("benben-delete", "一键删犇", "@/", null, () => {
     }
 
     var find_ben = function() { // Note: Loading bens
-        switchMode("my"); var feedPage, feedMode, $feed;
         function load(){
             console.log("page "+feedPage)
             $.get("/feed/"+feedMode+"?page="+feedPage, function(resp){
@@ -150,10 +149,7 @@ mod.reg("benben-delete", "一键删犇", "@/", null, () => {
                         {
                             type:"post",
                             url:"/api/feed/delete/"+$(this).attr("data-feed-id"),
-                            headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content},
-                            success:function (){
-                                switchMode("all")
-                            }
+                            headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content}
                         }
                     )
                 }); feedPage++
