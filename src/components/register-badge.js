@@ -15,9 +15,21 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
     ${ is_edit ? "" : `<div style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">激活码</span>
                 <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username"></div>` }
-    <div style="margin: 5px;margin-bottom: 20px;">
+    <div style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">badge</span>
                 <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您想要的badge" name="username">
+            </div>
+            <div style="margin: 5px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">背景</span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
+            </div>
+            <div style="margin: 5px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">前景</span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" value="#fff" name="username">
+            </div>
+            <div style="margin: 5px;margin-bottom: 20px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">预览</span>
+                <span class="exlg-badge-preview"></span>
             </div>
         </div>
         <br>
@@ -25,6 +37,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
     </div>
 </div>
     `, title_text, async () => {
+        $("input[exlg-badge-register]").off("input")
+
         const $board = $("#exlg-container"), $input = $board.find("input"), $title = $board.find("#exlg-dialog-title")
         const gerr = e => {
             $title.html(e)
@@ -39,6 +53,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
 
         // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
         const badge = is_edit ? $input[1].value : $input[2].value
+        const bg = is_edit ? $input[2].value : $input[3].value
+        const fg = is_edit ? $input[3].value : $input[4].value
         $title.html("获取并验证令牌...")
         mod.execute("token")
         let request = {
@@ -46,8 +62,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
             token: sto["^token"].token,
             data: {
                 text: badge,
-                bg: "mediumturquoise",
-                fg: "#fff"
+                bg: bg,
+                fg: fg
             }
         }
         if ( !is_edit ) {
@@ -71,7 +87,40 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
             $title.html("成功")
             exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload() })
         }
-    }, false)/*
+    }, false)
+
+    $(".exlg-badge-preview").attr("style", `
+        border-radius: 50px;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        transition: all .15s;
+        display: inline-block;
+        min-width: 10px;
+        font-size: 1em;
+        font-weight: 700;
+        line-height: 1;
+        vertical-align: baseline;
+        white-space: nowrap;
+        cursor: pointer;
+        margin-left: 2px;
+        margin-right: 2px;
+    `)
+    $("input[exlg-badge-register]").on("input", () => {
+        // Note: 当输入数据时加载预览
+        const $board = $("#exlg-container"), $input = $board.find("input")
+        const badge = is_edit ? $input[1].value : $input[2].value
+        const bg = is_edit ? $input[2].value : $input[3].value
+        const fg = is_edit ? $input[3].value : $input[4].value
+        const $preview = $(".exlg-badge-preview")
+        $preview
+            .text(badge)
+            .css("background", bg)
+            .css("color", fg)
+    })
+
+    /*
     const $board = $("#exlg-alert, #lg-alert")
     const $btn = $board.find(".am-modal-btn")
     // Note: 重构一次，Date = 20211127 Time = 21:10
@@ -104,7 +153,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
         clear_foot()
     })
         .appendTo($btn.parent())
-    $submit.on("click", ).appendTo($btn.parent())*/
+    $submit.on("click", ).appendTo($btn.parent())
+    */
 })
 
 export default register_badge
