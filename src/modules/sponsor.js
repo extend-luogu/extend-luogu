@@ -42,7 +42,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             $tar = $tar.next()
         if ($tar.next().length && $tar.next().hasClass("am-badge"))
             $tar = $tar.next()
-        $tar.after($(`<span class="exlg-badge">${badge.text}</span>`)
+        $tar.append("<span>&nbsp;</span>").after($(`<span class="exlg-badge">${badge.text}</span>`)
             .css("background", badge.bg || "mediumturquoise")
             .css("color", badge.fg || "#fff")
             .off("contextmenu")
