@@ -1,5 +1,6 @@
 import uindow, { xss, cs_get, $ } from "../utils.js"
 import mod from "../core.js"
+import exlg_alert from "../components/exlg-dialog-board.js"
 
 mod.reg("benben", "全网犇犇", "@/", {
     source: {
@@ -111,5 +112,111 @@ mod.reg("benben", "全网犇犇", "@/", {
 
 mod.reg("benben-quickpost", "CtrlEnter发送犇犇", "@/", null, () =>
     $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").click())
+, `
+`, "module")
+
+mod.reg("benben-delete", "一键删犇", "@/", null, () => {
+    let feedPage = 1
+    let feedMode = ""
+    let $feed = $("#feed")
+    function loadFeed() {
+        $.get("/feed/"+feedMode+"?page="+feedPage, function(resp) {
+            $feed.append(resp)
+            $("#feed-more").children("a").text("点击查看更多...")
+            $("[name=feed-delete]").click(function() {
+                $.post("/api/feed/delete/"+$(this).attr("data-feed-id"), function() {
+                    switchMode("watching")
+                })
+            })
+            $("[name=feed-reply]").click(function() {
+                let content = $(this).parents("li.feed-li").find(".feed-comment").text()
+                $("#feed-content").val(" || @" + $(this).attr("data-username") + " : " + content)
+            })
+            $("[name=feed-report]").click(function () {
+                let reportType = $(this).attr("data-report-type"), reportID = $(this).attr("data-report-id")
+                $("#report").modal({
+                    relatedTarget: this,
+                    onConfirm: function () {
+                        let reason = $("[name=reason]").val()
+                        let detail = $("[name=content]").val()
+
+                        $.post("/api/report/"+reportType, {
+                            relevantID: reportID,
+                            reason: reason + " " + detail
+                        }, function (data) {
+                            exlg_alert("提示", data.data)
+                        })
+                    }
+                })
+            })
+        })
+        feedPage++
+    }
+
+    function switchMode(mode) {
+        feedMode = mode
+        feedPage = 1
+        $feed.html("")
+        $("#feed-more").show()
+        $(".feed-selector").removeClass("am-active")
+        $(".feed-selector[data-mode="+mode+"]").addClass("am-active")
+        loadFeed()
+    }
+
+    let delete_ben = function() {
+        let l=$("#feed>li>div.am-comment-main>header>div>a:nth-child(2)")
+        function f(i){
+            $.ajax(
+                {
+                    type:"post",
+                    url:"/api/feed/delete/"+$(l[i]).attr("data-feed-id"),
+                    headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content},
+                    success:function (){
+                        console.log(i)
+                        if(i<l.length-1) setTimeout(function(){ f(i+1) }, 200)
+                        else {
+                            exlg_alert("删犇完成！3秒后自动刷新！")
+                            setTimeout(function(){ location.reload() }, 3000)
+                        }
+                    }
+                }
+            )
+        }
+        f(0)
+    }
+    let find_ben = function() { // Note: Loading bens
+        switchMode("my")
+        function load(){
+            console.log("page "+feedPage)
+            $.get("/feed/"+feedMode+"?page="+feedPage, function(resp){
+                $("#feed").append(resp)
+                $("#feed-more").children("a").text("点击查看更多...")
+                $("[name=feed-delete]").click(function(){
+                    $.ajax(
+                        {
+                            type:"post",
+                            url:"/api/feed/delete/"+$(this).attr("data-feed-id"),
+                            headers:{"x-csrf-token":document.querySelector("meta[name=csrf-token]").content}
+                        }
+                    )
+                }); feedPage++
+                if(resp.indexOf("没有更多动态了")!==-1) {
+                    console.log("finished")
+                    delete_ben()
+                }
+                else setTimeout(load, 200)
+            })
+        }
+        setTimeout(load, 1000)
+    }
+    let locations = document.getElementById("feed-submit").parentNode
+    let button = document.createElement("button")
+    button.className = "am-btn am-btn-danger am-btn-sm"
+    button.name = "del_ben"
+    button.id = "del_ben"
+    button.innerHTML = "　一键删犇！　"
+    button.onclick = function(){ find_ben() }
+    locations.appendChild(button)
+}
 , `
 `, "module")
