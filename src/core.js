@@ -1,4 +1,4 @@
-import { cur_time, log, warn, error, $ } from "./utils.js"
+import uindow, { cur_time, log, warn, error, $ } from "./utils.js"
 import icon_b from "./resources/logo.js"
 import category from "./category.js"
 import { datas } from "./storage.js"
@@ -150,6 +150,11 @@ const mod = {
         }, styl, cate
     ),
 
+    reg_lfe : (name, info, path, data, func, styl, cate) => {
+        mod.reg(name, info, path, data, func, styl, cate)
+        mod._.set(name, { lfe: true, ...mod._.get(name) })
+    },
+
     find: name => mod._.get(name),
     has: name => mod._.has(name),
 
@@ -186,6 +191,22 @@ const mod = {
                 if ("pre" in m)
                     mod._.set(name, exe({name, ...m}))
             }
+        }
+
+        uindow.console.info = content => {
+            const event = console.info(content)
+            log("info hooked: " + content)
+            if (content === "[@lfe/loader]") {
+                for (const [ name, m ] of mod._.entries()) {
+                    if (sto[category.alias(m.cate) + name].on && m.path.some(re => new RegExp(re, "g").test(pn))) {
+                        if ("lfe" in m) {
+                            mod.execute(name)
+                            log("loading lfe module: " + name)
+                        }
+                    }
+                }
+            }
+            return event
         }
     },
 
