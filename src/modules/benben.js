@@ -116,8 +116,55 @@ mod.reg("benben-quickpost", "CtrlEnter发送犇犇", "@/", null, () =>
 `, "module")
 
 mod.reg("benben-delete", "一键删犇", "@/", null, () => {
-    var delete_ben = function() {
-        var l=$("#feed>li>div.am-comment-main>header>div>a:nth-child(2)")
+    var feedPage = 1;
+    var feedMode = '';
+    var $feed = $("#feed");
+    function loadFeed() {
+        $.get("/feed/"+feedMode+"?page="+feedPage, function(resp) {
+            $feed.append(resp);
+            $("#feed-more").children("a").text("点击查看更多...")
+            $("[name=feed-delete]").click(function() {
+                $.post("/api/feed/delete/"+$(this).attr('data-feed-id'), function() {
+                    switchMode('watching');
+                })
+            })
+            $("[name=feed-reply]").click(function() {
+                var content = $(this).parents("li.feed-li").find(".feed-comment").text();
+                $("#feed-content").val(" || @" + $(this).attr('data-username') + " : " + content)
+            })
+            $("[name=feed-report]").click(function () {
+                var reportType = $(this).attr('data-report-type'), reportID = $(this).attr('data-report-id');
+                $('#report').modal({
+                    relatedTarget: this,
+                    onConfirm: function () {
+                        var reason = $('[name=reason]').val();
+                        var detail = $('[name=content]').val();
+
+                        $.post('/api/report/'+reportType, {
+                            relevantID: reportID,
+                            reason: reason + ' ' + detail
+                        }, function (data) {
+                            exlg_alert("提示", data.data);
+                        });
+                    }
+                });
+            });
+        });
+        feedPage++;
+    }
+
+    function switchMode(mode) {
+        feedMode = mode;
+        feedPage = 1;
+        $feed.html('');
+        $("#feed-more").show();
+        $(".feed-selector").removeClass("am-active");
+        $(".feed-selector[data-mode="+mode+"]").addClass("am-active");
+        loadFeed();
+    }
+
+    let delete_ben = function() {
+        let l=$("#feed>li>div.am-comment-main>header>div>a:nth-child(2)")
         function f(i){
             $.ajax(
                 {
@@ -137,12 +184,12 @@ mod.reg("benben-delete", "一键删犇", "@/", null, () => {
         }
         f(0)
     }
-
-    var find_ben = function() { // Note: Loading bens
+    let find_ben = function() { // Note: Loading bens
+        switchMode('my')
         function load(){
             console.log("page "+feedPage)
             $.get("/feed/"+feedMode+"?page="+feedPage, function(resp){
-                $feed.append(resp)
+                $("#feed").append(resp)
                 $("#feed-more").children("a").text("点击查看更多...")
                 $("[name=feed-delete]").click(function(){
                     $.ajax(
