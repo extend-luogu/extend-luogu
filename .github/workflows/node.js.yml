@@ -78,3 +78,13 @@ jobs:
           body_path: src/resources/update-log.txt
           prerelease: ${{ contains( env.VER, '-' ) }}
           files: dist/extend-luogu.min.user.js
+
+      - name: Publish to OSS
+        uses: wxh06/dist2oss@v1
+        with:
+          version: ${{ env.VER }}
+          stable: ${{ !contains( env.VER, '-' ) }}
+          access-key-id: ${{ secrets.OSS_ID }}
+          access-key-secret: ${{ secrets.OSS_SECRET }}
+          bucket: exlg
+          region: oss-cn-shanghai
