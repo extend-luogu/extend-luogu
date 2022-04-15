@@ -33,7 +33,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [check]
     if: github.event_name == 'push' && startsWith( github.event.head_commit.message, 'VER' )
 
     steps:
