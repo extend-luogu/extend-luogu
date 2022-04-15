@@ -1,11 +1,14 @@
+/* eslint-disable no-new */
 /* global XNColorPicker */
-import { $, cur_time, lg_usr, cs_post } from "../utils.js"
-import exlg_alert from "../components/exlg-dialog-board.js"
-import compo from "../compo-core.js"
-import mod, { sto } from "../core.js"
+import {
+    $, cur_time, lg_usr, cs_post,
+} from "../utils.js";
+import exlg_alert from "./exlg-dialog-board.js";
+import compo from "../compo-core.js";
+import mod, { sto } from "../core.js";
 
-const register_badge = compo.reg("register-badge", "badge 注册", null, null, is_edit => {
-    const title_text = `exlg badge ${ is_edit ? "修改" : "注册" }器`
+const register_badge = compo.reg("register-badge", "badge 注册", null, null, (is_edit) => {
+    const title_text = `exlg badge ${is_edit ? "修改" : "注册"}器`;
     exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
         <div class="exlg-badge-register" style="display:inline-block;text-align: left;padding-top: 10px;">
@@ -13,9 +16,9 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">用户uid</span>
                 <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" value=${lg_usr.uid} disabled title="暂不支持为别人注册 badge" name="username">
             </div>
-    ${ is_edit ? "" : `<div style="margin: 5px;">
+    ${is_edit ? "" : `<div style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">激活码</span>
-                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username"></div>` }
+                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username"></div>`}
     <div style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">badge</span>
                 <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您想要的badge" name="username">
@@ -38,99 +41,102 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
     </div>
 </div>
     `, title_text, async () => {
-        $("input[exlg-badge-register]").off("input")
+        $("input[exlg-badge-register]").off("input");
 
-        const $board = $("#exlg-container"), $input = $board.find("input"), $title = $board.find("#exlg-dialog-title")
-        const gerr = e => {
-            $title.html(e)
-            setTimeout(() => $title.html(title_text), 1500)
-        }
-        if (lg_usr?.uid && !$input[0].value)
-            $input[0].value = lg_usr.uid
-        if (!$input.get().some(e => e.value)) {
-            gerr("[Err] 请检查信息是否填写完整")
-            return
+        const $board = $("#exlg-container"),
+            $input = $board.find("input"),
+            $title = $board.find("#exlg-dialog-title");
+        const gerr = (e) => {
+            $title.html(e);
+            setTimeout(() => $title.html(title_text), 1500);
+        };
+        if (lg_usr?.uid && !$input[0].value) $input[0].value = lg_usr.uid;
+        if (!$input.get().some((e) => e.value)) {
+            gerr("[Err] 请检查信息是否填写完整");
+            return;
         }
 
         // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
-        const badge = is_edit ? $input[1].value : $input[2].value
-        const bg = is_edit ? $input[2].value : $input[3].value
-        const fg = is_edit ? $input[3].value : $input[4].value
-        $title.html("获取并验证令牌...")
-        mod.execute("token")
-        let request = {
+        const badge = is_edit ? $input[1].value : $input[2].value;
+        const bg = is_edit ? $input[2].value : $input[3].value;
+        const fg = is_edit ? $input[3].value : $input[4].value;
+        $title.html("获取并验证令牌...");
+        mod.execute("token");
+        const request = {
             uid: $input[0].value,
             token: sto["^token"].token,
             data: {
                 text: badge,
-                bg: bg,
-                fg: fg
-            }
+                bg,
+                fg,
+            },
+        };
+        if (!is_edit) {
+            request.activation = $input[1].value;
         }
-        if ( !is_edit ) {
-            request["activation"] = $input[1].value
-        }
-        $title.html("请求中...")
+        $title.html("请求中...");
         const res = (await cs_post({
             url: "https://exlg.piterator.com/badge/set",
             data: JSON.stringify(request),
-            type: "application/json"
-        })).responseText
-        const res_json = JSON.parse(decodeURIComponent(res))
-        if ( "error" in res_json ) {
-            $title.html("[Err] 失败")
-            exlg_alert(res_json["error"], "激活 badge 出错")
+            type: "application/json",
+        })).responseText;
+        const res_json = JSON.parse(decodeURIComponent(res));
+        if ("error" in res_json) {
+            $title.html("[Err] 失败");
+            exlg_alert(res_json.error, "激活 badge 出错");
+        } else {
+            const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data);
+            badges[$input[0].value].ts = cur_time();
+            sto["sponsor-tag"].badges = JSON.stringify(badges);
+            $title.html("成功");
+            exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload(); });
         }
-        else {
-            const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data)
-            badges[$input[0].value].ts = cur_time()
-            sto["sponsor-tag"].badges = JSON.stringify(badges)
-            $title.html("成功")
-            exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload() })
-        }
-    }, false)
+    }, false);
 
-    const $board = $("#exlg-container"), $input = $board.find("input")
+    const $board = $("#exlg-container"),
+        $input = $board.find("input");
 
     const updatePreview = () => {
         // Note: 当输入数据时加载预览
-        const $board = $("#exlg-container"), $input = $board.find("input")
-        const badge = is_edit ? $input[1].value : $input[2].value
-        const bg = is_edit ? $input[2].value : $input[3].value
-        const fg = is_edit ? $input[3].value : $input[4].value
-        const $preview = $(".exlg-badge-preview")
+        const $i = $("#exlg-container").find("input");
+        const badge = is_edit ? $i[1].value : $i[2].value;
+        const bg = is_edit ? $i[2].value : $i[3].value;
+        const fg = is_edit ? $i[3].value : $i[4].value;
+        const $preview = $(".exlg-badge-preview");
         $preview
             .text(badge)
             .css("background", bg)
-            .css("color", fg)
-    }
+            .css("color", fg);
+    };
 
     new XNColorPicker({
         color: "mediumturquoise",
         selector: ".exlg-bg-slector",
         colorTypeOption: "single,linear-gradient,radial-gradient",
-        onError: () => {},
-        onCancel: () => {},
-        onChange: () => {},
+        onError: () => { },
+        onCancel: () => { },
+        onChange: () => { },
         onConfirm: (color) => {
-            const c = color.colorType === "single" ? color.color.hex : color.color.str
-            is_edit ? $($input[2]).val(c) : $($input[3]).val(c)
-            updatePreview()
-        }
-    })
+            const c = color.colorType === "single" ? color.color.hex : color.color.str;
+            if (is_edit) $($input[2]).val(c);
+            else $($input[3]).val(c);
+            updatePreview();
+        },
+    });
     new XNColorPicker({
         color: "#fff",
         selector: ".exlg-fg-slector",
         colorTypeOption: "single,linear-gradient,radial-gradient",
-        onError: () => {},
-        onCancel: () => {},
-        onChange: () => {},
+        onError: () => { },
+        onCancel: () => { },
+        onChange: () => { },
         onConfirm: (color) => {
-            const c = color.colorType === "single" ? color.color.hex : color.color.str
-            is_edit ? $($input[3]).val(c) : $($input[4]).val(c)
-            updatePreview()
-        }
-    })
+            const c = color.colorType === "single" ? color.color.hex : color.color.str;
+            if (is_edit) $($input[3]).val(c);
+            else $($input[4]).val(c);
+            updatePreview();
+        },
+    });
 
     $(".exlg-badge-preview").attr("style", `
         border-radius: 50px;
@@ -149,8 +155,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
         cursor: pointer;
         margin-left: 2px;
         margin-right: 2px;
-    `)
-    $("input[exlg-badge-register]").on("input", updatePreview)
+    `);
+    $("input[exlg-badge-register]").on("input", updatePreview);
 
     /*
     const $board = $("#exlg-alert, #lg-alert")
@@ -187,6 +193,6 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
         .appendTo($btn.parent())
     $submit.on("click", ).appendTo($btn.parent())
     */
-})
+});
 
-export default register_badge
+export default register_badge;

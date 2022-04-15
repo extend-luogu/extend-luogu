@@ -1,1 +1,1 @@
-export let datas = {}
+export const datas = {};

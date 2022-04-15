@@ -3,5 +3,5 @@ export const msg = {
     NONE: -2,
     COMMENT_TAG: -3,
     NOT_A_PROBLEM_ELEMENT: -4,
-    ADD_COMPARE: 1
-}
+    ADD_COMPARE: 1,
+};

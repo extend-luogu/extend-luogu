@@ -1,22 +1,21 @@
-import uindow from "../utils.js"
-import mod from "../core.js"
-import css from "../resources/css/springboard.css"
+import uindow from "../utils.js";
+import mod from "../core.js";
+import css from "../resources/css/springboard.css";
 
-mod.reg_main("springboard", "跨域跳板", [ "@bili/robots.txt?.*", "@/robots.txt?.*" ], null, () => {
-    const q = new URLSearchParams(location.search)
+mod.reg_main("springboard", "跨域跳板", ["@bili/robots.txt?.*", "@/robots.txt?.*"], null, () => {
+    const q = new URLSearchParams(location.search);
     switch (q.get("type")) {
     case "update":
-        uindow.addEventListener("message", e => {
-            e.data.unshift("update")
-            uindow.parent.postMessage(e.data, "*")
-        })
-        break
+        uindow.addEventListener("message", (e) => {
+            e.data.unshift("update");
+            uindow.parent.postMessage(e.data, "*");
+        });
+        break;
     case "page":
-        const url = q.get("url")
-        if (!q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`))
-            document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`
-        break
+        const url = q.get("url");
+        if (!q.get("confirm") || confirm(`是否加载来自 ${url} 的页面？`)) document.body.innerHTML = `<iframe src="${url}" exlg="exlg"></iframe>`;
+        break;
     case "dash":
-        break
+        break;
     }
-}, css)
+}, css);
