@@ -1,5 +1,5 @@
-import mod from "../core.js"
-import { $, cur_time, cs_post } from "../utils.js"
+import mod, { sto } from "../core.js"
+import { $, cur_time, cs_post, lg_usr } from "../utils.js"
 import register_badge from "../components/register-badge.js"
 import css from "../resources/css/sponsor-tag.css"
 
@@ -21,7 +21,11 @@ mod.reg_hook_new("sponsor-tag", "标签显示", [ "@/", "@/paste", "@/discuss/.*
             Object.assign(badges, Object.fromEntries(Object.entries(
                 JSON.parse((await cs_post({
                     url: "https://exlg.piterator.com/badge/mget",
-                    data: JSON.stringify(pending),
+                    data: JSON.stringify({
+                        uid: lg_usr.uid,
+                        token: sto["^token"].token,
+                        data: pending,
+                    }),
                     type: "application/json",
                 })).responseText).data
             ).map(

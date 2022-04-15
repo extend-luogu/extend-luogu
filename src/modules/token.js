@@ -1,7 +1,7 @@
 import mod from "../core.js"
 import { cs_get2, cs_post, $ } from "../utils.js"
 
-mod.reg_chore("token", "EXLG 令牌", "1D", "@/.*", {
+mod.reg_chore("token", "exlg 令牌", "1D", "@/.*", {
     token: { ty: "string", priv: true }
 }, async ({ msto }) => {
     if (unsafeWindow._feInjection.currentUser) {
