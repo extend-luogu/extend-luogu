@@ -23,20 +23,18 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
             <div class="exlg-bg" style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">背景</span>
                 <span class="exlg-bg-slector" style="float: left;"></span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px; line-height: 1.52;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
             </div>
             <div class="exlg-fg" style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">前景</span>
                 <span class="exlg-fg-slector" style="float: left; height: 5px;"></span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px;" class="am-form-field exlg-badge-input" value="#fff" name="username">
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px; line-height: 1.52;" class="am-form-field exlg-badge-input" value="#fff" name="username">
             </div>
             <div style="margin: 5px;margin-bottom: 20px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">预览</span>
                 <span class="exlg-badge-preview"></span>
             </div>
         </div>
-        <br>
-        <small>Powered by <s>Amaze UI</s> 自行研发，去他妈的 Amaze UI</small>
     </div>
 </div>
     `, title_text, async () => {
