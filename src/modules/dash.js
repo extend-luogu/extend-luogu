@@ -68,10 +68,10 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     if ([ "exlg", "gh_index", "debug" ].indexOf(msto.source) === -1) msto.source = "exlg"
 
     const $tar = args.$tar
-    const _right_svg = `<svg class="icon" style="width: 1.2em;height: 1.2em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697"><path d="M644.266667 494.933333l-192 192-29.866667-29.866666 162.133333-162.133334-162.133333-162.133333 29.866667-29.866667 192 192z" fill="#444444" p-id="1698"></path></svg>`
+    // const _right_svg = `<svg class="icon" style="width: 1.2em;height: 1.2em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1697"><path d="M644.266667 494.933333l-192 192-29.866667-29.866666 162.133333-162.133334-162.133333-162.133333 29.866667-29.866667 192 192z" fill="#444444" p-id="1698"></path></svg>`
     const __renew_alink = (_i, e, $e = $(e)) => {
         $e.addClass("exlg-dash-options")
-        e.innerHTML = `<div class="link-title">${e.innerHTML}</div> ${_right_svg}`
+        e.innerHTML = `<div class="link-title">${e.innerHTML}</div>` // ${_right_svg}
     }
     if (args.type === 2) {
         __renew_alink(114514, $tar[0], $tar)

@@ -152,7 +152,7 @@
 .dropdown > .center {
 	padding: 4px 1px 10px;
 }
-.ops>a>.link-title {
+/* .ops>a>.link-title {
 	display: flex;
 	align-items: center;
 }
@@ -174,14 +174,15 @@
 	transition: background-color .3s;
 	margin-bottom: 0.2em;
 	margin-top: 0.2em;
-}
+} */
 .ops>a:hover {
 	background-color: rgb(227,229,231);
+	border-radius: 1em;
 }
 
 .wrapper.hover>.dropdown>.center {
 	font-size: 1.1em;
-	width: 13em;
+	/* width: 13em; */
 }
 
 .exlg-dropdown.field {
