@@ -31,6 +31,7 @@
 // @require        https://cdn.jsdelivr.net/gh/leizongmin/js-xss@1.0.10/dist/xss.min.js
 // @require        https://cdn.jsdelivr.net/gh/markedjs/marked@2.0.1/marked.min.js
 // @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@0.8.3/TM-dat.user.js
+// @require        https://gitee.com/xiannvzuo/xncolorpicker/raw/main/dist/xncolorpicker.min.js
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
@@ -39,5 +40,6 @@
 // @grant          GM_listValues
 // @grant          GM_setClipboard
 // @grant          GM_xmlhttpRequest
+// @grant          GM_getResourceText
 // @grant          unsafeWindow
 // ==/UserScript==

@@ -1,3 +1,4 @@
+/* global XNColorPicker */
 import { $, cur_time, lg_usr, cs_post } from "../utils.js"
 import exlg_alert from "../components/exlg-dialog-board.js"
 import compo from "../compo-core.js"
@@ -7,7 +8,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
     const title_text = `exlg badge ${ is_edit ? "修改" : "注册" }器`
     exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
-        <div style="display:inline-block;text-align: left;padding-top: 10px;">
+        <div class="exlg-badge-register" style="display:inline-block;text-align: left;padding-top: 10px;">
             <div style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">用户uid</span>
                 <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" value=${lg_usr.uid} disabled title="暂不支持为别人注册 badge" name="username">
@@ -19,13 +20,15 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">badge</span>
                 <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您想要的badge" name="username">
             </div>
-            <div style="margin: 5px;">
+            <div class="exlg-bg" style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">背景</span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
+                <span class="exlg-bg-slector" style="float: left;"></span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
             </div>
-            <div style="margin: 5px;">
+            <div class="exlg-fg" style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">前景</span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" value="#fff" name="username">
+                <span class="exlg-fg-slector" style="float: left; height: 5px;"></span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px;" class="am-form-field exlg-badge-input" value="#fff" name="username">
             </div>
             <div style="margin: 5px;margin-bottom: 20px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">预览</span>
@@ -89,6 +92,48 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
         }
     }, false)
 
+    const $board = $("#exlg-container"), $input = $board.find("input")
+
+    const updatePreview = () => {
+        // Note: 当输入数据时加载预览
+        const $board = $("#exlg-container"), $input = $board.find("input")
+        const badge = is_edit ? $input[1].value : $input[2].value
+        const bg = is_edit ? $input[2].value : $input[3].value
+        const fg = is_edit ? $input[3].value : $input[4].value
+        const $preview = $(".exlg-badge-preview")
+        $preview
+            .text(badge)
+            .css("background", bg)
+            .css("color", fg)
+    }
+
+    new XNColorPicker({
+        color: "mediumturquoise",
+        selector: ".exlg-bg-slector",
+        colorTypeOption: "single,linear-gradient,radial-gradient",
+        onError: () => {},
+        onCancel: () => {},
+        onChange: () => {},
+        onConfirm: (color) => {
+            const c = color.colorType === "single" ? color.color.hex : color.color.str
+            is_edit ? $($input[2]).val(c) : $($input[3]).val(c)
+            updatePreview()
+        }
+    })
+    new XNColorPicker({
+        color: "#fff",
+        selector: ".exlg-fg-slector",
+        colorTypeOption: "single,linear-gradient,radial-gradient",
+        onError: () => {},
+        onCancel: () => {},
+        onChange: () => {},
+        onConfirm: (color) => {
+            const c = color.colorType === "single" ? color.color.hex : color.color.str
+            is_edit ? $($input[3]).val(c) : $($input[4]).val(c)
+            updatePreview()
+        }
+    })
+
     $(".exlg-badge-preview").attr("style", `
         border-radius: 50px;
         padding-left: 10px;
@@ -107,18 +152,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
         margin-left: 2px;
         margin-right: 2px;
     `)
-    $("input[exlg-badge-register]").on("input", () => {
-        // Note: 当输入数据时加载预览
-        const $board = $("#exlg-container"), $input = $board.find("input")
-        const badge = is_edit ? $input[1].value : $input[2].value
-        const bg = is_edit ? $input[2].value : $input[3].value
-        const fg = is_edit ? $input[3].value : $input[4].value
-        const $preview = $(".exlg-badge-preview")
-        $preview
-            .text(badge)
-            .css("background", bg)
-            .css("color", fg)
-    })
+    $("input[exlg-badge-register]").on("input", updatePreview)
 
     /*
     const $board = $("#exlg-alert, #lg-alert")
