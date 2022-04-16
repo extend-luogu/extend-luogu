@@ -6,16 +6,15 @@ mod.reg_chore("token", "exlg 令牌", "10m", "@/.*", {
 }, async ({ msto }) => {
     if (unsafeWindow._feInjection.currentUser) {
         if (msto.token) { // Note: token exists
-            const ttl = JSON.parse((await cs_post({
-                url: "https://exlg.piterator.com/token/ttl",
-                data: JSON.stringify({
+            const ttl = (await cs_post(
+                "https://exlg.piterator.com/token/ttl",
+                {
                     uid: unsafeWindow._feInjection.currentUser.uid,
                     token: msto.token,
-                }),
-                type: "application/json",
-            })).responseText);
-            if ( // Note: Expires in more than one day
-                ttl.status !== 401 && ttl.data >= 60 * 60 * 25
+                },
+            )).data;
+            if ( // Note: Expires in more than 15 minutes
+                ttl.status !== 401 && ttl.data >= 60 * 15
             ) return false;
         }
         const paste_id = (await cs_post(
