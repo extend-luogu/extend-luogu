@@ -109,7 +109,16 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
         const $badge = getBadge(uid, bdty === "luogu4" ? e.childNodes[0].style.color : getColor(e), bdty, badge);
         // Note: user 页面的特殊情况
         if (["user-feed", "user-followers"].includes(args.ty)) $tar.parent().after($badge);
-        else $tar.after($badge).after($("<span>&nbsp;</span>"));
+        else {
+            $tar[0].innerHTML = $tar[0].innerHTML.replace(/(\s*$)/g, "");
+            if ($tar.hasClass("sb_amazeui") && !$tar[0].innerHTML) { // Note: 全网犇犇的傻逼写法适配
+                const $nulltar = $tar;
+                $tar = $tar.prev();
+                $tar[0].innerHTML = $tar[0].innerHTML.replace(/(\s*$)/g, "");
+                $nulltar.remove();
+            }
+            $tar.after($badge).after($("<span>&nbsp;</span>"));
+        }
     });
 }))(new Set(), {}, []), (e) => {
     // console.log(e.target)
