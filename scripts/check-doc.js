@@ -1,9 +1,11 @@
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 
+const readlines = (filename) => readFileSync(filename, "utf-8").replace(/\r/g, "").split("\n").filter((i) => i.trim());
+
 let mods = [];
 const entl = {};
-readFileSync("./src/all-modules.js", { encoding: "utf8" }).replaceAll("\r\n", "\n").split("\n")
+readlines("./src/all-modules.js")
     .filter((s) => !s.startsWith("//") && s.trim())
     .forEach((v) => mods = mods.concat(readFileSync(join("src", v.match(/"[^"]+";$/g)[0].slice(1, -2)), { encoding: "utf8" })
         .match(/(^|\n)mod\.reg([^"]*".*?"){2}/g)
@@ -36,7 +38,7 @@ if (mods.length) {
 //     .map(x => x[1].replaceAll("_", " "))
 //     .join("\n"))
 
-readFileSync("./doc/module/module.md", { encoding: "utf8" }).replaceAll("\r\n", "\n").split("\n")
+readlines("./doc/module/module.md")
     .filter((e) => /\(/.test(e))
     .map((e) => e.match(/]\(.*?\)/g)[0].slice(2, -1))
     .forEach((n) => {

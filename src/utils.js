@@ -243,3 +243,5 @@ export const judge_problem = (text) => [
     /^T[1-9][0-9]{0,}$/i,
     /^B[2-9][0-9]{3,}$/i,
 ].some((re) => re.test(text));
+
+export const tupledft_gen = (arr, op) => arr.map((e) => ({ dft: e, ...op }));
