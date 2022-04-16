@@ -1,10 +1,30 @@
 /* global XNColorPicker */
-import { $, cur_time, lg_usr, cs_post } from "../utils.js"
+import { $, cur_time, lg_usr, cs_post, log } from "../utils.js"
 import exlg_alert from "../components/exlg-dialog-board.js"
 import compo from "../compo-core.js"
 import mod, { sto } from "../core.js"
 
+let _added_fucking_api = false
 const register_badge = compo.reg("register-badge", "badge 注册", null, null, is_edit => {
+    // Note: 判断能否使用 eval
+    let _eval_disabled = false
+    try { (0, eval)(`exlg.log("原来\洛谷还有能用 eval 的给人用的页面是吧为什么连这个都不能统一一下的")`) }
+    catch (err) {
+        log("我操他妈的 CSP 傻逼是吧怎么不让我用 eval")
+        _eval_disabled = true
+    }
+    // Note: 引入 api
+    if (!_eval_disabled) {
+        if (!_added_fucking_api) {
+            _added_fucking_api = true
+            try { $(`<script src="https://gitee.com/xiannvzuo/xncolorpicker/raw/main/dist/xncolorpicker.min.js" charset="utf-8" defer=""></script>`).appendTo($("body")) }
+            catch (err) {
+                log("他妈连 script 都插不进来是吧那我要 eval 有什么用")
+                _eval_disabled = true
+            }
+        }
+    }
+    // Note: 原本的主程序
     const title_text = `exlg badge ${ is_edit ? "修改" : "注册" }器`
     exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
     <div style="text-align: center">
@@ -13,10 +33,11 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">用户uid</span>
                 <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" value=${lg_usr.uid} disabled title="暂不支持为别人注册 badge" name="username">
             </div>
-    ${ is_edit ? "" : `<div style="margin: 5px;">
+            <div style="margin: 5px;${is_edit ? "display: none;" : ""}">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">激活码</span>
-                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username"></div>` }
-    <div style="margin: 5px;">
+                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username">
+            </div>
+            <div style="margin: 5px;">
                 <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">badge</span>
                 <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您想要的badge" name="username">
             </div>
@@ -51,11 +72,16 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
             gerr("[Err] 请检查信息是否填写完整")
             return
         }
-
+        const badge = $input[2].value
+        const bg = $input[3].value
+        const fg = $input[4].value
+        // Note: 下面那位你可真是个小天才
         // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
+        /*
         const badge = is_edit ? $input[1].value : $input[2].value
         const bg = is_edit ? $input[2].value : $input[3].value
         const fg = is_edit ? $input[3].value : $input[4].value
+        */
         $title.html("获取并验证令牌...")
         mod.execute("token")
         let request = {
@@ -105,32 +131,46 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, i
             .css("color", fg)
     }
 
-    new XNColorPicker({
-        color: "mediumturquoise",
-        selector: ".exlg-bg-slector",
-        colorTypeOption: "single,linear-gradient,radial-gradient",
-        onError: () => {},
-        onCancel: () => {},
-        onChange: () => {},
-        onConfirm: (color) => {
-            const c = color.colorType === "single" ? color.color.hex : color.color.str
-            is_edit ? $($input[2]).val(c) : $($input[3]).val(c)
-            updatePreview()
+    if (!_eval_disabled) {
+        try {
+            new XNColorPicker({
+                color: "mediumturquoise",
+                selector: ".exlg-bg-slector",
+                colorTypeOption: "single,linear-gradient,radial-gradient",
+                onError: () => {},
+                onCancel: () => {},
+                onChange: () => {},
+                onConfirm: (color) => {
+                    const c = color.colorType === "single" ? color.color.hex : color.color.str
+                    is_edit ? $($input[2]).val(c) : $($input[3]).val(c)
+                    updatePreview()
+                }
+            })
+            new XNColorPicker({
+                color: "#fff",
+                selector: ".exlg-fg-slector",
+                colorTypeOption: "single,linear-gradient,radial-gradient",
+                onError: () => {},
+                onCancel: () => {},
+                onChange: () => {},
+                onConfirm: (color) => {
+                    const c = color.colorType === "single" ? color.color.hex : color.color.str
+                    is_edit ? $($input[3]).val(c) : $($input[4]).val(c)
+                    updatePreview()
+                }
+            })
         }
-    })
-    new XNColorPicker({
-        color: "#fff",
-        selector: ".exlg-fg-slector",
-        colorTypeOption: "single,linear-gradient,radial-gradient",
-        onError: () => {},
-        onCancel: () => {},
-        onChange: () => {},
-        onConfirm: (color) => {
-            const c = color.colorType === "single" ? color.color.hex : color.color.str
-            is_edit ? $($input[3]).val(c) : $($input[4]).val(c)
-            updatePreview()
+        catch (err) {
+            log("看样子刚才没有插进来啊那没事了")
+            _eval_disabled = true
+            $("input.exlg-fg-slector").on("input", updatePreview)
+            $("input.exlg-bg-slector").on("input", updatePreview)
         }
-    })
+    }
+    else {
+        $("input.exlg-fg-slector").on("input", updatePreview)
+        $("input.exlg-bg-slector").on("input", updatePreview)
+    }
 
     $(".exlg-badge-preview").attr("style", `
         border-radius: 50px;
