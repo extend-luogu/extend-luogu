@@ -71,7 +71,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
                 if (e.button === 2) location.href = "https://www.luogu.com.cn/paste/1t9f67wk";
                 else if (e.button === 0) register_badge();
             });
-        return uid === "100250" ? (lg_usr.badge = text, bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${text}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${text}</span>`).css({
+        return uid === "100250" ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${text}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${text}</span>`).css({
             display: "inline-block",
             padding: "0 8px",
             "box-sizing": "border-box",
@@ -95,13 +95,13 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
             uid = $(e.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
         }
         const badge = badges[uid];
-        if (!badge.text) return;
+        if (!badge || !badge.text) return;
         let $tar = $e,
             bdty = "undef";
         if ($tar.next().length && ($tar.next().hasClass("sb_amazeui"))) { $tar = $tar.next(); }
         if ($tar.next().length && $tar.next().hasClass("am-badge")) { $tar = $tar.next(); }
 
-        if (["user-feed", "user-followers", "luogu4-ops"].includes(args.ty)) bdty = "luogu4";
+        if (["user-feed", "user-followers", "no-hook-luogu4"].includes(args.ty)) bdty = "luogu4";
         else if (e.parentNode.tagName.toLowerCase() === "h2") bdty = "luogu3-h2";
         else if (args.ty === "no-hook" && e.parentNode.className === "wrapper" && !e.className.includes("lg-fg-")) return; // console.log("Fail~", e)// Note: 一旦不小心抓到了 .ops 上面不该抓的就不执行
         else bdty = "luogu3";
@@ -136,4 +136,10 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
             ty: "luogu3",
         },
     };
-}, () => ({ tar: $("a[target='_blank'][href^='/user/']"), ty: "no-hook" }), css, "module");
+}, () => {
+    if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
+        if (location.hash === "#activity") return { tar: $(".feed .wrapper>a[target='_blank']"), ty: "no-hook-luogu4" };
+        if (/^#following/.test(location.hash)) return { tar: $(".follow-container .wrapper>a[target='_blank']"), ty: "no-hook-luogu4" };
+    }
+    return { tar: $("a[target='_blank'][href^='/user/']"), ty: "no-hook" };
+}, css, "module");
