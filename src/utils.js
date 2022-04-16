@@ -207,8 +207,10 @@ const judge_problem = text => [
     /^B[2-9][0-9]{3,}$/i
 ].some(re => re.test(text))
 
+const tupledft_gen = (arr, op) => arr.map(e => ({ dft: e, ...op }))
+
 export {
     uindow as default, log, warn, error, xss, version_cmp, cur_time,
     lg_dat, lg_usr, lg_content, lg_alert, lg_post, cs_get, cs_get2, cs_post, springboard, $,
-    judge_problem, get_latest
+    judge_problem, get_latest, tupledft_gen
 }

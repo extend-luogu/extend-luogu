@@ -1,20 +1,17 @@
-import uindow, { $, judge_problem, lg_content } from "../utils.js"
+import uindow, { $, judge_problem, lg_content, tupledft_gen } from "../utils.js"
 import mod from "../core.js"
+import exlg_alert from "../components/exlg-dialog-board.js"
 import css from "../resources/css/rand-problem-ex.css"
 
 mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     exrand_difficulty: {
         ty: "tuple",
-        lvs: [
-            { ty: "boolean", dft: false, strict: true, repeat: 8 }
-        ],
+        lvs: tupledft_gen(Array.from("11111111").map(e => !!e), { ty: "boolean", strict: true }),
         priv: true
     },
     exrand_source: {
         ty: "tuple",
-        lvs: [
-            { ty: "boolean", dft: false, strict: true, repeat: 5 }
-        ],
+        lvs: tupledft_gen(Array.from("10000").map(e => !!e), { ty: "boolean", strict: true }),
         priv: true
     }
 }, ({msto}) => {
@@ -160,7 +157,11 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
             l.forEach((e, i) => {
                 if (msto_proxy[i]) g.push(e.id)
             })
-            if (!g.length) g = _empty
+            if (!g.length) {
+                exlg_alert("您没有设置")
+                g = _empty
+                l.forEach((e, i) => msto_proxy[i] = _empty.includes(e.id))
+            }
             return g[Math.floor(Math.random() * g.length)]
         }, [ dif_list, msto.exrand_difficulty, [ 0, 1, 2, 3, 4, 5, 6, 7 ]], [ src_list, msto.exrand_source, [ "P" ]])
         let res = await lg_content(`/problem/list?difficulty=${result[0]}&type=${result[1]}&page=1`)

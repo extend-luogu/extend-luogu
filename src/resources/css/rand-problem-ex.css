@@ -36,3 +36,8 @@
     width: 49%;
     float: right;
 }
+#exlg-exrand-window {
+    width: 250px;
+    height: 300px;
+    padding: 5px;
+}
