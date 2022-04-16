@@ -14,7 +14,7 @@ mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
         </p>
     `);
     // eslint-disable-next-line no-use-before-define
-    const $search_user = $("#search-user").on("click", func);
+    const $search_user = $("#search-user");
     const func = () => {
         $search_user.prop("disabled", true);
         $.get(`/api/user/search?keyword=${$("[name=username]").val().trim()}`, (res) => {
@@ -24,7 +24,8 @@ mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
             } else location.href = `/user/${res.users[0].uid}`;
         });
     };
-    $("#search-user-input").keydown((e) => { if (e.key === "Enter") func(); });
+    $search_user.on("click", func);
+    $("#search-user-input").whenKey("Enter", func);
 }, `
 `, "module");
 
