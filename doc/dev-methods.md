@@ -23,7 +23,7 @@
 - `lg_content(url)`
 - `lg_post(url, data)`
 - `cs_get({ url, onload })` and `cs_get2(url) -> Promise`
-- `cs_post({ url, data, type, header })`
+- `cs_post(url, data, header, type)`
 
 ### Notifications
 

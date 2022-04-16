@@ -9,10 +9,10 @@ mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+", "@/
         canvas.height = img[0].height;
         canvas.getContext("2d").drawImage(img[0], 0, 0);
         const input = $("input[placeholder$='验证码']")[0];
-        input.value = (await cs_post({
-            url: "https://luogu-captcha-bypass.piterator.com/predict/",
-            data: canvas.toDataURL("image/jpeg"),
-        })).responseText;
+        input.value = await cs_post(
+            "https://luogu-captcha-bypass.piterator.com/predict/",
+            canvas.toDataURL("image/jpeg"),
+        ).responseText;
         input.dispatchEvent(new Event("input"));
     };
     if (img.length) { // /auth/login and /discuss/*

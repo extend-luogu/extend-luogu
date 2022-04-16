@@ -150,27 +150,42 @@ export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xml
 });
 
 // Note: cs_get 的 Promise 版本
-export const cs_get2 = (url) => new Promise((resolve, reject) => {
-    GM_xmlhttpRequest({
-        url,
-        method: "GET",
-        onload: (e) => resolve(e),
-        onerror: (e) => reject(e),
+export const cs_get2 = (url, headers = {}) => {
+    const res = new Promise((resolve, onerror) => {
+        GM_xmlhttpRequest({
+            url,
+            method: "GET",
+            headers,
+            onload: (r) => {
+                try {
+                    r.data = JSON.parse(r.responseText);
+                } catch (e) { } // eslint-disable-line no-empty
+                resolve(r);
+            },
+            onerror,
+        });
     });
-});
+    return chain(res);
+};
 
-export const cs_post = ({
-    url, data, type, header,
-}) => new Promise((resolve, reject) => {
-    GM_xmlhttpRequest({
-        url,
-        method: "POST",
-        data,
-        headers: { "Content-Type": type, ...header },
-        onload: (e) => resolve(e),
-        onerror: (e) => reject(e),
+export const cs_post = (url, data, header = {}, type = "application/json") => {
+    const res = new Promise((resolve, onerror) => {
+        GM_xmlhttpRequest({
+            url,
+            method: "POST",
+            data: typeof data !== "string" ? JSON.stringify(data) : data,
+            headers: { "Content-Type": typeof data === "string" ? type : "application/json", ...header },
+            onload: (r) => {
+                try {
+                    r.data = JSON.parse(r.responseText);
+                } catch (e) { } // eslint-disable-line no-empty
+                resolve(r);
+            },
+            onerror,
+        });
     });
-});
+    return chain(res);
+};
 
 export const get_latest = (callbackfn) => {
     cs_get({

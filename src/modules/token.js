@@ -18,29 +18,27 @@ mod.reg_chore("token", "exlg 令牌", "1D", "@/.*", {
                 ttl.status !== 401 && ttl.data >= 60 * 60 * 25
             ) return false;
         }
-        const paste_id = JSON.parse((await cs_post({
-            url: "https://www.luogu.com.cn/paste/new?_contentOnly",
-            data: JSON.stringify({
-                data: JSON.parse((await cs_get2(
-                    "https://exlg.piterator.com/token/generate",
-                )).responseText).data,
+        const paste_id = await cs_post(
+            "https://www.luogu.com.cn/paste/new?_contentOnly",
+            {
+                data: await cs_get2("https://exlg.piterator.com/token/generate").data,
                 public: true,
-            }),
-            type: "application/json",
-            header: {
+            },
+            {
                 "x-csrf-token": $("[name='csrf-token']").attr("content"),
                 referer: "https://www.luogu.com.cn/paste",
             },
-        })).responseText).id;
-        msto.token = JSON.parse((await cs_get2(
+        ).data.id;
+        msto.token = await cs_get2(
             `https://exlg.piterator.com/token/verify/${paste_id}`,
-        )).responseText).data.token;
-        await cs_post({
-            url: `https://www.luogu.com.cn/paste/delete/${paste_id}?_contentOnly`,
-            header: {
+        ).data.data.token;
+        await cs_post(
+            `https://www.luogu.com.cn/paste/delete/${paste_id}?_contentOnly`,
+            {},
+            {
                 "x-csrf-token": $("[name='csrf-token']").attr("content"),
                 referer: "https://www.luogu.com.cn/paste",
             },
-        });
+        );
     } else return true;
 });

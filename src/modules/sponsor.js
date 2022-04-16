@@ -21,15 +21,14 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
     if (pending.length) {
         promises.push((async () => {
             Object.assign(badges, Object.fromEntries(Object.entries(
-                JSON.parse((await cs_post({
-                    url: "https://exlg.piterator.com/badge/mget",
-                    data: JSON.stringify({
+                await cs_post(
+                    "https://exlg.piterator.com/badge/mget",
+                    {
                         uid: lg_usr.uid,
                         token: sto["^token"].token,
                         data: pending,
-                    }),
-                    type: "application/json",
-                })).responseText).data,
+                    },
+                ).data.data,
             ).map(
                 ([uid, badge]) => [uid, Object.assign(badge, { ts: cur_time() })],
             )));

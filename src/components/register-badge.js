@@ -102,12 +102,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             request.activation = $input[1].value;
         }
         $title.html("请求中...");
-        const res = (await cs_post({
-            url: "https://exlg.piterator.com/badge/set",
-            data: JSON.stringify(request),
-            type: "application/json",
-        })).responseText;
-        const res_json = JSON.parse(decodeURIComponent(res));
+        const res_json = await cs_post("https://exlg.piterator.com/badge/set", request).data;
         if ("error" in res_json) {
             $title.html("[Err] 失败");
             exlg_alert(res_json.error, "激活 badge 出错");
