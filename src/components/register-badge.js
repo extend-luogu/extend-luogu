@@ -7,26 +7,16 @@ import exlg_alert from "./exlg-dialog-board.js";
 import compo from "../compo-core.js";
 import mod, { sto } from "../core.js";
 
-let _added_fucking_api = false;
 const register_badge = compo.reg("register-badge", "badge 注册", null, null, (is_edit) => {
-    // Note: 判断能否使用 eval
+    // Note: 引入 API 即判断能否使用 eval
     let _eval_disabled = false;
     try {
         // eslint-disable-next-line no-eval
-        (0, eval)(`exlg.log("原来洛谷还有能用 eval 的给人用的页面是吧为什么连这个都不能统一一下的")`);
+        (0, eval)(GM_getResourceText("colorpicker"));
+        log("原来洛谷还有能用 eval 的给人用的页面是吧为什么连这个都不能统一一下的");
     } catch (err) {
         log("我操他妈的 CSP 傻逼是吧怎么不让我用 eval");
         _eval_disabled = true;
-    }
-    // Note: 引入 api
-    if (!_eval_disabled) {
-        if (!_added_fucking_api) {
-            _added_fucking_api = true;
-            try { $(`<script src="https://gitee.com/xiannvzuo/xncolorpicker/raw/main/dist/xncolorpicker.min.js" charset="utf-8" defer=""></script>`).appendTo($("body")); } catch (err) {
-                log("他妈连 script 都插不进来是吧那我要 eval 有什么用");
-                _eval_disabled = true;
-            }
-        }
     }
     // Note: 原本的主程序
     const title_text = `exlg badge ${is_edit ? "修改" : "注册"}器`;

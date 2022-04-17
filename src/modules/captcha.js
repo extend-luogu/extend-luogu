@@ -15,10 +15,10 @@ mod.reg("captcha", "验证码自动填充", ["@/auth/login", "@/discuss/.+", "@/
         ).responseText;
         input.dispatchEvent(new Event("input"));
     };
-    if (img.length) { // /auth/login and /discuss/*
+    if (img.length) { // Note: 登陆和讨论
         img.click();
         img[0].onload = autofill;
-    } else { // /image
+    } else { // Note: 图床
         $(document).on("focus", "input[placeholder$='验证码']", () => {
             img = $("#--swal-image-hosting-upload-captcha");
             img[0].onload = autofill;

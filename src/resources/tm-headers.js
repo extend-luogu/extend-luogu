@@ -32,6 +32,8 @@
 // @require        https://cdn.jsdelivr.net/gh/markedjs/marked@2.0.1/marked.min.js
 // @require        https://cdn.jsdelivr.net/gh/ForkKILLET/TM-dat@0.8.3/TM-dat.user.js
 //
+// @resource       colorpicker https://gitee.com/xiannvzuo/xncolorpicker/raw/main/dist/xncolorpicker.min.js
+//
 // @grant          GM_addStyle
 // @grant          GM_getValue
 // @grant          GM_setValue
