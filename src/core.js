@@ -4,6 +4,7 @@ import uindow, {
 import icon_b from "./resources/logo.js";
 import category from "./category.js";
 import { datas } from "./storage.js";
+import queues from "./run-queue.js";
 
 // eslint-disable-next-line import/no-mutable-exports
 export let sto = null;
@@ -58,6 +59,112 @@ const mod = {
     reg_pre: (name, info, path, data, pre, func, styl, cate) => {
         mod.reg(name, info, path, data, func, styl, cate);
         mod._.set(name, { pre, ...mod._.get(name) });
+    },
+
+    _regv2_invoker: (gpth, msto) => {
+        const pth_modify = (pth) => {
+            if (!Array.isArray(pth)) {
+                pth = [pth];
+            }
+            return pth.map((p) => {
+                mod.path_alias.some(([re, url]) => {
+                    if (!p.match(re)) return false;
+                    p = p.replace(re, `${url}/`);
+                    return true;
+                });
+
+                if (!p.endsWith("$")) p += "$";
+                return p;
+            });
+        };
+
+        gpth = pth_modify(gpth);
+        const qpusher = (nm, pth, qn, fn) => {
+            pth = pth ? pth_modify(pth) : [];
+            if (pth.concat(gpth).some((e) => RegExp(e).test(location.href))) {
+                queues[qn].push((...arg) => fn({ ...((nm in msto.private) && { msto: msto.private[nm] }), gsto: msto.public, ...arg }));
+            }
+        };
+        return {
+            onload: ({ name, path }, _, fn) => qpusher(name, path, "onload", fn),
+            preload: ({ name, path }, _, fn) => qpusher(name, path, "preload", fn),
+            chore: ({ name, period }, _, fn) => {
+                if (typeof period === "string") {
+                    const num = +period.slice(0, -1),
+                        unit = {
+                            s: 1000,
+                            m: 1000 * 60,
+                            h: 1000 * 60 * 60,
+                            D: 1000 * 60 * 60 * 24,
+                        }[period.slice(-1)];
+                    if (!isNaN(num) && unit) period = num * unit;
+                    else error(`Parsing period failed: "${period}"`);
+                }
+
+                qpusher(name, "@/.*", "preload", async (arg) => {
+                    const last = arg.msto.last_chore,
+                        now = cur_time(1);
+
+                    if (!last || now - last > period) {
+                        if (await fn(arg)) { warn(`Chore failed: "${name}"`); } else { arg.msto.last_chore = cur_time(1); }
+                    } else log(`Pending chore: "${name}"`);
+                });
+            },
+
+            // Note: 这东西被枪毙的时间不远了
+            hook: ({ name, path }, _, fn, hook) => qpusher(name, path, "preload", (arg) => {
+                $("body").bind("DOMNodeInserted", (e) => {
+                    if (!e.target.tagName) { return false; }
+                    const res = hook(e);
+                    return res.result && fn({ ...arg, ...res });
+                });
+            }),
+        };
+    },
+
+    reg_v2: ({
+        name, info, path, cate,
+    }, data, reger, styl) => {
+        const rawName = category.alias(cate) + name;
+        datas[rawName] = {
+            ty: "object",
+            lvs: {
+                public: {
+                    ty: "object",
+                    lvs: Object.fromEntries(Object.entries(data).filter(([e]) => e !== "on")),
+                },
+                private: {
+                    ty: "object",
+                    lvs: {},
+                },
+                on: { ty: "boolean", dft: data.on?.dft ?? true },
+            },
+        };
+        const subfuncs = [];
+        const _regv2_data_reger = (rtd) => {
+            const mdf = (nm, dat) => dat && (rtd.private.lvs[nm] = {
+                ty: "object",
+                lvs: dat,
+            });
+            return new Proxy({
+                onload: (e, dat) => mdf(e.name, dat),
+                preload: (e, dat) => mdf(e.name, dat),
+                chore: (e, dat) => mdf(e.name, {
+                    ...dat,
+                    last_chore: { ty: "number", dft: -1, priv: true },
+                }),
+                hook: (e, dat) => mdf(e.name, dat),
+            }, {
+                get: (e, v) => ((...arg) => {
+                    subfuncs.push([v, ...arg]);
+                    e[v](...arg);
+                }),
+            });
+        };
+        reger(_regv2_data_reger(datas[rawName].lvs));
+        mod._.set(name, {
+            info, path, data, func: reger, subfuncs, styl, cate,
+        });
     },
 
     reg_main: (name, info, path, data, func, styl) => mod.reg(name, info, path, data, (arg) => { func(arg); return false; }, styl, "core"),
@@ -193,6 +300,29 @@ const mod = {
         const x = mod.find(name);
         x.on = true;
         mod._.set(name, x);
+    },
+
+    execute_v2: () => {
+        /*
+        if (name) {
+            const m = mod.find(name);
+            if (!m) {
+                error("233");
+            }
+            m.func((nm, _, fn) => fn({
+                msto: sto[category.alias(m.cate) + nm].private[nm],
+                gsto: sto[category.alias(m.cate) + nm].public,
+            }));
+        }
+        */
+        for (const [nm, m] of mod._.entries()) {
+            if (sto[category.alias(m.cate) + nm].on && m.subfuncs) {
+                const handler = mod._regv2_invoker(m.path, sto[category.alias(m.cate) + nm]);
+                for (const e of m.subfuncs) {
+                    handler[e[0]](...e.slice(1));
+                }
+            }
+        }
     },
 
     preload: (name) => {

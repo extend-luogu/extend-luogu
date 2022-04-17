@@ -1,5 +1,4 @@
 ## 模块
-- [获取 AtCoder 难度](./atdiff-fetch.md)
 - [返回比赛列表](./back-to-contest.md)
 - [全网犇犇](./benben.md)
 - [CtrlEnter发送犇犇](./benben-quickpost.md)
