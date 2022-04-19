@@ -368,12 +368,12 @@ const mod = {
             if (!m) error(`Executing named mod but not found: "${name}"`);
             if (m.styl) GM_addStyle(m.styl);
             log(`Executing ${named ? "named " : ""}mod: "${m.name}"`);
-            try {
-                if ("pred" in m) return m.func({ msto: sto[category.alias(m.cate) + m.name], named, pred: m.pred });
-                return m.func({ msto: sto[category.alias(m.cate) + m.name], named });
-            } catch (err) {
-                warn(err);
-            }
+            // try {
+            if ("pred" in m) return m.func({ msto: sto[category.alias(m.cate) + m.name], named, pred: m.pred });
+            return m.func({ msto: sto[category.alias(m.cate) + m.name], named });
+            // } catch (err) {
+            //     warn(err);
+            // }
         };
         if (name) {
             const m = mod.find(name);
