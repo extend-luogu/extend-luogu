@@ -53,6 +53,7 @@ buildSync({
     },
     loader: {
         ".css": "text",
+        ".html": "text",
     },
     bundle: true,
     charset: "utf8",

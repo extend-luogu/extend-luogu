@@ -212,25 +212,7 @@ export const lg_content = (url) => new Promise((res, rej) => {
         res(data);
     });
 });
-/*
-const exlg_alert_onaction = uindow.show_alert ? () => true : () => {
-    if (! ` ${document.body.className.split(' ')} `.includes("lg-alert-built")) {
-        $(document.head).append($(`<link rel="stylesheet" href="https://cdn.luogu.com.cn/css/amazeui.min.css">`))
-        $(`<div class="am-modal am-modal-alert am-modal-out" tabindex="-1" id="exlg-alert" style="display: none; margin-top: -40px;">
-            <div class="am-modal-dialog">
-                <div class="am-modal-hd" id="exlg-alert-title"></div>
-                <div class="am-modal-bd" id="exlg-alert-message"></div>
-                <div class="am-modal-footer">
-                    <span class="am-modal-btn">确定</span>
-                </div>
-            </div></div>`).appendTo($(document.body))
-        $(document.body).addClass("lg-alert-built")
-        return false
-        // Note: 阅读 Amaze UI 源码得出搞法
-    }
-    return true
-}
-*/
+
 export const lg_alert = (msg, title = "exlg 提醒您") => (uindow.show_alert
     ? uindow.show_alert(title, msg)
     : uindow.alert(`${title}\n${msg}`));

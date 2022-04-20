@@ -1,0 +1,74 @@
+<div class="exlg-unselectable exlg-badge-page" style="font-family: Consolas;white-space: nowrap;text-align: left;">
+    
+    <style>
+    .box {width:50%; float:left; display:inline;}
+    </style>
+    <div class="container">
+    <div class="box"><span style="margin: 5px;">
+        <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">uid</span>
+        <input id="regbadge-input-uid" exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" value="" disabled title="暂不支持为别人注册 badge" name="username"/>
+    </span><br/>
+    <span style="margin: 5px;">
+        <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">active</span>
+        <input id="regbadge-input-active" exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username"/>
+    </span><br/><br/>
+    <span style="margin: 5px;">
+        <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">type</span>
+        <select id="regbadge-type-select" exlg-badge-register type="select" style="padding: .1em;width: auto;display: inline;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username" value="3">
+            <option value="3">luogu3(default)</option>
+            <option value="4">luogu4</option>
+        </select>
+    </span><br/>
+    <span style="margin: 5px;">
+        <span style="height: 1.5em;float: left;padding: .1em;width: 5em;"> </span>
+        <span style="float: left;margin-left: 5px;"><button  id="regbadge-button-recoverall">恢复默认设置</button><br/>
+        <button id="regbadge-button-recover43">恢复为洛谷3设置</button><br/>
+        <button id="regbadge-button-outprint">导出json设置</button></span>
+    </span>
+    </div>
+    <div class="box" id="regbadge-settings">
+        <div class="exlg-bg" style="margin: 5px;">
+            <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">背景</span>
+            <span class="exlg-bg-slector" style="float: left;"></span>
+            <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
+        </div>
+        <div class="exlg-fg" style="margin: 5px;">
+            <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">前景</span>
+            <span class="exlg-fg-slector" style="float: left; height: 5px;"></span>
+            <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" value="#fff" name="username">
+        </div>
+    </div>
+    <div id="regbadge-preview" style="width: 100%;display: flex;">114</div>
+    </div>
+</div>
+
+<!--div style="text-align: center">
+        <div class="exlg-badge-register" style="display:inline-block;text-align: left;padding-top: 10px;">
+            <div style="margin: 5px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">用户uid</span>
+                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" value=${lg_usr.uid} disabled title="暂不支持为别人注册 badge" name="username">
+            </div>
+            <div style="margin: 5px;>
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">激活码</span>
+                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username">
+            </div>
+            <div style="margin: 5px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">badge</span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您想要的badge" name="username">
+            </div>
+            <div class="exlg-bg" style="margin: 5px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">背景</span>
+                <span class="exlg-bg-slector" style="float: left;"></span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px; line-height: 1.52;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
+            </div>
+            <div class="exlg-fg" style="margin: 5px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">前景</span>
+                <span class="exlg-fg-slector" style="float: left; height: 5px;"></span>
+                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px; line-height: 1.52;" class="am-form-field exlg-badge-input" value="#fff" name="username">
+            </div>
+            <div style="margin: 5px;margin-bottom: 20px;">
+                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">预览</span>
+                <span class="exlg-badge-preview"></span>
+            </div>
+        </div>
+    </div-->

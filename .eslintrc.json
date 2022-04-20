@@ -96,6 +96,7 @@
         "load_dat": true,
         "save_dat": true,
         "clear_dat": true,
-        "raw_dat": true
+        "raw_dat": true,
+        "GM_listValues": true
     }
 }
