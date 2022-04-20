@@ -113,7 +113,7 @@ mod.reg(
     "CtrlEnter发送犇犇",
     "@/",
     null,
-    () => $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").click()),
+    () => $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").trigger("click")),
     `
 `,
     "module",

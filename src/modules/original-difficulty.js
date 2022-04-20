@@ -10,7 +10,7 @@ mod.reg_v2({
     cate: "module",
 }, {
     cf_src: {
-        ty: "enum", dft: "codeforces.com", vals: ["codeforces.com", "codeforces.ml"], info: [
+        ty: "enum", dft: "codeforces.com", vals: ["codeforces.com", "codeforces.ml", "codeforc.es"], info: [
             "Codeforces problem source", "CF 题目源",
         ],
     },
@@ -54,7 +54,7 @@ mod.reg_v2({
             });
         } else {
             const atdif = JSON.parse(gsto.atdiff);
-            const pid = lg_dat.problem.description.match(/"^.{22}[-./A-Za-z0-9_]*"/g)[0].match(/"[^/]*$"/g)[0];
+            const pid = lg_dat.problem.description.match(/^.{22}[-./A-Za-z0-9_]*/g)[0].match(/[^/]*$/g)[0];
             if (pid in atdif) {
                 resolve(Math.round(atdif[pid] >= 400 ? atdif[pid] : 400 / Math.exp(1.0 - atdif[pid] / 400)));
             } else {

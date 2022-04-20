@@ -22,6 +22,7 @@
 // @connect        bens.rotriw.com
 // @connect        codeforces.com
 // @connect        codeforces.ml
+// @connect        codeforc.es
 // @connect        kenkoooo.com
 // @connect        api.github.com
 // @connect        exlg.piterator.com
