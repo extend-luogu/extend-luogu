@@ -63,6 +63,7 @@ mod.reg_v2({
         }
     }));
 
+    let lastHookedUrl = ""; // Note: 写成 url 避免傻逼洛谷切页面不刷新
     handler.hook({
         name: "difficulty-display",
         info: "显示原始难度",
@@ -76,10 +77,17 @@ mod.reg_v2({
         $status.text("获取中");
         dif.then((d) => $status.text(d ?? "不可用"));
     }, (e) => {
+        if (lastHookedUrl === location.href) {
+            return false;
+        }
         const tmp = e.target.querySelectorAll && e.target.querySelectorAll("div.stat > div.field");
-        return {
-            result: tmp?.length > 0,
-            target: tmp,
-        };
+        if (tmp?.length > 0) {
+            lastHookedUrl = location.href;
+            return {
+                result: true,
+                target: tmp,
+            };
+        }
+        return { result: false };
     });
 });
