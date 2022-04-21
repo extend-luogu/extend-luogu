@@ -10,13 +10,13 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
     badges: { ty: "string", priv: true },
 }, ((loaded, badges, promises) => (async ({ msto, args }) => {
     if ($.isEmptyObject(badges) && msto.badges) { Object.assign(badges, JSON.parse(msto.badges)); }
-    // eslint-disable-next-line array-callback-return
     const pending = args.tar.map((_, e) => {
         const uid = e.attributes.href.value.slice("/user/".length);
         if (!loaded.has(uid) && !(uid in badges && cur_time() - badges[uid].ts <= msto.cache)) {
             loaded.add(uid);
             return uid;
         }
+        return null;
     }).get();
     if (pending.length) {
         promises.push((async () => {
@@ -66,12 +66,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
                 "font-size": fs || "",
                 border: bd || "",
             })
-            .off("contextmenu")
-            .on("contextmenu", () => false)
-            .on("mousedown", (e) => {
-                if (e.button === 2) location.href = "https://www.luogu.com.cn/paste/1t9f67wk";
-                else if (e.button === 0) register_badge();
-            });
+            .on("click", register_badge);
         return uid === "100250" ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${text}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${text}</span>`).css({
             display: "inline-block",
             padding: "0 8px",
@@ -97,6 +92,11 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
         }
         const badge = badges[uid];
         if (!badge || !badge.text) return;
+        if (!Object.keys(badge).includes("lg4")) badge.lg4 = {};
+        ["bg", "fg", "ft", "fw", "bd", "fs", "text"].forEach((k) => {
+            badge.lg4[k] ||= badge[k];
+        });
+
         let $tar = $e,
             bdty = "undef";
         if ($tar.next().length && ($tar.next().hasClass("sb_amazeui"))) { $tar = $tar.next(); }
@@ -107,7 +107,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
         else if (args.ty === "no-hook" && e.parentNode.className === "wrapper" && !e.className.includes("lg-fg-")) return; // console.log("Fail~", e)// Note: 一旦不小心抓到了 .ops 上面不该抓的就不执行
         else bdty = "luogu3";
 
-        const $badge = getBadge(uid, bdty === "luogu4" ? e.childNodes[0].style.color : getColor(e), bdty, badge);
+        const $badge = getBadge(uid, bdty === "luogu4" ? e.childNodes[0].style.color : getColor(e), bdty, bdty === "luogu4" ? badge.lg4 : badge);
         // Note: user 页面的特殊情况
         if (["user-feed", "user-followers"].includes(args.ty)) $tar.parent().after($badge);
         else {

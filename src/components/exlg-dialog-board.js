@@ -29,22 +29,22 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
             _mon_flag = false;
         });
     const [$cont, $head, $main, $close] = ["#exlg-container", "#exlg-dialog-title", "#exlg-dialog-content", "#header-right"].map((n) => $wrap.find(n));
-    const [$accept, $cancel] = (msto.confirm_position === "right" ? [0, 1] : [1, 0]).map((n) => $wrap.find(`button[btn-rnk="${n}"]`));
+    const [$confirm, $cancel] = (msto.confirm_position === "right" ? [0, 1] : [1, 0]).map((n) => $wrap.find(`button[btn-rnk="${n}"]`));
 
-    $accept.text("确定");
+    $confirm.text("确定");
     $cancel.text("取消");
 
-    $accept.on("click", () => {
-        if (brd.action.onaccept?.() ?? true) brd.hide_dialog();
-        brd.resolve_result("accepted");
+    $confirm.on("click", async () => {
+        if (await brd.action.onconfirm?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("confirmed");
     });
-    $cancel.on("click", () => {
-        if (brd.action.oncancel?.() ?? true) brd.hide_dialog();
+    $cancel.on("click", async () => {
+        if (await brd.action.oncancel?.() ?? true) brd.hide_dialog();
         brd.resolve_result("canceled");
     });
-    $close.on("click", () => {
-        if (brd.action.onclose?.() ?? true) brd.hide_dialog();
-        brd.resolve_result("close");
+    $close.on("click", async () => {
+        if (await brd.action.onclose?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("closed");
     });
 
     // Note: 下面那么写是为了强迫症（
@@ -86,7 +86,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     action = {},
     { width, min_height } = {},
 ) => {
-    brd.action = typeof action === "function" ? { onaccept: action } : action;
+    brd.action = typeof action === "function" ? { onconfirm: action } : action;
     brd.dom.$head.html(title);
     brd.dom.$main.html(text ?? "exlg 提醒您");
     brd.dom.$cont.css({
@@ -94,6 +94,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
         width,
     });
     brd.show_dialog();
+    brd.action.onopen?.();
     return brd;
 }, css);
 
