@@ -31,3 +31,4 @@
 - [用户首页 HTML 显示](./user-intro-ins.md)
 - [题目颜色数量和比较](./user-problem-color.md)
 - [创建重现赛](./virtual-participation.md)
+- [元讨论引导](./meta-discussion-guiding.md)

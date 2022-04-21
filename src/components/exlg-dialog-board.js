@@ -23,30 +23,38 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     },
 }, ({ msto }) => {
     let _mon_flag = false;
-    // log(bhtml);
     const $wrap = $(bhtml).appendTo($(document.body))
         .on("mouseup", () => {
             // if (_mon_flag) brd.hide_dialog(); // Note: 有 bug, 弃用了
             _mon_flag = false;
         });
-    const [$cont, $head, $main, $clos] = ["#exlg-container", "#exlg-dialog-title", "#exlg-dialog-content", "#header-right"].map((n) => $wrap.find(n));
-    const [$cfrm, $canl] = (msto.confirm_position === "right" ? [0, 1] : [1, 0]).map((n) => $wrap.find(`button[btn-rnk="${n}"]`));
+    const [$cont, $head, $main, $close] = ["#exlg-container", "#exlg-dialog-title", "#exlg-dialog-content", "#header-right"].map((n) => $wrap.find(n));
+    const [$accept, $cancel] = (msto.confirm_position === "right" ? [0, 1] : [1, 0]).map((n) => $wrap.find(`button[btn-rnk="${n}"]`));
 
-    $cfrm.text("确定");
-    $canl.text("取消");
+    $accept.text("确定");
+    $cancel.text("取消");
 
-    $cfrm.on("click", () => brd.accept_dialog());
-    $canl.on("click", () => brd.hide_dialog());
-    $clos.on("click", () => brd.hide_dialog());
+    $accept.on("click", () => {
+        if (brd.action.onaccept?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("accepted");
+    });
+    $cancel.on("click", () => {
+        if (brd.action.oncancel?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("canceled");
+    });
+    $close.on("click", () => {
+        if (brd.action.onclose?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("close");
+    });
+
     // Note: 下面那么写是为了强迫症（
     $cont.on("click", (e) => e.stopPropagation());
     $cont.on("mousedown", (e) => ((_mon_flag = true) && e.stopPropagation()));
     if (msto.animation_speed !== "0s") $cont.css("transition", msto.animation_speed);
 
     brd = {
-        onaccept: () => true,
         dom: {
-            $wrap, $cont, $head, $main, $clos,
+            $wrap, $cont, $head, $main, $close,
         },
         wait_time: {
             "0s": 0, ".2s": 100, ".25s": 250, ".4s": 400,
@@ -54,33 +62,39 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
         show_dialog() {
             this.dom.$wrap.css("display", "flex");
             setTimeout(() => {
-                this.dom.$cont.removeClass("container-hide")
-                    .addClass("container-show");
+                this.dom.$cont.removeClass("container-hide").addClass("container-show");
             }, 50);
         },
         hide_dialog() {
-            this.dom.$cont.addClass("container-hide")
-                .removeClass("container-show");
+            this.dom.$cont.addClass("container-hide").removeClass("container-show");
             setTimeout(() => this.dom.$wrap.hide(), this.wait_time);
+            this.resolve_result("cancel");
         },
-        async accept_dialog() {
-            try {
-                if (await this.onaccept() === true) this.hide_dialog();
-            } catch (err) {
-                console.log(err);
-            }
+        resolve_result(res) {
+            this._resolve?.(res);
+        },
+        then() {
+            return new Promise((resolve) => {
+                this._resolve = resolve;
+            });
         },
     };
-}, (_, text = "", title = "exlg 提醒您", confirmAction = () => true, immediateAction = () => {}, { width, min_height } = {}) => {
-    brd.onaccept = confirmAction;
+}, (
+    _,
+    text = "",
+    title = "exlg 提醒您",
+    action = {},
+    { width, min_height } = {},
+) => {
+    brd.action = typeof action === "function" ? { onaccept: action } : action;
     brd.dom.$head.html(title);
-    brd.dom.$main.html(text);
+    brd.dom.$main.html(text ?? "exlg 提醒您");
     brd.dom.$cont.css({
-        "min-height": min_height || "",
-        width: width || "",
+        "min-height": min_height,
+        width,
     });
     brd.show_dialog();
-    immediateAction();
+    return brd;
 }, css);
 
 // export { exlg_alert as default };

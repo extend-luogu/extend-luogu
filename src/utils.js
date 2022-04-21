@@ -117,6 +117,8 @@ Array.prototype.lastElem = function () {
 
 // ==Utilities==Functions==
 
+export const sleep = t => new Promise(res => setTimeout(res, t));
+
 export const version_cmp = (v1, v2) => {
     if (!v1) return "<<";
 

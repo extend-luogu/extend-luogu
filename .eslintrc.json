@@ -85,7 +85,9 @@
         "no-multi-assign": "off",
         "import/no-extraneous-dependencies": "off",
         "no-script-url": "off",
-        "no-template-curly-in-string": "off"
+        "no-template-curly-in-string": "off",
+		"no-promise-executor-return": "off",
+		"arrow-parens": "off"
     },
     "globals": {
         "marked": true,
