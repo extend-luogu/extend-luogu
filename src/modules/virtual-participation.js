@@ -78,8 +78,8 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                         }`,
                     );
                 } catch {
-                    exlg_alert("<p>本场比赛的题目不公开</p>", "重现赛创建失败");
-                    return;
+                    setTimeout(exlg_alert("<p>本场比赛的题目不公开</p>", "重现赛创建失败"), 500);
+                    return false;
                 }
                 const pc = await lg_content(`/contest/edit/${vp_id}`);
                 // Note: 自己创建的比赛自己不会自动加入
@@ -88,7 +88,9 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 exlg_alert(`<p>邀请码: ${pc.currentData.contest.joinCode}</p>
                     <p>点确定自动跳转</p>`, "重现赛创建成功", () => {
                     location.href = `https://www.luogu.com.cn/contest/${vp_id}`;
+                    return true;
                 });
-            }, false);
+                return false;
+            });
         });
 }, css, "module");

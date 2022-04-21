@@ -26,7 +26,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     // log(bhtml);
     const $wrap = $(bhtml).appendTo($(document.body))
         .on("mouseup", () => {
-            if (_mon_flag) brd.hide_dialog();
+            // if (_mon_flag) brd.hide_dialog(); // Note: 有 bug, 弃用了
             _mon_flag = false;
         });
     const [$cont, $head, $main, $clos] = ["#exlg-container", "#exlg-dialog-title", "#exlg-dialog-content", "#header-right"].map((n) => $wrap.find(n));
@@ -40,7 +40,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     $clos.on("click", () => brd.hide_dialog());
     // Note: 下面那么写是为了强迫症（
     $cont.on("click", (e) => e.stopPropagation());
-    $cont.on("mousedown", (e) => (_mon_flag = true && e.stopPropagation()));
+    $cont.on("mousedown", (e) => ((_mon_flag = true) && e.stopPropagation()));
     if (msto.animation_speed !== "0s") $cont.css("transition", msto.animation_speed);
 
     brd = {
@@ -63,12 +63,16 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
                 .removeClass("container-show");
             setTimeout(() => this.dom.$wrap.hide(), this.wait_time);
         },
-        accept_dialog() {
-            if (this.onaccept()) this.hide_dialog();
+        async accept_dialog() {
+            try {
+                if (await this.onaccept() === true) this.hide_dialog();
+            } catch (err) {
+                console.log(err);
+            }
         },
     };
-}, (_, text = "", title = "exlg 提醒您", action = () => true, { width, min_height } = {}) => {
-    brd.onaccept = action;
+}, (_, text = "", title = "exlg 提醒您", confirmAction = () => true, immediateAction = () => {}, { width, min_height } = {}) => {
+    brd.onaccept = confirmAction;
     brd.dom.$head.html(title);
     brd.dom.$main.html(text);
     brd.dom.$cont.css({
@@ -76,6 +80,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
         width: width || "",
     });
     brd.show_dialog();
+    immediateAction();
 }, css);
 
 // export { exlg_alert as default };

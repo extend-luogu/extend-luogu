@@ -1,10 +1,10 @@
 /* input for our badge register */
-input[exlg-badge-register]{
+input[exlg-badge-register], select[exlg-badge-register]{
     outline: none;
     display: inline-block;
     width: auto;
     padding: 0.5em;
-    /* font-size: 1.6rem; */
+    font-size: 1.6rem;
     line-height: 1.2;
     color: #555;
     vertical-align: middle;
@@ -15,6 +15,10 @@ input[exlg-badge-register]{
     -webkit-appearance: none;
     -webkit-transition: border-color .15s ease-in-out,-webkit-box-shadow .15s ease-in-out;
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+input[exlg-badge-register][disabled] {
+    cursor: not-allowed;
+    background-color: #eee;
 }
 input[exlg-badge-register]:focus {
     border: 1px solid #3bb4f2;
@@ -85,7 +89,7 @@ body {
     /* vertical-align: middle; */
     align-items: center;
     display: table-cell;
-    z-index: 10;
+    z-index: 150;
 }
 .exlg-dialog-header {
     height: auto;

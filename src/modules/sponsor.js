@@ -55,15 +55,16 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
     };
 
     const getBadge = (uid, namecol, bdty, {
-        bg, fg, text, font, fw, border,
+        bg, fg, text, ft, fw, bd, fs,
     }) => {
         const $badge = $(`<span class="exlg-badge" badge-uid="${uid}" badge-type="${bdty}">${text}</span>`)
             .css({
-                background: (bg || "mediumturquoise") === "luogu-default" ? (namecol.includes("lg-fg-") ? _color[namecol] : namecol) : (bg || "mediumturquoise"),
+                background: (bg || "mediumturquoise").replaceAll("${luogu-default}", (namecol.includes("lg-fg-") ? _color[namecol] : namecol)),
                 color: fg || "#fff",
-                "font-family": font || "",
+                "font-family": ft || "",
                 "font-weight": fw || "700",
-                border: border || "",
+                "font-size": fs || "",
+                border: bd || "",
             })
             .off("contextmenu")
             .on("contextmenu", () => false)
