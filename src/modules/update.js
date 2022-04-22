@@ -1,5 +1,6 @@
 import { version_cmp } from "../utils.js";
 import mod, { sto } from "../core.js";
+// eslint-disable-next-line import/no-unresolved
 import update_log from "../resources/update-log.txt";
 import css from "../resources/css/update-log.css";
 import exlg_alert from "../components/exlg-dialog-board.js";
