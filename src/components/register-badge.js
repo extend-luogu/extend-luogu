@@ -1,7 +1,7 @@
 /* global XNColorPicker */
 /* eslint-disable no-new */
 import uindow, {
-    $, cur_time, lg_usr, cs_post, log, error,
+    $, cur_time, lg_usr, cs_post, log, warn,
 } from "../utils.js";
 import exlg_alert from "./exlg-dialog-board.js";
 import compo from "../compo-core.js";
@@ -18,7 +18,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         log("这个页面可以用 eval 的说!芜湖，起飞~");
     } catch (err) {
         log("这个页面并不可以用 eval (悲");
-        error(err);
+        warn(err);
         exlg_alert("这个页面并不可以用 eval 哇，试试其他页面，可以吗可以吗可以吗~诶诶诶诶诶不可以???!呜哇~");
         return;
     }
