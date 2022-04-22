@@ -223,12 +223,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             },
             {
                 tag: "badge", title: "badge", buttons: [
-                    { html: "注册", onclick: () => register_badge(false) },
-                    { html: "修改", onclick: () => register_badge(true) },
+                    { html: "注册/修改", onclick: () => register_badge() },
+                    { html: "导入 json 设置", onclick: () => exlg_alert("未做完, 不要急") },
                 ],
             },
             {
-                tag: "debug", title: "调试工具(慎用)", buttons: [
+                tag: "debug", title: "debug", buttons: [
                     {
                         html: "清除所有油猴缓存", onclick: () => {
                             exlg_alert(`你确定要这么做吗?<br/><strong style="color: red;">数据将不可恢复!</strong>`, "exlg 警告!", () => {
