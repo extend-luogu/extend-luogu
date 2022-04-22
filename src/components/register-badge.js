@@ -1,7 +1,11 @@
 /* global XNColorPicker */
 /* eslint-disable no-new */
 import uindow, {
+<<<<<<< HEAD
     $, cur_time, lg_usr, cs_post, log, warn,
+=======
+    $, cur_time, lg_usr, cs_post, log,
+>>>>>>> 3c469cf (VER 6.2.7-pre1)
 } from "../utils.js";
 import exlg_alert from "./exlg-dialog-board.js";
 import compo from "../compo-core.js";
@@ -10,7 +14,7 @@ import html from "../resources/badge-register.html";
 import css from "../resources/css/badge-register.css";
 
 const srd = { };
-const register_badge = compo.reg("register-badge", "badge 注册", null, null, () => {
+const register_badge = compo.reg("register-badge", "badge 注册", null, null, (configuration = null) => {
     // Note: 引入 API 即判断能否使用 eval
     try {
         // eslint-disable-next-line no-eval
@@ -18,8 +22,13 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         log("这个页面可以用 eval 的说!芜湖，起飞~");
     } catch (err) {
         log("这个页面并不可以用 eval (悲");
+<<<<<<< HEAD
         warn(err);
         exlg_alert("这个页面并不可以用 eval 哇，试试其他页面，可以吗可以吗可以吗~诶诶诶诶诶不可以???!呜哇~");
+=======
+        exlg_alert("这个页面不可以用 eval 哇，能不能...试一下其他页面的说...<br/>可以吗可以吗可以吗~<br/> - 诶诶诶诶诶不可以???!<br/>呜哇~达咩!<br/><small>(选项一：[确定] “好好好真拿你没办法”)<br/>(选项二：[取消] *exlg 娘上升到了新的境界*)&nbsp;</small>", "来自 exlg 娘的提示！", () => location.href = location.origin);
+        log("错误信息: ", err);
+>>>>>>> 3c469cf (VER 6.2.7-pre1)
         return;
     }
     const title_text = "exlg badge register ver.7.0: 暂不可用";
@@ -50,7 +59,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 <div>${res_json.error}</div>
             </div>
             <small>点击确定以返回。</small>`, "激活 badge 出错", () => {
-                    register_badge();
+                    register_badge(srd.parse_data);
                     return false;
                 });
             } else {
@@ -58,7 +67,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 badges[request.uid].ts = cur_time();
                 sto["sponsor-tag"].badges = JSON.stringify(badges);
                 srd.dom.$title.html("成功");
-                exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload(); });
+                exlg_alert("badge 激活成功！感谢您对 exlg 的<del>打钱</del>支持。", "badge 激活成功", () => { location.reload(); });
             }
             return false;
             /*
@@ -170,7 +179,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 srd.updatePreview();
                 srd.gerr("成功以 luogu3 覆盖 luogu4 设置");
             });
-            $(srd.dom.btn.outprint).on("click", () => {
+            $(srd.dom.btn.exportJSON).on("click", () => {
                 const res = JSON.stringify({ text: srd.dom.$text_input[0].value, ...srd.parse_data });
                 try {
                     GM_setClipboard(res, "text/plain");
@@ -180,6 +189,29 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     return;
                 }
                 srd.gerr("成功复制 json 配置信息至剪贴板");
+            });
+            $(srd.dom.btn.importJSON).on("click", () => {
+                const _tmp_data = srd.parse_data;
+                exlg_alert(`<textarea class="exlg-regbadge-configinput" rows="8" style="font-family: 'Fira Code', consolas, monospace;"></textarea>`, "请输入 json 配置", {
+                    onconfirm: () => {
+                        const str = $("textarea.exlg-regbadge-configinput").val();
+                        let obj = null;
+                        try {
+                            obj = JSON.parse(str);
+                        } catch (err) {
+                            log("无法正确解析配置: ", err);
+                            $("#exlg-dialog-title").html("无法正确解析配置");
+                            setTimeout(() => $("#exlg-dialog-title").html("请输入 json 配置"), 1500);
+                            $("textarea.exlg-regbadge-configinput").val("");
+                            return false;
+                        }
+                        register_badge(obj);
+                        return false;
+                    },
+                    onopen: () => {
+                        $("textarea.exlg-regbadge-configinput").val(JSON.stringify(_tmp_data));
+                    },
+                });
             });
             srd.dom.$type.on("change", () => {
                 srd.current_type = srd.dom.$type.val();
@@ -261,12 +293,14 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             if (typeof _data !== "undefined" && typeof _data.text !== "undefined") {
                 srd.dom.$text_input[0].value = _data.text; // Note: 已经有了
                 delete _data.text;
-                Object.assign(srd.parse_data, _data);
+                if (configuration === null) Object.assign(srd.parse_data, _data);
                 srd.dom.$act.val("已激活").attr("disabled", "");
                 srd.isactive = true;
             } else { // Note: 没有
                 srd.isactive = false;
             }
+
+            if (configuration !== null) Object.assign(srd.parse_data, configuration);
 
             srd.refreshInputData();
             srd.updatePreview();

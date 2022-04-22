@@ -11,6 +11,9 @@
             <input key="active" exlg-badge-register type="text" style="padding: .1em;"/>
         </span>
         <br/>
+        <small style="margin-left: 2px;" extraMessage="怎么有人连预览里是个输入框都看不出来哇">
+            <strong>提示:</strong> 请在预览处点击 badge 以编辑内容。
+        </small>
         <br/>
         <span style="margin: 5px;">
             <span class="exlg-regbadge-fronttitle">模式</span>
@@ -23,9 +26,11 @@
         <span style="margin: 5px;">
             <span style="height: 1.5em;float: left;padding: .1em;width: 5em;"> </span>
             <span style="float: left;margin-left: 5px;">
-            <button id="regbadge-button-recoverall">恢复默认设置</button><br/>
-            <button id="regbadge-button-recover43">恢复为洛谷3设置</button><br/>
-            <button id="regbadge-button-outprint">导出json设置</button></span>
+                <button id="regbadge-button-recoverall">还原默认设置</button><br/>
+                <button id="regbadge-button-recover43">覆盖为洛谷3设置</button><br/>
+                <button id="regbadge-button-exportJSON">导出配置</button>
+                <button id="regbadge-button-importJSON">导入配置</button>
+            </span>
         </span>
     </div>
     <div class="exlg-regbadge-box" id="regbadge-settings">
@@ -60,8 +65,6 @@
             <span class="exlg-regbadge-fronttitle">字粗</span>
             <input key="fw" css-key="font-weight" exlg-badge-register type="text" style="padding: .1em;" placeholder="700" value=""/>
         </span>
-        <br/>
-        <small>提示: 请在预览处点击 badge 以编辑内容。</small>
     </div>
     <div id="regbadge-preview-container" style="width: 100%;display: flex;">
         <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">预览</span>

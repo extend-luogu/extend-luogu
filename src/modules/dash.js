@@ -227,7 +227,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             {
                 tag: "badge", title: "badge", buttons: [
                     { html: "注册/修改", onclick: () => register_badge() },
-                    { html: "导入 json 设置", onclick: () => exlg_alert("未做完, 不要急") },
                 ],
             },
             {
