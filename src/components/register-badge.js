@@ -211,8 +211,9 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                         srd.dom.$ccf[0].style = e.r;
                     }
                 });
+                // Hack: 千万不要忘了删掉测试代码！！！！！！！！
                 if (lg_usr.badge) {
-                    srd.dom.$lgbg.html(`<span class="lg${srd.current_type}-badge">${lg_usr.badge}</span>`).css("color", lColor[lg_usr.color][srd.current_type - 3]).show();
+                    srd.dom.$lgbg.html(`<span class="lg${srd.current_type}-badge" style="background-color: ${lColor[lg_usr.color][srd.current_type - 3]};">${lg_usr.badge}</span>`).show();
                 } else srd.dom.$lgbg.hide();
                 srd.dom.$exlg_badge_prev.attr("style", `
                     border-radius: 50px;
@@ -254,8 +255,9 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             };
 
             const _data = JSON.parse(sto["sponsor-tag"].badges)[lg_usr.uid];
-            if (typeof _data !== "undefined") { // Note: 已经有了
-                srd.dom.$text_input[0].value = _data.text;
+            console.log(_data.text);
+            if (typeof _data !== "undefined" && typeof _data.text !== "undefined") {
+                srd.dom.$text_input[0].value = _data.text; // Note: 已经有了
                 delete _data.text;
                 Object.assign(srd.parse_data, _data);
                 srd.dom.$act.val("已激活").attr("disabled", "");

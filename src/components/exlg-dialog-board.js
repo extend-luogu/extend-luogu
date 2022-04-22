@@ -89,8 +89,8 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     brd.dom.$head.html(title);
     brd.dom.$main.html(text ?? "exlg 提醒您");
     brd.dom.$cont.css({
-        "min-height": min_height,
-        width,
+        "min-height": min_height ?? "300px",
+        width: width ?? "500px", // Note: 没填需要回到默认值，不然开了一下注册器之后后面全是宽窗口
     });
     brd.show_dialog();
     brd.action.onopen?.();
