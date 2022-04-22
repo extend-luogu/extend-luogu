@@ -293,7 +293,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     },
                 });
                 $(srd.customSettings[e.id].jsdom).on("input", (f) => {
-                    colpicker.setColor(f.target.value);
+                    colpicker.setColor(f.target.value || f.target.placeholder);
                 });
             });
         },
