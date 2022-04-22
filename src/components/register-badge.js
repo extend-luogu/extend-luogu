@@ -244,7 +244,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 srd.recalcInputWidth();
             };
 
-            const _data = JSON.parse(sto["sponsor-tag"].badges)[100250];
+            const _data = JSON.parse(sto["sponsor-tag"].badges)[lg_usr.uid];
             if (typeof _data !== "undefined") { // Note: 已经有了
                 srd.dom.$text_input[0].value = _data.text;
                 delete _data.text;
