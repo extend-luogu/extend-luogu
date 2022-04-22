@@ -1,11 +1,7 @@
 /* global XNColorPicker */
 /* eslint-disable no-new */
 import uindow, {
-<<<<<<< HEAD
     $, cur_time, lg_usr, cs_post, log, warn,
-=======
-    $, cur_time, lg_usr, cs_post, log,
->>>>>>> 3c469cf (VER 6.2.7-pre1)
 } from "../utils.js";
 import exlg_alert from "./exlg-dialog-board.js";
 import compo from "../compo-core.js";
@@ -22,13 +18,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         log("这个页面可以用 eval 的说!芜湖，起飞~");
     } catch (err) {
         log("这个页面并不可以用 eval (悲");
-<<<<<<< HEAD
-        warn(err);
-        exlg_alert("这个页面并不可以用 eval 哇，试试其他页面，可以吗可以吗可以吗~诶诶诶诶诶不可以???!呜哇~");
-=======
         exlg_alert("这个页面不可以用 eval 哇，能不能...试一下其他页面的说...<br/>可以吗可以吗可以吗~<br/> - 诶诶诶诶诶不可以???!<br/>呜哇~达咩!<br/><small>(选项一：[确定] “好好好真拿你没办法”)<br/>(选项二：[取消] *exlg 娘上升到了新的境界*)&nbsp;</small>", "来自 exlg 娘的提示！", () => location.href = location.origin);
-        log("错误信息: ", err);
->>>>>>> 3c469cf (VER 6.2.7-pre1)
+        warn("错误信息: ", err);
         return;
     }
     const title_text = "exlg badge register ver.7.0: 暂不可用";
