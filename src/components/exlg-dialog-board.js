@@ -68,7 +68,6 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
         hide_dialog() {
             this.dom.$cont.addClass("container-hide").removeClass("container-show");
             setTimeout(() => this.dom.$wrap.hide(), this.wait_time);
-            this.resolve_result("cancel");
         },
         resolve_result(res) {
             this._resolve?.(res);

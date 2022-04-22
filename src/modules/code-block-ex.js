@@ -1,4 +1,4 @@
-import { $ } from "../utils.js";
+import { $, log } from "../utils.js";
 import mod from "../core.js";
 import css from "../resources/css/code-block-ex.css";
 
@@ -42,9 +42,16 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
             : $(`<div class="exlg-copy">复制</div>`)
                 .on("click", () => {
                     if ($btn.text() !== "复制") return; // Note: Debounce
+                    try {
+                        GM_setClipboard($pre.text(), "text/plain");
+                    } catch (err) {
+                        $btn.text("复制失败").toggleClass("exlg-copied");
+                        setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800);
+                        log("复制到剪贴板失败, 错误信息: ", err);
+                        return;
+                    }
                     $btn.text("复制成功").toggleClass("exlg-copied");
                     setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800);
-                    GM_setClipboard($pre.text(), "text/plain");
                 });
 
         const $code = $pre.children("code");

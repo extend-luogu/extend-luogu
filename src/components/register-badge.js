@@ -149,16 +149,25 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 srd.parse_data = { lg4: { } };
                 srd.refreshInputData();
                 srd.updatePreview();
+                srd.gerr("已清空所有设置选项至默认值");
             });
             $(srd.dom.btn.recover43).on("click", () => {
-                if (srd.dom.$type.val() === 3) return;
+                if (srd.dom.$type.val() === 3) return srd.gerr("处于 luogu3 编辑模式，操作无效");
                 srd.parse_data.lg4 = { };
                 srd.refreshInputData();
                 srd.updatePreview();
+                srd.gerr("成功以 luogu3 覆盖 luogu4 设置");
             });
             $(srd.dom.btn.outprint).on("click", () => {
                 const res = JSON.stringify({ text: srd.dom.$text_input[0].value, ...srd.parse_data });
-                GM_setClipboard(res, "text/plain");
+                try {
+                    GM_setClipboard(res, "text/plain");
+                } catch (err) {
+                    srd.gerr("复制至剪贴板失败");
+                    log("复制到剪贴板失败, 错误信息: ", err);
+                    return;
+                }
+                srd.gerr("成功复制 json 配置信息至剪贴板");
             });
             srd.dom.$type.on("change", () => {
                 srd.current_type = srd.dom.$type.val();
@@ -257,33 +266,35 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
 
             srd.refreshInputData();
             srd.updatePreview();
-            new XNColorPicker({
-                color: "mediumturquoise",
-                selector: ".exlg-bg-colset",
-                colorTypeOption: "single,linear-gradient,radial-gradient",
-                onError: () => { },
-                onCancel: () => { },
-                onChange: () => { },
-                onConfirm: (color) => {
-                    const c = color.colorType === "single" ? color.color.hex : color.color.str;
-                    srd.customSettings.bg.jsdom.value = c;
-                    srd.customSettings.bg.setData();
-                    srd.updatePreview();
+            [
+                {
+                    selector: ".exlg-bg-colset",
+                    defaultColor: "mediumturquoise",
+                    id: "bg",
                 },
-            });
-            new XNColorPicker({
-                color: "#fff",
-                selector: ".exlg-fg-colset",
-                colorTypeOption: "single,linear-gradient,radial-gradient",
-                onError: () => { },
-                onCancel: () => { },
-                onChange: () => { },
-                onConfirm: (color) => {
-                    const c = color.colorType === "single" ? color.color.hex : color.color.str;
-                    srd.customSettings.fg.jsdom.value = c;
-                    srd.customSettings.fg.setData();
-                    srd.updatePreview();
+                {
+                    selector: ".exlg-fg-colset",
+                    defaultColor: "#fff",
+                    id: "fg",
                 },
+            ].forEach((e) => {
+                const colpicker = new XNColorPicker({
+                    color: e.defaultColor,
+                    selector: e.selector,
+                    colorTypeOption: "single,linear-gradient,radial-gradient",
+                    onError: () => { },
+                    onCancel: () => { },
+                    onChange: () => { },
+                    onConfirm: (color) => {
+                        const c = color.colorType === "single" ? color.color.hex : color.color.str;
+                        srd.customSettings[e.id].jsdom.value = c;
+                        srd.customSettings[e.id].setData();
+                        srd.updatePreview();
+                    },
+                });
+                $(srd.customSettings[e.id].jsdom).on("input", (f) => {
+                    colpicker.setColor(f.target.value);
+                });
             });
         },
     }, { width: "800px", min_height: "400px" });
