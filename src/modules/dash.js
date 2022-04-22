@@ -1,9 +1,10 @@
 import uindow, {
-    $, version_cmp, get_latest, lg_usr,
+    $, version_cmp, lg_usr,
 } from "../utils.js";
 import mod from "../core.js";
 import logo from "../resources/logo.js";
 import register_badge from "../components/register-badge.js";
+import get_latest from "../components/get-latest.js";
 import css from "../resources/css/dash-bridge.css";
 import category from "../category.js";
 import compo from "../compo-core.js";
@@ -55,6 +56,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                     name: nm,
                     description: m.info,
                     unclosable,
+                    /*
                     settings: Object.entries(datas[alias + nm]?.lvs ?? {})
                         .filter(([k, s]) => k !== "on" && !s.priv)
                         .map(([k, s]) => ({
@@ -67,7 +69,8 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                             ...(s.ty === "number" && { minValue: s.min, maxValue: s.max, increment: s.step }),
                             ...(s.ty === "enum" && { acceptableValues: s.vals }),
                         })),
-                    // settings: _toSettings(datas[alias + nm]?.lvs ?? {}),
+                    */
+                    settings: _toSettings(datas[alias + nm]?.lvs ?? {}),
                 })),
         }));
     console.log(modules);
@@ -116,7 +119,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         debug: "localhost:1634/dashboard",
     }[msto.source]);
     if (msto.enable_rclick) {
-        $btn.bind("contextmenu", () => false)
+        $btn.on("contextmenu", false)
             .on("mousedown", (e) => {
                 if (!e.button) _jump_settings();
                 else if (e.button === 2) {
@@ -266,22 +269,21 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     $operator = $span.find("#vers-comp-operator"),
                     $latest = $span.find("#latest-version"),
                     $fuckingdots = $span.find("#annoyingthings");
-                const _check = () => {
+                const _check = async () => {
                     $operator.text("");
                     $latest.text("");
                     $fuckingdots.html("");
-                    get_latest((latest, op) => {
-                        $operator.html(op).css("color", { "<<": "#fe4c61", "==": "#52c41a", ">>": "#3498db" }[op]);
-                        $latest.text(latest).attr("title", "最新版本");
-                        $fuckingdots.html({ "<<": `<i class="exlg-icon exlg-info" name="有新版本"></i>`, ">>": `<i class="exlg-icon exlg-info" name="内测中！"></i>` }[op] || "").children().css("cssText", "position: absolute;display: inline-block;");
-                        if (op === "<<" && version_cmp(msto.latest_ignore, latest) === "<<") {
-                            const $ignore_vers = $(`<span style="color: red;margin-left: 30px;"><svg class="icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446"><path d="M512 128c-211.7 0-384 172.3-384 384s172.3 384 384 384 384-172.3 384-384-172.3-384-384-384z m0 717.4c-183.8 0-333.4-149.6-333.4-333.4S328.2 178.6 512 178.6 845.4 328.2 845.4 512 695.8 845.4 512 845.4zM651.2 372.8c-9.9-9.9-25.9-9.9-35.8 0L512 476.2 408.6 372.8c-9.9-9.9-25.9-9.9-35.8 0-9.9 9.9-9.9 25.9 0 35.8L476.2 512 372.8 615.4c-9.9 9.9-9.9 25.9 0 35.8 4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4L512 547.8l103.4 103.4c4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4c9.9-9.9 9.9-25.9 0-35.8L547.8 512l103.4-103.4c9.9-9.9 9.9-25.9 0-35.8z" p-id="5447"></path></svg></span>`).on("click", () => {
-                                msto.latest_ignore = latest;
-                                $ignore_vers.hide();
-                            }).appendTo($fuckingdots);
-                        }
-                        if (op === "==") msto.latest_ignore = GM_info.script.version;
-                    });
+                    const [latest, op] = await get_latest();
+                    $operator.html(op).css("color", { "<<": "#fe4c61", "==": "#52c41a", ">>": "#3498db" }[op]);
+                    $latest.text(latest).attr("title", "最新版本");
+                    $fuckingdots.html({ "<<": `<i class="exlg-icon exlg-info" name="有新版本"></i>`, ">>": `<i class="exlg-icon exlg-info" name="内测中！"></i>` }[op] || "").children().css("cssText", "position: absolute;display: inline-block;");
+                    if (op === "<<" && version_cmp(msto.latest_ignore, latest) === "<<") {
+                        const $ignore_vers = $(`<span style="color: red;margin-left: 30px;"><svg class="icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446"><path d="M512 128c-211.7 0-384 172.3-384 384s172.3 384 384 384 384-172.3 384-384-172.3-384-384-384z m0 717.4c-183.8 0-333.4-149.6-333.4-333.4S328.2 178.6 512 178.6 845.4 328.2 845.4 512 695.8 845.4 512 845.4zM651.2 372.8c-9.9-9.9-25.9-9.9-35.8 0L512 476.2 408.6 372.8c-9.9-9.9-25.9-9.9-35.8 0-9.9 9.9-9.9 25.9 0 35.8L476.2 512 372.8 615.4c-9.9 9.9-9.9 25.9 0 35.8 4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4L512 547.8l103.4 103.4c4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4c9.9-9.9 9.9-25.9 0-35.8L547.8 512l103.4-103.4c9.9-9.9 9.9-25.9 0-35.8z" p-id="5447"></path></svg></span>`).on("click", () => {
+                            msto.latest_ignore = latest;
+                            $ignore_vers.hide();
+                        }).appendTo($fuckingdots);
+                    }
+                    if (op === "==") msto.latest_ignore = GM_info.script.version;
                 };
                 $check_btn.on("click", _check).appendTo($span);
                 // Note: TODO: 最后放一个按钮查找，加个最新版本忽略机制，每次忽略之后对于小于等于那个版本的都不管

@@ -189,23 +189,6 @@ export const cs_post = (url, data, header = {}, type = "application/json") => {
     return chain(res);
 };
 
-export const get_latest = (callbackfn) => {
-    cs_get({
-        url: "https://api.github.com/repos/extend-luogu/extend-luogu/tags?per_page=1",
-        onload: (resp) => {
-            const
-                latest = JSON.parse(resp.responseText)[0].name,
-                { version } = GM_info.script,
-                op = version_cmp(version, latest);
-
-            const l = `Comparing version: ${version} ${op} ${latest}`;
-            log(l);
-
-            if (callbackfn) callbackfn(latest, op);
-        },
-    });
-};
-
 export const cur_time = (ratio = 1000) => ~~(Date.now() / ratio);
 
 export const lg_content = (url) => new Promise((res, rej) => {
