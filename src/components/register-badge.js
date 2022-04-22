@@ -35,11 +35,12 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 token: sto["^token"].token,
                 data,
             };
-            if (!srd.isactive) srd.activation = srd.dom.$act.val();
+            if (!srd.isactive) request.activation = srd.dom.$act.val();
             if (!request.data.text) {
                 srd.gerr("[Err] 请填写 badge");
                 return false;
             }
+
             srd.dom.$title.html("请求中...");
             const res_json = await cs_post("https://exlg.piterator.com/badge/set", request).data;
             if ("error" in res_json) {
@@ -81,6 +82,15 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             // Note: 不会写异步，爬了
         },
         onopen: () => {
+            const lColor = {
+                Purple: ["#8e44ad", "rgb(157, 61, 207)"],
+                Red: ["#e74c3c", "rgb(254, 76, 97)"],
+                Orange: ["#e67e22", "rgb(243, 156, 17)"],
+                Green: ["#5eb95e", "rgb(82, 196, 26)"],
+                Blue: ["#0e90d2", "rgb(52, 152, 219)"],
+                Gray: ["#bbb", "rgb(191, 191, 191)"],
+                Cheater: ["#996600", "rgb(173, 139, 0)"],
+            };
             const $cont = $("#exlg-container");
             const $title = $cont.find("#exlg-dialog-title");
             srd.gerr = (message, timeout = 1500) => {
@@ -118,7 +128,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     jsdom: e,
                     jqdom: $(e),
                     defaultvalue: e.placeholder,
-                    setData(ty = srd.current_type) {
+                    setData(ty = srd.current_type) { // Note: 写入 parse-data
                         (ty & 1 ? srd.parse_data : srd.parse_data.lg4)[this.key] = this.jsdom.value;
                         if (this.jsdom.value && this.jsdom.value === (ty & 1 ? this.defaultvalue : (srd.parse_data[key] || this.defaultvalue))) delete (ty & 1 ? srd.parse_data : srd.parse_data.lg4)[this.key];
                         // Note: 在改 3 的时候对 4 的影响
@@ -127,9 +137,10 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                             delete srd.parse_data.lg4[this.key];
                         }
                     },
-                    refreshData(ty = srd.current_type) {
+                    refreshData(ty = srd.current_type) { // Note: 读入 parse-data
                         this.jsdom.value = (srd.parse_data[this.key] || "");
                         if (ty > 3) this.jsdom.value = srd.parse_data.lg4[this.key] || this.jsdom.value;
+                        if (this.colorpicker) this.colorpicker.refreshPicker();
                     },
                     resetHolder(ty = srd.current_type) {
                         if (ty & 1) {
@@ -139,6 +150,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 };
                 $(e).on("input", () => {
                     srd.customSettings[key].setData(srd.current_type);
+                    if (srd.customSettings[key].colorpicker) srd.customSettings[key].colorpicker.refreshPicker();
                     srd.updatePreview();
                 });
             });
@@ -188,15 +200,6 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             srd.dom.$text_input.on("input", srd.recalcInputWidth);
 
             srd.updatePreview = () => {
-                const lColor = {
-                    Purple: ["#8e44ad", "rgb(157, 61, 207)"],
-                    Red: ["#e74c3c", "rgb(254, 76, 97)"],
-                    Orange: ["#e67e22", "rgb(243, 156, 17)"],
-                    Green: ["#5eb95e", "rgb(82, 196, 26)"],
-                    Blue: ["#0e90d2", "rgb(52, 152, 219)"],
-                    Gray: ["#bbb", "rgbrgb(191, 191, 191)"],
-                    Cheater: ["#996600", "rgb(173, 139, 0)"],
-                };
                 const wColor = ["Red", "Orange", "Purple", "Cheater"];
                 srd.dom.$prvid.removeAttr("style").text(lg_usr.name);
                 if (srd.current_type === 4 || wColor.includes(lg_usr.color)) srd.dom.$prvid.css("font-weight", "bold");
@@ -255,7 +258,6 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             };
 
             const _data = JSON.parse(sto["sponsor-tag"].badges)[lg_usr.uid];
-            console.log(_data.text);
             if (typeof _data !== "undefined" && typeof _data.text !== "undefined") {
                 srd.dom.$text_input[0].value = _data.text; // Note: 已经有了
                 delete _data.text;
@@ -280,8 +282,14 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     id: "fg",
                 },
             ].forEach((e) => {
+                const dominput = srd.customSettings[e.id].jsdom;
+                const getInputString = () => {
+                    let str = dominput.value || dominput.placeholder;
+                    if (e.id === "bg") str = str.replaceAll("${luogu-default}", lColor[lg_usr.color][srd.current_type - 3]);
+                    return str;
+                };
                 const colpicker = new XNColorPicker({
-                    color: e.defaultColor,
+                    color: getInputString() ?? e.defaultColor,
                     selector: e.selector,
                     colorTypeOption: "single,linear-gradient,radial-gradient",
                     onError: () => { },
@@ -294,9 +302,16 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                         srd.updatePreview();
                     },
                 });
-                $(srd.customSettings[e.id].jsdom).on("input", (f) => {
-                    colpicker.setColor(f.target.value || f.target.placeholder);
+                colpicker.getColorString = getInputString;
+                colpicker.refreshPicker = function () {
+                    this.setColor(this.getColorString());
+                };
+                srd.customSettings[e.id].colorpicker = colpicker;
+                /*
+                $(dominput).on("input", () => {
+
                 });
+                */
             });
         },
     }, { width: "800px", min_height: "400px" });

@@ -65,6 +65,8 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
                 "font-weight": fw || "700",
                 "font-size": fs || "",
                 border: bd || "",
+                "background-size": "contain",
+                "background-repeat": "no-repeat",
             })
             .on("click", register_badge);
         return uid === "100250" ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${text}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${text}</span>`).css({
