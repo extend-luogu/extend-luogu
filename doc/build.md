@@ -1,6 +1,4 @@
-## 开发、自行搭建
-
-简体中文 | [English](./build.en.md)
+## 开发、自行构建
 
 ### 前置要求
 - `yarn`
@@ -17,7 +15,12 @@ yarn
 
 该指令生成一个 minify 后的 build/extend-luogu.user.js。
 ```
-yarn run build
+yarn build
+```
+
+该指令运行 eslint。
+```
+yarn lint
 ```
 
 该指令生成一个 bundle 后的 build/extend-luogu.user.js，便于调试。
