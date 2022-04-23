@@ -3,3 +3,7 @@
 
 yarn lint
 node ./scripts/check-doc.js
+if [ -d dist ]; then
+	echo "No dist files expected."
+	exit 1
+fi

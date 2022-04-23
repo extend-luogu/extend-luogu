@@ -117,6 +117,8 @@ Array.prototype.lastElem = function () {
 
 // ==Utilities==Functions==
 
+export const sleep = t => new Promise(res => setTimeout(res, t));
+
 export const version_cmp = (v1, v2) => {
     if (!v1) return "<<";
 
@@ -187,23 +189,6 @@ export const cs_post = (url, data, header = {}, type = "application/json") => {
     return chain(res);
 };
 
-export const get_latest = (callbackfn) => {
-    cs_get({
-        url: "https://api.github.com/repos/extend-luogu/extend-luogu/tags?per_page=1",
-        onload: (resp) => {
-            const
-                latest = JSON.parse(resp.responseText)[0].name,
-                { version } = GM_info.script,
-                op = version_cmp(version, latest);
-
-            const l = `Comparing version: ${version} ${op} ${latest}`;
-            log(l);
-
-            if (callbackfn) callbackfn(latest, op);
-        },
-    });
-};
-
 export const cur_time = (ratio = 1000) => ~~(Date.now() / ratio);
 
 export const lg_content = (url) => new Promise((res, rej) => {
@@ -212,25 +197,7 @@ export const lg_content = (url) => new Promise((res, rej) => {
         res(data);
     });
 });
-/*
-const exlg_alert_onaction = uindow.show_alert ? () => true : () => {
-    if (! ` ${document.body.className.split(' ')} `.includes("lg-alert-built")) {
-        $(document.head).append($(`<link rel="stylesheet" href="https://cdn.luogu.com.cn/css/amazeui.min.css">`))
-        $(`<div class="am-modal am-modal-alert am-modal-out" tabindex="-1" id="exlg-alert" style="display: none; margin-top: -40px;">
-            <div class="am-modal-dialog">
-                <div class="am-modal-hd" id="exlg-alert-title"></div>
-                <div class="am-modal-bd" id="exlg-alert-message"></div>
-                <div class="am-modal-footer">
-                    <span class="am-modal-btn">确定</span>
-                </div>
-            </div></div>`).appendTo($(document.body))
-        $(document.body).addClass("lg-alert-built")
-        return false
-        // Note: 阅读 Amaze UI 源码得出搞法
-    }
-    return true
-}
-*/
+
 export const lg_alert = (msg, title = "exlg 提醒您") => (uindow.show_alert
     ? uindow.show_alert(title, msg)
     : uindow.alert(`${title}\n${msg}`));

@@ -1,221 +1,376 @@
-/* eslint-disable no-new */
 /* global XNColorPicker */
-import {
-    $, cur_time, lg_usr, cs_post, log,
+/* eslint-disable no-new */
+import uindow, {
+    $, cur_time, lg_usr, cs_post, log, warn,
 } from "../utils.js";
 import exlg_alert from "./exlg-dialog-board.js";
 import compo from "../compo-core.js";
 import mod, { sto } from "../core.js";
+import html from "../resources/badge-register.html";
+import css from "../resources/css/badge-register.css";
 
-const register_badge = compo.reg("register-badge", "badge 注册", null, null, (is_edit) => {
+const srd = { };
+const register_badge = compo.reg("register-badge", "badge 注册", null, null, (configuration = null) => {
     // Note: 引入 API 即判断能否使用 eval
-    let _eval_disabled = false;
     try {
         // eslint-disable-next-line no-eval
         (0, eval)(GM_getResourceText("colorpicker"));
-        log("原来洛谷还有能用 eval 的给人用的页面是吧为什么连这个都不能统一一下的");
+        log("这个页面可以用 eval 的说!芜湖，起飞~");
     } catch (err) {
-        log("我操他妈的 CSP 傻逼是吧怎么不让我用 eval");
-        _eval_disabled = true;
+        log("这个页面并不可以用 eval (悲");
+        exlg_alert("这个页面不可以用 eval 哇，能不能...试一下其他页面的说...<br/>可以吗可以吗可以吗~<br/> - 诶诶诶诶诶不可以???!<br/>呜哇~达咩!<br/><small>(选项一：[确定] “好好好真拿你没办法”)<br/>(选项二：[取消] *exlg 娘上升到了新的境界*)&nbsp;</small>", "来自 exlg 娘的提示！", () => location.href = location.origin);
+        warn("错误信息: ", err);
+        return;
     }
-    // Note: 原本的主程序
-    const title_text = `exlg badge ${is_edit ? "修改" : "注册"}器`;
-    exlg_alert(`<div class="exlg-update-log-text exlg-unselectable exlg-badge-page" style="font-family: Consolas;">
-    <div style="text-align: center">
-        <div class="exlg-badge-register" style="display:inline-block;text-align: left;padding-top: 10px;">
-            <div style="margin: 5px;">
-                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">用户uid</span>
-                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="填写用户名或uid" value=${lg_usr.uid} disabled title="暂不支持为别人注册 badge" name="username">
-            </div>
-            <div style="margin: 5px;${is_edit ? "display: none;" : ""}">
-                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">激活码</span>
-                <input exlg-badge-register type="text" style="padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您获取的激活码" name="username">
-            </div>
-            <div style="margin: 5px;">
-                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">badge</span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em;" class="am-form-field exlg-badge-input" placeholder="您想要的badge" name="username">
-            </div>
-            <div class="exlg-bg" style="margin: 5px;">
-                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">背景</span>
-                <span class="exlg-bg-slector" style="float: left;"></span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px; line-height: 1.52;" class="am-form-field exlg-badge-input" value="mediumturquoise" name="username">
-            </div>
-            <div class="exlg-fg" style="margin: 5px;">
-                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">前景</span>
-                <span class="exlg-fg-slector" style="float: left; height: 5px;"></span>
-                <input exlg-badge-register type="text" style="margin-bottom: 10px;padding: .1em; width: 171px; line-height: 1.52;" class="am-form-field exlg-badge-input" value="#fff" name="username">
-            </div>
-            <div style="margin: 5px;margin-bottom: 20px;">
-                <span style="height: 1.5em;float: left;padding: .1em;width: 5em;">预览</span>
-                <span class="exlg-badge-preview"></span>
-            </div>
-        </div>
-    </div>
-</div>
-    `, title_text, async () => {
-        $("input[exlg-badge-register]").off("input");
+    const title_text = "exlg badge register ver.7.0: 暂不可用";
+    exlg_alert(html, title_text, {
+        onconfirm: async () => {
+            srd.dom.$title.html("获取并验证令牌...");
+            mod.execute("token");
+            // eslint-disable-next-line prefer-const
+            let data = { text: srd.dom.$text_input[0].value };
+            Object.assign(data, srd.parse_data);
+            const request = {
+                uid: srd.dom.$uid[0].value,
+                token: sto["^token"].token,
+                data,
+            };
+            if (!srd.isactive) request.activation = srd.dom.$act.val();
+            if (!request.data.text) {
+                srd.gerr("[Err] 请填写 badge");
+                return false;
+            }
 
-        const $board = $("#exlg-container"),
-            $input = $board.find("input"),
-            $title = $board.find("#exlg-dialog-title");
-        const gerr = (e) => {
-            $title.html(e);
-            setTimeout(() => $title.html(title_text), 1500);
-        };
-        if (lg_usr?.uid && !$input[0].value) $input[0].value = lg_usr.uid;
-        if (!$input.get().some((e) => e.value)) {
-            gerr("[Err] 请检查信息是否填写完整");
-            return;
-        }
-        const badge = $input[2].value;
-        const bg = $input[3].value;
-        const fg = $input[4].value;
-        // Note: 下面那位你可真是个小天才
-        // Note: $input[1] 在注册模式下是激活码，在修改模式下是badge
-        /*
-        const badge = is_edit ? $input[1].value : $input[2].value
-        const bg = is_edit ? $input[2].value : $input[3].value
-        const fg = is_edit ? $input[3].value : $input[4].value
-        */
-        $title.html("获取并验证令牌...");
-        mod.execute("token");
-        const request = {
-            uid: $input[0].value,
-            token: sto["^token"].token,
-            data: {
-                text: badge,
-                bg,
-                fg,
-            },
-        };
-        if (!is_edit) {
-            request.activation = $input[1].value;
-        }
-        $title.html("请求中...");
-        const res_json = await cs_post("https://exlg.piterator.com/badge/set", request).data;
-        if ("error" in res_json) {
-            $title.html("[Err] 失败");
-            exlg_alert(res_json.error, "激活 badge 出错");
-        } else {
-            const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data);
-            badges[$input[0].value].ts = cur_time();
-            sto["sponsor-tag"].badges = JSON.stringify(badges);
-            $title.html("成功");
-            exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload(); });
-        }
-    }, false);
+            srd.dom.$title.html("请求中...");
+            const res_json = await cs_post("https://exlg.piterator.com/badge/set", request).data;
+            if ("error" in res_json) {
+                srd.dom.$title.html("[Err] 失败");
+                exlg_alert(`<div style="margin-bottom: 1.5em;">
+                <div><strong style="color: red;">错误信息:</strong></div>
+                <div>${res_json.error}</div>
+            </div>
+            <small>点击确定以返回。</small>`, "激活 badge 出错", () => {
+                    register_badge(srd.parse_data);
+                    return false;
+                });
+            } else {
+                const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data);
+                badges[request.uid].ts = cur_time();
+                sto["sponsor-tag"].badges = JSON.stringify(badges);
+                srd.dom.$title.html("成功");
+                exlg_alert("badge 激活成功！感谢您对 exlg 的<del>打钱</del>支持。", "badge 激活成功", () => { location.reload(); });
+            }
+            return false;
+            /*
+            return cs_post("https://exlg.piterator.com/badge/set", request).then((res) => {
+                return new Promise((resolve, reject) => {
+                    const res_json = res.data;
+                    if ("error" in res_json) {
+                        $title.html("[Err] 失败");
+                        exlg_alert(res_json.error, "激活 badge 出错");
+                        resolve(false);
+                    } else {
+                        const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data);
+                        badges[$input[0].value].ts = cur_time();
+                        sto["sponsor-tag"].badges = JSON.stringify(badges);
+                        $title.html("成功");
+                        exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload(); });
+                        resolve(false);
+                    }
+                });
+            */
+            // Note: 不会写异步，爬了
+        },
+        onopen: () => {
+            const lColor = {
+                Purple: ["#8e44ad", "rgb(157, 61, 207)"],
+                Red: ["#e74c3c", "rgb(254, 76, 97)"],
+                Orange: ["#e67e22", "rgb(243, 156, 17)"],
+                Green: ["#5eb95e", "rgb(82, 196, 26)"],
+                Blue: ["#0e90d2", "rgb(52, 152, 219)"],
+                Gray: ["#bbb", "rgb(191, 191, 191)"],
+                Cheater: ["#996600", "rgb(173, 139, 0)"],
+            };
+            const $cont = $("#exlg-container");
+            const $title = $cont.find("#exlg-dialog-title");
+            srd.gerr = (message, timeout = 1500) => {
+                $title.html(message);
+                setTimeout(() => $title.html(title_text), timeout);
+            };
+            srd.dom = {
+                $title: "#exlg-dialog-title",
+                $uid: "input[key='uid']",
+                $act: "input[key='active']",
+                $prvid: "#regbadge-preview-id",
+                $ccf: ".preview-ccf-tag",
+                $type: "select",
+                $lgbg: "#preview-lg-badge",
+                $exlg_badge_prev: ".exlg-badge-preview",
+                $text_input: "#regbadge-preview input",
+                $text_test: "#regbadge-preview span[fuck=o2]",
+                btn: {},
+            };
 
-    const $board = $("#exlg-container"),
-        $input = $board.find("input");
+            Object.keys(srd.dom).forEach((key) => srd.dom[key] = key.includes("$") ? $cont.find(srd.dom[key]) : srd.dom[key]);
+            srd.current_type = 3;
+            srd.refreshInputData = () => {
+                Object.keys(srd.customSettings).forEach((key) => srd.customSettings[key].refreshData(srd.current_type));
+            };
 
-    const updatePreview = () => {
-        // Note: 当输入数据时加载预览
-        const $i = $("#exlg-container").find("input");
-        const badge = is_edit ? $i[1].value : $i[2].value;
-        const bg = is_edit ? $i[2].value : $i[3].value;
-        const fg = is_edit ? $i[3].value : $i[4].value;
-        const $preview = $(".exlg-badge-preview");
-        $preview
-            .text(badge)
-            .css("background", bg)
-            .css("color", fg);
-    };
+            srd.customSettings = { };
+            srd.parse_data = { lg4: { } };
 
-    if (!_eval_disabled) {
-        try {
-            new XNColorPicker({
-                color: "mediumturquoise",
-                selector: ".exlg-bg-slector",
-                colorTypeOption: "single,linear-gradient,radial-gradient",
-                onError: () => { },
-                onCancel: () => { },
-                onChange: () => { },
-                onConfirm: (color) => {
-                    const c = color.colorType === "single" ? color.color.hex : color.color.str;
-                    if (is_edit) $($input[2]).val(c);
-                    else $($input[3]).val(c);
-                    updatePreview();
-                },
+            $cont.find("input[key][css-key]").each((_, e) => {
+                const key = e.getAttribute("key");
+                srd.customSettings[key] = {
+                    key,
+                    csskey: e.getAttribute("css-key"),
+                    jsdom: e,
+                    jqdom: $(e),
+                    defaultvalue: e.placeholder,
+                    setData(ty = srd.current_type) { // Note: 写入 parse-data
+                        (ty & 1 ? srd.parse_data : srd.parse_data.lg4)[this.key] = this.jsdom.value;
+                        if (this.jsdom.value && this.jsdom.value === (ty & 1 ? this.defaultvalue : (srd.parse_data[key] || this.defaultvalue))) delete (ty & 1 ? srd.parse_data : srd.parse_data.lg4)[this.key];
+                        // Note: 在改 3 的时候对 4 的影响
+                        // Note: 存在 4 并且 与当前 3 相同
+                        if ((ty & 1) && (Object.keys(srd.parse_data.lg4).includes(this.key)) && srd.parse_data.lg4[this.key] === srd.parse_data[this.key]) {
+                            delete srd.parse_data.lg4[this.key];
+                        }
+                    },
+                    refreshData(ty = srd.current_type) { // Note: 读入 parse-data
+                        this.jsdom.value = (srd.parse_data[this.key] || "");
+                        if (ty > 3) this.jsdom.value = srd.parse_data.lg4[this.key] || this.jsdom.value;
+                        if (this.colorpicker) this.colorpicker.refreshPicker();
+                    },
+                    resetHolder(ty = srd.current_type) {
+                        if (ty & 1) {
+                            this.jsdom.placeholder = this.defaultvalue;
+                        } else this.jsdom.placeholder = srd.parse_data[key] || this.defaultvalue;
+                    },
+                };
+                $(e).on("input", () => {
+                    srd.customSettings[key].setData(srd.current_type);
+                    if (srd.customSettings[key].colorpicker) srd.customSettings[key].colorpicker.refreshPicker();
+                    srd.updatePreview();
+                });
             });
-            new XNColorPicker({
-                color: "#fff",
-                selector: ".exlg-fg-slector",
-                colorTypeOption: "single,linear-gradient,radial-gradient",
-                onError: () => { },
-                onCancel: () => { },
-                onChange: () => { },
-                onConfirm: (color) => {
-                    const c = color.colorType === "single" ? color.color.hex : color.color.str;
-                    $($input[is_edit ? 3 : 4]).val(c);
-                    updatePreview();
-                },
+            $cont.find(".exlg-badge-page button").each((_, e) => {
+                srd.dom.btn[e.id.slice("regbadge-button-".length)] = e;
             });
-        } catch (err) {
-            log("看样子刚才没有插进来啊那没事了");
-            _eval_disabled = true;
-            $("input.exlg-fg-slector").on("input", updatePreview);
-            $("input.exlg-bg-slector").on("input", updatePreview);
-        }
-    } else {
-        $("input.exlg-fg-slector").on("input", updatePreview);
-        $("input.exlg-bg-slector").on("input", updatePreview);
-    }
+            $(srd.dom.btn.recoverall).on("click", () => {
+                srd.parse_data = { lg4: { } };
+                srd.refreshInputData();
+                srd.updatePreview();
+                srd.gerr("已清空所有设置选项至默认值");
+            });
+            $(srd.dom.btn.recover43).on("click", () => {
+                if (srd.dom.$type.val() === 3) return srd.gerr("处于 luogu3 编辑模式，操作无效");
+                srd.parse_data.lg4 = { };
+                srd.refreshInputData();
+                srd.updatePreview();
+                srd.gerr("成功以 luogu3 覆盖 luogu4 设置");
+            });
+            $(srd.dom.btn.exportJSON).on("click", () => {
+                let res = { };
+                try {
+                    res = JSON.stringify({ text: srd.dom.$text_input[0].value, ...srd.parse_data });
+                    if (res.lg4 && res.lg4.text) delete res.lg4.text;
+                    // 去掉 lg4.text
+                } catch (err) {
+                    srd.gerr("导出配置 json 失败");
+                    warn("导出配置 json 失败, 错误信息: ", err);
+                    return;
+                }
+                try {
+                    GM_setClipboard(res, "text/plain");
+                } catch (err) {
+                    srd.gerr("复制至剪贴板失败");
+                    warn("复制到剪贴板失败, 错误信息: ", err);
+                    return;
+                }
+                srd.gerr("成功复制 json 配置信息至剪贴板");
+            });
+            $(srd.dom.btn.importJSON).on("click", () => {
+                const _tmp_data = srd.parse_data;
+                exlg_alert(`<textarea class="exlg-regbadge-configinput" rows="8" style="font-family: 'Fira Code', consolas, monospace;"></textarea>`, "请输入 json 配置", {
+                    onconfirm: () => {
+                        const str = $("textarea.exlg-regbadge-configinput").val();
+                        let obj = null;
+                        try {
+                            obj = JSON.parse(str);
+                            if (typeof obj !== "object") throw new TypeError("obj are expected to be an object.");
+                        } catch (err) {
+                            log("无法正确解析配置: ", err);
+                            $("#exlg-dialog-title").html("无法正确解析配置");
+                            setTimeout(() => $("#exlg-dialog-title").html("请输入 json 配置"), 1500);
+                            $("textarea.exlg-regbadge-configinput").val("");
+                            return false;
+                        }
+                        register_badge(obj);
+                        return false;
+                    },
+                    onopen: () => {
+                        $("textarea.exlg-regbadge-configinput").val(JSON.stringify(_tmp_data));
+                    },
+                });
+            });
+            srd.dom.$type.on("change", () => {
+                srd.current_type = srd.dom.$type.val();
+                Object.keys(srd.customSettings).forEach((key) => {
+                    srd.customSettings[key].resetHolder();
+                    uindow.hsrd = srd;
+                });
+                srd.refreshInputData();
+                srd.updatePreview();
+            });
 
-    $(".exlg-badge-preview").attr("style", `
-        border-radius: 50px;
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-        transition: all .15s;
-        display: inline-block;
-        min-width: 10px;
-        font-size: 1em;
-        font-weight: 700;
-        line-height: 1;
-        vertical-align: baseline;
-        white-space: nowrap;
-        cursor: pointer;
-        margin-left: 2px;
-        margin-right: 2px;
-    `);
-    $("input[exlg-badge-register]").on("input", updatePreview);
+            srd.recalcInputWidth = () => {
+                srd.dom.$text_test.text(srd.dom.$text_input[0].value);
+                srd.dom.$text_input.css("width", srd.dom.$text_test[0].offsetWidth + 4);
+            };
 
-    /*
-    const $board = $("#exlg-alert, #lg-alert")
-    const $btn = $board.find(".am-modal-btn")
-    // Note: 重构一次，Date = 20211127 Time = 21:10
-    const $cancel = $btn.clone().text("取消")
-    const $submit = $btn.clone().text("确定").off("click")
-    const $title = $("#exlg-alert-title, #lg-alert-title").on("click", () => $title.html(title_text)).addClass("exlg-unselectable")
-    const $dimmer = $(".am-dimmer")
-    console.log($board, $cancel, $submit, $dimmer, $title, $btn)
-    const clear_foot = () => setTimeout(() => {
-        console.log("tried to clear foot!")
-        $cancel.remove()
-        $submit.remove()
-        $title.off("click").removeClass("exlg-unselectable")
-        $dimmer.off("click")
-        $btn.show()
-    }, 200)
-    if (uindow.show_alert)
-        $(".am-dimmer").on("click", () => {
-            clear_foot()
-        })
-    else
-        $(".am-dimmer").off("click").on("click", () => {
-            console.log("get dimmered.", $btn)
-            $btn.click()
-            clear_foot()
-        })
-    $btn.css("cssText", "display: none!important;")
-    $cancel.on("click", () => {
-        $btn.click()
-        clear_foot()
-    })
-        .appendTo($btn.parent())
-    $submit.on("click", ).appendTo($btn.parent())
-    */
-});
+            if (lg_usr?.uid && !srd.dom.$uid[0].value) srd.dom.$uid[0].value = lg_usr.uid;
+            srd.dom.$text_input.on("input", srd.recalcInputWidth);
+
+            srd.updatePreview = () => {
+                const wColor = ["Red", "Orange", "Purple", "Cheater"];
+                srd.dom.$prvid.removeAttr("style").text(lg_usr.name);
+                if (srd.current_type === 4 || wColor.includes(lg_usr.color)) srd.dom.$prvid.css("font-weight", "bold");
+                srd.dom.$prvid.css("color", lColor[lg_usr.color][srd.current_type - 3]);
+                [
+                    { l: [0, 1, 2], r: "display: none;" },
+                    { l: [3, 4, 5], r: "fill: #5eb95e;" },
+                    { l: [6, 7], r: "fill: #3498db;" },
+                    { l: [8, 9, 10], r: "fill: #f1c40f;" },
+                ].forEach((e) => {
+                    if (e.l.includes(lg_usr.ccfLevel)) {
+                        srd.dom.$ccf[0].style = e.r;
+                    }
+                });
+                // Hack: 千万不要忘了删掉测试代码！！！！！！！！
+                if (lg_usr.badge) {
+                    srd.dom.$lgbg.html(`<span class="lg${srd.current_type}-badge" style="background-color: ${lColor[lg_usr.color][srd.current_type - 3]};">${lg_usr.badge}</span>`).show();
+                } else srd.dom.$lgbg.hide();
+                srd.dom.$exlg_badge_prev.attr("style", `
+                    border-radius: 50px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                    transition: all .15s;
+                    display: inline-block;
+                    min-width: 10px;
+                    font-size: 1em;
+                    font-weight: 700;
+                    line-height: 1;
+                    vertical-align: baseline;
+                    white-space: nowrap;
+                    cursor: pointer;
+                    margin-left: 2px;
+                    margin-right: 2px;
+                    background-repeat: no-repeat;
+                `);
+                Object.keys(srd.customSettings).forEach((key, _index) => {
+                    const obj = srd.customSettings[key];
+                    let str = !(srd.current_type & 1)
+                        ? (srd.parse_data.lg4[key] || (srd.parse_data[key] || obj.defaultvalue))
+                        : (srd.parse_data[key] || obj.defaultvalue);
+                    if (key === "bg") {
+                        str = str.replaceAll("${luogu-default}", lColor[lg_usr.color][srd.current_type - 3]);
+                    }
+                    srd.dom.$exlg_badge_prev.css(obj.csskey, str);
+                });
+                [
+                    "minWidth",
+                    "fontSize",
+                    "fontWeight",
+                    "whiteSpace",
+                ].forEach((kv) => {
+                    srd.dom.$text_test[0].style[kv] = srd.dom.$exlg_badge_prev[0].style[kv];
+                }); // 需要的 css 复制过去
+                srd.recalcInputWidth();
+            };
+
+            const _data = JSON.parse(sto["sponsor-tag"].badges)[lg_usr.uid];
+            if (typeof _data !== "undefined" && typeof _data.text !== "undefined") {
+                srd.dom.$text_input[0].value = _data.text; // Note: 已经有了
+                delete _data.text;
+                if (configuration === null) Object.assign(srd.parse_data, _data);
+                srd.dom.$act.val("已激活").attr("disabled", "");
+                srd.isactive = true;
+            } else { // Note: 没有
+                srd.isactive = false;
+            }
+
+            // console.log(configuration);
+            if (configuration !== null) {
+                configuration.text = configuration.text ?? "";
+                Object.assign(srd.parse_data, configuration);
+                srd.dom.$text_input[0].value = configuration.text;
+            }
+
+            $("input[key='bg'][css-key], input[key='fg'][css-key]").each((i, e, $e = $(e)) => $e.on("input", () => {
+                e.value = e.value.replaceAll("to top", "0deg")
+                    .replaceAll("to right", "90deg")
+                    .replaceAll("to bottom", "180deg")
+                    .replaceAll("to left", "270deg")
+                    .replaceAll("to top right", "45deg")
+                    .replaceAll("to right top", "45deg")
+                    .replaceAll("to bottom right", "135deg")
+                    .replaceAll("to right bottom", "135deg")
+                    .replaceAll("to bottom left", "225deg")
+                    .replaceAll("to left bottom", "225deg")
+                    .replaceAll("to top left", "315deg")
+                    .replaceAll("to left top", "315deg");
+            }));
+
+            srd.refreshInputData();
+            srd.updatePreview();
+            [
+                {
+                    selector: ".exlg-bg-colset",
+                    defaultColor: "mediumturquoise",
+                    id: "bg",
+                },
+                {
+                    selector: ".exlg-fg-colset",
+                    defaultColor: "#fff",
+                    id: "fg",
+                },
+            ].forEach((e) => {
+                const dominput = srd.customSettings[e.id].jsdom;
+                const getInputString = () => {
+                    let str = dominput.value || dominput.placeholder;
+                    if (e.id === "bg") str = str.replaceAll("${luogu-default}", lColor[lg_usr.color][srd.current_type - 3]);
+                    return str;
+                };
+                const colpicker = new XNColorPicker({
+                    color: getInputString() ?? e.defaultColor,
+                    selector: e.selector,
+                    colorTypeOption: "single,linear-gradient,radial-gradient",
+                    onError: () => { },
+                    onCancel: () => { },
+                    onChange: () => { },
+                    onConfirm: (color) => {
+                        const c = color.colorType === "single" ? color.color.hex : color.color.str;
+                        srd.customSettings[e.id].jsdom.value = c;
+                        srd.customSettings[e.id].setData();
+                        srd.updatePreview();
+                    },
+                });
+                colpicker.getColorString = getInputString;
+                colpicker.refreshPicker = function () {
+                    this.setColor(this.getColorString());
+                };
+                srd.customSettings[e.id].colorpicker = colpicker;
+                /*
+                $(dominput).on("input", () => {
+
+                });
+                */
+            });
+        },
+    }, { width: "800px", min_height: "400px" });
+}, css);
 
 export default register_badge;

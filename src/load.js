@@ -2,6 +2,7 @@ import uindow, {
     $, log, warn, error, xss, springboard, version_cmp, lg_alert, lg_content, lg_post,
 } from "./utils.js";
 import register_badge from "./components/register-badge.js";
+import exlg_alert from "./components/exlg-dialog-board.js";
 import mod from "./core.js";
 import compo from "./compo-core.js";
 import { datas } from "./storage.js";
@@ -13,7 +14,7 @@ Object.assign(uindow, {
         mod, compo, datas,
         log, error,
         springboard, version_cmp,
-        lg_alert, lg_content, register_badge, lg_post,
+        lg_alert, lg_content, register_badge, lg_post, exlg_alert,
         TM_dat: {
             reload_dat: (sch) => {
                 raw_dat = null;

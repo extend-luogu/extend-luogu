@@ -85,7 +85,9 @@
         "no-multi-assign": "off",
         "import/no-extraneous-dependencies": "off",
         "no-script-url": "off",
-        "no-template-curly-in-string": "off"
+        "no-template-curly-in-string": "off",
+		"no-promise-executor-return": "off",
+		"arrow-parens": "off"
     },
     "globals": {
         "marked": true,
@@ -96,6 +98,7 @@
         "load_dat": true,
         "save_dat": true,
         "clear_dat": true,
-        "raw_dat": true
+        "raw_dat": true,
+        "GM_listValues": true
     }
 }

@@ -47,7 +47,8 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
                     _setcomment($(`a[href="/user/${uid}"][target=_blank]`));
                     msto.comments = JSON.stringify(cmts);
                     $name_text.text(uid in cmts ? cmts[uid] : orin);
-                }, true);
+                    return true;
+                });
                 $("#exlg-user-com-input").val(uid in cmts ? cmts[uid] : orin);
             });
         }

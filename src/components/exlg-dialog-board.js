@@ -1,8 +1,15 @@
-/* eslint-disable */
-// FIXME I don't want to handle this file.
+/**
+ * 20:20, Apr.20 2022
+ * 完成了一次重构。包括：
+ *  - 分离 html 文件
+ *  - 重写代码结构
+ *  - 重设 api
+ * by minstdfx
+ */
 import { $ } from "../utils.js";
 import compo from "../compo-core.js";
 import css from "../resources/css/exlg-dialog-board.css";
+import bhtml from "../resources/exlg-dialog-board.html";
 
 let brd = {};
 const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
@@ -11,69 +18,84 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
         info: ["Speed of Board Animation", "启动消失动画速度"],
     },
     confirm_position: {
-        ty: "enum", dft: "right", vals: ["left", "right"],
+        ty: "enum", dft: "left", vals: ["left", "right"],
         info: ["Position of Confirm Button", "确定按钮相对位置"],
     },
 }, ({ msto }) => {
-    let $cont,
-        $head,
-        $main,
-        _mouse_down_on_wrapper = false;
-    const $wrap = $(`<div class="exlg-dialog-wrapper" id="exlg-wrapper" style="display: none;">`)
-        .append($cont = $(`<div class="exlg-dialog-container container-hide" id="exlg-container" style="${msto.animation_speed === "0s" ? "" : `transition: all ${msto.animation_speed};`}"></div>`)
-            .append($(`<div class="exlg-dialog-header">`)
-                .append($head = $(`<strong id="exlg-dialog-title">我做东方鬼畜音mad，好吗</strong>`))
-                .append($(`<div id="header-right" onclick="" style="opacity: 0.5;"><svg class="icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446"><path d="M512 128c-211.7 0-384 172.3-384 384s172.3 384 384 384 384-172.3 384-384-172.3-384-384-384z m0 717.4c-183.8 0-333.4-149.6-333.4-333.4S328.2 178.6 512 178.6 845.4 328.2 845.4 512 695.8 845.4 512 845.4zM651.2 372.8c-9.9-9.9-25.9-9.9-35.8 0L512 476.2 408.6 372.8c-9.9-9.9-25.9-9.9-35.8 0-9.9 9.9-9.9 25.9 0 35.8L476.2 512 372.8 615.4c-9.9 9.9-9.9 25.9 0 35.8 4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4L512 547.8l103.4 103.4c4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4c9.9-9.9 9.9-25.9 0-35.8L547.8 512l103.4-103.4c9.9-9.9 9.9-25.9 0-35.8z" p-id="5447"></path></svg></div>`)
-                    .on("click", () => brd.hide_dialog())), // Note: 不这么写 this 会变化
-            ).append($(`<div class="exlg-dialog-body">`)
-                .append($main = $(`<div id="exlg-dialog-content">`))).append($(`<div class="exlg-dialog-footer">`)
-                .append($(`<button class="exlg-dialog-btn">确定</button>`)
-                    .on("click", () => brd.accept_dialog()))
-                [msto.confirm_position === "left" ? "prepend" : "append"]($(`<button class="exlg-dialog-btn">取消</button>`)
-                    .on("click", () => brd.hide_dialog())))
-            .on("click", (e) => e.stopPropagation())
-            .on("mousedown", (e) => e.stopPropagation())).on("mousedown", () => (_mouse_down_on_wrapper = true))
+    let _mon_flag = false;
+    const $wrap = $(bhtml).appendTo($(document.body))
         .on("mouseup", () => {
-            if (_mouse_down_on_wrapper) brd.hide_dialog();
-            _mouse_down_on_wrapper = false;
-        })
-        .appendTo($(document.body));
-    const [wrapper, container, header, content] = [$wrap, $cont, $head, $main];
+            // if (_mon_flag) brd.hide_dialog(); // Note: 有 bug, 弃用了
+            _mon_flag = false;
+        });
+    const [$cont, $head, $main, $close] = ["#exlg-container", "#exlg-dialog-title", "#exlg-dialog-content", "#header-right"].map((n) => $wrap.find(n));
+    const [$confirm, $cancel] = (msto.confirm_position === "right" ? [0, 1] : [1, 0]).map((n) => $wrap.find(`button[btn-rnk="${n}"]`));
+
+    $confirm.text("确定");
+    $cancel.text("取消");
+
+    $confirm.on("click", async () => {
+        if (await brd.action.onconfirm?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("confirmed");
+    });
+    $cancel.on("click", async () => {
+        if (await brd.action.oncancel?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("canceled");
+    });
+    $close.on("click", async () => {
+        if (await brd.action.onclose?.() ?? true) brd.hide_dialog();
+        brd.resolve_result("closed");
+    });
+
+    // Note: 下面那么写是为了强迫症（
+    $cont.on("click", (e) => e.stopPropagation());
+    $cont.on("mousedown", (e) => ((_mon_flag = true) && e.stopPropagation()));
+    if (msto.animation_speed !== "0s") $cont.css("transition", msto.animation_speed);
 
     brd = {
-        _ac_func: null,
-        wrapper, container, header, content,
+        dom: {
+            $wrap, $cont, $head, $main, $close,
+        },
         wait_time: {
             "0s": 0, ".2s": 100, ".25s": 250, ".4s": 400,
         }[msto.animation_speed],
-        autoquit: true,
         show_dialog() {
-            this.wrapper.css("display", "flex");
+            this.dom.$wrap.css("display", "flex");
             setTimeout(() => {
-                this.container.removeClass("container-hide");
-                this.container.addClass("container-show");
+                this.dom.$cont.removeClass("container-hide").addClass("container-show");
             }, 50);
         },
         hide_dialog() {
-            this.container.addClass("container-hide");
-            this.container.removeClass("container-show");
-            setTimeout(() => this.wrapper.hide(), this.wait_time);
-            // header.innerHTML = "&nbsp;"
-            // content.innerHTML = ""
+            this.dom.$cont.addClass("container-hide").removeClass("container-show");
+            setTimeout(() => this.dom.$wrap.hide(), this.wait_time);
         },
-        accept_dialog() {
-            this._ac_func(() => this.hide_dialog()); // Note: 一样的问题
-            if (this.autoquit) {
-                this.hide_dialog();
-            }
+        resolve_result(res) {
+            this._resolve?.(res);
+        },
+        then() {
+            return new Promise((resolve) => {
+                this._resolve = resolve;
+            });
         },
     };
-}, (_, text = "", title = "exlg 提醒您", onaccepted = () => { }, autoquit = true) => {
-    brd.autoquit = autoquit;
-    brd._ac_func = onaccepted;
-    brd.header.text(title);
-    brd.content.html(text);
+}, (
+    _,
+    text = "",
+    title = "exlg 提醒您",
+    action = {},
+    { width, min_height } = {},
+) => {
+    brd.action = typeof action === "function" ? { onconfirm: action } : action;
+    brd.dom.$head.html(title);
+    brd.dom.$main.html(text ?? "exlg 提醒您");
+    brd.dom.$cont.css({
+        "min-height": min_height ?? "300px",
+        width: width ?? "500px", // Note: 没填需要回到默认值，不然开了一下注册器之后后面全是宽窗口
+    });
     brd.show_dialog();
+    brd.action.onopen?.();
+    return brd;
 }, css);
 
-export { exlg_alert as default };
+// export { exlg_alert as default };
+export default exlg_alert;
