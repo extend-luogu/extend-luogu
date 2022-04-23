@@ -7,8 +7,13 @@
 - `Node.js`
 
 ### 步骤
-1. 把这个仓库 clone 到本地。
-2. 运行如下命令：
+1.把这个仓库 clone 到本地
+
+```
+git clone "https://github.com/extend-luogu/extend-luogu.git"
+```
+
+2.运行如下命令：
 
 该指令安装项目依赖。
 ```
