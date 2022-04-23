@@ -171,12 +171,21 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 srd.gerr("成功以 luogu3 覆盖 luogu4 设置");
             });
             $(srd.dom.btn.exportJSON).on("click", () => {
-                const res = JSON.stringify({ text: srd.dom.$text_input[0].value, ...srd.parse_data });
+                let res = { };
+                try {
+                    res = JSON.stringify({ text: srd.dom.$text_input[0].value, ...srd.parse_data });
+                    if (res.lg4 && res.lg4.text) delete res.lg4.text;
+                    // 去掉 lg4.text
+                } catch (err) {
+                    srd.gerr("导出配置 json 失败");
+                    warn("导出配置 json 失败, 错误信息: ", err);
+                    return;
+                }
                 try {
                     GM_setClipboard(res, "text/plain");
                 } catch (err) {
                     srd.gerr("复制至剪贴板失败");
-                    log("复制到剪贴板失败, 错误信息: ", err);
+                    warn("复制到剪贴板失败, 错误信息: ", err);
                     return;
                 }
                 srd.gerr("成功复制 json 配置信息至剪贴板");
@@ -189,6 +198,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                         let obj = null;
                         try {
                             obj = JSON.parse(str);
+                            if (typeof obj !== "object") throw new TypeError("obj are expected to be an object.");
                         } catch (err) {
                             log("无法正确解析配置: ", err);
                             $("#exlg-dialog-title").html("无法正确解析配置");
@@ -292,7 +302,27 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                 srd.isactive = false;
             }
 
-            if (configuration !== null) Object.assign(srd.parse_data, configuration);
+            // console.log(configuration);
+            if (configuration !== null) {
+                configuration.text = configuration.text ?? "";
+                Object.assign(srd.parse_data, configuration);
+                srd.dom.$text_input[0].value = configuration.text;
+            }
+
+            $("input[key='bg'][css-key], input[key='fg'][css-key]").each((i, e, $e = $(e)) => $e.on("input", () => {
+                e.value = e.value.replaceAll("to top", "0deg")
+                    .replaceAll("to right", "90deg")
+                    .replaceAll("to bottom", "180deg")
+                    .replaceAll("to left", "270deg")
+                    .replaceAll("to top right", "45deg")
+                    .replaceAll("to right top", "45deg")
+                    .replaceAll("to bottom right", "135deg")
+                    .replaceAll("to right bottom", "135deg")
+                    .replaceAll("to bottom left", "225deg")
+                    .replaceAll("to left bottom", "225deg")
+                    .replaceAll("to top left", "315deg")
+                    .replaceAll("to left top", "315deg");
+            }));
 
             srd.refreshInputData();
             srd.updatePreview();
@@ -341,27 +371,6 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             });
         },
     }, { width: "800px", min_height: "400px" });
-
-    // Note: 这选色器傻逼是吧不让我用 to
-    // Note: 我不理解新的 exlg_alert
-    $("input[key][css-key]").on("input", () => {
-        $("input[key][css-key]").each((e) => {
-            // Note: 傻逼行为
-            $("input[key][css-key]")[e].value = $("input[key][css-key]")[e].value
-                .replaceAll("to top", "0deg")
-                .replaceAll("to right", "90deg")
-                .replaceAll("to bottom", "180deg")
-                .replaceAll("to left", "270deg")
-                .replaceAll("to top right", "45deg")
-                .replaceAll("to right top", "45deg")
-                .replaceAll("to bottom right", "135deg")
-                .replaceAll("to right bottom", "135deg")
-                .replaceAll("to bottom left", "225deg")
-                .replaceAll("to left bottom", "225deg")
-                .replaceAll("to top left", "315deg")
-                .replaceAll("to left top", "315deg");
-        });
-    });
 }, css);
 
 export default register_badge;
