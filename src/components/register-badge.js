@@ -15,10 +15,10 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
     try {
         // eslint-disable-next-line no-eval
         (0, eval)(GM_getResourceText("colorpicker"));
-        log("这个页面可以用 eval 的说!芜湖，起飞~");
+        log("这个页面可以用 eval 的说！芜湖，起飞~");
     } catch (err) {
         log("这个页面并不可以用 eval (悲");
-        exlg_alert("这个页面不可以用 eval 哇，能不能...试一下其他页面的说...<br/>可以吗可以吗可以吗~<br/> - 诶诶诶诶诶不可以???!<br/>呜哇~达咩!<br/><small>(选项一：[确定] “好好好真拿你没办法”)<br/>(选项二：[取消] *exlg 娘上升到了新的境界*)&nbsp;</small>", "来自 exlg 娘的提示！", () => location.href = location.origin);
+        exlg_alert("这个页面不可以用 eval 哇，能不能...试一下其他页面的说...<br/>可以吗可以吗可以吗~<br/> - 诶诶诶诶诶不可以？??!<br/>呜哇~达咩！<br/><small>(选项一：[确定] “好好好真拿你没办法”)<br/>(选项二：[取消] *exlg 娘上升到了新的境界*)&nbsp;</small>", "来自 exlg 娘的提示！", () => location.href = location.origin);
         warn("错误信息: ", err);
         return;
     }
@@ -178,14 +178,14 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     // 去掉 lg4.text
                 } catch (err) {
                     srd.gerr("导出配置 json 失败");
-                    warn("导出配置 json 失败, 错误信息: ", err);
+                    warn("导出配置 json 失败，错误信息: ", err);
                     return;
                 }
                 try {
                     GM_setClipboard(res, "text/plain");
                 } catch (err) {
                     srd.gerr("复制至剪贴板失败");
-                    warn("复制到剪贴板失败, 错误信息: ", err);
+                    warn("复制到剪贴板失败，错误信息: ", err);
                     return;
                 }
                 srd.gerr("成功复制 json 配置信息至剪贴板");

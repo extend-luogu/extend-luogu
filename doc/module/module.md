@@ -1,9 +1,9 @@
 ## 模块
 - [返回比赛列表](./back-to-contest.md)
 - [全网犇犇](./benben.md)
-- [CtrlEnter发送犇犇](./benben-quickpost.md)
+- [CtrlEnter 发送犇犇](./benben-quickpost.md)
 - [犇犇龙王排行榜](./benben-ranklist.md)
-- [博客Ex](./blog.md)
+- [博客 Ex](./blog.md)
 - [验证码自动填充](./captcha.md)
 - [代码块优化](./code-block-ex.md)
 - [控制面板](./dash-board.md)

@@ -47,7 +47,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
                     } catch (err) {
                         $btn.text("复制失败").toggleClass("exlg-copied");
                         setTimeout(() => $btn.text("复制").toggleClass("exlg-copied"), 800);
-                        log("复制到剪贴板失败, 错误信息: ", err);
+                        log("复制到剪贴板失败，错误信息: ", err);
                         return;
                     }
                     $btn.text("复制成功").toggleClass("exlg-copied");

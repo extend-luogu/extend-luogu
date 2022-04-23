@@ -13,7 +13,7 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
             if ((location.hash || "#main") === "#problems") {
                 if ($(".pid").length !== 0 && lg_dat.contest.startTime > cur_time()) {
                     $("a.title.color-default").on("click", () => {
-                        exlg_alert("比赛尚未开始, 请开始后再查看题目");
+                        exlg_alert("比赛尚未开始，请开始后再查看题目");
                     });
                     $("a.title.color-default").removeAttr("href");
                 }

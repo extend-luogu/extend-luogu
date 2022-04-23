@@ -25,7 +25,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     let _mon_flag = false;
     const $wrap = $(bhtml).appendTo($(document.body))
         .on("mouseup", () => {
-            // if (_mon_flag) brd.hide_dialog(); // Note: 有 bug, 弃用了
+            // if (_mon_flag) brd.hide_dialog(); // Note: 有 bug，弃用了
             _mon_flag = false;
         });
     const [$cont, $head, $main, $close] = ["#exlg-container", "#exlg-dialog-title", "#exlg-dialog-content", "#header-right"].map((n) => $wrap.find(n));

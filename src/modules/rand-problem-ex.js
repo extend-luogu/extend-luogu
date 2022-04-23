@@ -18,7 +18,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     },
 }, ({ msto }) => {
     const dif_list = [
-        ["入门", "red"], ["普及-", "orange"], ["普及/提高-", "yellow"], ["普及+/提高", "green"], ["提高+/省选-", "blue"], ["省选/NOI-", "purple"], ["NOI/NOI+/CTSC", "black"], ["暂无评定", "gray"],
+        ["入门", "red"], ["普及-", "orange"], ["普及/提高-", "yellow"], ["普及 +/提高", "green"], ["提高 +/省选-", "blue"], ["省选/NOI-", "purple"], ["NOI/NOI+/CTSC", "black"], ["暂无评定", "gray"],
     ].map((e, i, arr) => ({
         text: e[0],
         color: e[1],
@@ -73,7 +73,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     const $btn_list = $jump.parent();
 
     $(".am-btn[name='gotorandom']").text("随机");
-    const $jump_exrand = $(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex">随机ex</button>`).appendTo($btn_list);
+    const $jump_exrand = $(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex">随机 ex</button>`).appendTo($btn_list);
 
     $jump.on("click", () => {
         if (/^[0-9]+.?[0-9]*$/.test($input.val())) $input.val(`P${$input.val()}`);
@@ -92,9 +92,9 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
             mouse_on_board = false;
             if (!mouse_on_dash) {
                 $board.hide();
-            } // Hack: 维护onboard
+            } // Hack: 维护 onboard
         });
-    $(".lg-index-stat>h2").text("问题跳转 ").append($(`<div id="exlg-dash-0" class="exlg-rand-settings">ex设置</div>`));
+    $(".lg-index-stat>h2").text("问题跳转 ").append($(`<div id="exlg-dash-0" class="exlg-rand-settings">ex 设置</div>`));
     const $ul = $board.children("ul").css("list-style-type", "none");
 
     const $exrand_menu = $(`<div id="exlg-exrand-menu"></div>`).appendTo($ul);
@@ -143,10 +143,10 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
                 $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => ((mproxy[i] === bln) ? ($e.show()) : ($e.hide())));
             }, [".exrand-enabled", true], [".exrand-disabled", false]);
         }, [$exrand_diff, msto.exrand_difficulty], [$exrand_srce, msto.exrand_source]); // Hack: 防止开两个页面瞎玩的情况
-        $board.show(); // Hack: 鼠标放在dash上开window
+        $board.show(); // Hack: 鼠标放在 dash 上开 window
     })
         .on("mouseleave", () => {
-            mouse_on_dash = false; // Hack: 离开dash和board超过200ms直接关掉
+            mouse_on_dash = false; // Hack: 离开 dash 和 board 超过 200ms 直接关掉
             if (!mouse_on_board) {
                 setTimeout(() => {
                     if (!mouse_on_board) $board.hide();
@@ -154,7 +154,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
             }
         });
 
-    const exrand_poi = async () => { // Note: 异步写法（用到了lg_content）
+    const exrand_poi = async () => { // Note: 异步写法（用到了 lg_content）
         const result = $.double(([l, msto_proxy, _empty]) => {
             let g = [];
             l.forEach((e, i) => {

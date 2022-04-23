@@ -110,7 +110,7 @@ mod.reg("benben", "全网犇犇", "@/", {
 
 mod.reg(
     "benben-quickpost",
-    "CtrlEnter发送犇犇",
+    "CtrlEnter 发送犇犇",
     "@/",
     null,
     () => $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").trigger("click")),

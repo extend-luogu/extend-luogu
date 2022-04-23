@@ -17,7 +17,7 @@ mod.reg("tasklist-ex", "任务计划 ex", "@/", {
         if ($e.find("i").hasClass("am-icon-check")) $e.addClass("tasklist-ac-problem");
     });
 
-    const $toggle_AC = $(`<div>[<a id="toggle-button">隐藏已AC</a>]</div>`);
+    const $toggle_AC = $(`<div>[<a id="toggle-button">隐藏已 AC</a>]</div>`);
     $("button[name=task-edit]").parent().after($toggle_AC);
 
     const $ac_problem = $(".tasklist-ac-problem");

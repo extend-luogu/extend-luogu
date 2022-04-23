@@ -17,7 +17,7 @@ let last_ptr = -1,
     my = null;
 mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0-9]{0,}.*", {
     problem_compare: {
-        ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC题目比较"],
+        ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC 题目比较"],
     },
 }, ({ msto, args }) => {
     const color = [

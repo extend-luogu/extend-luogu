@@ -76,7 +76,7 @@
 
 2. exlg 的服务
 
-    exlg 是由 洛谷用户@optimize_2 与 洛谷用户@ForkΨKILLET 创立的 TamperMonkey 网页插件项目，用于优化洛谷的使用体验。
+    exlg 是由 洛谷用户 @optimize_2 与 洛谷用户 @ForkΨKILLET 创立的 TamperMonkey 网页插件项目，用于优化洛谷的使用体验。
 
 3. exlg 服务的使用
 

@@ -20,7 +20,7 @@ yarn
 yarn run build
 ```
 
-该指令生成一个 bundle 后的 build/extend-luogu.user.js, 便于调试。
+该指令生成一个 bundle 后的 build/extend-luogu.user.js，便于调试。
 ```
 yarn run test
 ```

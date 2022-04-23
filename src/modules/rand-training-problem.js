@@ -11,7 +11,7 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
     },
 }, ({ msto, args }) => {
     const ptypes = msto.mode.startsWith("unac") + msto.mode.endsWith("only") * (-1) + 2;
-    if (!args.length) return; // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致RE
+    if (!args.length) return; // Hack: 这一步明明 result 已经是 0 的情况下还把参数传进去了导致 RE
     $(args[0].firstChild).clone(true)
         .appendTo(args)
         .text("随机跳题")

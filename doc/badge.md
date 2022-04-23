@@ -15,7 +15,7 @@ Badge 是 exlg 贡献者的标识。
 
 ### 手动注册
 
-访问 `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/这里改成激活码/这里填uid/这里填你想要的badge内容/`
+访问 `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/这里改成激活码/这里填 uid/这里填你想要的 badge 内容/`
 
 ### 自动注册
 
@@ -30,7 +30,7 @@ Badge 是 exlg 贡献者的标识。
 
 ### 手动修改
 
-访问 `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/edit/这里填uid/这里填你想要的badge内容/`
+访问 `https://service-cmrlfv7t-1305163805.sh.apigw.tencentcs.com/release/edit/这里填 uid/这里填你想要的 badge 内容/`
 
 ### 自动修改
 

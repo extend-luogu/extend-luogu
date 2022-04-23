@@ -121,7 +121,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         }),
         gcmd("cc", "[name: char]", [
             "jump to <name>, \"h|p|c|r|d|i|m|n\" stands for home|problem|contest|record|discuss|I myself|message|notification. or jump home.",
-            "跳转至 [name]，\"h|p|c|r|d|i|m|n\" 代表：主页|题目|比赛|评测记录|讨论|个人中心|私信|通知。空则跳转主页。",
+            "跳转至 [name]，\"h|p|c|r|d|i|m|n\" 代表：主页 | 题目 | 比赛 | 评测记录 | 讨论 | 个人中心 | 私信 | 通知。空则跳转主页。",
         ], (name) => {
             name = name || "h";
             const tar = {
@@ -139,7 +139,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         }),
         gcmd("mod", "action: string, [name: string]", [
             "for <action> \"enable|disable|toggle\", opearte the mod named <name>.",
-            "当 <action> 为 \"enable|disable|toggle\"，对名为 <name> 的模块执行对应操作：启用|禁用|切换。",
+            "当 <action> 为 \"enable|disable|toggle\"，对名为 <name> 的模块执行对应操作：启用 | 禁用 | 切换。",
         ], (action, name) => {
             switch (action) {
             case "enable":
@@ -156,7 +156,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         }),
         gcmd("dash", "action: string", [
             "for <action> \"show|hide|toggle\", opearte the exlg dashboard.",
-            "当 <action> 为 \"show|hide|toggle\", 显示|隐藏|切换 exlg 管理面板。",
+            "当 <action> 为 \"show|hide|toggle\", 显示 | 隐藏 | 切换 exlg 管理面板。",
         ], (action) => {
             if (!["show", "hide", "toggle"].includes(action)) return cli_error`dash: unknown action "${action}"`;
             $("#exlg-dash-window")[action]();

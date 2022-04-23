@@ -233,7 +233,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 tag: "debug", title: "debug", buttons: [
                     {
                         html: "清除所有油猴缓存", onclick: () => {
-                            exlg_alert(`你确定要这么做吗?<br/><strong style="color: red;">数据将不可恢复!</strong>`, "exlg 警告!", () => {
+                            exlg_alert(`你确定要这么做吗？<br/><strong style="color: red;">数据将不可恢复！</strong>`, "exlg 警告！", () => {
                                 GM_listValues().forEach(GM_deleteValue);
                                 location.reload();
                                 return true;
@@ -242,7 +242,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     },
                     {
                         html: "强制急停", onclick: () => {
-                            exlg_alert("还没做出来, 嘿嘿~");
+                            exlg_alert("还没做出来，嘿嘿~");
                         },
                     },
                 ],
@@ -286,7 +286,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 };
                 $check_btn.on("click", _check).appendTo($span);
                 // Note: TODO: 最后放一个按钮查找，加个最新版本忽略机制，每次忽略之后对于小于等于那个版本的都不管
-                // Note: 如果不是最新版本，那么加2个按钮(弹窗通知，忽略，最后一个是查找)
+                // Note: 如果不是最新版本，那么加 2 个按钮 (弹窗通知，忽略，最后一个是查找)
                 // Note: 版本老了红色，版本对了绿色，版本新了蓝色（指测试版
                 // Note: 新版显示提示。
             }
