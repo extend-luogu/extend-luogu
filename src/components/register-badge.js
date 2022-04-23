@@ -258,6 +258,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     cursor: pointer;
                     margin-left: 2px;
                     margin-right: 2px;
+                    background-repeat: no-repeat;
                 `);
                 Object.keys(srd.customSettings).forEach((key, _index) => {
                     const obj = srd.customSettings[key];
@@ -340,6 +341,27 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             });
         },
     }, { width: "800px", min_height: "400px" });
+
+    // Note: 这选色器傻逼是吧不让我用 to
+    // Note: 我不理解新的 exlg_alert
+    $("input[key][css-key]").on("input", () => {
+        $("input[key][css-key]").each((e) => {
+            // Note: 傻逼行为
+            $("input[key][css-key]")[e].value = $("input[key][css-key]")[e].value
+                .replaceAll("to top", "0deg")
+                .replaceAll("to right", "90deg")
+                .replaceAll("to bottom", "180deg")
+                .replaceAll("to left", "270deg")
+                .replaceAll("to top right", "45deg")
+                .replaceAll("to right top", "45deg")
+                .replaceAll("to bottom right", "135deg")
+                .replaceAll("to right bottom", "135deg")
+                .replaceAll("to bottom left", "225deg")
+                .replaceAll("to left bottom", "225deg")
+                .replaceAll("to top left", "315deg")
+                .replaceAll("to left top", "315deg");
+        });
+    });
 }, css);
 
 export default register_badge;
