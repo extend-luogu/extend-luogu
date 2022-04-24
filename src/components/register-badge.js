@@ -192,7 +192,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             });
             $(srd.dom.btn.importJSON).on("click", () => {
                 const _tmp_data = srd.parse_data;
-                exlg_alert(`<textarea class="exlg-regbadge-configinput" rows="8" style="font-family: 'Fira Code', 'Fira Mono', Consolas, monospace;"></textarea>`, "请输入 json 配置", {
+                exlg_alert(`<textarea class="exlg-regbadge-configinput" rows="8" style="font-family: 'Fira Code', 'Fira Mono', Consolas;"></textarea>`, "请输入 json 配置", {
                     onconfirm: () => {
                         const str = $("textarea.exlg-regbadge-configinput").val();
                         let obj = null;

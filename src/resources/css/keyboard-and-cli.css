@@ -14,7 +14,7 @@
 	width: 100%;
 	border: none;
 	outline: none;
-	font-family: "Fira Code", "Fira Mono", "consolas", "Courier New", monospace;
+	font-family: "Fira Code", "Fira Mono", "consolas", "Courier New";
 	color: #000;
 }
 #exlg-cli-input.error {

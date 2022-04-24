@@ -157,12 +157,12 @@
 #exlg-dash {
     padding: 3px 19px 4px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.6);
-    font-family: "Fira Code", "Fira Mono", Consolas, Monospace;
+    font-family: "Fira Code", "Fira Mono", Consolas;
     /* background-color: #3F48CC !important; */
 }
 #exlg-dash-window {
     box-shadow: 0 3px 8px rgba(0,0,0,0.6);
-    font-family: "Fira Code", "Fira Mono", Consolas, Monospace;
+    font-family: "Fira Code", "Fira Mono", Consolas;
     padding: 10px;
     width: 400px !important;
     left: -175px !important;
