@@ -13,4 +13,4 @@ Badge 是 exlg 贡献者的标识。
 
 注册和修改 badge 的方法：
 
-直接使用内置的注册修改器。
+直接使用内置的注册修改器。见 [Support](./component/register-badge.md)。
