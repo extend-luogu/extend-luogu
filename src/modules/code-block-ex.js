@@ -9,7 +9,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
     code_block_title: { ty: "string", dft: "源代码 - ${lang}", info: ["Custom Code Title(with Language)", "自定义代码块标题 - 限定语言"] },
     code_block_title_nolang: { ty: "string", dft: "源代码", info: ["Custom Code Title(without Language)", "自定义代码块标题 - 默认"] },
     copy_code_font: {
-        ty: "string", dft: "'Fira Code', Consolas, monospace", info: ["Code Block Font", "代码块字体"], strict: true,
+        ty: "string", dft: "'Fira Code', 'Fira Mono', Consolas, monospace", info: ["Code Block Font", "代码块字体"], strict: true,
     },
     max_show_lines: {
         ty: "number", dft: -1, min: -1, max: 100, info: ["Max Lines On Show", "代码块最大显示行数"], strict: true,

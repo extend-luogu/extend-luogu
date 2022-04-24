@@ -23,7 +23,10 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         if (msto.direct_display) {
             $tar.css("white-space", "pre");
             $tar.text(com ?? orin);
-        } else $tar.append(`<span class="exlg-usercmt exlg-usercom-tag">(${com})</span>`);
+        } else {
+            $tar.children("span.exlg-usercom-tag").remove();
+            if (com) $tar.append(`<span class="exlg-usercmt exlg-usercom-tag">(${com})</span>`);
+        }
     };
     if (!result) { // Note: 刚刚加载时
         // Note: 检查是否有空
@@ -46,7 +49,7 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
                         delete cmts[uid];
                         nn = orin;
                     } else cmts[uid] = nn;
-                    _setcomment($(`a[href="/user/${uid}"][target=_blank]`), nn, orin);
+                    _setcomment($(`a[href="/user/${uid}"][target=_blank]`), cmts[uid], orin);
                     msto.comments = JSON.stringify(cmts);
                     $name_text.text(uid in cmts ? cmts[uid] : orin);
                     return true;

@@ -152,88 +152,44 @@
 .dropdown > .center {
 	padding: 4px 1px 10px;
 }
-/* .ops>a>.link-title {
-	display: flex;
-	align-items: center;
-}
-.ops>a>.link-title>svg {
-	margin-right: 8px;
-	width: 16px;
-}
-.ops>a[class] {
-	width: auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 2px;
-	padding: 6px 14px;
-	border-radius: 8px;
-	color: var(--text2);
-	font-size: 14px;
-	cursor: pointer;
-	transition: background-color .3s;
-	margin-bottom: 0.2em;
-	margin-top: 0.2em;
-} */
-.ops>a:hover {
-	background-color: rgb(227,229,231);
-	border-radius: 1em;
-}
 
-.wrapper.hover>.dropdown>.center {
-	font-size: 1.1em;
-	/* width: 13em; */
+/* exlg beautified dash css by haraki */
+#exlg-dash {
+    padding: 3px 19px 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+    font-family: "Fira Code", "Fira Mono", Consolas, Monospace;
+    /* background-color: #3F48CC !important; */
 }
-
-.exlg-dropdown.field {
-	display: inline-block;
-	border-left: none;
-	padding: 0 .8em;
+#exlg-dash-window {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+    font-family: "Fira Code", "Fira Mono", Consolas, Monospace;
+    padding: 10px;
+    width: 400px !important;
+    left: -175px !important;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(12px);
+    margin-top: 10px;
 }
-.exlg-dropdown.field:hover {
-	color: #00aeec!important;
+#exlg-windiv,#exlg-dash-window>h2 {
+    padding: 5px;
 }
-.exlg-dropdown.field:hover > .value {
-	color: #00aeec!important;
+#exlg-dash-window>h2 g {
+    fill: #3F48CC;
 }
-.exlg-dropdown.field:hover > .key {
-	color: #00aeec!important;
+.exlg-windiv-btn {
+    background-color: #3F48CC !important;
+    border: none !important;
+    padding: 0.313em 1em;
 }
-.exlg-dropdown.field > .value {
-	display: block;
-	text-align: center;
-	line-height: 1.5;
-	font-weight: 700;
-
-	color: #6c757d;
-	font-size: 1.1em;
-	transition: color .2s;
+.exlg-windiv-btn:hover {
+    background-color: #607ee8 !important;
+    transition: background-color 0.25s;
 }
-.exlg-dropdown.field > .key {
-	display: block;
-	text-align: center;
-	/* font-size: 0.5em; */
-
-	color: #9499a0;
-	font-weight: 400;
-	font-size: .75em;
-	transition: color .2s;
+#link-div .exlg-windiv-btnspan:nth-child(2) svg {
+    fill: #ffffff;
+    padding-right: 3px;
+    height: 16px;
+    width: 16px;
+    line-height: 1.5;
 }
-.exlg-dropdown.field > .key-small {
-	display: block;
-	text-align: center;
-	/* font-size: 0.5em; */
-
-	color: #9499a0;
-	font-weight: 400;
-	font-size: .5em;
-	transition: color .2s;
-}
-
-.ops[data-v-78704ac9] {
-	padding: .5em .9em;
-}
-
-.header[data-v-78704ac9] {
-	margin-bottom: -0.6em;
-}
+/* end. */
