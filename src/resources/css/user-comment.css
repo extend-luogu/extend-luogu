@@ -1,10 +1,18 @@
 .exlg-usercom-edit {
     transition: all .4s;
     opacity: 0;
+    border-radius: .2em;
+    margin-left: .2em;
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    fill: currentColor;
+    overflow: hidden;
 }
 .exlg-usercom-edit:hover {
     transition: all .4s;
     opacity: 0.8;
+    background: rgba(0, 0, 0, 0.1);
 }
 .exlg-usercom-tag {
     color: #8a7b7b;

@@ -4,7 +4,7 @@ input[exlg-badge-register], select[exlg-badge-register]{
     display: inline-block;
     width: auto;
     padding: 0.5em;
-    font-size: 1.6rem;
+    /* font-size: 1.6rem; */
     line-height: 1.2;
     color: #555;
     vertical-align: middle;

@@ -35,15 +35,15 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     $cancel.text("取消");
 
     $confirm.on("click", async () => {
-        if (await brd.action.onconfirm?.() ?? true) brd.hide_dialog();
+        if (await brd.action.onconfirm?.(brd) ?? true) brd.hide_dialog();
         brd.resolve_result("confirmed");
     });
     $cancel.on("click", async () => {
-        if (await brd.action.oncancel?.() ?? true) brd.hide_dialog();
+        if (await brd.action.oncancel?.(brd) ?? true) brd.hide_dialog();
         brd.resolve_result("canceled");
     });
     $close.on("click", async () => {
-        if (await brd.action.onclose?.() ?? true) brd.hide_dialog();
+        if (await brd.action.onclose?.(brd) ?? true) brd.hide_dialog();
         brd.resolve_result("closed");
     });
 
@@ -93,7 +93,7 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
         width: width ?? "500px", // Note: 没填需要回到默认值，不然开了一下注册器之后后面全是宽窗口
     });
     brd.show_dialog();
-    brd.action.onopen?.();
+    brd.action.onopen?.(brd);
     return brd;
 }, css);
 

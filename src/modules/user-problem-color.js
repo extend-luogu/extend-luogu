@@ -20,6 +20,9 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC 题目比较"],
     },
 }, ({ msto, args }) => {
+    if (typeof (args) === "object" && args.message === msg.PRIVATE_INFORMATION) {
+        return; // Note: 用户开启完全隐私保护
+    }
     const color = [
         [191, 191, 191],
         [254, 76, 97],
@@ -30,7 +33,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         [157, 61, 207],
         [14, 29, 105],
     ];
-    const func = async ($prb, _flag) => {
+    const colorProblem = async ($prb, _flag) => {
         if (ta === null) {
             const content = await lg_content(`/user/${lg_usr.uid}`);
             ta = lg_dat.passedProblems;
@@ -39,8 +42,8 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         }
         let same = 0;
         if (_flag) {
-            const $ps = $prb[1];
-            $ps.querySelectorAll("a").forEach((p, d) => {
+            const ps = $prb[1];
+            ps.querySelectorAll("a").forEach((p, d) => {
                 if (d < ta.length && my.has(ta[d].pid)) { // Note: d 在某些情况下会达到 ta.length
                     same++;
                     p.style.backgroundColor = "rgba(82, 196, 26, 0.3)";
@@ -51,16 +54,16 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ta.length} <> ${my.size} : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`);
     };
-    const _color = (id) => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`;
+    const getRGBColor = (id) => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`;
     if (typeof (args) === "object" && args.message === msg.ADD_COMPARE) {
         if ((!msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return;
-        func([114514, 1919810], false);
+        colorProblem([114514, 1919810], false);
         return;
     }
     args.forEach((arg) => {
         if (arg.target.href === "javascript:void 0") return;
         // if (! lg_dat[arg.board_id][arg.position])
-        arg.target.style.setProperty("color", _color([(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty]), "important");
+        arg.target.style.setProperty("color", getRGBColor([(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty]), "important");
         if ((arg.board_id === brds.PASSED_PROBLEMS && arg.position === lg_dat.passedProblems.length - 1)
             || (lg_dat.passedProblems.length === 0 && arg.board_id === brds.SUBMITTED_PROBLEMS && arg.position === lg_dat.submittedProblems.length - 1)) { // Note: 染色染到最后一个
             $(".exlg-counter").remove();
@@ -74,7 +77,7 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
             }
 
             if ((!msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return;
-            func($prb, true);
+            colorProblem($prb, true);
         }
     });
 }, (e) => {
@@ -113,6 +116,10 @@ mod.reg_hook_new("user-problem-color", "题目颜色数量和比较", "@/user/[0
         }],
     };
 }, () => {
+    if (typeof lg_dat.submittedProblems === "undefined" || typeof lg_dat.passedProblems === "undefined") {
+        // Note: 开启完全隐私保护
+        return { message: msg.PRIVATE_INFORMATION };
+    }
     if ((!lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
         $(".exlg-counter").remove();
         const $prb = $(".card.padding-default > .problems");

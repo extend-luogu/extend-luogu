@@ -10,7 +10,7 @@ textarea.exlg-regbadge-configinput {
     display: block;
     width: 100%;
     padding: 0.5em;
-    font-size: 1.6rem;
+    /* font-size: 1.6rem; */
     line-height: 1.2;
     color: #555;
     outline: 0;

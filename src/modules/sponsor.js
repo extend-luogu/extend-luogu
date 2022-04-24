@@ -85,12 +85,8 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
         if (!$e || $e.hasClass("exlg-badge-username")) return;
         $e.addClass("exlg-badge-username"); // Note: 防止重复加
         let uid = $e.attr("href").slice("/user/".length);
-        // if (args.ty === "user-followers") console.log(e, $(e.parentNode.parentNode.parentNode.parentNode).find("img"), e.parentNode.parentNode.parentNode.parentNode.innerHTML)
-        if (args.ty === "user-feed" && uid === "ript:void 0") { // Note: 太草了，原来只要钩头像就行了
-            uid = $(e.parentNode.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
-        }
-        if (args.ty === "user-followers" && uid === "ript:void 0") { // Note: 太草了，原来只要钩头像就行了
-            uid = $(e.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
+        if (["user-feed", "user-followers"].includes(args.ty) && uid === "ript:void 0") { // Note: 太草了，原来只要钩头像就行了
+            uid = $(e.parentNode.parentNode.previousElementSibling ?? e.parentNode.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
         }
         const badge = badges[uid];
         if (!badge || !badge.text) return;
@@ -112,16 +108,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
         const $badge = getBadge(uid, bdty === "luogu4" ? e.childNodes[0].style.color : getColor(e), bdty, bdty === "luogu4" ? badge.lg4 : badge);
         // Note: user 页面的特殊情况
         if (["user-feed", "user-followers"].includes(args.ty)) $tar.parent().after($badge);
-        else {
-            $tar[0].innerHTML = $tar[0].innerHTML.replace(/(\s*$)/g, "");
-            if ($tar.hasClass("sb_amazeui") && !$tar[0].innerHTML) { // Note: 全网犇犇的傻逼写法适配
-                const $nulltar = $tar;
-                $tar = $tar.prev();
-                $tar[0].innerHTML = $tar[0].innerHTML.replace(/(\s*$)/g, "");
-                $nulltar.remove();
-            }
-            $tar.after($badge).after($("<span>&nbsp;</span>"));
-        }
+        else $tar.after($badge).after($("<span>&nbsp;</span>"));
     });
 }))(new Set(), {}, []), (e) => {
     // console.log(e.target)
