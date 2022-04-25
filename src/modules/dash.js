@@ -2,7 +2,9 @@ import uindow, {
     $, version_cmp, lg_usr,
 } from "../utils.js";
 import mod from "../core.js";
-import logo from "../resources/logo.js";
+import {
+    svg_logo, exlg_settings_svg, svg_gayhub, svg_cross,
+} from "../resources/svg-images.js";
 import register_badge from "../components/register-badge.js";
 import get_latest from "../components/get-latest.js";
 import css from "../resources/css/dash-bridge.css";
@@ -120,34 +122,34 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             return;
         } // Note: 因为这个原因要放到最前面去，否则会先执行 $btn.prependTo($tar).
         const renewDropdown = ($board, $cb) => {
-            const _cuser = lg_usr;
-            $board.children(".header").after(`<style>${css_dd}</style>`); // 测试过了不然没办法保证这个 css 只在全页面出现一次
-            $board.children(".header").after(`
-            <div style="margin-top: 0.4em;">
-                <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.following">
-                    <span class="value">${_cuser.followingCount}</span>
-                    <span data-v-3c4577b8="" class="key">关注</span>
-                </a>
-                <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.follower">
-                    <span class="value">${_cuser.followerCount}</span>
-                    <span data-v-3c4577b8="" class="key">粉丝</span>
-                </a>
-                <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/notification">
-                    <span class="value">${_cuser.unreadNoticeCount + _cuser.unreadMessageCount}</span>
-                    <span data-v-3c4577b8="" class="key">动态</span>
-                </a>
-            </div>
-            `);
-            $board.children(".header").after(`
-            <div class="exlg-dropdown field">
-                <span data-v-3c4577b8="" class="key-small">CCF 评级: <strong>${_cuser.ccfLevel}</strong> | 咕值排行: <strong>${_cuser.ranking}</strong></span>
-            </div>
-            `);
+            // Note: 测试过了不然没办法保证这个 css 只在全页面出现一次
+            $board.children(".header").after(`<style>${css_dd}</style>`)
+                .after(`
+                <div style="margin-top: 0.4em;">
+                    <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${lg_usr.uid}#following.following">
+                        <span class="value">${lg_usr.followingCount}</span>
+                        <span data-v-3c4577b8="" class="key">关注</span>
+                    </a>
+                    <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${lg_usr.uid}#following.follower">
+                        <span class="value">${lg_usr.followerCount}</span>
+                        <span data-v-3c4577b8="" class="key">粉丝</span>
+                    </a>
+                    <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/notification">
+                        <span class="value">${lg_usr.unreadNoticeCount + lg_usr.unreadMessageCount}</span>
+                        <span data-v-3c4577b8="" class="key">动态</span>
+                    </a>
+                </div>
+                `)
+                .after(`
+                <div class="exlg-dropdown field">
+                    <span data-v-3c4577b8="" class="key-small">CCF 评级: <strong>${lg_usr.ccfLevel}</strong> | 咕值排行: <strong>${lg_usr.ranking}</strong></span>
+                </div>
+                `);
             $cb.each(renewAlink);
             const $exlg = $($cb[5]).clone().attr("href", "javascript:void 0");
             $exlg.on("click", jumpSettings);
             $($cb[5]).after($exlg);
-            $exlg.children("div.link-title").html(`<svg data-v-a97ae32a="" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="code" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-code fa-w-20"><path data-v-a97ae32a="" fill="currentColor" d="M278.9 511.5l-61-17.7c-6.4-1.8-10-8.5-8.2-14.9L346.2 8.7c1.8-6.4 8.5-10 14.9-8.2l61 17.7c6.4 1.8 10 8.5 8.2 14.9L293.8 503.3c-1.9 6.4-8.5 10.1-14.9 8.2zm-114-112.2l43.5-46.4c4.6-4.9 4.3-12.7-.8-17.2L117 256l90.6-79.7c5.1-4.5 5.5-12.3.8-17.2l-43.5-46.4c-4.5-4.8-12.1-5.1-17-.5L3.8 247.2c-5.1 4.7-5.1 12.8 0 17.5l144.1 135.1c4.9 4.6 12.5 4.4 17-.5zm327.2.6l144.1-135.1c5.1-4.7 5.1-12.8 0-17.5L492.1 112.1c-4.8-4.5-12.4-4.3-17 .5L431.6 159c-4.6 4.9-4.3 12.7.8 17.2L523 256l-90.6 79.7c-5.1 4.5-5.5 12.3-.8 17.2l43.5 46.4c4.5 4.9 12.1 5.1 17 .6z" class=""></path></svg> 插件设置`);
+            $exlg.children("div.link-title").html(`${exlg_settings_svg} 插件设置`);
         };
         if ($tar.hasClass("user-nav") || $tar.parent().hasClass("user-nav")) renewDropdown($tar.find(".dropdown > .center"), $tar.find(".ops > a"));
     }
@@ -190,29 +192,8 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             $spn.append(`<style>${css_dash}</style>`);
         }
         $spn.appendTo($hov);
-        /*
-        let mondsh = false,
-            monbrd = false;
-        $btn.on("mouseenter", () => {
-            mondsh = true;
-            $spn.show();
-        });
-        $btn.on("mouseleave", () => {
-            mondsh = false;
-            if (!monbrd) {
-                setTimeout(() => {
-                    if (!monbrd) $spn.hide();
-                }, 200);
-            }
-        });
-        $spn.on("mouseenter", () => { monbrd = true; })
-            .on("mouseleave", () => {
-                monbrd = false;
-                if (!mondsh) $spn.hide();
-            });
-        */
 
-        $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;">${logo}</h2>`).appendTo($spn);
+        $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;">${svg_logo}</h2>`).appendTo($spn);
         const $bdiv = $(`<div id="exlg-windiv"></div>`).appendTo($spn);
 
         const _list = [
@@ -233,9 +214,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 tag: "link", title: "链接", buttons: [
                     { html: "官网", url: "https://exlg.cc" },
                     {
-                        col: "#666", html: `<a style="height: 8px;width: 8px;"><svg aria-hidden="true" height="12" viewBox="0 0 16 16" version="1.1" width="12" data-view-component="true" class="octicon octicon-mark-github">
-                <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-            </svg></a>Github`, url: "https://github.com/extend-luogu/extend-luogu",
+                        col: "#666", html: `<a style="height: 8px;width: 8px;">${svg_gayhub}</a>Github`, url: "https://github.com/extend-luogu/extend-luogu",
                     },
                     { html: "爱发电", url: "https://afdian.net/@extend-luogu" },
                 ],
@@ -271,6 +250,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 ],
             },
         ];
+
         _list.forEach((e) => {
             const $div = $(`<div id="${e.tag}-div"><span class="exlg-windiv-left-tag">${e.title}</span></div>`).appendTo($bdiv),
                 $span = $("<span></span>").appendTo($div);
@@ -300,7 +280,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     $latest.text(latest).attr("title", "最新版本");
                     $fuckingdots.html({ "<<": `<i class="exlg-icon exlg-info" name="有新版本"></i>`, ">>": `<i class="exlg-icon exlg-info" name="内测中！"></i>` }[op] || "").children().css("cssText", "position: absolute;display: inline-block;");
                     if (op === "<<" && version_cmp(msto.latest_ignore, latest) === "<<") {
-                        const $ignore_vers = $(`<span style="color: red;margin-left: 30px;"><svg class="icon" style="vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" width="24" height="24" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446"><path d="M512 128c-211.7 0-384 172.3-384 384s172.3 384 384 384 384-172.3 384-384-172.3-384-384-384z m0 717.4c-183.8 0-333.4-149.6-333.4-333.4S328.2 178.6 512 178.6 845.4 328.2 845.4 512 695.8 845.4 512 845.4zM651.2 372.8c-9.9-9.9-25.9-9.9-35.8 0L512 476.2 408.6 372.8c-9.9-9.9-25.9-9.9-35.8 0-9.9 9.9-9.9 25.9 0 35.8L476.2 512 372.8 615.4c-9.9 9.9-9.9 25.9 0 35.8 4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4L512 547.8l103.4 103.4c4.9 4.9 11.4 7.4 17.9 7.4s13-2.5 17.9-7.4c9.9-9.9 9.9-25.9 0-35.8L547.8 512l103.4-103.4c9.9-9.9 9.9-25.9 0-35.8z" p-id="5447"></path></svg></span>`).on("click", () => {
+                        const $ignore_vers = $(`<span style="color: red;margin-left: 30px;">${svg_cross}</span>`).on("click", () => {
                             msto.latest_ignore = latest;
                             $ignore_vers.hide();
                         }).appendTo($fuckingdots);

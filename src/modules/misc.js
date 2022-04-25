@@ -2,6 +2,7 @@ import mod from "../core.js";
 import {
     $, judge_problem, lg_dat, lg_content,
 } from "../utils.js";
+import { svg_exit } from "../resources/svg-images.js";
 
 import hidesol_css from "../resources/css/hide-solution.css";
 import backtocont_css from "../resources/css/back-to-contest.css";
@@ -32,9 +33,7 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     if ((!pid) || (!cid)) return;
     if ($info_rows.children(".exlg-back-to-contest").length > 0) return; // Note: 防止重复
     $pre.attr("href", `/contest/${cid}#problems`)
-        .html(`<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="door-open" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="svg-inline--fa fa-door-open fa-w-20">
-            <path data-v-450d4937="" data-v-303bbf52="" fill="currentColor" d="M624 448h-80V113.45C544 86.19 522.47 64 496 64H384v64h96v384h144c8.84 0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zM312.24 1.01l-192 49.74C105.99 54.44 96 67.7 96 82.92V448H16c-8.84 0-16 7.16-16 16v32c0 8.84 7.16 16 16 16h336V33.18c0-21.58-19.56-37.41-39.76-32.17zM264 288c-13.25 0-24-14.33-24-32s10.75-32 24-32 24 14.33 24 32-10.75 32-24 32z"></path>
-            </svg>返回列表`)
+        .html(`${svg_exit}返回列表`)
         .appendTo($info_rows);
 }, (e) => {
     const tar = e.target,
