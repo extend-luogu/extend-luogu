@@ -6,7 +6,8 @@ import logo from "../resources/logo.js";
 import register_badge from "../components/register-badge.js";
 import get_latest from "../components/get-latest.js";
 import css from "../resources/css/dash-bridge.css";
-import css_bd from "../resources/css/beautified-dash.css";
+import css_dash from "../resources/css/beautified-dash.css";
+import css_dd from "../resources/css/beautified-dropdown.css";
 import category from "../category.js";
 import compo from "../compo-core.js";
 import { datas } from "../storage.js";
@@ -86,11 +87,15 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         ty: "boolean", dft: true,
         info: ["Beautify Dropdown", "右上角用户信息卡美化"],
     },
+    beautify_dash: {
+        ty: "boolean", dft: true,
+        info: ["Beautify Dash Board", "控制桥面板美化"],
+    },
     enable_rclick: {
         ty: "boolean", dft: true,
         info: ["Use Right Click to change source", "右键点击按钮换源"],
     },
-    latest_ignore: { // 最新忽略版本更新提示的版本
+    latest_ignore: { // Note: 最新忽略版本更新提示的版本
         ty: "string", dft: "0.0.0",
     },
 }, ({ msto, args }) => {
@@ -105,7 +110,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
 
     // Note: 美化
     if (msto.beautify_dropdown) {
-        GM_addStyle(css_bd);
+        GM_addStyle(css_dd);
         const renewAlink = (_i, e, $e = $(e)) => {
             $e.addClass("exlg-dash-options");
             e.innerHTML = `<div class="link-title">${e.innerHTML}</div>`;
@@ -116,6 +121,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
         } // Note: 因为这个原因要放到最前面去，否则会先执行 $btn.prependTo($tar).
         const renewDropdown = ($board, $cb) => {
             const _cuser = lg_usr;
+            $board.children(".header").after(`<style>${css_dd}</style>`); // 测试过了不然没办法保证这个 css 只在全页面出现一次
             $board.children(".header").after(`
             <div style="margin-top: 0.4em;">
                 <a class="exlg-dropdown field" href="//www.luogu.com.cn/user/${_cuser.uid}#following.following">
@@ -147,9 +153,10 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     }
 
     // Note: 按钮
-    const $spn = $(`<span id="exlg-dash-window" class="exlg-window" style="display: none;"></span>`).css("left", "-125px");
+    const $hov = $(`<span id="exlg-dash-wrapper"></span>`).prependTo($tar);
+    const $spn = $(`<span id="exlg-dash-window" class="exlg-window"></span>`).css("left", "-125px");
     const $btn = $(`<div id="exlg-dash" exlg="exlg">exlg</div>`)
-        .prependTo($tar)
+        .prependTo($hov)
         .css("backgroundColor", {
             exlg: "cornflowerblue",
             gh_index: "darkblue",
@@ -179,7 +186,11 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     // Note: 创建窗口。
     const create_window = !$tar.parent().hasClass("mobile-nav-container");
     if (create_window) {
-        $spn.prependTo($tar);
+        if (msto.beautify_dash) {
+            $spn.append(`<style>${css_dash}</style>`);
+        }
+        $spn.appendTo($hov);
+        /*
         let mondsh = false,
             monbrd = false;
         $btn.on("mouseenter", () => {
@@ -199,6 +210,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 monbrd = false;
                 if (!mondsh) $spn.hide();
             });
+        */
 
         $(`<h2 align="center" style="margin-top: 5px;margin-bottom: 10px;">${logo}</h2>`).appendTo($spn);
         const $bdiv = $(`<div id="exlg-windiv"></div>`).appendTo($spn);

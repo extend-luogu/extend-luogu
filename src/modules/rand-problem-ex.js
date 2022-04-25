@@ -2,7 +2,6 @@ import uindow, {
     $, judge_problem, lg_content, tupledft_gen,
 } from "../utils.js";
 import mod from "../core.js";
-import exlg_alert from "../components/exlg-dialog-board.js";
 import css from "../resources/css/rand-problem-ex.css";
 
 mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
@@ -58,9 +57,6 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
         else location.href = `https://www.luogu.com.cn/problemnew/show/${str}`;
     };
 
-    let mouse_on_board = false,
-        mouse_on_dash = false;
-
     // Note: 重新构建界面
     let $input = $("input[name='toproblem']");
     $input.after($input.clone()).remove();
@@ -71,6 +67,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     $jump = $(".am-btn[name='goto']");
 
     const $btn_list = $jump.parent();
+    const $settings_dash = $(`<div id="exlg-dash-0" class="exlg-rand-settings">ex 设置</div>`);
 
     $(".am-btn[name='gotorandom']").text("随机");
     const $jump_exrand = $(`<button class="am-btn am-btn-success am-btn-sm" name="gotorandomex">随机 ex</button>`).appendTo($btn_list);
@@ -86,15 +83,24 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     const $board = $(`<span id="exlg-exrand-window" class="exlg-window" style="display: block;">
     <br>
     <ul></ul>
-    </span>`).appendTo($btn_list).hide()
+    </span>`).appendTo($settings_dash)
+        .css({
+            position: "absolute",
+            left: "-100px",
+            top: "20px",
+            "z-index": 9,
+            "font-weight": "initial",
+        });
+    /*
+        .hide()
         .on("mouseenter", () => { mouse_on_board = true; })
         .on("mouseleave", () => {
             mouse_on_board = false;
             if (!mouse_on_dash) {
                 $board.hide();
             } // Hack: 维护 onboard
-        });
-    $(".lg-index-stat>h2").text("问题跳转 ").append($(`<div id="exlg-dash-0" class="exlg-rand-settings">ex 设置</div>`));
+        }); */
+    $(".lg-index-stat>h2").text("问题跳转 ").append($settings_dash);
     const $ul = $board.children("ul").css("list-style-type", "none");
 
     const $exrand_menu = $(`<div id="exlg-exrand-menu"></div>`).appendTo($ul);
@@ -134,8 +140,6 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
     }, [$exrand_diff, dif_list, msto.exrand_difficulty], [$exrand_srce, src_list, msto.exrand_source]);
 
     $("#exlg-dash-0").on("mouseenter", () => {
-        mouse_on_dash = true;
-
         $.double(([$p, mproxy]) => {
             // Kill: const _$smalldash = [$p.children(".exrand-enabled").children(".exlg-smallbtn"), $p.children(".exrand-disabled").children(".exlg-smallbtn")]
 
@@ -143,16 +147,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
                 $p.children(jqstr).children(".exlg-smallbtn").each((i, e, $e = $(e)) => ((mproxy[i] === bln) ? ($e.show()) : ($e.hide())));
             }, [".exrand-enabled", true], [".exrand-disabled", false]);
         }, [$exrand_diff, msto.exrand_difficulty], [$exrand_srce, msto.exrand_source]); // Hack: 防止开两个页面瞎玩的情况
-        $board.show(); // Hack: 鼠标放在 dash 上开 window
-    })
-        .on("mouseleave", () => {
-            mouse_on_dash = false; // Hack: 离开 dash 和 board 超过 200ms 直接关掉
-            if (!mouse_on_board) {
-                setTimeout(() => {
-                    if (!mouse_on_board) $board.hide();
-                }, 200);
-            }
-        });
+    });
 
     const exrand_poi = async () => { // Note: 异步写法（用到了 lg_content）
         const result = $.double(([l, msto_proxy, _empty]) => {
@@ -161,7 +156,7 @@ mod.reg("rand-problem-ex", "随机跳题_ex", "@/", {
                 if (msto_proxy[i]) g.push(e.id);
             });
             if (!g.length) {
-                exlg_alert("您没有设置");
+                // exlg_alert("您没有设置"); // Note: 没有设置但是有默认选项，写这行的是不是没看懂我在干嘛
                 g = _empty;
                 l.forEach((e, i) => msto_proxy[i] = _empty.includes(e.id));
             }
