@@ -15,5 +15,7 @@
     - 如 "源代码 - ${lang}" 会被解析为 "源代码 - C++" 等
  - 代码块字体 / Code Block Font
     - 字面意思。
+ - 代码块背景色 / Code Block Background Color
+    - 字面意思。用于解决在 ISS#147 中被提出的类似问题。
  - 代码块最大显示行数 / Max Lines On Show
-    - 字面意思。
+    - 字面意思。~~但是没做出来~~
