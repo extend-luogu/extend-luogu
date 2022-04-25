@@ -97,6 +97,11 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     if (["exlg", "gh_index", "debug"].indexOf(msto.source) === -1) msto.source = "exlg";
 
     const { $tar } = args;
+    const jumpSettings = () => uindow.exlg.dash = uindow.open({
+        exlg: "https://dash.exlg.cc/index.html",
+        gh_index: "https://extend-luogu.github.io/exlg-setting-new/index.html",
+        debug: "localhost:1634/dashboard",
+    }[msto.source]);
 
     // Note: 美化
     if (msto.beautify_dropdown) {
@@ -152,11 +157,6 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             // gh_bundle: "darkslateblue"
         }[msto.source])
         .css("margin-top", $tar.hasClass("nav-container") ? "5px" : "0px");
-    const jumpSettings = () => uindow.exlg.dash = uindow.open({
-        exlg: "https://dash.exlg.cc/index.html",
-        gh_index: "https://extend-luogu.github.io/exlg-setting-new/index.html",
-        debug: "localhost:1634/dashboard",
-    }[msto.source]);
     if (msto.enable_rclick) {
         $btn.on("contextmenu", false)
             .on("mousedown", (e) => {
