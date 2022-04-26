@@ -36,9 +36,9 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         info: ["Language of descriptions in the dashboard", "控制面板提示语言"],
     },
 }, () => {
-    const _toSettings = (schroot, path = []) => Object.entries(schroot)
+    const toSettings = (schroot, path = []) => Object.entries(schroot)
         .filter(([k, s]) => k !== "on" && !s.priv)
-        .map(([k, s]) => (s.ty === "object" ? _toSettings(s.lvs, path.concat(k)) : {
+        .flatMap(([k, s]) => (s.ty === "object" ? toSettings(s.lvs, path.concat(k)) : {
             name: path.concat(k),
             displayName: k.split("_").map((t) => t.toInitialCase()).join(" "),
             description: s.info,
@@ -47,8 +47,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
             }[s.ty],
             ...(s.ty === "number" && { minValue: s.min, maxValue: s.max, increment: s.step }),
             ...(s.ty === "enum" && { acceptableValues: s.vals }),
-        }))
-        .flat();
+        }));
     const modules = [...category._]
         .map(([name, {
             description, alias, icon, unclosable,
@@ -60,21 +59,8 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                     name: nm,
                     description: m.info,
                     unclosable,
-                    /*
-                    settings: Object.entries(datas[alias + nm]?.lvs ?? {})
-                        .filter(([k, s]) => k !== "on" && !s.priv)
-                        .map(([k, s]) => ({
-                            name: k,
-                            displayName: k.split("_").map((t) => t.toInitialCase()).join(" "),
-                            description: s.info,
-                            type: {
-                                number: "SLIDER", boolean: "CHECKBOX", string: "TEXTBOX", enum: "SELECTBOX",
-                            }[s.ty],
-                            ...(s.ty === "number" && { minValue: s.min, maxValue: s.max, increment: s.step }),
-                            ...(s.ty === "enum" && { acceptableValues: s.vals }),
-                        })),
-                    */
-                    settings: _toSettings(datas[alias + nm]?.lvs ?? {}),
+                    // Note: 有个傻狗注释掉了然后出锅了，我不说是谁。
+                    settings: toSettings(datas[alias + nm]?.lvs ?? {}),
                 })),
         }));
     console.log(modules);
