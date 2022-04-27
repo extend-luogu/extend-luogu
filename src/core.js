@@ -1,7 +1,7 @@
 import uindow, {
     cur_time, log, warn, error, $,
 } from "./utils.js";
-import icon_b from "./resources/logo.js";
+import { svg_logo as icon_b } from "./resources/svg-images.js";
 import category from "./category.js";
 import { datas } from "./storage.js";
 import queues from "./run-queue.js";
@@ -78,11 +78,19 @@ const mod = {
             });
         };
 
+        const grtpr = (e, x) => {
+            if (typeof x === "object" && e in x) {
+                return x[e];
+            }
+        };
+
         gpth = pth_modify(gpth);
         const qpusher = (nm, pth, qn, fn) => {
             pth = pth ? pth_modify(pth) : [];
-            if (pth.concat(gpth).some((e) => RegExp(e).test(location.href))) {
-                queues[qn].push((...arg) => fn({ ...((nm in msto.private) && { msto: msto.private[nm] }), gsto: msto.public, ...arg }));
+            const md = grtpr(nm, msto.private),
+                enb = grtpr("on", md);
+            if (enb !== false && pth.concat(gpth).some((e) => RegExp(e).test(location.href))) {
+                queues[qn].push((...arg) => fn({ msto: md, gsto: msto.public }, ...arg));
             }
         };
         return {
@@ -113,7 +121,7 @@ const mod = {
 
             // Note: 这东西被枪毙的时间不远了
             hook: ({ name, path }, _, fn, hook) => qpusher(name, path, "preload", (arg) => {
-                $("body").bind("DOMNodeInserted", (e) => {
+                $("body").on("DOMNodeInserted", (e) => {
                     if (!e.target.tagName) { return false; }
                     const res = hook(e);
                     return res.result && fn({ ...arg, ...res });
@@ -125,19 +133,23 @@ const mod = {
     reg_v2: ({
         name, info, path, cate,
     }, data, reger, styl) => {
+        info = info.replaceAll(" ", "_");
         const rawName = category.alias(cate) + name;
+        const pubdat = Object.entries(data ?? {}).filter(([e]) => e !== "on");
         datas[rawName] = {
             ty: "object",
             lvs: {
-                public: {
-                    ty: "object",
-                    lvs: Object.fromEntries(Object.entries(data).filter(([e]) => e !== "on")),
-                },
+                ...(pubdat && {
+                    public: {
+                        ty: "object",
+                        lvs: Object.fromEntries(pubdat),
+                    },
+                }),
                 private: {
                     ty: "object",
                     lvs: {},
                 },
-                on: { ty: "boolean", dft: data.on?.dft ?? true },
+                on: { ty: "boolean", dft: data?.on?.dft ?? true },
             },
         };
         const subfuncs = [];

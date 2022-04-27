@@ -37,7 +37,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
     },
 }, () => {
     const toSettings = (schroot, path = []) => Object.entries(schroot)
-        .filter(([k, s]) => k !== "on" && !s.priv)
+        .filter(([k, s]) => (path.length || k !== "on") && !s.priv)
         .flatMap(([k, s]) => (s.ty === "object" ? toSettings(s.lvs, path.concat(k)) : {
             name: path.concat(k),
             displayName: k.split("_").map((t) => t.toInitialCase()).join(" "),
