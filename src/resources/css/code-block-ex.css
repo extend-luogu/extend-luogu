@@ -28,6 +28,10 @@ div.exlg-copied {
     background-color: rgba(52, 152, 219, 0.9)!important;
     color: white!important;
 }
+div.exlg-copied.exlg-copied-fail {
+    background-color: rgba(219, 52, 52, 0.9)!important;
+    color: white!important;
+}
 .copy-btn {
     font-size: .8em;
     padding: 0 5px;

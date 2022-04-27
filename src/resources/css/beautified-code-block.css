@@ -1,0 +1,59 @@
+/* exlg beautified cbex css by minstdfx */
+h3.exlg-code-title.exlg-beautified-cbex {
+    /* width: 100%; */
+    /* margin: 0 0; */
+    margin-bottom: 0!important;
+    padding: 0.4rem 0.6rem 0.4rem 2rem;
+    /* border-bottom: 0.05rem solid rgba(68,138,255,.1); */
+    background-color: #eeeeee;
+    font-weight: 700;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding-top: 8px;
+    margin-top: 10px;
+    box-shadow: 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%), 0 3px 1px -2px rgb(0 0 0 / 20%);
+}
+h3.exlg-code-title.exlg-beautified-cbex+pre[exlg-copy-code-block] {
+    margin-top: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%), 0 3px 1px -2px rgb(0 0 0 / 20%);
+    background-color: rgb(250,250,250);
+}
+h3.exlg-code-title.exlg-beautified-cbex+pre > code.hljs[class] {
+    font-family: "Fira Code", Consolas, monospace;
+    background: white;
+    padding: 0.5em;
+}
+h3.exlg-code-title.exlg-beautified-cbex > div.exlg-copy {
+    color: rgb(108, 117, 125);
+    border: 0px solid #3498db;
+    margin-left: 1px;
+    font-size: 0;
+    transition: background-color .3s;
+    background-image: url("data:image/svg+xml;utf8,<svg class='icon' style='width: 1em;height: 1em;vertical-align: middle;fill: rgb(108, 117, 125);overflow: hidden;' viewBox='0 0 1024 1024' version='1.1' xmlns='http://www.w3.org/2000/svg' p-id='2669'><path d='M661.333333 234.666667A64 64 0 0 1 725.333333 298.666667v597.333333a64 64 0 0 1-64 64h-469.333333A64 64 0 0 1 128 896V298.666667a64 64 0 0 1 64-64z m-21.333333 85.333333H213.333333v554.666667h426.666667v-554.666667z m191.829333-256a64 64 0 0 1 63.744 57.856l0.256 6.144v575.701333a42.666667 42.666667 0 0 1-85.034666 4.992l-0.298667-4.992V149.333333H384a42.666667 42.666667 0 0 1-42.368-37.674666L341.333333 106.666667a42.666667 42.666667 0 0 1 37.674667-42.368L384 64h447.829333z' p-id='2670'></path></svg>");
+    height: 20px;
+    width: 20px;
+    padding: 0;
+}
+h3.exlg-code-title.exlg-beautified-cbex > div.exlg-copy:hover {
+    background-color: rgba(108, 117, 125, 0.1);
+}
+h3.exlg-code-title.exlg-beautified-cbex > div.exlg-copied[class] {
+    background-color: rgba(108, 117, 125, 0)!important;
+    /* color: rgba(164, 210, 250)!important; */
+    background-image: url("data:image/svg+xml;utf8,<svg class='icon' style='width: 1em;height: 1em;vertical-align: middle;fill: rgb(70, 160, 240);overflow: hidden;' viewBox='0 0 1024 1024' version='1.1' xmlns='http://www.w3.org/2000/svg' p-id='2669'><path d='M661.333333 234.666667A64 64 0 0 1 725.333333 298.666667v597.333333a64 64 0 0 1-64 64h-469.333333A64 64 0 0 1 128 896V298.666667a64 64 0 0 1 64-64z m-21.333333 85.333333H213.333333v554.666667h426.666667v-554.666667z m191.829333-256a64 64 0 0 1 63.744 57.856l0.256 6.144v575.701333a42.666667 42.666667 0 0 1-85.034666 4.992l-0.298667-4.992V149.333333H384a42.666667 42.666667 0 0 1-42.368-37.674666L341.333333 106.666667a42.666667 42.666667 0 0 1 37.674667-42.368L384 64h447.829333z' p-id='2670'></path></svg>");
+}
+h3.exlg-code-title.exlg-beautified-cbex > div.exlg-copied[class]:hover {
+    background-color: rgba(108, 117, 125, 0.3)!important;
+}
+
+h3.exlg-code-title.exlg-beautified-cbex > div.exlg-copied.exlg-copied-fail[class] {
+    background-color: rgba(108, 117, 125, 0)!important;
+    /* color: rgba(164, 210, 250)!important; */
+    background-image: url("data:image/svg+xml;utf8,<svg class='icon' style='width: 1em;height: 1em;vertical-align: middle;fill: rgb(219, 52, 52);overflow: hidden;' viewBox='0 0 1024 1024' version='1.1' xmlns='http://www.w3.org/2000/svg' p-id='2669'><path d='M661.333333 234.666667A64 64 0 0 1 725.333333 298.666667v597.333333a64 64 0 0 1-64 64h-469.333333A64 64 0 0 1 128 896V298.666667a64 64 0 0 1 64-64z m-21.333333 85.333333H213.333333v554.666667h426.666667v-554.666667z m191.829333-256a64 64 0 0 1 63.744 57.856l0.256 6.144v575.701333a42.666667 42.666667 0 0 1-85.034666 4.992l-0.298667-4.992V149.333333H384a42.666667 42.666667 0 0 1-42.368-37.674666L341.333333 106.666667a42.666667 42.666667 0 0 1 37.674667-42.368L384 64h447.829333z' p-id='2670'></path></svg>");
+}
+h3.exlg-code-title.exlg-beautified-cbex > div.exlg-copied.exlg-copied-fail[class]:hover {
+    background-color: rgba(108, 117, 125, 0.3)!important;
+}
