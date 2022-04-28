@@ -65,7 +65,7 @@ mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*"
                 "font-weight": fw || "700",
                 "font-size": fs || "",
                 border: bd || "",
-                "background-size": "contain",
+                /* "background-size": "contain", */
                 /* "background-repeat": "no-repeat", */
             })
             .on("click", () => register_badge());

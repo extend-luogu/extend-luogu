@@ -268,7 +268,6 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
                     cursor: pointer;
                     margin-left: 2px;
                     margin-right: 2px;
-                    background-repeat: no-repeat;
                 `);
                 Object.keys(srd.customSettings).forEach((key, _index) => {
                     const obj = srd.customSettings[key];
