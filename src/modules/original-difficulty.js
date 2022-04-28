@@ -12,7 +12,7 @@ mod.reg_v2({
     cf_src: {
         ty: "enum", dft: "codeforces.com", vals: ["codeforces.com", "codeforces.ml", "codeforc.es"], info: [
             "Codeforces problem source", "CF 题目源",
-        ],
+        ], migration: true,
     },
     atdiff: { ty: "string", priv: true },
 }, (handler) => {

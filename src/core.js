@@ -134,8 +134,16 @@ const mod = {
         name, info, path, cate,
     }, data, reger, styl) => {
         info = info.replaceAll(" ", "_");
+        let olds = {};
+        const oll = [];
+        const gtolds = (dat, ...dir) => olds = Object.fromEntries(Object.entries(olds).concat(Object.entries(dat).map(([k, v]) => {
+            const origName = v.migration === true ? k : v.migration;
+            oll.push([origName, dir.concat(k)]);
+            return [origName, { ...v, priv: true }];
+        })));
         const rawName = category.alias(cate) + name;
         const pubdat = Object.entries(data ?? {}).filter(([e]) => e !== "on");
+        gtolds(pubdat, "public");
         datas[rawName] = {
             ty: "object",
             lvs: {
@@ -154,10 +162,15 @@ const mod = {
         };
         const subfuncs = [];
         const _regv2_data_reger = (rtd) => {
-            const mdf = (nm, dat) => dat && (rtd.private.lvs[nm] = {
-                ty: "object",
-                lvs: dat,
-            });
+            const mdf = (nm, dat) => {
+                if (dat) {
+                    rtd.private.lvs[nm] = {
+                        ty: "object",
+                        lvs: dat,
+                    };
+                    gtolds(dat, "private", nm);
+                }
+            };
             return new Proxy({
                 onload: (e, dat) => mdf(e.name, dat),
                 preload: (e, dat) => mdf(e.name, dat),
@@ -174,8 +187,9 @@ const mod = {
             });
         };
         reger(_regv2_data_reger(datas[rawName].lvs));
+        datas[rawName].lvs = { ...datas[rawName].lvs, ...olds };
         mod._.set(name, {
-            info, path, data, func: reger, subfuncs, styl, cate,
+            info, path, data, func: reger, subfuncs, migrlist: oll, styl, cate,
         });
     },
 
@@ -328,8 +342,20 @@ const mod = {
         }
         */
         for (const [nm, m] of mod._.entries()) {
-            if (sto[category.alias(m.cate) + nm].on && m.subfuncs) {
-                const handler = mod._regv2_invoker(m.path, sto[category.alias(m.cate) + nm]);
+            const rawName = category.alias(m.cate) + nm;
+            if (sto[rawName].on && m.subfuncs) {
+                if (Array.isArray(m.migrlist)) {
+                    for (const [snm, dir] of m.migrlist) {
+                        if (sto[rawName][snm] !== datas[rawName].lvs[snm].dft) {
+                            let curr = sto[rawName];
+                            const tmpd = dir.slice(0, -1);
+                            for (const et of tmpd) curr = curr[et];
+                            curr[dir.lastElem()] = sto[rawName][snm];
+                            sto[rawName][snm] = datas[rawName].lvs[snm].dft;
+                        }
+                    }
+                }
+                const handler = mod._regv2_invoker(m.path, sto[rawName]);
                 for (const e of m.subfuncs) {
                     handler[e[0]](...e.slice(1));
                 }

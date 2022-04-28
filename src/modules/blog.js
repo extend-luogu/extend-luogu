@@ -11,8 +11,12 @@ mod.reg_v2({
         name: "format",
         info: "按照洛谷题解标准格式化",
     }, {
-        on: { ty: "boolean", dft: true, info: ["Enable format", "显示格式化按钮"] },
-        cloud: { ty: "boolean", dft: true, info: ["Enable cloud format", "启用云格式化"] },
+        on: {
+            ty: "boolean", dft: true, info: ["Enable format", "显示格式化按钮"], migration: "format",
+        },
+        cloud: {
+            ty: "boolean", dft: true, info: ["Enable cloud format", "启用云格式化"], migration: true,
+        },
     }, ({ msto }) => {
         const $menu = $(".mp-editor-menu");
         $menu.append("<li data-v-6d5597b1=\"\" class=\"mp-divider\"><span data-v-6d5597b1=\"\">|</span></li>");
@@ -38,7 +42,9 @@ mod.reg_v2({
         name: "hotkeys",
         info: "编辑快捷键",
     }, {
-        on: { ty: "boolean", dft: true, info: ["Enable hotkeys", "快捷键"] },
+        on: {
+            ty: "boolean", dft: true, info: ["Enable hotkeys", "快捷键"], migration: "hotkeys",
+        },
     }, () => {
         $(uindow).whenKey({
             CtrlB: () => $("a[title='粗体']")[0].click(),
