@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import uindow, {
-    $, warn, log, lg_usr,
+    $, warn, log, lg_usr, judge_problem,
 } from "../utils.js";
 import mod, { sto } from "../core.js";
 import css from "../resources/css/keyboard-and-cli.css";
@@ -154,6 +154,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
                 return cli_error`mod: unknown action "${action}"`;
             }
         }),
+        /*
         gcmd("dash", "action: string", [
             "for <action> \"show|hide|toggle\", opearte the exlg dashboard.",
             "当 <action> 为 \"show|hide|toggle\", 显示 | 隐藏 | 切换 exlg 管理面板。",
@@ -161,6 +162,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             if (!["show", "hide", "toggle"].includes(action)) return cli_error`dash: unknown action "${action}"`;
             $("#exlg-dash-window")[action]();
         }),
+        */
         gcmd("lang", "lang: string", [
             "for <lang> \"en|zh\" switch current cli language.",
             "当 <lang> 为 \"en|zh\"，切换当前语言。",
@@ -171,6 +173,81 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
             } catch {
                 return cli_error`lang: unknown language ${lang}`;
             }
+        }),
+        gcmd("go", "type: string, [extinfo: string]", [
+            "jumps to any corner of Luogu.",
+            "跳转到洛谷的任何一个角落。",
+        ], (type, extinfo) => {
+            let errorbit = 0;
+            const alias = {
+                h: ["home", "homepage"],
+                p: ["problem"],
+                c: ["contest"],
+                r: ["record", "submission"],
+                d: ["discuss", "forum"],
+                i: ["user"],
+                m: ["chat", "message"],
+                n: ["notification"],
+            };
+            const nospectar = {
+                h: "/",
+                p: "/problem/list",
+                c: "/contest/list",
+                r: "/record/list",
+                d: "/discuss/lists",
+                i: `/user/${lg_usr.uid}`,
+                m: "/chat",
+                n: "/user/notification",
+            };
+            const intps = (pf) => (id) => {
+                if (isNaN(+id)) {
+                    errorbit = 1;
+                    return cli_error`unable to parse integer "${id}"`;
+                }
+                return `/${pf}/${+id}`;
+            };
+            const specp = {
+                p(pid) {
+                    pid = pid.toUpperCase();
+                    if (!judge_problem(pid)) {
+                        errorbit = 1;
+                        return cli_error`unable to judge pid ${pid}`;
+                    }
+                    return `/problem/${pid}`;
+                },
+                c: intps("contest"),
+                r: intps("record"),
+                d(did) {
+                    const tar = [
+                        ["relevantaffairs", "gs", "gsq", "灌水", "灌水区", "r", "ra"],
+                        ["academics", "xs", "xsb", "学术", "学术版", "a", "ac"],
+                        ["siteaffairs", "zw", "zwb", "站务", "站务版", "s", "sa"],
+                        ["problem", "tm", "tmzb", "题目", "题目总版", "p"],
+                        ["service", "fk", "fksqgd", "反馈", "反馈、申请、工单专版", "se"],
+                    ];
+                    const forum = tar.find((ns) => ns.includes(did))?.[0];
+                    if (forum) return `/discuss/lists?forumname=${forum}`;
+                    return intps("discuss");
+                },
+                i: intps("user"),
+            };
+            let href = "",
+                rty = type;
+            for (const [rn, al] of Object.entries(alias)) {
+                if (al.includes(type)) {
+                    rty = rn;
+                    break;
+                }
+            }
+            if (extinfo) {
+                if (!(rty in specp)) {
+                    return cli_error`category ${type} has no arguments`;
+                }
+                href = specp[rty](extinfo);
+            } else {
+                href = nospectar[rty];
+            }
+            if (!errorbit) location.href = href;
         }),
         gcmd("uid", "uid: integer", [
             "jumps to homepage of user whose uid is <uid>.",
