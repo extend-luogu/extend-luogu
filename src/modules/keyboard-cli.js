@@ -188,7 +188,7 @@ mod.reg("keyboard-and-cli", "键盘操作与命令行", "@/.*", {
         gcmd("cp", "pid: string", [
             "Jump to the problem with problemid <pid>.",
             "跳转至题目编号为 <pid> 的题目界面。",
-        ], (pid) => location.href = `/problem/${pid}`),
+        ], (pid) => location.href = `/problem/` + `${pid}`.toUpperCase()),
     ].reduce((tot, cmd) => {
         tot[cmd.name] = cmd;
         return tot;
