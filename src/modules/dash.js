@@ -1,7 +1,7 @@
 import uindow, {
     $, version_cmp, lg_usr,
 } from "../utils.js";
-import mod from "../core.js";
+import mod, { sto } from "../core.js";
 import {
     svg_logo, exlg_settings_svg, svg_gayhub, svg_cross,
 } from "../resources/svg-images.js";
@@ -93,7 +93,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
     const jumpSettings = () => uindow.exlg.dash = uindow.open({
         exlg: "https://dash.exlg.cc/index.html",
         gh_index: "https://extend-luogu.github.io/exlg-setting-new/index.html",
-        debug: "localhost:1634/dashboard",
+        debug: "localhost:1634/index.html",
     }[msto.source]);
 
     // Note: 美化
@@ -190,7 +190,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                     /*
                     { html: "JsDelivr", url: "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js" },
                     */
-                    { html: "Raw", url: "https://github.com/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" },
+                    { html: "Raw", url: `https://github.com/extend-luogu/extend-luogu/raw/${sto["#get-latest"].fetch_preview ? "preview" : "latest"}/dist/extend-luogu.min.user.js` },
                     /*
                     { html: "FastGit", url: "https://hub.fastgit.xyz/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" },
                     */
