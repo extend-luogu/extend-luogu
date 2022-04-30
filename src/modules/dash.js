@@ -35,6 +35,9 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         ty: "enum", dft: "zh", vals: ["zh", "en"],
         info: ["Language of descriptions in the dashboard", "控制面板提示语言"],
     },
+    load_speed: {
+        ty: "number", dft: 10, min: 0, max: 10, info: ["Dash animation speed", "dash 动画速度"],
+    },
 }, () => {
     const toSettings = (schroot, path = []) => Object.entries(schroot)
         .filter(([k, s]) => (path.length || k !== "on") && !s.priv)
