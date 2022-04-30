@@ -1,6 +1,6 @@
 import mod from "../core.js";
 import { $ } from "../utils.js";
-import { svg_modify_usercomment } from "../resources/svg-images.js";
+import svg_modify_usercomment from "../resources/image/modify-usercomment.svg";
 import css from "../resources/css/user-comment.css";
 import exlg_alert from "../components/exlg-dialog-board.js";
 

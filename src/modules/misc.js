@@ -2,7 +2,7 @@ import mod from "../core.js";
 import {
     $, judge_problem, lg_dat, lg_content,
 } from "../utils.js";
-import { svg_exit } from "../resources/svg-images.js";
+import svg_exit from "../resources/image/exit.svg";
 
 import hidesol_css from "../resources/css/hide-solution.css";
 import backtocont_css from "../resources/css/back-to-contest.css";

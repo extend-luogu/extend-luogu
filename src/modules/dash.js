@@ -2,9 +2,13 @@ import uindow, {
     $, version_cmp, lg_usr,
 } from "../utils.js";
 import mod, { sto } from "../core.js";
-import {
-    svg_logo, exlg_settings_svg, svg_gayhub, svg_cross,
-} from "../resources/svg-images.js";
+
+// SVGs
+import svg_logo from "../resources/image/logo.svg";
+import exlg_settings_svg from "../resources/image/settings.svg";
+import svg_gayhub from "../resources/image/gayhub.svg";
+import svg_cross from "../resources/image/cross.svg";
+
 import register_badge from "../components/register-badge.js";
 import get_latest from "../components/get-latest.js";
 import css from "../resources/css/dash-bridge.css";

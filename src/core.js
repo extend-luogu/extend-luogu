@@ -1,7 +1,7 @@
 import uindow, {
     cur_time, log, warn, error, $,
 } from "./utils.js";
-import { svg_logo as icon_b } from "./resources/svg-images.js";
+import icon_b from "./resources/image/logo.svg";
 import category from "./category.js";
 import { datas } from "./storage.js";
 import queues from "./run-queue.js";

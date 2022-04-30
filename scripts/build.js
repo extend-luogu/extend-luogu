@@ -32,7 +32,7 @@ const chk = (dn) => readdirSync(dn, { encoding: "utf8", withFileTypes: true }).f
     const ext = fn.name.match(/\.[^.]*$/g)[0];
     if (ext === ".css") tmpcss[rfn.replace(/\.[^.]*$/, "")] = rfn;
     else cpSync(rfn, join(tmpd, rfn));
-    if ([".css", ".html"].includes(ext)) trklist.push(join(tmpd, rfn));
+    if ([".css", ".html", ".svg"].includes(ext)) trklist.push(join(tmpd, rfn));
 });
 
 if (existsSync(tmpd)) rmSync(tmpd, { recursive: true, force: true });
@@ -54,6 +54,7 @@ buildSync({
     loader: {
         ".css": "text",
         ".html": "text",
+        ".svg": "text",
     },
     bundle: true,
     charset: "utf8",
