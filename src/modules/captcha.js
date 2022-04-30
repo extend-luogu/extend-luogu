@@ -24,5 +24,4 @@ mod.reg("captcha", "验证码自动填充", [/* "@/auth/login", */"@/discuss/.+"
             img[0].onload = autofill;
         });
     }
-}, `
-`, "module");
+}, null, "module");

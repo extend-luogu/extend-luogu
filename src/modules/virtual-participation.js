@@ -38,33 +38,28 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 let st = new Date(pa[0], pa[1] - 1, pa[2], pb[0], pb[1], 0, 0); // Note: Date 要减一个月
                 st = st.getTime() / 1000;
 
-                let orig_pids = "";
-                let orig_scrs = "";
-                $.each(lg_dat.contestProblems, (id, vl) => {
-                    if (id) {
-                        orig_pids += ",";
-                        orig_scrs += ",";
-                    }
-                    orig_pids += `"${vl.problem.pid}"`;
-                    orig_scrs += `"${vl.problem.pid}": ${vl.problem.fullScore}`;
+                const orig_pids = [],
+                    orig_scrs = {};
+                $.each(lg_dat.contestProblems, (_, vl) => {
+                    orig_pids.push(String(vl.problem.pid));
+                    orig_scrs[vl.problem.pid] = vl.problem.fullScore;
                 });
 
                 let resp = null;
-                const cdt = `{
-                    "settings":{
-                        "name": "Virtual Participation for ${lg_dat.contest.name}",
-                        "description": ${JSON.stringify(lg_dat.contest.description)},
-                        "visibilityType":5,
-                        "invitationCodeType":1,
-                        "ruleType":${lg_dat.contest.ruleType},
-                        "startTime":${st},
-                        "endTime":${st + lg_dat.contest.endTime - lg_dat.contest.startTime},
-                        "rated":false,
-                        "ratingGroup":null
+                resp = await lg_post(`/fe/api/contest/new`, JSON.stringify({
+                    settings: {
+                        name: `Virtual Participation for ${lg_dat.contest.name}`,
+                        description: lg_dat.contest.description,
+                        visibilityType: 5,
+                        invitationCodeType: 1,
+                        ruleType: lg_dat.contest.ruleType,
+                        startTime: st,
+                        endTime: st + lg_dat.contest.endTime - lg_dat.contest.startTime,
+                        rated: false,
+                        ratingGroup: null,
                     },
-                    "hostID":${lg_usr.uid}
-                }`;
-                resp = await lg_post(`/fe/api/contest/new`, cdt);
+                    hostID: lg_usr.uid,
+                }));
                 let vp_id = resp.id.toString();
                 if ((resp.status ?? 200) === 200) vp_id = resp.id.toString();
                 else error(`Failed to modify contest ${vp_id} with status code ${resp.status}.`);
@@ -72,10 +67,10 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                 try {
                     resp = await lg_post(
                         `/fe/api/contest/editProblem/${vp_id}`,
-                        `{
-                            "pids":[${orig_pids}],
-                            "scores":{${orig_scrs}}
-                        }`,
+                        JSON.stringify({
+                            pids: orig_pids,
+                            scores: orig_scrs,
+                        }),
                     );
                 } catch {
                     setTimeout(exlg_alert("<p>本场比赛的题目不公开</p>", "重现赛创建失败"), 500);

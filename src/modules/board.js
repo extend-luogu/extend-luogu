@@ -1,19 +1,11 @@
 import mod from "../core.js";
 import { $, cs_get } from "../utils.js";
 import css from "../resources/css/benben-ranklist.css";
+import html from "../resources/search-user.html";
 import exlg_alert from "../components/exlg-dialog-board.js";
 
 mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
-    $board.html(`
-        <h3>查找用户</h3>
-        <div class="am-input-group am-input-group-primary am-input-group-sm">
-            <input type="text" class="am-form-field" placeholder="例：kkksc03，可跳转站长主页" name="username" id="search-user-input">
-        </div>
-        <p>
-            <button class="am-btn am-btn-danger am-btn-sm" id="search-user">跳转</button>
-        </p>
-    `);
-    // eslint-disable-next-line no-use-before-define
+    $board.html(html);
     const $search_user = $("#search-user");
     const func = () => {
         $search_user.prop("disabled", true);
@@ -26,8 +18,7 @@ mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
     };
     $search_user.on("click", func);
     $("#search-user-input").whenKey("Enter", func);
-}, `
-`, "module");
+}, null, "module");
 
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
     show: { ty: "boolean", dft: true, info: ["Show in default", "是否默认展开"] },

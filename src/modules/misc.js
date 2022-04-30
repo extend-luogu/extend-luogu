@@ -15,8 +15,7 @@ mod.reg("dbc-jump", "双击题号跳题", "@/.*", null, () => {
             : "https://www.luogu.com.cn/problem/";
         if (judge_problem(pid)) window.open(url + pid);
     });
-}, `
-`, "module");
+}, null, "module");
 
 mod.reg("hide-solution", "隐藏题解", ["@/problem/[A-Z0-9]+", "@/problem/solution/.*"], { // Note: 为了避免识别成题目列表
     hidesolu: { ty: "boolean", dft: false, priv: true },
@@ -64,8 +63,7 @@ mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*",
         && /^\/problem\/[A-Z][A-Z0-9]+$/.exec(new URL(e.target.href).pathname) // Note: 如果插入的是题目链接
     ) return { result: true, args: { pid_tag: e.target.firstChild } };
     return { result: false };
-}, () => null, `
-`, "module");
+}, () => null, null, "module");
 
 mod.reg("mainpage-discuss-limit", "主页讨论个数限制", ["@/"], {
     max_discuss: {
@@ -81,10 +79,8 @@ mod.reg("mainpage-discuss-limit", "主页讨论个数限制", ["@/"], {
     $discuss.each((i, e, $e = $(e)) => {
         if (i >= msto.max_discuss) $e.hide();
     });
-}, `
-`, "module");
+}, null, "module");
 
 mod.reg("user-css", "自定义样式表", ".*", {
     css: { ty: "string" },
-}, ({ msto }) => GM_addStyle(msto.css), `
-`, "module");
+}, ({ msto }) => GM_addStyle(msto.css), null, "module");

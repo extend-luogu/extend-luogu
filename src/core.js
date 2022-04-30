@@ -56,11 +56,6 @@ const mod = {
         });
     },
 
-    reg_pre: (name, info, path, data, pre, func, styl, cate) => {
-        mod.reg(name, info, path, data, func, styl, cate);
-        mod._.set(name, { pre, ...mod._.get(name) });
-    },
-
     _regv2_invoker: (gpth, msto) => {
         const pth_modify = (pth) => {
             if (!Array.isArray(pth)) {
@@ -363,55 +358,16 @@ const mod = {
         }
     },
 
-    preload: (name) => {
-        if (sto === null) sto = mod.fake_sto; // Hack: 替代方案，变量还是没法 export 后修改
-        const exe = (m, named) => {
-            if (!m) error(`Preloading named mod but not found: "${name}"`);
-            log(`Preloading ${named ? "named " : ""}mod: "${m.name}"`);
-            try {
-                return { pred: m.pre({ msto: sto[category.alias(m.cate) + m.name], named }), ...m };
-            } catch (err) {
-                warn(err);
-                return m;
-            }
-        };
-
-        const pn = location.href;
-        for (const [modName, m] of mod._.entries()) {
-            if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
-                m.willrun = true;
-                if ("pre" in m) mod._.set(modName, exe({ name: modName, ...m }));
-            }
-        }
-
-        uindow.console.info = (content) => {
-            const event = console.info(content);
-            log(`info hooked: ${content}`);
-            if (content === "[@lfe/loader]") {
-                for (const [modName, m] of mod._.entries()) {
-                    if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
-                        if ("lfe" in m) {
-                            mod.execute(modName);
-                            log(`loading lfe module: ${modName}`);
-                        }
-                    }
-                }
-            }
-            return event;
-        };
-    },
-
     execute: (name) => {
         const exe = (m, named) => {
             if (!m) error(`Executing named mod but not found: "${name}"`);
             if (m.styl) GM_addStyle(m.styl);
             log(`Executing ${named ? "named " : ""}mod: "${m.name}"`);
-            // try {
-            if ("pred" in m) return m.func({ msto: sto[category.alias(m.cate) + m.name], named, pred: m.pred });
-            return m.func({ msto: sto[category.alias(m.cate) + m.name], named });
-            // } catch (err) {
-            //     warn(err);
-            // }
+            try {
+                return m.func({ msto: sto[category.alias(m.cate) + m.name], named });
+            } catch (err) {
+                warn(err);
+            }
         };
         if (name) {
             const m = mod.find(name);
@@ -426,5 +382,34 @@ const mod = {
         }
     },
 };
+
+queues.preload.push(() => {
+    if (sto === null) sto = mod.fake_sto; // Hack: 替代方案，变量还是没法 export 后修改
+
+    const pn = location.href;
+    for (const [modName, m] of mod._.entries()) {
+        if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
+            m.willrun = true;
+            mod._.set(modName, m);
+        }
+    }
+
+    uindow.console.info = (content) => {
+        const event = console.info(content);
+        log(`info hooked: ${content}`);
+        if (content === "[@lfe/loader]") {
+            for (const [modName, m] of mod._.entries()) {
+                if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
+                    if ("lfe" in m) {
+                        mod.execute(modName);
+                        log(`loading lfe module: ${modName}`);
+                    }
+                }
+            }
+        }
+        return event;
+    };
+}, mod.execute_v2);
+queues.onload.push(mod.execute);
 
 export default mod;

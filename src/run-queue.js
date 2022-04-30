@@ -3,8 +3,8 @@ class RunQueue {
         this.fq = [];
     }
 
-    push(fn) {
-        this.fq.push(fn);
+    push(...fn) {
+        this.fq = this.fq.concat(fn);
     }
 
     apply() {

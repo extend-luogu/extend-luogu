@@ -97,8 +97,7 @@ mod.reg("benben", "全网犇犇", "@/", {
 
             uindow.loadFeed();
         });
-}, `
-`, "module");
+}, null, "module");
 
 mod.reg(
     "benben-quickpost",
@@ -106,8 +105,7 @@ mod.reg(
     "@/",
     null,
     () => $("textarea").whenKey("CtrlEnter", () => $("#feed-submit").trigger("click")),
-    `
-`,
+    null,
     "module",
 );
 
