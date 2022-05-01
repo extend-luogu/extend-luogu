@@ -48,6 +48,12 @@ mod.reg_board("link-ex", "友链ex", null, ({ $board }) => {
         <p>
             <a href="https://www.luogu.com.cn/blog/334586/luogu-dictionary"> OI词典 </a>
         </p>
+        <p>
+            <a href="https://www.luogu.com.cn/discuss/432028"> exlg讨论专帖 </a>
+            <span style="color: orange">
+                <small><b> 温馨提醒：请将所有与 exlg 有关的讨论发布在此处。</b></small>
+            </span>
+        </p>
     `);
 }, `
 `, "module");
