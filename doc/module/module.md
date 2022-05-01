@@ -1,6 +1,7 @@
 ## 模块
 - [返回比赛列表](./back-to-contest.md)
 - [全网犇犇](./benben.md)
+- [犇犇自动展开](./benben-autoshow.md)
 - [CtrlEnter 发送犇犇](./benben-quickpost.md)
 - [犇犇龙王排行榜](./benben-ranklist.md)
 - [博客 Ex](./blog.md)

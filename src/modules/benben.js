@@ -110,3 +110,27 @@ mod.reg(
 `,
     "module",
 );
+
+mod.reg(
+    "benben-autoshow",
+    "犇犇自动展开",
+    "@/",
+    null,
+    () => {
+        $("#feed-more").css("display", "none");
+        $(uindow).on("DOMNodeInserted", () => {
+            $(uindow).off("scroll");
+            $(uindow).on("scroll", () => { // Note: 绑定滚动事件
+                const scrollBottom = $("body").height() - $(uindow).height() - $(uindow).scrollTop();
+                if (scrollBottom < 200) {
+                    $("#feed-more").trigger("click");
+                    // Note: 人类迷惑行为
+                    $(uindow).off("scroll");
+                }
+            });
+        });
+    },
+    `
+`,
+    "module",
+);
