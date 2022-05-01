@@ -364,8 +364,9 @@ const mod = {
             }
         }
 
+        const oldConsoleInfo = console.info.bind({}); // Note: 拷贝一个 console.info 防止在 Violentmonkey 中的无限递归
         uindow.console.info = (content) => {
-            const event = console.info(content);
+            const event = oldConsoleInfo(content);
             log(`info hooked: ${content}`);
             if (content === "[@lfe/loader]") {
                 for (const [modName, m] of mod._.entries()) {
