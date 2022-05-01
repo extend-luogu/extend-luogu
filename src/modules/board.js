@@ -29,6 +29,29 @@ mod.reg_board("search-user", "用户查找", null, ({ $board }) => {
 }, `
 `, "module");
 
+mod.reg_board("link-ex", "友链ex", null, ({ $board }) => {
+    $board.html(`
+        <h3>友链ex</h3>
+        <p>
+            <a href="https://oi-wiki.org/"> OI-wiki </a>
+        </p>
+        
+        <p>
+            <a href="https://csacademy.com/app/graph_editor/"> 图论作图 </a>
+        </p>
+        <p>
+            <a href="https://www.desmos.com/calculator?lang=zh-CN"> 函数作图 </a>
+        </p>
+        <p>
+            <a href="https://www.luogu.com.cn/blog/334586/csp-pre-knowledge"> CSP初赛知识点 </a>
+        </p>
+        <p>
+            <a href="https://www.luogu.com.cn/blog/334586/luogu-dictionary"> OI词典 </a>
+        </p>
+    `);
+}, `
+`, "module");
+
 mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
     show: { ty: "boolean", dft: true, info: ["Show in default", "是否默认展开"] },
 }, ({ msto, $board }) => {
