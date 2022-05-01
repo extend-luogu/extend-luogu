@@ -7,6 +7,15 @@ const compo = {
     _: new Map(),
     sto: null,
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {object} data
+     * @argument {Function} pre
+     * @argument {Function} func
+     * @argument {string} styl
+     * @returns {Function}
+     */
     reg: (name, info, data, pre, func, styl) => {
         const sn = category.alias("component") + name;
         info = info.replaceAll(" ", "_");

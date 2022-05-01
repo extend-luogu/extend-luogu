@@ -50,6 +50,7 @@ if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
 // ==Utilities==Libraries==
 
 // [Ctrl][Shift][Alt] + Key
+/** @argument {Event} e */
 export const toKeyCode = (e) => [
     e.ctrlKey ? "Ctrl" : "",
     e.shiftKey ? "Shift" : "",
@@ -76,6 +77,7 @@ jQuery.fn.extend({
     },
 });
 
+/** @type {import('xss')} */
 export const xss = new filterXSS.FilterXSS({
     onTagAttr: (_, k, v) => {
         if (k === "style") return `${k}="${v}"`;
@@ -85,6 +87,11 @@ export const xss = new filterXSS.FilterXSS({
 
 // ==Utilities==Extensions==
 
+/**
+ * @argument {string} f
+ * @argument {boolean} UTC
+ * @returns {string}
+ */
 Date.prototype.format = function (f, UTC) {
     UTC = UTC ? "UTC" : "";
     const re = {
@@ -107,6 +114,9 @@ Date.prototype.format = function (f, UTC) {
     return f;
 };
 
+/**
+ * @returns {string}
+ */
 String.prototype.toInitialCase = function () {
     return this[0].toUpperCase() + this.slice(1);
 };
@@ -117,8 +127,16 @@ Array.prototype.lastElem = function () {
 
 // ==Utilities==Functions==
 
+/**
+ * @argument {number} t
+ * @returns {Promise<void>}
+ */
 export const sleep = t => new Promise(res => setTimeout(res, t));
 
+/**
+ * @argument {string} v1
+ * @argument {string} v2
+ */
 export const version_cmp = (v1, v2) => {
     if (!v1) return "<<";
 
@@ -135,6 +153,10 @@ export const version_cmp = (v1, v2) => {
     return "==";
 };
 
+/**
+ * @argument {object} param
+ * @argument {string} styl
+ */
 export const springboard = (param, styl) => {
     const q = new URLSearchParams(); for (const k in param) q.set(k, param[k]);
     const $sb = $(`
@@ -144,6 +166,9 @@ export const springboard = (param, styl) => {
     return $sb;
 };
 
+/**
+ * @argument {{ url: string, onload: Function, onerror?: Function }}
+ */
 export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xmlhttpRequest({
     url,
     method: "GET",
@@ -152,6 +177,9 @@ export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xml
 });
 
 // Note: cs_get 的 Promise 版本
+/**
+ * @argument {string} url
+ */
 export const cs_get2 = (url, headers = {}) => {
     const res = new Promise((resolve, onerror) => {
         GM_xmlhttpRequest({
@@ -170,6 +198,10 @@ export const cs_get2 = (url, headers = {}) => {
     return chain(res);
 };
 
+/**
+ * @argument {string} url
+ * @argument {object} data
+ */
 export const cs_post = (url, data, header = {}, type = "application/json") => {
     const res = new Promise((resolve, onerror) => {
         GM_xmlhttpRequest({
@@ -191,6 +223,9 @@ export const cs_post = (url, data, header = {}, type = "application/json") => {
 
 export const cur_time = (ratio = 1000) => ~~(Date.now() / ratio);
 
+/**
+ * @argument {string} url
+ */
 export const lg_content = (url) => new Promise((res, rej) => {
     $.get(`${url + (url.includes("?") ? "&" : "?")}_contentOnly=1`, (data) => {
         if (data.code !== 200) rej(new Error(`Requesting failure code: ${res.code}.`));
@@ -198,12 +233,19 @@ export const lg_content = (url) => new Promise((res, rej) => {
     });
 });
 
+/**
+ * @argument {string} msg
+ * @returns {void}
+ */
 export const lg_alert = (msg, title = "exlg 提醒您") => (uindow.show_alert
     ? uindow.show_alert(title, msg)
     : uindow.alert(`${title}\n${msg}`));
 
-// eslint-disable-next-line import/no-mutable-exports
-export let csrf_token = null;
+let csrf_token = null;
+/**
+ * @argument {string} url
+ * @argument {object} data
+ */
 export const lg_post = (url, data) => $.ajax({
     url,
     data,
@@ -215,6 +257,9 @@ export const lg_post = (url, data) => $.ajax({
     method: "post",
 });
 
+/**
+ * @argument {string} text
+ */
 export const judge_problem = (text) => [
     /^AT[1-9][0-9]{0,}$/i,
     /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
@@ -226,4 +271,8 @@ export const judge_problem = (text) => [
     /^B[2-9][0-9]{3,}$/i,
 ].some((re) => re.test(text));
 
+/**
+ * @argument {Array} arr
+ * @argument {Object} op
+ */
 export const tupledft_gen = (arr, op) => arr.map((e) => ({ dft: e, ...op }));

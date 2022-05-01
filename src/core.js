@@ -26,6 +26,9 @@ const mod = {
         ["ghpage", "extend-luogu.github.io"],
     ].map(([alias, path]) => [new RegExp(`^@${alias}/`), path]),
 
+    /**
+     * @argument {string[] | string} pth
+     */
     pth_modify: (pth) => {
         if (!Array.isArray(pth)) {
             pth = [pth];
@@ -46,6 +49,15 @@ const mod = {
         "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting-new/((index|bundle).html)?",
     ],
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {string[] | string} path
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {string | null} styl
+     * @argument {string} cate
+     */
     reg: (name, info, path, data, func, styl, cate) => {
         path = mod.pth_modify(path);
         const rawName = category.alias(cate) + name;
@@ -116,6 +128,12 @@ const mod = {
         };
     },
 
+    /**
+     * @argument {{ name: string, info: string, path: string | string[], cate: string }}
+     * @argument {object} data
+     * @argument {Function} reger
+     * @argument {string | null} styl
+     */
     reg_v2: ({
         name, info, path, cate,
     }, data, reger, styl) => {
@@ -179,8 +197,26 @@ const mod = {
         });
     },
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {string[] | string} path
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {string | null} styl
+     */
     reg_main: (name, info, path, data, func, styl) => mod.reg(name, info, path, data, (arg) => { func(arg); return false; }, styl, "core"),
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {string} tab
+     * @argument {any} vars
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {string | null} styl
+     * @argument {string} cate
+     */
     reg_user_tab: (name, info, tab, vars, data, func, styl, cate) => mod.reg(
         name,
         info,
@@ -200,6 +236,15 @@ const mod = {
         cate,
     ),
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {string} period
+     * @argument {string[] | string} path
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {string | null} styl
+     */
     reg_chore: (name, info, period, path, data, func, styl) => {
         if (typeof period === "string") {
             const num = +period.slice(0, -1),
@@ -237,12 +282,19 @@ const mod = {
                     else sto[`^${name}`].last_chore = cur_time(1);
                 } else log(`Pending chore: "${name}"`);
             },
-            `
-            `,
+            null,
             "chore",
         );
     },
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {string | null} styl
+     * @argument {string} cate
+     */
     reg_board: (name, info, data, func, styl, cate) => mod.reg(
         name,
         info,
@@ -263,21 +315,16 @@ const mod = {
     ),
 
     /**
-     * @deprecated 请使用 reg_hook_new 来注册钩子
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {string[] | string} path
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {Function} hook
+     * @argument {Function} darg
+     * @argument {string | null} styl
+     * @argument {string} cate
      */
-    reg_hook: (name, info, path, data, func, hook, styl, cate) => mod.reg(
-        name,
-        info,
-        path,
-        data,
-        (arg) => {
-            func(arg);
-            $("body").bind("DOMNodeInserted", (e) => hook(e) && func(arg));
-        },
-        styl,
-        cate,
-    ),
-
     reg_hook_new: (name, info, path, data, func, hook, darg, styl, cate) => mod.reg(
         name,
         info,
@@ -295,19 +342,40 @@ const mod = {
         cate,
     ),
 
+    /**
+     * @argument {string} name
+     * @argument {string} info
+     * @argument {string[] | string} path
+     * @argument {object | null} data
+     * @argument {Function} func
+     * @argument {string | null} styl
+     * @argument {string} cate
+     */
     reg_lfe: (name, info, path, data, func, styl, cate) => {
         mod.reg(name, info, path, data, func, styl, cate);
         mod._.set(name, { lfe: true, ...mod._.get(name) });
     },
 
+    /**
+     * @argument {string} name
+     * @returns {object}
+     */
     find: (name) => mod._.get(name),
+
+    /**
+     * @argument {string} name
+     * @returns {object}
+     */
     has: (name) => mod._.has(name),
 
+    /** @argument {string} name */
     disable: (name) => {
         const x = mod.find(name);
         x.on = false;
         mod._.set(name, x);
     },
+
+    /** @argument {string} name */
     enable: (name) => {
         const x = mod.find(name);
         x.on = true;
@@ -382,6 +450,7 @@ const mod = {
         };
     },
 
+    /** @argument {string} name */
     execute: (name) => {
         const exe = (m, named) => {
             if (!m) error(`Executing named mod but not found: "${name}"`);
