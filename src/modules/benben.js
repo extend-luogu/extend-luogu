@@ -120,7 +120,7 @@ mod.reg(
             $(uindow).off("scroll");
             $(uindow).on("scroll", () => { // Note: 绑定滚动事件
                 const scrollBottom = $("body").height() - $(uindow).height() - $(uindow).scrollTop();
-                if (scrollBottom < 200) {
+                if (scrollBottom < 500 && !$(".am-active").hasAttr("exlg")) {
                     $("#feed-more").trigger("click");
                     // Note: 人类迷惑行为
                     $(uindow).off("scroll");
