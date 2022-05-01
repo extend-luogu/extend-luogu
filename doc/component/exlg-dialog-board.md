@@ -8,11 +8,11 @@
  - 确定按钮相对位置 / Position of Confirm Button
 
 ### API 使用方法
-函数原型: `function (exlg.)exlg_alert(text = "", title = "exlg 提醒您", action = {}, { width, min_height } = {});`
+函数原型：`function (exlg.)exlg_alert(text = "", title = "exlg 提醒您", action = {}, { width, min_height } = {});`
 
 函数接受的参数：
- - `text`: exlg 公告板显示的内容(html)。默认为空。
- - `title`: exlg 公告板显示的标题(html)。默认为 `exlg 提醒您`。
+ - `text`: exlg 公告板显示的内容 (html)。默认为空。
+ - `title`: exlg 公告板显示的标题 (html)。默认为 `exlg 提醒您`。
  - `action`: 应该传入一个 object，内含
 >1. `(async) function onopen(hrd)`: 希望在创建公告板时执行的函数。默认为 `() => {}`。
 >2. `(async) function onconfirm(hrd)`: 希望在点击确定时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。
@@ -29,7 +29,7 @@
 >2. `$head`: `.exlg-dialog-header > #exlg-dialog-title`
 >3. `$main`: `.exlg-dialog-body > #exlg-dialog-content`
 >4. `$close`: `#header-right`
-- `wait_time`: 原则上，窗口切换显示状态所需要的时间(以毫秒为单位)。
+- `wait_time`: 原则上，窗口切换显示状态所需要的时间 (以毫秒为单位)。
 - `hide_dialog`/`show_dialog`: 用于关闭/打开窗口的方法。**原则上不应被直接调用。**
 - `resolve_result`: 用于 resolve 的方法。
 - `then`: 无需解释。

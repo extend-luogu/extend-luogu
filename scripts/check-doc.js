@@ -65,7 +65,7 @@ readdirSync("./src/components").forEach((s) => {
     }
     cdcs.splice(tmp, 1);
 });
-if (cdcs.length) {
+if (cdcs.length - 1) {
     console.error(`error: unknown doc[s]: ${cdcs.join(", ")}`);
     process.exit(1);
 }

@@ -17,7 +17,7 @@ mod.reg_hook_new("code-block-ex", "代码块优化", "@/.*", {
         ty: "string", dft: "'Fira Code', 'Fira Mono', Consolas", info: ["Code Block Font", "代码块字体"], strict: true,
     },
     cb_background_color: {
-        ty: "string", dft: "white", info: ["Code Block Background Color", "代码块背景色(配合其他美化插件)"], strict: true,
+        ty: "string", dft: "white", info: ["Code Block Background Color", "代码块背景色 (配合其他美化插件)"], strict: true,
     },
     max_show_lines: {
         ty: "number", dft: -1, min: -1, max: 100, info: ["Max Lines On Show", "代码块最大显示行数"], strict: true,
