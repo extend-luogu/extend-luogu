@@ -25,6 +25,9 @@ jobs:
       - name: Lint
         run: yarn lint
 
+      - name: Check docs
+        run: node ./scripts/check-doc.js
+
       - name: Check commit messages
         env:
           COMMIT_MSG: ${{ toJson(github.event.commits.*.message) }}
