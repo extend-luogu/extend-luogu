@@ -26,21 +26,28 @@ const mod = {
         ["ghpage", "extend-luogu.github.io"],
     ].map(([alias, path]) => [new RegExp(`^@${alias}/`), path]),
 
+    pth_modify: (pth) => {
+        if (!Array.isArray(pth)) {
+            pth = [pth];
+        }
+        return pth.map((p) => {
+            mod.path_alias.some(([re, url]) => {
+                if (!p.match(re)) return false;
+                p = p.replace(re, `${url}/`);
+                return true;
+            });
+
+            if (!p.endsWith("$")) p += "$";
+            return p;
+        });
+    },
+
     path_dash_board: [
         "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting-new/((index|bundle).html)?",
     ],
 
     reg: (name, info, path, data, func, styl, cate) => {
-        if (!Array.isArray(path)) path = [path];
-        path.forEach((p, i) => {
-            mod.path_alias.some(([re, url]) => {
-                if (!p.match(re)) return false;
-                path[i] = p.replace(re, `${url}/`);
-                return true;
-            });
-
-            if (!p.endsWith("$")) path[i] += "$";
-        });
+        path = mod.pth_modify(path);
         const rawName = category.alias(cate) + name;
         mod.data[rawName] = {
             ty: "object",
@@ -57,31 +64,15 @@ const mod = {
     },
 
     _regv2_invoker: (gpth, msto) => {
-        const pth_modify = (pth) => {
-            if (!Array.isArray(pth)) {
-                pth = [pth];
-            }
-            return pth.map((p) => {
-                mod.path_alias.some(([re, url]) => {
-                    if (!p.match(re)) return false;
-                    p = p.replace(re, `${url}/`);
-                    return true;
-                });
-
-                if (!p.endsWith("$")) p += "$";
-                return p;
-            });
-        };
-
         const grtpr = (e, x) => {
             if (typeof x === "object" && e in x) {
                 return x[e];
             }
         };
 
-        gpth = pth_modify(gpth);
+        gpth = mod.pth_modify(gpth);
         const qpusher = (nm, pth, qn, fn) => {
-            pth = pth ? pth_modify(pth) : [];
+            pth = pth ? mod.pth_modify(pth) : [];
             const md = grtpr(nm, msto.private),
                 enb = grtpr("on", md);
             if (enb !== false && pth.concat(gpth).some((e) => RegExp(e).test(location.href))) {
@@ -116,7 +107,7 @@ const mod = {
 
             // Note: 这东西被枪毙的时间不远了
             hook: ({ name, path }, _, fn, hook) => qpusher(name, path, "preload", (arg) => {
-                $("body").on("DOMNodeInserted", (e) => {
+                document.querySelector("body").addEventListener("DOMNodeInserted", (e) => {
                     if (!e.target.tagName) { return false; }
                     const res = hook(e);
                     return res.result && fn({ ...arg, ...res });
@@ -184,7 +175,7 @@ const mod = {
         reger(_regv2_data_reger(datas[rawName].lvs));
         datas[rawName].lvs = { ...datas[rawName].lvs, ...olds };
         mod._.set(name, {
-            info, path, data, func: reger, subfuncs, migrlist: oll, styl, cate,
+            info, path: mod.pth_modify(path), data, func: reger, subfuncs, migrlist: oll, styl, cate,
         });
     },
 
@@ -338,30 +329,61 @@ const mod = {
         */
         for (const [nm, m] of mod._.entries()) {
             const rawName = category.alias(m.cate) + nm;
-            if (sto[rawName].on && m.subfuncs) {
-                if (Array.isArray(m.migrlist)) {
-                    for (const [snm, dir] of m.migrlist) {
-                        if (sto[rawName][snm] !== datas[rawName].lvs[snm].dft) {
-                            let curr = sto[rawName];
-                            const tmpd = dir.slice(0, -1);
-                            for (const et of tmpd) curr = curr[et];
-                            curr[dir.lastElem()] = sto[rawName][snm];
-                            sto[rawName][snm] = datas[rawName].lvs[snm].dft;
+            if (sto[rawName].on) {
+                if (m.styl) GM_addStyle(m.styl);
+                if (m.subfuncs) {
+                    if (Array.isArray(m.migrlist)) {
+                        for (const [snm, dir] of m.migrlist) {
+                            if (sto[rawName][snm] !== datas[rawName].lvs[snm].dft) {
+                                let curr = sto[rawName];
+                                const tmpd = dir.slice(0, -1);
+                                for (const et of tmpd) curr = curr[et];
+                                curr[dir.lastElem()] = sto[rawName][snm];
+                                sto[rawName][snm] = datas[rawName].lvs[snm].dft;
+                            }
                         }
                     }
-                }
-                const handler = mod._regv2_invoker(m.path, sto[rawName]);
-                for (const e of m.subfuncs) {
-                    handler[e[0]](...e.slice(1));
+                    const handler = mod._regv2_invoker(m.path, sto[rawName]);
+                    for (const e of m.subfuncs) {
+                        log(`Executing "${e[1].name}" of "${nm}"`);
+                        handler[e[0]](...e.slice(1));
+                    }
                 }
             }
         }
     },
 
+    preload: () => {
+        if (sto === null) sto = mod.fake_sto; // Hack: 替代方案，变量还是没法 export 后修改
+
+        const pn = location.href;
+        for (const [modName, m] of mod._.entries()) {
+            if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
+                m.willrun = true;
+                mod._.set(modName, m);
+            }
+        }
+
+        uindow.console.info = (content) => {
+            const event = console.info(content);
+            log(`info hooked: ${content}`);
+            if (content === "[@lfe/loader]") {
+                for (const [modName, m] of mod._.entries()) {
+                    if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
+                        if ("lfe" in m) {
+                            mod.execute(modName);
+                            log(`loading lfe module: ${modName}`);
+                        }
+                    }
+                }
+            }
+            return event;
+        };
+    },
+
     execute: (name) => {
         const exe = (m, named) => {
             if (!m) error(`Executing named mod but not found: "${name}"`);
-            if (m.styl) GM_addStyle(m.styl);
             log(`Executing ${named ? "named " : ""}mod: "${m.name}"`);
             try {
                 return m.func({ msto: sto[category.alias(m.cate) + m.name], named });
@@ -376,40 +398,13 @@ const mod = {
 
         for (const [modName, m] of mod._.entries()) {
             m.on = sto[category.alias(m.cate) + modName].on;
-            if (m.willrun) {
+            if (m.willrun && !m.subfuncs) {
                 if (exe({ name: modName, ...m }) === false) break;
             }
         }
     },
 };
 
-queues.preload.push(() => {
-    if (sto === null) sto = mod.fake_sto; // Hack: 替代方案，变量还是没法 export 后修改
-
-    const pn = location.href;
-    for (const [modName, m] of mod._.entries()) {
-        if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
-            m.willrun = true;
-            mod._.set(modName, m);
-        }
-    }
-
-    uindow.console.info = (content) => {
-        const event = console.info(content);
-        log(`info hooked: ${content}`);
-        if (content === "[@lfe/loader]") {
-            for (const [modName, m] of mod._.entries()) {
-                if (sto[category.alias(m.cate) + modName].on && m.path.some((re) => new RegExp(re, "g").test(pn))) {
-                    if ("lfe" in m) {
-                        mod.execute(modName);
-                        log(`loading lfe module: ${modName}`);
-                    }
-                }
-            }
-        }
-        return event;
-    };
-}, mod.execute_v2);
 queues.onload.push(mod.execute);
 
 export default mod;

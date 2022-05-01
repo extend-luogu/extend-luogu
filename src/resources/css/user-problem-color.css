@@ -1,3 +1,28 @@
 .main > .card > h3 {
 	display: inline-block;
 }
+
+.color-default.p0 {
+    color: rgb(191, 191, 191);
+}
+.color-default.p1 {
+    color: rgb(254, 76, 97);
+}
+.color-default.p2 {
+    color: rgb(243, 156, 17);
+}
+.color-default.p3 {
+    color: rgb(255, 193, 22);
+}
+.color-default.p4 {
+    color: rgb(82, 196, 26);
+}
+.color-default.p5 {
+    color: rgb(52, 152, 219);
+}
+.color-default.p6 {
+    color: rgb(157, 61, 207);
+}
+.color-default.p7 {
+    color: rgb(14, 29, 105);
+}

@@ -5,6 +5,7 @@ import register_badge from "./components/register-badge.js";
 import exlg_alert from "./components/exlg-dialog-board.js";
 import mod from "./core.js";
 import compo from "./compo-core.js";
+import queues from "./run-queue.js";
 import { datas } from "./storage.js";
 
 log("Exposing");
@@ -12,7 +13,7 @@ log("Exposing");
 Object.assign(uindow, {
     exlg: {
         mod, compo, datas,
-        log, error,
+        log, error, queues,
         springboard, version_cmp,
         lg_alert, lg_content, register_badge, lg_post, exlg_alert,
         TM_dat: {
