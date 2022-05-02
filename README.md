@@ -1,6 +1,6 @@
 # extend-luogu
 ## 简介
-在使用(洛谷)[luogu.com.cn]时，您是否遇到过如下情况：
+在使用[洛谷](luogu.com.cn)时，您是否遇到过如下情况：
 
 ![我运行了一段求助的代码，结果电脑崩溃了。](https://cdn.luogu.com.cn/upload/image_hosting/3awa0xmu.png)
 
@@ -20,7 +20,7 @@
 - 表情输入
 - ……
 
-现在，就(安装)[/doc/installation.md)(exlg)[exlg.cc]吧！
+现在，就(安装)[/doc/installation.md) (exlg)[exlg.cc] 吧！
 
 ## 文档
 
