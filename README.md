@@ -1,12 +1,12 @@
 # extend-luogu
 ## 简介
-在使用(洛谷)[https://www.luogu.com.cn]时，您是否遇到过如下情况：
+在使用(洛谷)[luogu.com.cn]时，您是否遇到过如下情况：
 
-![](https://cdn.luogu.com.cn/upload/image_hosting/3awa0xmu.png)
+![我运行了一段求助的代码，结果电脑崩溃了。](https://cdn.luogu.com.cn/upload/image_hosting/3awa0xmu.png)
 
-![](https://cdn.luogu.com.cn/upload/image_hosting/jpqbn6cs.png)
+![我想找一个用户，但是不知道id。](https://cdn.luogu.com.cn/upload/image_hosting/jpqbn6cs.png)
 
-![](https://cdn.luogu.com.cn/upload/image_hosting/si9cooyt.png)
+![我的随机跳题跳到了一堆我不会做的题。](https://cdn.luogu.com.cn/upload/image_hosting/si9cooyt.png)
 
 > 如果您也深有同感，我们强烈建议您使用 **ex**tend-**l**uo**g**u。
 
