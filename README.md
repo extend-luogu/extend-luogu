@@ -2,11 +2,11 @@
 ## 简介
 在使用[洛谷](https://luogu.com.cn)时，您是否遇到过如下情况：
 
-![我运行了一段求助的代码，结果电脑崩溃了。](https://cdn.luogu.com.cn/upload/image_hosting/3awa0xmu.png)
+![我运行了一段求助的代码，结果电脑崩溃了。](https://github.com/Xiaohuba/extend-luogu/blob/patch-2/src/resources/image/exlg.png?raw=true)
 
-![我想找一个用户，但是不知道id。](https://cdn.luogu.com.cn/upload/image_hosting/jpqbn6cs.png)
+![我想找一个用户，但是不知道id。](https://github.com/Xiaohuba/extend-luogu/blob/patch-2/src/resources/image/exlg3.png?raw=true)
 
-![我的随机跳题跳到了一堆我不会做的题。](https://cdn.luogu.com.cn/upload/image_hosting/si9cooyt.png)
+![我的随机跳题跳到了一堆我不会做的题。](https://github.com/Xiaohuba/extend-luogu/blob/patch-2/src/resources/image/exlg2.png?raw=true)
 
 > 如果您也深有同感，我们强烈建议您使用 **ex**tend-**l**uo**g**u。
 
@@ -20,7 +20,7 @@
 - 表情输入
 - ……
 
-现在，就(安装)[/doc/installation.md) (exlg)[exlg.cc] 吧！
+现在，就[安装](/doc/installation.md) [exlg](https://exlg.cc) 吧！
 
 ## 文档
 
