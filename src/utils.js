@@ -221,7 +221,7 @@ export const cs_post = (url, data, header = {}, type = "application/json") => {
     return chain(res);
 };
 
-export const cur_time = (ratio = 1000) => ~~(Date.now() / ratio);
+export const cur_time = (ratio = 1000) => Math.floor(Date.now() / ratio);
 
 /**
  * @argument {string} url
