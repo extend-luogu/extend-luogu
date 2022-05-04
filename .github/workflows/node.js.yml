@@ -34,6 +34,24 @@ jobs:
         run: |
           node ./node_modules/exlg-git-commit-msg-std/check.js -c "$PWD/.gitmsgrc.cjs" -e COMMIT_MSG
 
+  artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Build
+        run: yarn run build -d dist -o extend-luogu.min.user.js
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: dist/extend-luogu.min.user.js
+
   build:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith( github.event.head_commit.message, 'VER' )
