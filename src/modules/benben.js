@@ -121,7 +121,8 @@ mod.reg(
             $(uindow).on("scroll", () => { // Note: 绑定滚动事件
                 const scrollBottom = $("body").height() - $(uindow).height() - $(uindow).scrollTop();
                 const more = !$("div.lg-article>h2:contains('没有更多动态了')").length;
-                if (scrollBottom < 500 && !$(".am-active").hasAttr("exlg") && more) {
+                const attr = $(".am-active").attr("exlg");
+                if (scrollBottom < 500 && typeof attr !== typeof undefined && attr !== false && more) {
                     $("#feed-more").trigger("click");
                     // Note: 人类迷惑行为
                     $(uindow).off("scroll");
