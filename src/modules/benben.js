@@ -109,6 +109,7 @@ mod.reg(
     "module",
 );
 
+/*
 mod.reg(
     "benben-autoshow",
     "犇犇自动展开",
@@ -133,3 +134,4 @@ mod.reg(
     null,
     "module",
 );
+*/
