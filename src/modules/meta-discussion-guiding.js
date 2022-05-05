@@ -24,7 +24,10 @@ mod.reg(
         $newpost_submit_wrapper[0].addEventListener("click", (evt) => {
             const post_content = uindow.markdownPalettes.content?.toLowerCase();
             const post_title = $newpost_title.val();
-            const exist_meta_words = remeta_words_regex.map(re => [post_content.match(re)?.[0], post_title.match(re)?.[0]]).flat().filter((s, i, a) => s && s !== a[i + 1]);
+            const exist_meta_words = remeta_words_regex
+                .map(re => [post_content.match(re)?.[0], post_title.match(re)?.[0]])
+                .flat()
+                .filter((s, i, a) => s && s !== a[i + 1]);
 
             if (exist_meta_words.length) {
                 evt.stopPropagation();

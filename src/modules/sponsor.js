@@ -5,7 +5,7 @@ import {
 import register_badge from "../components/register-badge.js";
 import css from "../resources/css/sponsor-tag.css";
 
-mod.reg_hook_new("sponsor-tag", "标签显示", ["@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*", "@/user/[0-9]{0,}.*"], {
+mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*", "@/user/\\d*.*"], {
     cache: { ty: "string", dft: "3600", info: ["Cache time", "缓存时间（秒）"] },
     badges: { ty: "string", priv: true },
 }, ((loaded, badges, promises) => (async ({ msto, args }) => {
