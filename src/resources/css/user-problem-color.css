@@ -2,27 +2,27 @@
 	display: inline-block;
 }
 
-.color-default.p0 {
-    color: rgb(191, 191, 191);
+.problem-id > .color-default.p0 {
+    color: rgb(191, 191, 191) !important;
 }
-.color-default.p1 {
-    color: rgb(254, 76, 97);
+.problem-id > .color-default.p1 {
+    color: rgb(254, 76, 97) !important;
 }
-.color-default.p2 {
-    color: rgb(243, 156, 17);
+.problem-id > .color-default.p2 {
+    color: rgb(243, 156, 17) !important;
 }
-.color-default.p3 {
-    color: rgb(255, 193, 22);
+.problem-id > .color-default.p3 {
+    color: rgb(255, 193, 22) !important;
 }
-.color-default.p4 {
-    color: rgb(82, 196, 26);
+.problem-id > .color-default.p4 {
+    color: rgb(82, 196, 26) !important;
 }
-.color-default.p5 {
-    color: rgb(52, 152, 219);
+.problem-id > .color-default.p5 {
+    color: rgb(52, 152, 219) !important;
 }
-.color-default.p6 {
-    color: rgb(157, 61, 207);
+.problem-id > .color-default.p6 {
+    color: rgb(157, 61, 207) !important;
 }
-.color-default.p7 {
-    color: rgb(14, 29, 105);
+.problem-id > .color-default.p7 {
+    color: rgb(14, 29, 105) !important;
 }
