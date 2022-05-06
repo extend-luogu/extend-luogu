@@ -1,6 +1,6 @@
 import mod from "../core.js";
 import {
-    $, judge_problem, lg_dat, lg_content,
+    $, judge_problem, lg_dat,
 } from "../utils.js";
 import svg_exit from "../resources/image/exit.svg";
 
@@ -41,27 +41,18 @@ mod.reg_hook_new("back-to-contest", "返回比赛列表", [
     return { args: { cid, pid, $info_rows: $(tar.parentNode) }, result: (tar.tagName.toLowerCase() === "a" && (tar.href || "").includes("/record/list") && tar.href.slice(tar.href.indexOf("/record/list")) === `/record/list?pid=${pid}&contestId=${cid}`) };
 }, () => ({ cid: lg_dat.contest.id, pid: lg_dat.problem.pid, $info_rows: $(".info-rows").parent() }), backtocont_css, "module");
 
-mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", {
-    reload: { ty: "boolean", dft: true, info: ["Always reload data", "翻页时总是重新加载数据"] },
-}, ((data) => async ({ msto, args }) => {
-    const load = async (pid_tag) => {
-        if (!(location.href in data)) { // Note: 如果当前页面未曾加载数据
-            if (msto.reload) Object.getOwnPropertyNames(data).forEach((prop) => delete data[prop]); // Note: 清空所有数据
-            data[location.href] = lg_content(location.href); // Note: 则创建异步 AJAX 任务
-        }
-        $(pid_tag).addClass("exlg-difficulty-color").addClass(`color-${(await data[location.href]).currentData.records.result.filter( // Note: 等待异步获取完成
+mod.reg_hook_new("submission-color", "记录难度可视化", "@/record/list.*", null, (args) => {
+    // Note: 寄吧的，直接从 _feInstance 里面读就行了，狗都不用 _feInjection。傻逼是吧？？？
+    (args.pid_taglist ?? document.body.querySelectorAll(".pid")).forEach((pid_tag) => {
+        $(pid_tag).addClass("exlg-difficulty-color").addClass(`color-${_feInstance.currentData.records.result.filter(
             (record) => record.problem.pid === pid_tag.innerText.trim(), // Note: 根据 PID 筛选当前题目
         )[0].problem.difficulty}`);
-    };
-    if (args) load(args.pid_tag); // Note: 标签插入时
-    else $(".pid").each((i, tag) => load(tag)); // Note: 页面加载完成时
-})({
-    [location.href]: unsafeWindow._feInjection, // Note: 初始数据位于 feInjection，当前页不必通过 AJAX 获取
-}), (e) => {
+    });
+}, (e) => {
     if (
         e.target && e.target.tagName.toLowerCase() === "a"
         && /^\/problem\/[A-Z][A-Z0-9]+$/.exec(new URL(e.target.href).pathname) // Note: 如果插入的是题目链接
-    ) return { result: true, args: { pid_tag: e.target.firstChild } };
+    ) return { result: true, args: { pid_taglist: [e.target.firstChild] } };
     return { result: false };
 }, () => null, null, "module");
 

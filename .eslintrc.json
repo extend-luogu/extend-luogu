@@ -99,6 +99,7 @@
         "save_dat": true,
         "clear_dat": true,
         "raw_dat": true,
-        "GM_listValues": true
+        "GM_listValues": true,
+        "_feInstance": true
     }
 }
