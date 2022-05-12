@@ -10,8 +10,8 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
     comments: { ty: "string", dft: "{}", priv: true }, // Note: string 只是替代方案，换用 dict 是迟早的
     direct_display: { ty: "boolean", dft: true, info: ["Directly replace username", "直接替换用户名"] },
 }, ({ msto, result, args }) => { // Note: 你他妈也知道替代方案是吧
-    const _setcomment = ($nm, com, orin = $nm.attr("exlg-usercom")) => {
-        if (!$nm) return;
+    const _setcomment = ($nm, com, orin = $nm.attr("exlg-usercom")) => { // Note: 这里的 orin 在谷 3 页面有效
+        if (!$nm) return; // Note: luogu4 还没做qwq
         if (!$nm.length) return;
         if ($nm.length > 1) {
             $nm.each((_i, e) => _setcomment($(e), com));
@@ -19,7 +19,7 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         }
         let $tar = $nm;
         if ($nm.children("span[style]").length) $tar = $nm.children("span[style]");
-        // console.log($nm, $tar, com ?? orin);
+        console.log($nm, $tar, com, orin, $nm.attr("exlg-usercom"));
 
         if (msto.direct_display) {
             $tar.css("white-space", "pre");
@@ -36,11 +36,12 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         // Note: 编辑
         if (/^\/user\/[1-9][0-9]{0,}$/.test(location.pathname)) {
             const $username = $(".user-info > div.user-name"),
-                orin = $username.text();
+                orin = $username.text().trim();
             const uid = +location.pathname.slice(6);
-            $username.html(``);
-            const $name_text = $(`<span id="exlg-name-text"></span>`).appendTo($username);
-            $name_text.text(uid in cmts ? cmts[uid] : orin);
+            // $username.html(``);
+            const $name_text = $(`<span id="exlg-name-text" style="font-size: medium;text-shadow: 0 0 black;" class="exlg-usercom-tag"></span>`).appendTo($username);
+            $name_text.text(`(${uid in cmts ? cmts[uid] : orin})`);
+            if (!(uid in cmts)) $name_text.hide();
             const $cbtn = $(`<span title="修改用户备注">${svg_modify_usercomment}</span>`);
             $username.append($cbtn);
             $cbtn.on("click", () => {
@@ -49,10 +50,15 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
                     if (nn.trim() === "") {
                         delete cmts[uid];
                         nn = orin;
-                    } else cmts[uid] = nn;
-                    _setcomment($(`a[href="/user/${uid}"][target=_blank]`), cmts[uid], orin);
+                        $name_text.hide();
+                    } else {
+                        cmts[uid] = nn.trim();
+                        $name_text.show();
+                    }
+                    console.log(orin);
+                    _setcomment($(`a[href="/user/${uid}"][target=_blank]`), msto.direct_display ? (cmts[uid] ?? orin) : cmts[uid], orin); // Note: 谷 4 页面必须传
                     msto.comments = JSON.stringify(cmts);
-                    $name_text.text(uid in cmts ? cmts[uid] : orin);
+                    $name_text.text(`(${uid in cmts ? cmts[uid] : orin})`);
                     return true;
                 });
                 $("#exlg-user-com-input").val(uid in cmts ? cmts[uid] : orin);
