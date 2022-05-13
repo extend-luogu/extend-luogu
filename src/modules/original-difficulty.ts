@@ -3,12 +3,7 @@ import {
     $, error, lg_dat, cs_get,
 } from "../utils.js";
 
-mod.reg_v2({
-    name: "original-difficulty",
-    info: "显示原始难度",
-    path: ["@/problem/CF.*", "@/problem/AT.*"],
-    cate: "module",
-}, {
+mod.reg_v2("module/original-difficulty", "原始难度", "@/problem/[A-Z0-9]+(#.*)?", {
     cf_src: {
         ty: "enum", dft: "codeforces.com", vals: ["codeforces.com", "codeforces.ml", "codeforc.es"], info: [
             "Codeforces problem source", "CF 题目源",

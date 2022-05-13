@@ -1,16 +1,11 @@
-class RunQueue {
-    constructor() {
-        this.fq = [];
-    }
-
-    push(...fn) {
-        this.fq = this.fq.concat(fn);
-    }
-
+class Queue extends Array {
     apply() {
-        this.fq.forEach((f) => f());
+        this.forEach((f) => f());
     }
 }
-const queues = Object.fromEntries(["onload", "preload"].map((e) => ([e, new RunQueue()])));
+const queues = {
+    onload: new Queue(),
+    preload: new Queue(),
+};
 
 export default queues;

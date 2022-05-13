@@ -1,1 +1,1 @@
-export const datas = {};
+export const datas: Record<string, any> = {};

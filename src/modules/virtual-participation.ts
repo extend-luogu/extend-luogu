@@ -73,7 +73,7 @@ mod.reg("virtual-participation", "创建重现赛", "@/contest/[0-9]*(#.*)?", {
                         }),
                     );
                 } catch {
-                    setTimeout(exlg_alert("<p>本场比赛的题目不公开</p>", "重现赛创建失败"), 500);
+                    setTimeout(() => exlg_alert("<p>本场比赛的题目不公开</p>", "重现赛创建失败"), 500);
                     return false;
                 }
                 const pc = await lg_content(`/contest/edit/${vp_id}`);

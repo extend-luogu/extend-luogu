@@ -1,12 +1,7 @@
 import uindow, { $, cs_post } from "../utils.js";
 import mod from "../core.js";
 
-mod.reg_v2({
-    name: "blog",
-    info: "博客 ex",
-    path: ["@/blogAdmin/article/edit/.*", "@/blogAdmin/article/new"],
-    cate: "module",
-}, null, (handler) => {
+mod.reg_v2("module/blog", "博客 ex", ["@/blogAdmin/article/edit/.*", "@/blogAdmin/article/new"], (handler) => {
     handler.onload({
         name: "format",
         info: "按照洛谷题解标准格式化",

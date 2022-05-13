@@ -6,13 +6,92 @@ import category from "./category.js";
 import { datas } from "./storage.js";
 import queues from "./run-queue.js";
 
+interface Mod {
+    // TODO
+    on: boolean;
+}
+
 // eslint-disable-next-line import/no-mutable-exports
 export let sto = null;
+
+type Reger = (handler: {
+    onload: (...args: any) => void;
+    preload: (...args: any) => void;
+    chore: (...args: any) => void;
+    hook: (...args: any) => void;
+}) => void;
+
+function reg2(id: string, info: string, path: string[] | string, reger: Reger, styl?: string): void;
+function reg2(id: string, info: string, path: string[] | string, data: Record<string, any>, reger: Reger, styl?: string): void;
+function reg2(id: string, info: string, path: string[] | string, ...args: any) {
+    const name = id.includes("/") ? id.split("/")[1] : id;
+    const cate = id.includes("/") ? id.split("/")[0] : "";
+    const data: Record<string, any> = typeof args[0] === "object" ? args[0] : null;
+    const reger: Reger = typeof args[0] === "function" ? args[0] : args[1];
+    const styl: string | null = typeof args[1] === "string" ? args[0] : args[2];
+    info = info.replaceAll(" ", "_");
+    let olds = {};
+    const oll = [];
+    const gtolds = (dat, ...dir) => {
+        olds = Object.fromEntries(Object.entries(olds).concat(Object.entries(dat).map(([k, v]) => {
+            const origName = v.migration ? k : v.migration;
+            oll.push([origName, dir.concat(k)]);
+            return [origName, { ...v, priv: true }];
+        })));
+    };
+    const rawName = category.alias(cate) + name;
+    const pubdat = Object.entries(data ?? {}).filter(([e]) => e !== "on");
+    gtolds(pubdat, "public");
+    datas[rawName] = {
+        ty: "object",
+        lvs: {
+            ...(pubdat && {
+                public: {
+                    ty: "object",
+                    lvs: Object.fromEntries(pubdat),
+                },
+            }),
+            private: {
+                ty: "object",
+                lvs: {},
+            },
+            on: { ty: "boolean", dft: data?.on?.dft ?? true },
+        },
+    };
+    const subfuncs = [];
+    const mdf = (nm, dat) => {
+        if (!dat) return;
+        datas[rawName].lvs.private.lvs[nm] = {
+            ty: "object",
+            lvs: dat,
+        };
+        gtolds(dat, "private", nm);
+    };
+    reger(new Proxy({
+        onload: (e, dat) => mdf(e.name, dat),
+        preload: (e, dat) => mdf(e.name, dat),
+        chore: (e, dat) => mdf(e.name, {
+            ...dat,
+            last_chore: { ty: "number", dft: -1, priv: true },
+        }),
+        hook: (e, dat) => mdf(e.name, dat),
+    }, {
+        get: (e, v) => ((...arg) => {
+            subfuncs.push([v, ...arg]);
+            e[v](...arg);
+        }),
+    }));
+    Object.assign(datas[rawName].lvs, olds);
+    mod._.set(name, {
+        info, path: mod.pth_modify(path), data, func: reger, subfuncs, migrlist: oll, styl, cate,
+    });
+}
+
 const mod = {
     _: new Map(),
 
     fake_sto: sto,
-    data: {},
+    data: {} as Record<string, any>,
 
     path_alias: [
         ["", ".*\\.luogu\\.(com\\.cn|org)"],
@@ -26,10 +105,7 @@ const mod = {
         ["ghpage", "extend-luogu.github.io"],
     ].map(([alias, path]) => [new RegExp(`^@${alias}/`), path]),
 
-    /**
-     * @argument {string[] | string} pth
-     */
-    pth_modify: (pth) => {
+    pth_modify: (pth: string[] | string) => {
         if (!Array.isArray(pth)) {
             pth = [pth];
         }
@@ -46,19 +122,12 @@ const mod = {
     },
 
     path_dash_board: [
-        "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting-new/((index|bundle).html)?",
+        "@dash/((index|bundle)(.html)?)?",
+        "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?",
+        "@debug/exlg-setting-new/((index|bundle).html)?",
     ],
 
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
-     */
-    reg: (name, info, path, data, func, styl, cate) => {
+    reg: (name: string, info: string, path: string[] | string, data: any | null, func: Function, styl: string | null, cate: string) => {
         path = mod.pth_modify(path);
         const rawName = category.alias(cate) + name;
         mod.data[rawName] = {
@@ -120,7 +189,7 @@ const mod = {
             // Note: 这东西被枪毙的时间不远了
             hook: ({ name, path }, _, fn, hook) => qpusher(name, path, "preload", (arg) => {
                 document.querySelector("body").addEventListener("DOMNodeInserted", (e) => {
-                    if (!e.target.tagName) { return false; }
+                    if (!e.target.tagName) return false;
                     const res = hook(e);
                     return res.result && fn({ ...arg, ...res });
                 });
@@ -128,108 +197,11 @@ const mod = {
         };
     },
 
-    /**
-     * @callback regerType
-     * @argument {{ name: string, info: string, path?: string }} desc
-     * @argument {object | null} data
-     * @argument {...Function} funcs
-     */
+    reg_v2: reg2,
 
-    /**
-     * @callback reger
-     * @argument {{ chore: regerType, onload: regerType, preload: regerType, hook: regerType }} handler
-     */
+    reg_main: (name: string, info: string, path: string[] | string, data: object | null, func: Function, styl?: string) => mod.reg(name, info, path, data, (arg) => { func(arg); return false; }, styl, "core"),
 
-    /**
-     * @argument {{ name: string, info: string, path: string | string[], cate: string }}
-     * @argument {object} data
-     * @argument {reger} reger
-     * @argument {string | null} styl
-     */
-    reg_v2: ({
-        name, info, path, cate,
-    }, data, reger, styl) => {
-        info = info.replaceAll(" ", "_");
-        let olds = {};
-        const oll = [];
-        const gtolds = (dat, ...dir) => olds = Object.fromEntries(Object.entries(olds).concat(Object.entries(dat).map(([k, v]) => {
-            const origName = v.migration === true ? k : v.migration;
-            oll.push([origName, dir.concat(k)]);
-            return [origName, { ...v, priv: true }];
-        })));
-        const rawName = category.alias(cate) + name;
-        const pubdat = Object.entries(data ?? {}).filter(([e]) => e !== "on");
-        gtolds(pubdat, "public");
-        datas[rawName] = {
-            ty: "object",
-            lvs: {
-                ...(pubdat && {
-                    public: {
-                        ty: "object",
-                        lvs: Object.fromEntries(pubdat),
-                    },
-                }),
-                private: {
-                    ty: "object",
-                    lvs: {},
-                },
-                on: { ty: "boolean", dft: data?.on?.dft ?? true },
-            },
-        };
-        const subfuncs = [];
-        const _regv2_data_reger = (rtd) => {
-            const mdf = (nm, dat) => {
-                if (dat) {
-                    rtd.private.lvs[nm] = {
-                        ty: "object",
-                        lvs: dat,
-                    };
-                    gtolds(dat, "private", nm);
-                }
-            };
-            return new Proxy({
-                onload: (e, dat) => mdf(e.name, dat),
-                preload: (e, dat) => mdf(e.name, dat),
-                chore: (e, dat) => mdf(e.name, {
-                    ...dat,
-                    last_chore: { ty: "number", dft: -1, priv: true },
-                }),
-                hook: (e, dat) => mdf(e.name, dat),
-            }, {
-                get: (e, v) => ((...arg) => {
-                    subfuncs.push([v, ...arg]);
-                    e[v](...arg);
-                }),
-            });
-        };
-        reger(_regv2_data_reger(datas[rawName].lvs));
-        datas[rawName].lvs = { ...datas[rawName].lvs, ...olds };
-        mod._.set(name, {
-            info, path: mod.pth_modify(path), data, func: reger, subfuncs, migrlist: oll, styl, cate,
-        });
-    },
-
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     */
-    reg_main: (name, info, path, data, func, styl) => mod.reg(name, info, path, data, (arg) => { func(arg); return false; }, styl, "core"),
-
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string} tab
-     * @argument {any} vars
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
-     */
-    reg_user_tab: (name, info, tab, vars, data, func, styl, cate) => mod.reg(
+    reg_user_tab: (name: string, info: string, tab: string, vars: any, data: object | null, func: Function, styl: string | null, cate: string) => mod.reg(
         name,
         info,
         "@/user/.*",
@@ -248,16 +220,7 @@ const mod = {
         cate,
     ),
 
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string} period
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     */
-    reg_chore: (name, info, period, path, data, func, styl) => {
+    reg_chore: (name: string, info: string, period: string | number, path: string[] | string, data: object | null, func: Function, styl?: string) => {
         if (typeof period === "string") {
             const num = +period.slice(0, -1),
                 unit = {
@@ -299,15 +262,7 @@ const mod = {
         );
     },
 
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
-     */
-    reg_board: (name, info, data, func, styl, cate) => mod.reg(
+    reg_board: (name: string, info: string, data: object | null, func: Function, styl: string | null, cate: string) => mod.reg(
         name,
         info,
         "@/",
@@ -326,18 +281,7 @@ const mod = {
         cate,
     ),
 
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {Function} hook
-     * @argument {Function} darg
-     * @argument {string | null} styl
-     * @argument {string} cate
-     */
-    reg_hook_new: (name, info, path, data, func, hook, darg, styl, cate) => mod.reg(
+    reg_hook_new: (name: string, info: string, path: string[] | string, data: object | null, func: Function, hook: Function, darg: Function, styl: string | null, cate: string) => mod.reg(
         name,
         info,
         path,
@@ -354,41 +298,22 @@ const mod = {
         cate,
     ),
 
-    /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
-     */
-    reg_lfe: (name, info, path, data, func, styl, cate) => {
+    reg_lfe: (name: string, info: string, path: string[] | string, data: object | null, func: Function, styl: string | null, cate: string) => {
         mod.reg(name, info, path, data, func, styl, cate);
         mod._.set(name, { lfe: true, ...mod._.get(name) });
     },
 
-    /**
-     * @argument {string} name
-     * @returns {object}
-     */
-    find: (name) => mod._.get(name),
+    find: (name: string): Mod => mod._.get(name),
 
-    /**
-     * @argument {string} name
-     * @returns {object}
-     */
-    has: (name) => mod._.has(name),
+    has: (name: string): boolean => mod._.has(name),
 
-    /** @argument {string} name */
-    disable: (name) => {
+    disable: (name: string) => {
         const x = mod.find(name);
         x.on = false;
         mod._.set(name, x);
     },
 
-    /** @argument {string} name */
-    enable: (name) => {
+    enable: (name: string) => {
         const x = mod.find(name);
         x.on = true;
         mod._.set(name, x);
@@ -462,8 +387,7 @@ const mod = {
         };
     },
 
-    /** @argument {string} name */
-    execute: (name) => {
+    execute: (name: string) => {
         const exe = (m, named) => {
             if (!m) error(`Executing named mod but not found: "${name}"`);
             log(`Executing ${named ? "named " : ""}mod: "${m.name}"`);

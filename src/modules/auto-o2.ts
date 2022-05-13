@@ -1,12 +1,7 @@
 import mod from "../core.js";
 import { $, hookSelector } from "../utils.js";
 
-mod.reg_v2({
-    name: "auto-o2",
-    info: "自动开启 O2",
-    path: "@/problem/[A-Z0-9]+(#.*)?",
-    cate: "module",
-}, {
+mod.reg_v2("module/auto-o2", "自动开启 O2", "@/problem/[A-Z0-9]+(#.*)?", {
     on: { ty: "boolean", dft: false },
     mode: {
         ty: "enum", dft: "lastSubmitted", vals: ["lastSubmitted", "lastChecked", "always"], info: ["Mode", "模式"],

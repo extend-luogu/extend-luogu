@@ -135,12 +135,7 @@ let last_ptr = -1,
 */
 
 // Note: 先摆了，到时候 UI 之类的也要改
-mod.reg_v2({
-    name: "user-problem-color",
-    info: "题目颜色数量和比较",
-    path: "@/user/[0-9]{0,}.*",
-    cate: "module",
-}, {
+mod.reg_v2("module/module/user-problem-color", "题目颜色数量和比较", "@/user/[0-9]{0,}.*", {
     problem_compare: {
         ty: "boolean", strict: true, dft: true, info: ["AC compare", "AC 题目比较"], migration: true,
     },
@@ -222,7 +217,7 @@ mod.reg_v2({
                     });
 
                     $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ta.length} <> ${my.size} : ${same}`
-                + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`);
+                        + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`);
                 });
             }
         });

@@ -12,13 +12,13 @@ const tmpd = "_tmp",
     outfn = join(parg.d ?? "build", parg.o ?? "extend-luogu.user.js");
 
 if (parg.G) {
-    writeFileSync("./src/all-modules.js", readdirSync("./src/modules").map(
+    writeFileSync("./src/all-modules.ts", readdirSync("./src/modules").map(
         (s) => `import "./modules/${s}"`,
     ).join("\n"));
     (([fn, val]) => {
         if (!existsSync(fn)) writeFileSync(fn, val);
     })(["./src/resources/update-log.txt", ""]);
-    execSync(`git add ./src/all-modules.js`);
+    execSync(`git add ./src/all-modules.ts`);
 }
 
 const tmpcss = {},
@@ -46,7 +46,7 @@ buildSync({
 trklist.forEach((fn) => writeFileSync(fn, readFileSync(fn, { encoding: "utf8" }).replace(/\n( {4})*/g, "")));
 
 buildSync({
-    entryPoints: [join(tmpd, "./src/main.js")],
+    entryPoints: [join(tmpd, "./src/main.ts")],
     outfile: outfn,
     banner: {
         js: `${readFileSync("./src/resources/tm-headers.js", "utf8").replace("CUR_VER", process.env.npm_package_version)}\n;`,

@@ -1,24 +1,14 @@
-// declare global {
-//     interface String {
-//         toInitialCase: () => string;
-//     }
-//     interface Array<T> {
-//         lastElem: () => T
-//     }
-// }
+interface GMWindow extends Window {
+    console: Console;
+    _feInjection: any;
+    show_alert: (title: string, message: string) => void;
+}
 
-/** @type {Window & { console: Console, _feInjection: any }} */
-const uindow = unsafeWindow;
-
+const uindow: GMWindow = unsafeWindow as any;
 export default uindow;
 
-/**
- * @template T
- * @argument {Promise<T>} res
- * @returns {Promise<T> & T}
- */
-export function chain(res) {
-    return new Proxy(res, {
+export function chain<T>(res: Promise<T>): Promise<T> & T {
+    return new Proxy<any>(res, {
         get(target, prop) {
             if (prop === "then") {
                 return (cb) => {
@@ -31,9 +21,9 @@ export function chain(res) {
     });
 }
 
-export const log = (f, ...s) => uindow.console.log(`%c[exlg] ${f}`, "color: #0e90d2;", ...s);
-export const warn = (f, ...s) => uindow.console.warn(`%c[exlg] ${f}`, "color: #0e90d2;", ...s);
-export const error = (f, ...s) => {
+export const log = (f: string, ...s) => uindow.console.log(`%c[exlg] ${f}`, "color: #0e90d2;", ...s);
+export const warn = (f: string, ...s) => uindow.console.warn(`%c[exlg] ${f}`, "color: #0e90d2;", ...s);
+export const error = (f: string, ...s) => {
     uindow.console.error(`%c[exlg] ${f}`, "color: #0e90d2;", ...s);
     throw Error(s.join(" "));
 };
@@ -50,15 +40,13 @@ if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
 // ==Utilities==Libraries==
 
 // [Ctrl][Shift][Alt] + Key
-/** @argument {Event} e */
-export const toKeyCode = (e) => [
+export const toKeyCode = (e: KeyboardEvent) => [
     e.ctrlKey ? "Ctrl" : "",
     e.shiftKey ? "Shift" : "",
     e.altKey ? "Alt" : "",
     e.key.toInitialCase(),
 ].join("");
 
-/** @type {import('jquery')} */
 export const $ = jQuery.extend({
     double: (func, first, second) => [func(first), func(second)],
 });
@@ -77,7 +65,6 @@ jQuery.fn.extend({
     },
 });
 
-/** @type {import('xss')} */
 export const xss = new filterXSS.FilterXSS({
     onTagAttr: (_, k, v) => {
         if (k === "style") return `${k}="${v}"`;
@@ -87,13 +74,17 @@ export const xss = new filterXSS.FilterXSS({
 
 // ==Utilities==Extensions==
 
-/**
- * @argument {string} f
- * @argument {boolean} UTC
- * @returns {string}
- */
-Date.prototype.format = function (f, UTC) {
-    UTC = UTC ? "UTC" : "";
+declare global {
+    interface Date {
+        format: (f: string, UTC: boolean) => string;
+    }
+    interface String {
+        toInitialCase: () => string;
+    }
+}
+
+Date.prototype.format = function (f: string, isUTC: boolean): string {
+    const UTC = isUTC ? "UTC" : "";
     const re = {
         "y+": this[`get${UTC}FullYear`](),
         "m+": this[`get${UTC}Month`]() + 1,
@@ -114,10 +105,7 @@ Date.prototype.format = function (f, UTC) {
     return f;
 };
 
-/**
- * @returns {string}
- */
-String.prototype.toInitialCase = function () {
+String.prototype.toInitialCase = function (): string {
     return this[0].toUpperCase() + this.slice(1);
 };
 
@@ -131,17 +119,9 @@ Array.prototype.lastElem = function () {
 
 // ==Utilities==Functions==
 
-/**
- * @argument {number} t
- * @returns {Promise<void>}
- */
-export const sleep = t => new Promise(res => setTimeout(res, t));
+export const sleep = (t: number): Promise<void> => new Promise(res => setTimeout(res, t));
 
-/**
- * @argument {string} v1
- * @argument {string} v2
- */
-export const version_cmp = (v1, v2) => {
+export const version_cmp = (v1: string, v2: string) => {
     if (!v1) return "<<";
 
     const op = (x1, x2) => (x1 === x2 ? "==" : x1 < x2 ? "<<" : ">>");
@@ -157,11 +137,7 @@ export const version_cmp = (v1, v2) => {
     return "==";
 };
 
-/**
- * @argument {object} param
- * @argument {string} styl
- */
-export const springboard = (param, styl) => {
+export const springboard = (param: Record<string, string>, styl: string) => {
     const q = new URLSearchParams(); for (const k in param) q.set(k, param[k]);
     const $sb = $(`
         <iframe id="exlg-${param.type}" src=" https://www.bilibili.com/robots.txt?${q}" style="${styl}" exlg="exlg"></iframe>
@@ -170,10 +146,7 @@ export const springboard = (param, styl) => {
     return $sb;
 };
 
-/**
- * @argument {{ url: string, onload: Function, onerror?: Function }}
- */
-export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xmlhttpRequest({
+export const cs_get = ({ url, onload, onerror = (err) => error(err) }: Partial<Parameters<typeof GM_xmlhttpRequest>[0]>) => GM_xmlhttpRequest({
     url,
     method: "GET",
     onload,
@@ -181,16 +154,13 @@ export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xml
 });
 
 // Note: cs_get 的 Promise 版本
-/**
- * @argument {string} url
- */
-export const cs_get2 = (url, headers = {}) => {
+export const cs_get2 = (url: string, headers = {}): any => {
     const res = new Promise((resolve, onerror) => {
         GM_xmlhttpRequest({
             url,
             method: "GET",
             headers,
-            onload: (r) => {
+            onload: (r: any) => {
                 try {
                     r.data = JSON.parse(r.responseText);
                 } catch (e) { } // eslint-disable-line no-empty
@@ -202,18 +172,14 @@ export const cs_get2 = (url, headers = {}) => {
     return chain(res);
 };
 
-/**
- * @argument {string} url
- * @argument {object} data
- */
-export const cs_post = (url, data, header = {}, type = "application/json") => {
+export const cs_post = (url: string, data: any, header = {}, type = "application/json"): any => {
     const res = new Promise((resolve, onerror) => {
         GM_xmlhttpRequest({
             url,
             method: "POST",
             data: typeof data !== "string" ? JSON.stringify(data) : data,
             headers: { "Content-Type": typeof data === "string" ? type : "application/json", ...header },
-            onload: (r) => {
+            onload: (r: any) => {
                 try {
                     r.data = JSON.parse(r.responseText);
                 } catch (e) { } // eslint-disable-line no-empty
@@ -227,30 +193,19 @@ export const cs_post = (url, data, header = {}, type = "application/json") => {
 
 export const cur_time = (ratio = 1000) => Math.floor(Date.now() / ratio);
 
-/**
- * @argument {string} url
- */
-export const lg_content = (url) => new Promise((res, rej) => {
+export const lg_content = (url: string): any => new Promise((res, rej) => {
     $.get(`${url + (url.includes("?") ? "&" : "?")}_contentOnly=1`, (data) => {
-        if (data.code !== 200) rej(new Error(`Requesting failure code: ${res.code}.`));
+        if (data.code !== 200) rej(new Error(`Requesting failure code: ${data.code}.`));
         res(data);
     });
 });
 
-/**
- * @argument {string} msg
- * @returns {void}
- */
-export const lg_alert = (msg, title = "exlg 提醒您") => (uindow.show_alert
+export const lg_alert = (msg: string, title = "exlg 提醒您"): void => (uindow.show_alert
     ? uindow.show_alert(title, msg)
     : uindow.alert(`${title}\n${msg}`));
 
 let csrf_token = null;
-/**
- * @argument {string} url
- * @argument {object} data
- */
-export const lg_post = (url, data) => $.ajax({
+export const lg_post = (url: string, data: any) => $.ajax({
     url,
     data,
     headers: {
@@ -261,10 +216,7 @@ export const lg_post = (url, data) => $.ajax({
     method: "post",
 });
 
-/**
- * @argument {string} text
- */
-export const judge_problem = (text) => [
+export const judge_problem = (text: string) => [
     /^AT[1-9][0-9]{0,}$/i,
     /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
     /^SP[1-9][0-9]{0,}$/i,
@@ -275,18 +227,10 @@ export const judge_problem = (text) => [
     /^B[2-9][0-9]{3,}$/i,
 ].some((re) => re.test(text));
 
-/**
- * @argument {Array} arr
- * @argument {Object} op
- */
-export const tupledft_gen = (arr, op) => arr.map((e) => ({ dft: e, ...op }));
+export const tupledft_gen = (arr: any[], op: any) => arr.map((e) => ({ dft: e, ...op }));
 
-/**
- * 生成一个 hook 函数，钩取满足特定 selector 的元素。
- * @argument {string} selector
- * @returns {Function}
- */
-export const hookSelector = (selector) => (e) => {
+/** 生成一个 hook 函数，钩取满足特定 selector 的元素。 */
+export const hookSelector = (selector: string): Function => (e) => {
     const tmp = e.target.querySelectorAll(selector);
     return {
         result: Boolean(tmp?.length),

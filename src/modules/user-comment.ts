@@ -19,7 +19,6 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         }
         let $tar = $nm;
         if ($nm.children("span[style]").length) $tar = $nm.children("span[style]");
-        console.log($nm, $tar, com, orin, $nm.attr("exlg-usercom"));
 
         if (msto.direct_display) {
             $tar.css("white-space", "pre");
@@ -35,11 +34,11 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         for (const [i, v] of Object.entries(cmts)) if (v === null || v === "") delete cmts[i];
         // Note: 编辑
         if (/^\/user\/[1-9][0-9]{0,}$/.test(location.pathname)) {
-            const $username = $(".user-info > div.user-name"),
-                orin = $username.text().trim();
+            const $username = $(".user-header-top > .user-info > div.user-name"), // Note: 此处可以使用全局 jq，因为预期操作 O(用户操作)。
+                orin = $username[0].firstElementChild.innerText.trim();
             const uid = +location.pathname.slice(6);
             // $username.html(``);
-            const $name_text = $(`<span id="exlg-name-text" style="font-size: medium;text-shadow: 0 0 black;" class="exlg-usercom-tag"></span>`).appendTo($username);
+            const $name_text = $(`<span id="exlg-name-text" style="font-size: medium;color: #ddd;" class="exlg-usercom-tag"></span>`).appendTo($username);
             $name_text.text(`(${uid in cmts ? cmts[uid] : orin})`);
             if (!(uid in cmts)) $name_text.hide();
             const $cbtn = $(`<span title="修改用户备注">${svg_modify_usercomment}</span>`);
@@ -55,7 +54,6 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
                         cmts[uid] = nn.trim();
                         $name_text.show();
                     }
-                    console.log(orin);
                     _setcomment($(`a[href="/user/${uid}"][target=_blank]`), msto.direct_display ? (cmts[uid] ?? orin) : cmts[uid], orin); // Note: 谷 4 页面必须传
                     msto.comments = JSON.stringify(cmts);
                     $name_text.text(`(${uid in cmts ? cmts[uid] : orin})`);
@@ -72,7 +70,7 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
         $arg.attr("exlg-usercom", $arg.text().trim()); // 直接存原本的信息
         if (!uid || uid === "javascript:void 0") {
             // console.log(`no uid ${uid}!`);
-            uid = $(arg.parentNode.parentNode.previousElementSibling ?? arg.parentNode.parentNode.parentNode.previousElementSibling).find("img").attr("src").replace(/[^0-9]/ig, "");
+            uid = $(arg.parentNode.parentNode.previousElementSibling ?? arg.parentNode.parentNode.parentNode.parentNode.parentNode.previousElementSibling).find("img").attr("src").replace(/[^0-9]/ig, "");
         }
         if (uid in cmts) {
             // console.log("each: ", arg);
@@ -81,8 +79,10 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
     });
 }, (e) => {
     if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
+        // console.log(e.target);
         if (($(e.target).hasClass("feed") && !$(e.target).hasClass("exlg-badge-feed")) || (/^#following/.test(location.hash) && $(e.target).parent().hasClass("sub-body"))) {
-            const tmp = e.target.querySelectorAll(".wrapper > a[target='_blank']");
+            const tmp = Array.from(e.target.querySelectorAll("a[target='_blank']")).filter((tar) => !(tar.querySelectorAll("svg").length));
+            // console.log(e.target, tmp, e.target.innerHTML);
             return {
                 result: tmp.length,
                 args: tmp,
@@ -96,8 +96,8 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
     };
 }, () => {
     if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
-        if (location.hash === "#activity") return document.querySelectorAll(".feed .wrapper>a[target='_blank']");
-        if (/^#following/.test(location.hash)) return document.querySelectorAll(".follow-container .wrapper>a[target='_blank']");
+        if (location.hash === "#activity") return Array.from(document.querySelectorAll(".feed .wrapper>a[target='_blank']")).filter((tar) => !(tar.querySelectorAll("svg").length));
+        if (/^#following/.test(location.hash)) return Array.from(document.querySelectorAll(".follow-container .wrapper>a[target='_blank']")).filter((tar) => !(tar.querySelectorAll("svg").length));
     }
     return document.querySelectorAll("a[target='_blank'][href^='/user/']");
 }, css, "module");
