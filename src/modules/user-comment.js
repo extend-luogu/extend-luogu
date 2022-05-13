@@ -67,7 +67,7 @@ mod.reg_hook_new("user-comment", "用户备注", ".*", {
     }
     args.forEach((arg) => {
         const $arg = $(arg);
-        let uid = arg.href.split("/").lastElem();
+        let uid = arg.href.split("/").at(-1); // .lastElem();
         if (typeof $arg.attr("exlg-usercom") !== "undefined") return;
         $arg.attr("exlg-usercom", $arg.text().trim()); // 直接存原本的信息
         if (!uid || uid === "javascript:void 0") {

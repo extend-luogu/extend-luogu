@@ -406,7 +406,7 @@ const mod = {
                                 let curr = sto[rawName];
                                 const tmpd = dir.slice(0, -1);
                                 for (const et of tmpd) curr = curr[et];
-                                curr[dir.lastElem()] = sto[rawName][snm];
+                                curr[dir.at(-1)] = sto[rawName][snm];
                                 sto[rawName][snm] = datas[rawName].lvs[snm].dft;
                             }
                         }
