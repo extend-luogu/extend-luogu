@@ -27,7 +27,8 @@ const mod = {
     ].map(([alias, path]) => [new RegExp(`^@${alias}/`), path]),
 
     /**
-     * @argument {string[] | string} pth
+     * 修饰 path 参数，替换域名开头，变成数组
+     * @argument {string[] | string} pth 将要修饰的 path
      */
     pth_modify: (pth) => {
         if (!Array.isArray(pth)) {
@@ -50,13 +51,14 @@ const mod = {
     ],
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
+     * 注册 v1 模块
+     * @argument {string} name 模块 ID
+     * @argument {string} info 模块信息
+     * @argument {string[] | string} path 模块生效的 path
+     * @argument {object | null} data 模块数据
+     * @argument {Function} func 运行函数
+     * @argument {string | null} styl 样式
+     * @argument {string} cate 模块类型
      */
     reg: (name, info, path, data, func, styl, cate) => {
         path = mod.pth_modify(path);
@@ -129,22 +131,25 @@ const mod = {
     },
 
     /**
+     * 子模块注册器
      * @callback regerType
-     * @argument {{ name: string, info: string, path?: string }} desc
-     * @argument {object | null} data
-     * @argument {...Function} funcs
+     * @argument {{ name: string, info: string, path?: string | string[] }} desc 子模块的相关信息
+     * @argument {object | null} data 子模块的私有数据
+     * @argument {...Function} funcs 注册的一系列方法
      */
 
     /**
+     * 用于注册子模块的函数
      * @callback reger
-     * @argument {{ chore: regerType, onload: regerType, preload: regerType, hook: regerType }} handler
+     * @argument {{ chore: regerType, onload: regerType, preload: regerType, hook: regerType }} handler 用于注册子模块的主 handler
      */
 
     /**
-     * @argument {{ name: string, info: string, path: string | string[], cate: string }}
-     * @argument {object} data
-     * @argument {reger} reger
-     * @argument {string | null} styl
+     * 注册 v2 模块
+     * @argument {{ name: string, info: string, path: string | string[], cate: string }} desc 模块信息
+     * @argument {object} data 模块公有数据
+     * @argument {reger} reger 注册子模块的函数
+     * @argument {string | null} styl 模块样式
      */
     reg_v2: ({
         name, info, path, cate,
@@ -210,6 +215,7 @@ const mod = {
     },
 
     /**
+     * 注册唯一运行的模块，即主模块
      * @argument {string} name
      * @argument {string} info
      * @argument {string[] | string} path

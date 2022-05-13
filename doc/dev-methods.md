@@ -14,7 +14,6 @@
 
 - `Date.prototype.format(f, UTC)`
 - `String.prototype.toInitialCase()`
-- `Array.prototype.lastElem()`
 - `cur_time(ratio = 1)`
 - `jQuery.fn.whenKey(keyCode, callback)` or `jQuery.fn.whenKey({ ...keyCode: callback })`
 
