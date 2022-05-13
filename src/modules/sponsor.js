@@ -86,7 +86,7 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         $e.addClass("exlg-badge-username"); // Note: 防止重复加
         let uid = $e.attr("href").slice("/user/".length);
         if (["user-feed", "user-followers"].includes(args.ty) && uid === "ript:void 0") { // Note: 太草了，原来只要钩头像就行了
-            uid = $(e.parentNode.parentNode.previousElementSibling ?? e.parentNode.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
+            uid = $(e.parentNode.parentNode.previousElementSibling ?? e.parentNode.parentNode.parentNode.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
         }
         const badge = badges[uid];
         if (!badge || !badge.text) return;
@@ -107,7 +107,8 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
 
         const $badge = getBadge(uid, bdty === "luogu4" ? e.childNodes[0].style.color : getColor(e), bdty, bdty === "luogu4" ? badge.lg4 : badge);
         // Note: user 页面的特殊情况
-        if (["user-feed", "user-followers"].includes(args.ty)) $tar.parent().after($badge);
+        if (args.ty === "user-feed") $tar.parent().parent().parent().after($badge);
+        else if (args.ty === "user-followers") $tar.parent().after($badge);
         else $tar.after($badge).after($("<span>&nbsp;</span>"));
     });
 }))(new Set(), {}, []), (e) => {
@@ -119,9 +120,9 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         // Note: 动态（犇犇）|| 关注的人
         if (($(e.target).hasClass("feed") && !$(e.target).hasClass("exlg-badge-feed")) || (/^#following/.test(location.hash) && $(e.target).parent().hasClass("sub-body"))) {
             return {
-                result: $(e.target).find(".wrapper > a[target='_blank']").length,
+                result: $(e.target).find("a[target='_blank']:not(:has(svg))").length,
                 args: {
-                    tar: $(e.target).find(".wrapper > a[target='_blank']"),
+                    tar: $(e.target).find("a[target='_blank']:not(:has(svg))"),
                     ty: (/^#following/.test(location.hash) ? "user-followers" : "user-feed"),
                 },
             };
@@ -137,8 +138,8 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
     };
 }, () => {
     if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
-        if (location.hash === "#activity") return { tar: $(".feed .wrapper>a[target='_blank']"), ty: "no-hook-luogu4" };
-        if (/^#following/.test(location.hash)) return { tar: $(".follow-container .wrapper>a[target='_blank']"), ty: "no-hook-luogu4" };
+        if (location.hash === "#activity") return { tar: $(".feed a[target='_blank']:not(:has(svg))"), ty: "no-hook-luogu4" };
+        if (/^#following/.test(location.hash)) return { tar: $(".follow-container a[target='_blank']:not(:has(svg))"), ty: "no-hook-luogu4" };
     }
     return { tar: $("a[target='_blank'][href^='/user/']"), ty: "no-hook" };
 }, css, "module");
