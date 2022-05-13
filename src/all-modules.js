@@ -1,3 +1,4 @@
+import "./modules/auto-o2.js";
 import "./modules/benben.js";
 import "./modules/blog.js";
 import "./modules/board.js";

@@ -129,9 +129,21 @@ const mod = {
     },
 
     /**
+     * @callback regerType
+     * @argument {{ name: string, info: string, path?: string }} desc
+     * @argument {object | null} data
+     * @argument {...Function} funcs
+     */
+
+    /**
+     * @callback reger
+     * @argument {{ chore: regerType, onload: regerType, preload: regerType, hook: regerType }} handler
+     */
+
+    /**
      * @argument {{ name: string, info: string, path: string | string[], cate: string }}
      * @argument {object} data
-     * @argument {Function} reger
+     * @argument {reger} reger
      * @argument {string | null} styl
      */
     reg_v2: ({

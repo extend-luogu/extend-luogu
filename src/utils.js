@@ -280,3 +280,16 @@ export const judge_problem = (text) => [
  * @argument {Object} op
  */
 export const tupledft_gen = (arr, op) => arr.map((e) => ({ dft: e, ...op }));
+
+/**
+ * 生成一个 hook 函数，钩取满足特定 selector 的元素。
+ * @argument {string} selector
+ * @returns {Function}
+ */
+export const hookSelector = (selector) => (e) => {
+    const tmp = e.target.querySelectorAll(selector);
+    return {
+        result: Boolean(tmp?.length),
+        args: tmp,
+    };
+};
