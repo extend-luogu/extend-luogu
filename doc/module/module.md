@@ -35,3 +35,4 @@
 - [题目颜色数量和比较](./user-problem-color.md)
 - [创建重现赛](./virtual-participation.md)
 - [元讨论引导](./meta-discussion-guiding.md)
+- [添加到 cph](./import-problem-to-cph.md)
