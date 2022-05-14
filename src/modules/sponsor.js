@@ -85,8 +85,13 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         if (!$e || $e.hasClass("exlg-badge-username")) return;
         $e.addClass("exlg-badge-username"); // Note: 防止重复加
         let uid = $e.attr("href").slice("/user/".length);
-        if (["user-feed", "user-followers"].includes(args.ty) && uid === "ript:void 0") { // Note: 太草了，原来只要钩头像就行了
-            uid = $(e.parentNode.parentNode.previousElementSibling ?? e.parentNode.parentNode.parentNode.parentNode.parentNode.previousElementSibling).children("img").attr("src").replace(/[^0-9]/ig, "");
+
+        if (/^\/problem\/.*$/.test(location.pathname) && !/^\/problem\/solution.*$/.test(location.pathname)) { // 题目提供者
+            if (_feInstance.currentData.problem.provider.name === e.innerText.trim()) uid = String(_feInstance.currentData.problem.provider.uid);
+        }
+        if (["user-feed", "user-followers", "no-hook-luogu4", "no-hook-luogu4-solu", "solution-luogu4"].includes(args.ty) && uid === "ript:void 0") { // Note: 太草了，原来只要钩头像就行了
+            const $qwq = $(e.parentNode.parentNode.previousElementSibling ?? (e.parentNode.parentNode.parentNode.previousElementSibling ?? e.parentNode.parentNode.parentNode.parentNode.parentNode.previousElementSibling));
+            uid = ($qwq[0].tagName.toLowerCase() === "img" ? $qwq : $qwq.children("img")).attr("src").replace(/[^0-9]/ig, "");
         }
         const badge = badges[uid];
         if (!badge || !badge.text) return;
@@ -100,19 +105,34 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         if ($tar.next().length && ($tar.next().hasClass("sb_amazeui"))) { $tar = $tar.next(); }
         if ($tar.next().length && $tar.next().hasClass("am-badge")) { $tar = $tar.next(); }
 
-        if (["user-feed", "user-followers", "no-hook-luogu4"].includes(args.ty)) bdty = "luogu4";
+        if (["user-feed", "user-followers", "no-hook-luogu4", "no-hook-luogu4-solu", "solution-luogu4"].includes(args.ty)) bdty = "luogu4";
         else if (e.parentNode.tagName.toLowerCase() === "h2") bdty = "luogu3-h2";
         else if (args.ty === "no-hook" && e.parentNode.className === "wrapper" && !e.className.includes("lg-fg-")) return; // console.log("Fail~", e)// Note: 一旦不小心抓到了 .ops 上面不该抓的就不执行
         else bdty = "luogu3";
 
         const $badge = getBadge(uid, bdty === "luogu4" ? e.childNodes[0].style.color : getColor(e), bdty, bdty === "luogu4" ? badge.lg4 : badge);
         // Note: user 页面的特殊情况
-        if (args.ty === "user-feed") $tar.parent().parent().parent().after($badge);
-        else if (args.ty === "user-followers") $tar.parent().after($badge);
+        if ($tar.parent().parent().parent().hasClass("card")) $tar.parent().append($badge); // 洛谷 4 页面 badge: 用户卡片
+        else if (["solution-luogu4", "no-hook-luogu4-solu"].includes(args.ty)) $tar.parent().parent().parent().after($badge);
+        else if (args.ty === "user-feed") $tar.parent().parent().parent().after($badge); // 洛谷 4 页面 badge: 用户动态
+        else if (["user-feed", "user-followers"].includes(args.ty)) $tar.parent().after($badge); // 洛谷 4 页面 badge: 关注的
         else $tar.after($badge).after($("<span>&nbsp;</span>"));
     });
 }))(new Set(), {}, []), (e) => {
     // console.log(e.target)
+    if (/^\/problem\/.*$/.test(location.pathname)) {
+        // TODO: 记得做用户备注和这里的钩子
+        // 现在题解区和题目提供者还没发钩钩子呜呜
+        // 题解区的原有的
+        const $tmp = $(e.target).find("a[target='_blank']:not(:has(svg)).color-none");
+        return {
+            result: $tmp.length,
+            args: {
+                tar: $tmp,
+                ty: "solution-luogu4",
+            },
+        };
+    }
     // Note: 这里注意一下，在用户主页等使用了 luogu4 的新版 ui 的地方，在插入 .feed 的时候还没有给 用户名加上 attr
     // Note: 所以我先把 .feed 拎出来再看
     // Note: 以下是用户主页
@@ -137,6 +157,10 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         },
     };
 }, () => {
+    if (/^\/problem\/.*$/.test(location.pathname)) {
+        const $tmp = $(".card>.info-rows a[target='_blank']:not(:has(svg)), .full-container .user a[target='_blank']:not(:has(svg))");
+        return { tar: $tmp, ty: "no-hook-luogu4-solu" };
+    }
     if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
         if (location.hash === "#activity") return { tar: $(".feed a[target='_blank']:not(:has(svg))"), ty: "no-hook-luogu4" };
         if (/^#following/.test(location.hash)) return { tar: $(".follow-container a[target='_blank']:not(:has(svg))"), ty: "no-hook-luogu4" };
