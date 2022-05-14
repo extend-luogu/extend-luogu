@@ -3,16 +3,10 @@ import { $, lg_usr } from "../utils.js";
 import css from "../resources/css/messages.css";
 
 mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
-    let chat_last_fetch = {};
-    let ever_fetched = false;
-    let last_fetch_id = 0;
-
-    const uid_self = lg_usr.uid;
-
-    $("body").append(`<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>`);
-
+    const $container = $("body").append(`<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>`)
+        .find("#exlg-messages-container");
     function msg_show(msg) {
-        $("#exlg-messages-container").append(`
+        const $curbd = $(`
         <div class="exlg-message-outter" id="exlg-message-${msg.id}">
             <div class="exlg-message-inner">
                 <a href="https://www.luogu.com.cn/user/${msg.sender.uid}" target="_blank">
@@ -29,39 +23,24 @@ mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
             </div>
             <a class="exlg-message-show" id="exlg-message-show-${msg.id}" href="https://www.luogu.com.cn/chat" target="_blank">查看</a>
         </div>`);
-        $(`#exlg-message-close-${msg.id}`).click(() => { $(`#exlg-message-${msg.id}`).remove(); });
-        $(`#exlg-message-show-${msg.id}`).click(() => { $(`#exlg-message-${msg.id}`).remove(); });
+        $container.append($curbd)
+            .on("click", `#exlg-message-close-${msg.id}, #exlg-message-show-${msg.id}`, () => { $curbd.remove(); });
         $(`#exlg-message-username-${msg.id}`).text(msg.sender.name);
         $(`#exlg-message-content-${msg.id}`).text(msg.content);
     }
 
-    setInterval(() => {
-        $.ajax({
-            url: "https://www.luogu.com.cn/chat",
-            type: "get",
-            headers: { "x-luogu-type": "content-only" },
-            success(data) {
-                const chat = data.currentData.latestMessages.result;
-                if (ever_fetched && chat[0].id !== chat_last_fetch[0].id) {
-                    const new_msg = [];
-                    for (let i = 0; i < data.currentData.latestMessages.count; ++i) {
-                        if (chat[i].id > last_fetch_id) {
-                            if (chat[i].sender.uid !== uid_self) new_msg.push(chat[i]);
-                            else break;
-                        }
-                    }
-                    for (let i = new_msg.length - 1; i >= 0; --i) {
-                        console.log(new_msg[i].content);
-                        msg_show(new_msg[i]);
-                    }
-                }
-                ever_fetched = true;
-                chat_last_fetch = chat;
-                last_fetch_id = chat[0].id;
-            },
-            error(error) {
-                console.log(`Messages fetch error: ${error}`);
-            },
-        });
-    }, 1000);
+    const socket = new WebSocket("wss://ws.luogu.com.cn/ws");
+    socket.onopen = () => socket.send(JSON.stringify({
+        type: "join_channel",
+        channel: "chat",
+        channel_param: String(lg_usr.uid),
+        exclusive_key: null,
+    }));
+
+    socket.onmessage = (e) => {
+        const u = JSON.parse(e.data);
+        if (u._ws_type === "server_broadcast" && u.message instanceof Object && u.message.sender.uid !== lg_usr.uid) {
+            msg_show(u.message);
+        }
+    };
 }, css, "module");
