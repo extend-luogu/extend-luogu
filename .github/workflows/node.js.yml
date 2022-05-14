@@ -47,10 +47,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Build
-        env:
-          MSG: ${{ toJSON(github.event.commits.*.message) }}
         run: |
-          ./scripts/tag.py
+          echo "Debugging artifact" > ./src/resources/update-log.txt
           yarn run build -d dist -o extend-luogu.min.user.js
       - uses: actions/upload-artifact@v3
         with:
