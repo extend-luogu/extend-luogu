@@ -236,8 +236,12 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                         },
                     },
                     {
-                        html: "强制急停", onclick: () => {
-                            exlg_alert("还没做出来，嘿嘿~");
+                        html: "刷新 token", onclick: () => {
+                            exlg_alert(`点击确定以刷新用户 token。`, "exlg 提醒您", async () => {
+                                await mod.execute("token");
+                                location.reload();
+                                return true;
+                            });
                         },
                     },
                 ],

@@ -15,6 +15,7 @@
 }
 .ops > a.color-none:hover {
 	background-color: rgb(227,229,231);
+    border-radius: 8px;
 }
 .ops > a.color-none >.link-title {
 	display: flex;
