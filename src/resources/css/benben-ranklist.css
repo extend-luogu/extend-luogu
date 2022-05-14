@@ -26,3 +26,8 @@
     font-size: 1em;
     font-weight: normal;
 }
+
+.btn-disable {
+    pointer-events: none;
+    color: #97979a;
+}

@@ -30,21 +30,33 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
             msto.show = !msto.show;
             $fbtn.text(msto.show ? "收起" : "展开");
             $list.toggle();
-        });
-    const refresh = () => cs_get({
-        url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
-        onload(res) {
-            // let s=`<h3 id="bb-rnklst-h2">犇犇排行榜 <span id="bb-rnklst-btn" class="bb-rnklst-span"> [<a>${ msto.show ? "收起" : "展开" }</a>]</span><span style="float: right;" class="bb-rnklst-span"> [<a id="refresh-bbrnk">刷新</a>]</span></h3>`
-            $(JSON.parse(res.response)).each((index, obj) => {
-                $(`<li class="bb-rnkitm">
+        }),
+        $rbtn = $board.find("#refresh-bbrnk");
+
+    let tbOnchange = false; // Note: true 时再 render 就会冲突
+    function render(str) {
+        if (tbOnchange) return;
+        tbOnchange = true;
+        $list.html(str);
+        tbOnchange = false;
+    }
+
+    function refresh() {
+        $rbtn.addClass("btn-disable").text("刷新中");
+        cs_get({
+            url: `https://bens.rotriw.com/ranklist?_contentOnly=1`,
+            onload(res) {
+                $rbtn.removeClass("btn-disable").text("刷新");
+                // let s=`<h3 id="bb-rnklst-h2">犇犇排行榜 <span id="bb-rnklst-btn" class="bb-rnklst-span"> [<a>${ msto.show ? "收起" : "展开" }</a>]</span><span style="float: right;" class="bb-rnklst-span"> [<a id="refresh-bbrnk">刷新</a>]</span></h3>`
+                render(JSON.parse(res.response).map(([bbCount, userName, userId]) => `<li class="bb-rnkitm">
                     <span>
-                        <a href="https://bens.rotriw.com/user/${obj[2]}">${obj[1]}</a>
-                        <span>${obj[0]} 条</span>
+                        <a href="https://bens.rotriw.com/user/${userId}">${userName}</a>
+                        <span>${bbCount} 条</span>
                     </span>
-                </li>`).appendTo($list);
-            });
-        },
-    });
-    $board.find("#refresh-bbrnk").on("click", () => { $list.html(""); refresh(); });
+                </li>`).join(""));
+            },
+        });
+    }
+    $board.find("#refresh-bbrnk").on("click", refresh);
     refresh();
 }, css, "module");
