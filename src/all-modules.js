@@ -24,3 +24,4 @@ import "./modules/user-intro-ins.js";
 import "./modules/user-problem-color.js";
 import "./modules/virtual-participation.js";
 import "./modules/meta-discussion-guiding.js";
+import "./modules/import-problem-to-cph.js";
