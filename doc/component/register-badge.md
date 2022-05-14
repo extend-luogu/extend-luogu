@@ -1,6 +1,7 @@
 ## Badge 注册 / Register Badge
 
 ### 功能
+
 注册 badge。
 
 可以在命令行中使用 `exlg.register_badge()` 调用。
