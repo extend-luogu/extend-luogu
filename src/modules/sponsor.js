@@ -1,6 +1,6 @@
 import mod, { sto } from "../core.js";
 import {
-    $, cur_time, cs_post, lg_usr,
+    $, cur_time, cs_post, lg_usr, log,
 } from "../utils.js";
 import register_badge from "../components/register-badge.js";
 import css from "../resources/css/sponsor-tag.css";
@@ -120,15 +120,15 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         if (!badge || !badge.text) return;
         let tar = e,
             tarNext;
-
+        // Note: 下面的 try-catch 不要动
         try {
-        // eslint-disable-next-line no-cond-assign
-            if ((tarNext = tar.nextElementSibling) && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("sb_amazeui"))) tar = tarNext;
+            tarNext = tar.nextElementSibling;
+            if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("sb_amazeui"))) tar = tarNext;
         } catch (err) {
-            console.log(tarNext, err);
+            log(err, tarNext);
         }
-        // eslint-disable-next-line no-cond-assign
-        if ((tarNext = tar.nextElementSibling) && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("am-badge"))) tar = tarNext;
+        tarNext = tar.nextElementSibling;
+        if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("am-badge"))) tar = tarNext;
 
         const badgeDom = getBadge(uid, args.badgeType === "luogu4" ? e.childNodes[0].style.color : getColor(e), args.badgeType, getStyleList(args.badgeType, badge));
         // if (tar.parentNode.tagName.toLowerCase() === "h2") badgeDom.exlg 给调整一下大小，懒得写了
@@ -146,7 +146,6 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
             const _nbsp = document.createElement("span");
             _nbsp.innerHTML = "&nbsp;";
             tmp = kthParentNode(tar, parentRank);
-            console.log(tmp);
             tmp.after(badgeDom.exlg);
             if (parentRank === 0) tmp.after(_nbsp);
             if (badgeDom.pseudoTag) {
