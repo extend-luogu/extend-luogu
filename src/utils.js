@@ -316,3 +316,61 @@ export const hookSelector = (selector) => (e) => {
         args: tmp,
     };
 };
+
+// Note: master 传进去一个 BroadcastChannel
+// Note: slave 在 master 发消息的时候被调用，参数是消息的内容
+export const sharedFunction = (channel, master, slave) => {
+    const id = (new Date()).valueOf(),
+        ctrl = new BroadcastChannel(`${channel}-ctrl`),
+        data = new BroadcastChannel(`${channel}-data`);
+    let isMaster = false,
+        max;
+    let timeoutId;
+    const onElection = () => {
+        max = 0;
+        ctrl.postMessage(`Alive ${id}`);
+        setTimeout(() => {
+            if (max < id) {
+                isMaster = true;
+                ctrl.postMessage("Victory");
+                $(uindow).on("unload", () => {
+                    ctrl.postMessage("Election");
+                });
+                master(data);
+            }
+        }, 1000);
+    };
+    ctrl.onmessage = (ev) => {
+        const msg = ev.data;
+        if (msg === "Ping" && isMaster) {
+            ctrl.postMessage("Pong");
+        } else if (msg === "Pong") {
+            clearTimeout(timeoutId);
+        } else if (msg === "Election") onElection();
+        else if (msg.split()[0] === "Alive") {
+            console.log(Number(msg.split(" ")[1]));
+            max = Math.max(max, Number(msg.split(" ")[1]));
+        } else if (msg === "Victory") {
+            isMaster = false;
+        }
+    };
+    data.onmessage = (ev) => { slave(ev.data); };
+    ctrl.postMessage("Ping");
+    timeoutId = setTimeout(() => {
+        ctrl.postMessage("Election");
+        onElection();
+    }, 1000);
+};
+
+/*
+const listenBroadcast = (channel) => {
+    const ch = new BroadcastChannel(channel);
+    ch.onmessage = (ev) => {
+        console.log(channel, ": ", ev.data);
+    }
+}
+listenBroadcast("test-ctrl");
+listenBroadcast("test-data");
+
+sharedFunction("test", ()=>{}, ()=>{});
+*/
