@@ -4,12 +4,12 @@
   "description": "Make luogu more powerful.",
   "type": "module",
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "main": "./src/main.js",
   "scripts": {
     "build": "node ./scripts/build.js",
-    "lint": "eslint src scripts",
+    "lint": "eslint src scripts && markdownlint-cli2 \"**/*.md\"",
     "prepare": "husky install",
     "test": "node ./scripts/build.js -d build -b"
   },
@@ -30,7 +30,8 @@
     "eslint-plugin-promise": "^6.0.0",
     "exlg-git-commit-msg-std": "^0.0.3",
     "husky": "^7.0.0",
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "markdownlint-cli2": "^0.4.0"
   },
   "dependencies": {}
 }
