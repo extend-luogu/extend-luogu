@@ -12,6 +12,33 @@ import css from "../resources/css/exlg-dialog-board.css";
 import bhtml from "../resources/exlg-dialog-board.html";
 
 let brd = {};
+/**
+ * 创建一个 exlg 公告版。
+ * @argument {String} text  exlg 公告板显示的内容 (html)。默认为空。
+ * @argument {String} title exlg 公告板显示的标题 (html)。默认为"exlg 提醒您"。
+ * @argument {Object} actions exlg 公告板在被点击时的行为。
+ * @argument {Object} windowArgs 对于窗口的自定义参数。
+ * @argument {Function} actions.onopen (brd) 在创建公告板时执行的函数(可以是 async)。默认为 `() => {}`。
+ * @argument {Function} actions.onconfirm (brd) 在点击确定时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
+ * @argument {Function} actions.oncancel (brd) 在点击取消时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
+ * @argument {Function} actions.onclose (brd) 在点击右上角红叉关闭时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
+ * @argument {String} width 弹出公告板窗口的宽度。默认为 `500px`。
+ * @argument {String} min_height 弹出公告板窗口的最小高度。默认为 `300px`。
+ * @returns {Object} 该 object(hrd) 也是所有 action 的参数。
+ * 该 object 包含：
+ * - `dom`: 一系列的 jQuery 元素，下面列出了它们分别对应的选择器。
+ * >
+ * >0. `$wrap`: `#exlg-wrapper`, `.exlg-dialog-wrapper`
+ * >1. `$cont`: `#exlg-container`, `.exlg-dialog-container`
+ * >2. `$head`: `.exlg-dialog-header > #exlg-dialog-title`
+ * >3. `$main`: `.exlg-dialog-body > #exlg-dialog-content`
+ * >4. `$close`: `#header-right`
+ * >
+ * - `wait_time`: 原则上，窗口切换显示状态所需要的时间 (以毫秒为单位)。
+ * - `hide_dialog`/`show_dialog`: 用于关闭/打开窗口的方法。**原则上不应被直接调用。**
+ * - `resolve_result`: 用于 resolve 的方法。
+ * - `then`: 无需解释。
+ */
 const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     animation_speed: {
         ty: "enum", dft: ".4s", vals: ["0s", ".2s", ".25s", ".4s"],

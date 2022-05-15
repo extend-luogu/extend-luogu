@@ -10,6 +10,11 @@ import html from "../resources/badge-register.html";
 import css from "../resources/css/badge-register.css";
 
 const srd = { };
+/**
+ * 进行一个 badge 的注册和修改
+ * @argument {Object} data 表示传入的 badge 配置
+ * @returns {Void}
+ */
 const register_badge = compo.reg("register-badge", "badge 注册", null, null, (configuration = null) => {
     // Note: 引入 API 即判断能否使用 eval
     try {
