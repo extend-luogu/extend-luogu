@@ -9,7 +9,7 @@
   "main": "./src/main.js",
   "scripts": {
     "build": "node ./scripts/build.js",
-    "lint": "eslint src scripts && markdownlint-cli2 \"**/*.md\"",
+    "lint": "eslint src scripts && markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
     "prepare": "husky install",
     "test": "node ./scripts/build.js -d build -b"
   },
