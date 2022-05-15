@@ -30,11 +30,6 @@ jobs:
         
       - name: AutoCorrect lint
         uses: huacnlee/autocorrect-action@main
-        
-      - name: Markdownlint
-        uses: articulate/actions-markdownlint@v1
-        with:
-          files: '**/*.md'
 
       - name: Check commit messages
         env:
