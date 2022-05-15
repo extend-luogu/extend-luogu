@@ -1,5 +1,7 @@
 import mod from "../core.js";
-import { $, lg_usr } from "../utils.js";
+import {
+    $, lg_usr, sharedFunction, log,
+} from "../utils.js";
 import css from "../resources/css/messages.css";
 
 mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
@@ -29,18 +31,34 @@ mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
         $(`#exlg-message-content-${msg.id}`).text(msg.content);
     }
 
-    const socket = new WebSocket("wss://ws.luogu.com.cn/ws");
-    socket.onopen = () => socket.send(JSON.stringify({
-        type: "join_channel",
-        channel: "chat",
-        channel_param: String(lg_usr.uid),
-        exclusive_key: null,
-    }));
-
-    socket.onmessage = (e) => {
-        const u = JSON.parse(e.data);
+    sharedFunction("exlg-message", (bc) => {
+        const socket = new WebSocket("wss://ws.luogu.com.cn/ws");
+        socket.onopen = () => socket.send(JSON.stringify({
+            type: "join_channel",
+            channel: "chat",
+            channel_param: String(lg_usr.uid),
+            exclusive_key: null,
+        }));
+        socket.onmessage = (e) => {
+            bc.postMessage(e.data);
+            const u = JSON.parse(e.data);
+            if (u._ws_type === "server_broadcast" && u.message instanceof Object && u.message.sender.uid !== lg_usr.uid) {
+                msg_show(u.message);
+            }
+        };
+    }, (msg) => {
+        const u = JSON.parse(msg);
         if (u._ws_type === "server_broadcast" && u.message instanceof Object && u.message.sender.uid !== lg_usr.uid) {
             msg_show(u.message);
         }
+    });
+
+    const listenBroadcast = (channel) => {
+        const ch = new BroadcastChannel(channel);
+        ch.onmessage = (ev) => {
+            log(channel, ": ", ev.data);
+        };
     };
+    listenBroadcast("exlg-message-ctrl");
+    listenBroadcast("exlg-message-data");
 }, css, "module");
