@@ -1,18 +1,47 @@
 import mod, { sto } from "../core.js";
 import {
-    $, cur_time, cs_post, lg_usr, log,
+    $, cur_time, cs_post, lg_usr,
 } from "../utils.js";
 import register_badge from "../components/register-badge.js";
 import css from "../resources/css/sponsor-tag.css";
 
-const pseudoTagWhitelist = ["100250"];
+export const pseudoTagWhitelist = { 100250: "风神少女" };
+
+const allTargets = [
+    { // 题解
+        pathTest: /^\/problem\/solution.*$/,
+        domSelector: ".card>.info-rows a[target='_blank']",
+        type: { displayType: "luogu4", elementType: "solu", anceLevel: 3 },
+    },
+    { // 出题人
+        pathTest: /^\/problem\/.*$/,
+        domSelector: ".full-container .user a[target='_blank']",
+        type: { displayType: "luogu4", elementType: "prob", anceLevel: 0 },
+    },
+    { // 个人主页 - 动态
+        pathTest: ({ pathname, hash }) => (/^\/user\/[0-9]{0,}.*$/.test(pathname) && hash === "activity"),
+        domSelector: ".feed a[target='_blank']",
+        type: { displayType: "luogu4", elementType: "user-feed", anceLevel: 3 },
+    },
+    { // 个人主页 - 关注
+        pathTest: ({ pathname, hash }) => (/^\/user\/[0-9]{0,}.*$/.test(pathname) && /^#following/.test(hash)),
+        domSelector: ".follow-container a[target='_blank']",
+        type: { displayType: "luogu4", elementType: "user-follow", anceLevel: 1 },
+    },
+    { // 默认(谷三代前端)
+        pathTest: () => true,
+        domSelector: "a[target='_blank'][href^='/user/']",
+        type: { displayType: "luogu3", elementType: "luogu3", anceLevel: 0 },
+    },
+];
+const ccfLevelTagFilter = (tar) => !(tar.querySelectorAll("svg").length);
 
 mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*", "@/problem/.*", "@/ranking.*", "@/user/\\d*.*"], {
     cache: { ty: "string", dft: "3600", info: ["Cache time", "缓存时间（秒）"] },
     badges: { ty: "string", priv: true },
-}, ((loaded, badges, promises) => (async ({ msto, args }) => {
+}, ((loaded, badges, promises) => (async ({ msto, args: { domList, type: { displayType, elementType, anceLevel } } }) => {
     if ($.isEmptyObject(badges) && msto.badges) { Object.assign(badges, JSON.parse(msto.badges)); }
-    const pending = Array.from(args.tar).map((e) => {
+    const pending = Array.from(domList).map((e) => {
         const uid = e.attributes.href.value.slice("/user/".length);
         if (!loaded.has(uid) && !(uid in badges && cur_time() - badges[uid].ts <= msto.cache)) {
             loaded.add(uid);
@@ -57,7 +86,7 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
     };
 
     const getBadge = (uid, namecol, bdty, {
-        bg, fg, text, ft, fw, bd, fs,
+        bg, fg, text, ft, fw, bd, fs, pseudo,
     }) => {
         const $badge = $(`<span class="exlg-badge" badge-uid="${uid}" badge-type="${bdty}">${text}</span>`)
             .css({
@@ -71,8 +100,20 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
                 /* "background-repeat": "no-repeat", */
             })
             .on("click", () => register_badge());
+        if (Object.keys(pseudoTagWhitelist).includes(uid) && (!pseudo)) {
+            try {
+                const s = JSON.parse(text);
+                if (typeof s === "object") {
+                    [$badge[0].innerText, pseudo] = s;
+                }
+            } catch (err) {
+                // 说明是正常的 text 呗...
+                // 那就什么都不做，嗯嗯，啊对对对。
+            }
+            pseudo ??= pseudoTagWhitelist[uid]; // if still..
+        }
         return {
-            pseudoTag: (pseudoTagWhitelist.includes(uid) ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${text}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${text}</span>`).css({
+            pseudoTag: ((Object.keys(pseudoTagWhitelist).includes(uid) && pseudo) ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${pseudo}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${pseudo}</span>`).css({
                 display: "inline-block",
                 padding: "0 8px",
                 "box-sizing": "border-box",
@@ -104,128 +145,68 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
 
     const kthParentNode = (target, k) => (target ? (k ? kthParentNode(target.parentNode, k - 1) : target) : null);
 
-    args.tar.forEach((e) => {
+    domList.forEach((e) => {
+        // header
         const $e = $(e);
         if (!$e || $e.hasClass("exlg-badge-username")) return;
         $e.addClass("exlg-badge-username"); // Note: 防止重复加
+        // get uid
         let uid = $e.attr("href").slice("/user/".length);
-
-        if (args.ty === "pprovider") {
+        if (elementType === "prob") {
             const { provider } = _feInstance.currentData.problem;
             if (provider.name === e.innerText.trim()) uid = provider.uid;
         }
-        if (args.badgeType === "luogu4" && uid === "ript:void 0") uid = findUidByImg(e, 5);
-
+        if (displayType === "luogu4" && uid === "ript:void 0") uid = findUidByImg(e, 5);
         const badge = badges[uid];
-        if (!badge || !badge.text) return;
-        let tar = e,
-            tarNext;
-        // Note: 下面的 try-catch 不要动
-        try {
-            tarNext = tar.nextElementSibling;
-            if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("sb_amazeui"))) tar = tarNext;
-        } catch (err) {
-            log(err, tarNext);
-        }
+        if (!badge || (!badge.text && !(Object.keys(pseudoTagWhitelist).includes(uid) && badge.pseudo))) return;
+
+        let [tar, tarNext] = [e, e.nextElementSibling];
+        if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("sb_amazeui"))) tar = tarNext;
         tarNext = tar.nextElementSibling;
         if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("am-badge"))) tar = tarNext;
 
-        const badgeDom = getBadge(uid, args.badgeType === "luogu4" ? e.childNodes[0].style.color : getColor(e), args.badgeType, getStyleList(args.badgeType, badge));
-        // if (tar.parentNode.tagName.toLowerCase() === "h2") badgeDom.exlg 给调整一下大小，懒得写了
-
+        const badgeDom = getBadge(uid, displayType === "luogu4" ? e.childNodes[0].style.color : getColor(e), displayType, getStyleList(displayType, badge));
         let tmp = kthParentNode(tar, 3);
         if (tmp && ((tmp.classList ? [...tmp.classList] : tmp.className.split(" ")).includes("card"))) {
             if (badgeDom.pseudoTag) tmp.parentNode.appendChild(badgeDom.pseudoTag);
             tmp.parentNode.appendChild(badgeDom.exlg);
         } else {
-            const parentRank = {
-                solu: 3,
-                "user-feed": 3,
-                "user-follow": 1,
-            }[args.ty] ?? 0;
             const _nbsp = document.createElement("span");
             _nbsp.innerHTML = "&nbsp;";
-            tmp = kthParentNode(tar, parentRank);
+            tmp = kthParentNode(tar, anceLevel);
             tmp.after(badgeDom.exlg);
-            if (parentRank === 0) tmp.after(_nbsp);
+            if (anceLevel === 0) tmp.after(_nbsp);
             if (badgeDom.pseudoTag) {
                 tmp.after(badgeDom.pseudoTag);
-                if (parentRank === 0) tmp.after(_nbsp);
+                if (anceLevel === 0) tmp.after(_nbsp);
             }
         }
     });
 }))(new Set(), {}, []), (e) => {
-    const _filter = (tar) => !(tar.querySelectorAll("svg").length);
-    if (/^\/problem\/.*$/.test(location.pathname)) { // 题目页面
-        if (/^\/problem\/solution.*$/.test(location.pathname)) {
-            // 题解
-            const _tar = Array.from(e.target.querySelectorAll(".card>.info-rows a[target='_blank']")).filter(_filter);
-            return {
-                args: {
-                    tar: _tar, hook: true, ty: "solu", badgeType: "luogu4",
-                },
-                result: _tar.length,
-            };
-        } // else
-        return { // 题目页面提供者不钩
-            args: null, result: 0,
-        };
-    }
-    if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
-        if (location.hash === "#activity") {
-            const _tar = Array.from(e.target.querySelectorAll(".feed a[target='_blank']")).filter(_filter);
-            return {
-                args: {
-                    tar: _tar, hook: true, ty: "user-feed", badgeType: "luogu4",
-                },
-                result: _tar.length,
-            };
+    let _res = { args: null, result: false };
+    allTargets.every(({ pathTest, domSelector, type }) => {
+        if ((typeof pathTest === "function") ? pathTest(location) : pathTest.test(location.pathname)) {
+            return (_res = ((() => {
+                const domList = Array.from(e.target.querySelectorAll(domSelector)).filter(ccfLevelTagFilter);
+                return {
+                    args: { type, domList },
+                    result: Boolean(domList?.length),
+                };
+            })()), 0);
         }
-        if (/^#following/.test(location.hash)) {
-            const _tar = Array.from(e.target.querySelectorAll(".follow-container a[target='_blank']")).filter(_filter);
-            return {
-                args: {
-                    tar: _tar, hook: true, ty: "user-follow", badgeType: "luogu4",
-                },
-                result: _tar.length,
-            };
-        }
-    }
-    const _tar = Array.from(e.target.querySelectorAll("a[target='_blank'][href^='/user/']")).filter(_filter);
-    return {
-        args: {
-            tar: _tar, hook: true, ty: "lg3", badgeType: "luogu3",
-        },
-        result: _tar.length,
-    };
+        return 1;
+    });
+    return _res;
 }, () => {
-    const _filter = (tar) => !(tar.querySelectorAll("svg").length);
-    if (/^\/problem\/.*$/.test(location.pathname)) { // 题目页面
-        if (/^\/problem\/solution.*$/.test(location.pathname)) {
-            // 题解
-            return {
-                tar: Array.from(document.querySelectorAll(".card>.info-rows a[target='_blank']")).filter(_filter), hook: false, ty: "solu", badgeType: "luogu4",
-            };
-        } // else
-        return { // 题目页面提供者
-            tar: Array.from(document.querySelectorAll(".full-container .user a[target='_blank']")).filter(_filter), hook: false, ty: "pprovider", badgeType: "luogu4",
-        };
-    }
-    if (/^\/user\/[0-9]{0,}.*$/.test(location.pathname)) {
-        if (location.hash === "#activity") {
-            return {
-                tar: Array.from(document.querySelectorAll(".feed a[target='_blank']")).filter(_filter), hook: false, ty: "user-feed", badgeType: "luogu4",
-            };
+    let _res = { args: null, result: false };
+    allTargets.every(({ pathTest, domSelector, type }) => {
+        if ((typeof pathTest === "function") ? pathTest(location) : pathTest.test(location.pathname)) {
+            return (_res = ((() => {
+                const domList = Array.from(document.querySelectorAll(domSelector)).filter(ccfLevelTagFilter);
+                return { type, domList };
+            })()), 0);
         }
-        if (/^#following/.test(location.hash)) {
-            return {
-                tar: Array.from(document.querySelectorAll(".follow-container a[target='_blank']")).filter(_filter),
-                hook: false, ty: "user-follow", badgeType: "luogu4",
-            };
-        }
-    }
-    return {
-        tar: Array.from(document.querySelectorAll("a[target='_blank'][href^='/user/']")).filter(_filter),
-        hook: false, ty: "lg3", badgeType: "luogu3",
-    };
+        return 1;
+    });
+    return _res;
 }, css, "module");
