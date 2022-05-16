@@ -8,12 +8,18 @@ const compo = {
     sto: null,
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {object} data
-     * @argument {Function} pre
-     * @argument {Function} func
-     * @argument {string} styl
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param data
+     * @param {object} data
+     * @param pre
+     * @param {Function} pre
+     * @param func
+     * @param {Function} func
+     * @param styl
+     * @param {string} styl
      * @returns {Function}
      */
     reg: (name, info, data, pre, func, styl) => {

@@ -14,7 +14,8 @@ export default uindow;
 
 /**
  * @template T
- * @argument {Promise<T>} res
+ * @param res
+ * @param {Promise<T>} res
  * @returns {Promise<T> & T}
  */
 export function chain(res) {
@@ -52,7 +53,9 @@ if (location.host === "www.luogu.com.cn" && !/blog/g.test(location.href)) {
 // [Ctrl][Shift][Alt] + Key
 /**
  * 用一个 Event 生成 KeyCode
- * @argument {Event} e
+ *
+ * @param e
+ * @param {Event} e
  */
 export const toKeyCode = (e) => [
     e.ctrlKey ? "Ctrl" : "",
@@ -92,8 +95,11 @@ export const xss = new filterXSS.FilterXSS({
 
 /**
  * 格式化日期
- * @argument {string} f 格式化的 pattern
- * @argument {boolean} UTC 是否使用 UTC
+ *
+ * @param f
+ * @param {string} f 格式化的 pattern
+ * @param UTC
+ * @param {boolean} UTC 是否使用 UTC
  * @returns {string} 格式化后的时间
  */
 Date.prototype.format = function (f, UTC) {
@@ -120,6 +126,7 @@ Date.prototype.format = function (f, UTC) {
 
 /**
  * 将字符串转化成首字母大写，其余小写的串
+ *
  * @returns {string}
  */
 String.prototype.toInitialCase = function () {
@@ -138,15 +145,20 @@ Array.prototype.lastElem = function () {
 
 /**
  * setTimeout 的 Promise 形式
- * @argument {number} t 暂停时间
+ *
+ * @param t
+ * @param {number} t 暂停时间
  * @returns {Promise<void>}
  */
 export const sleep = t => new Promise(res => setTimeout(res, t));
 
 /**
  * 比较两个版本
- * @argument {string} v1
- * @argument {string} v2
+ *
+ * @param v1
+ * @param {string} v1
+ * @param v2
+ * @param {string} v2
  */
 export const version_cmp = (v1, v2) => {
     if (!v1) return "<<";
@@ -166,8 +178,11 @@ export const version_cmp = (v1, v2) => {
 
 /**
  * 搭建跨域跳板
- * @argument {object} param
- * @argument {string} styl
+ *
+ * @param param
+ * @param {object} param
+ * @param styl
+ * @param {string} styl
  */
 export const springboard = (param, styl) => {
     const q = new URLSearchParams(); for (const k in param) q.set(k, param[k]);
@@ -180,7 +195,12 @@ export const springboard = (param, styl) => {
 
 /**
  * 跨域 GET
- * @argument {{ url: string, onload: Function, onerror?: Function }}
+ *
+ * @param root0
+ * @param root0.url
+ * @param root0.onload
+ * @param root0.onerror
+ * @param {{ url: string, onload: Function, onerror?: Function }}
  */
 export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xmlhttpRequest({
     url,
@@ -192,7 +212,10 @@ export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xml
 // Note: cs_get 的 Promise 版本
 /**
  * 跨域 GET，但是使用 Promise
- * @argument {string} url
+ *
+ * @param url
+ * @param headers
+ * @param {string} url
  */
 export const cs_get2 = (url, headers = {}) => {
     const res = new Promise((resolve, onerror) => {
@@ -214,10 +237,15 @@ export const cs_get2 = (url, headers = {}) => {
 
 /**
  * 跨域 POST
- * @argument {string} url
- * @argument {object} data
- * @argument {object} [header]
- * @argument {string} [type]
+ *
+ * @param url
+ * @param {string} url
+ * @param data
+ * @param {object} data
+ * @param header
+ * @param {object} [header]
+ * @param type
+ * @param {string} [type]
  */
 export const cs_post = (url, data, header = {}, type = "application/json") => {
     const res = new Promise((resolve, onerror) => {
@@ -240,13 +268,16 @@ export const cs_post = (url, data, header = {}, type = "application/json") => {
 
 /**
  * 返回经过比例缩放的当前时间
- * @argument {number} ratio 比率
+ *
+ * @param ratio
+ * @param {number} ratio 比率
  * @returns 当前时间
  */
 export const cur_time = (ratio = 1000) => Math.floor(Date.now() / ratio);
 
 /**
- * @argument {string} url
+ * @param url
+ * @param {string} url
  */
 export const lg_content = (url) => new Promise((res, rej) => {
     $.get(`${url + (url.includes("?") ? "&" : "?")}_contentOnly=1`, (data) => {
@@ -257,7 +288,10 @@ export const lg_content = (url) => new Promise((res, rej) => {
 
 /**
  * Luogu 的 Alert
- * @argument {string} msg
+ *
+ * @param msg
+ * @param title
+ * @param {string} msg
  * @returns {void}
  */
 export const lg_alert = (msg, title = "exlg 提醒您") => (uindow.show_alert
@@ -267,8 +301,11 @@ export const lg_alert = (msg, title = "exlg 提醒您") => (uindow.show_alert
 let csrf_token = null;
 /**
  * 在本站 POST
- * @argument {string} url
- * @argument {object} data
+ *
+ * @param url
+ * @param {string} url
+ * @param data
+ * @param {object} data
  */
 export const lg_post = (url, data) => $.ajax({
     url,
@@ -283,7 +320,9 @@ export const lg_post = (url, data) => $.ajax({
 
 /**
  * 判断一个字符串是不是题号
- * @argument {string} text
+ *
+ * @param text
+ * @param {string} text
  * @returns {boolean}
  */
 export const judge_problem = (text) => [
@@ -299,14 +338,19 @@ export const judge_problem = (text) => [
 
 /**
  * 用一个数组生成 TM_dat Tuple 的 Schema
- * @argument {Array} arr
- * @argument {Object} op 额外参数
+ *
+ * @param arr
+ * @param {Array} arr
+ * @param op
+ * @param {object} op 额外参数
  */
 export const tupledft_gen = (arr, op) => arr.map((e) => ({ dft: e, ...op }));
 
 /**
  * 生成一个 hook 函数，钩取满足特定 selector 的元素。
- * @argument {string} selector
+ *
+ * @param selector
+ * @param {string} selector
  * @returns {Function}
  */
 export const hookSelector = (selector) => (e) => {

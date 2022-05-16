@@ -12,7 +12,8 @@
     },
     "extends": "airbnb/base",
     "plugins": [
-        "promise"
+        "promise",
+        "jsdoc"
     ],
     "rules": {
         "no-tabs": 1,
@@ -87,7 +88,28 @@
         "no-script-url": "off",
         "no-template-curly-in-string": "off",
 		"no-promise-executor-return": "off",
-		"arrow-parens": "off"
+		"arrow-parens": "off",
+
+        "jsdoc/check-access": 1, 
+        "jsdoc/check-alignment": 1, 
+        "jsdoc/check-property-names": 1, 
+        "jsdoc/check-types": 1, 
+        "jsdoc/check-values": 1, 
+        "jsdoc/empty-tags": 1, 
+        "jsdoc/implements-on-classes": 1, 
+        "jsdoc/multiline-blocks": 1, 
+        "jsdoc/newline-after-description": 1, 
+        "jsdoc/no-multi-asterisks": 1, 
+        "jsdoc/require-jsdoc": 1, 
+        "jsdoc/require-param": 1, 
+        "jsdoc/require-property": 1, 
+        "jsdoc/require-property-description": 1, 
+        "jsdoc/require-property-name": 1, 
+        "jsdoc/require-property-type": 1, 
+        "jsdoc/require-returns-check": 1, 
+        "jsdoc/require-yields": 1, 
+        "jsdoc/require-yields-check": 1, 
+        "jsdoc/tag-lines": 1
     },
     "globals": {
         "marked": true,

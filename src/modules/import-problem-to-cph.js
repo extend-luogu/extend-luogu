@@ -5,9 +5,16 @@ import exlg_alert from "../components/exlg-dialog-board.js";
 mod.reg_hook_new("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+(#.*)?", "@/record/.*"], null, ({ args }) => {
     if (!args.length || window.location.href.search("/record/") !== -1) return;
 
+    /**
+     *
+     */
     function regi_exlg_cph() {
         $("button.exlg-cph").click(() => {
             $.get(window.location.href, (elem) => {
+                /**
+                 *
+                 * @param html
+                 */
                 function htmlToElement(html) {
                     return new DOMParser().parseFromString(html, "text/html").documentElement;
                 }

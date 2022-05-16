@@ -14,17 +14,18 @@ import bhtml from "../resources/exlg-dialog-board.html";
 let brd = {};
 /**
  * 创建一个 exlg 公告版。
- * @argument {String} text  exlg 公告板显示的内容 (html)。默认为空。
- * @argument {String} title exlg 公告板显示的标题 (html)。默认为"exlg 提醒您"。
- * @argument {Object} actions exlg 公告板在被点击时的行为。
- * @argument {Object} windowArgs 对于窗口的自定义参数。
- * @argument {Function} actions.onopen (brd) 在创建公告板时执行的函数(可以是 async)。默认为 `() => {}`。
- * @argument {Function} actions.onconfirm (brd) 在点击确定时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
- * @argument {Function} actions.oncancel (brd) 在点击取消时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
- * @argument {Function} actions.onclose (brd) 在点击右上角红叉关闭时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
- * @argument {String} width 弹出公告板窗口的宽度。默认为 `500px`。
- * @argument {String} min_height 弹出公告板窗口的最小高度。默认为 `300px`。
- * @returns {Object} 该 object(hrd) 也是所有 action 的参数。
+ *
+ * @param {string} text  exlg 公告板显示的内容 (html)。默认为空。
+ * @param {string} title exlg 公告板显示的标题 (html)。默认为"exlg 提醒您"。
+ * @param {object} actions exlg 公告板在被点击时的行为。
+ * @param {object} windowArgs 对于窗口的自定义参数。
+ * @param {Function} actions.onopen (brd) 在创建公告板时执行的函数(可以是 async)。默认为 `() => {}`。
+ * @param {Function} actions.onconfirm (brd) 在点击确定时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
+ * @param {Function} actions.oncancel (brd) 在点击取消时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
+ * @param {Function} actions.onclose (brd) 在点击右上角红叉关闭时执行的函数，应当返回一个 `Boolean`。若返回 `true`，则关闭公告板。默认为 `() => true`。
+ * @param {string} width 弹出公告板窗口的宽度。默认为 `500px`。
+ * @param {string} min_height 弹出公告板窗口的最小高度。默认为 `300px`。
+ * @returns {object} 该 object(hrd) 也是所有 action 的参数。
  * 该 object 包含：
  * - `dom`: 一系列的 jQuery 元素，下面列出了它们分别对应的选择器。
  * >

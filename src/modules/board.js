@@ -34,6 +34,10 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
         $rbtn = $board.find("#refresh-bbrnk");
 
     let tbOnchange = false; // Note: true 时再 render 就会冲突
+    /**
+     *
+     * @param str
+     */
     function render(str) {
         if (tbOnchange) return;
         tbOnchange = true;
@@ -41,6 +45,9 @@ mod.reg_board("benben-ranklist", "犇犇龙王排行榜", {
         tbOnchange = false;
     }
 
+    /**
+     *
+     */
     function refresh() {
         $rbtn.addClass("btn-disable").text("刷新中");
         cs_get({

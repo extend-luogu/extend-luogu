@@ -28,7 +28,9 @@ const mod = {
 
     /**
      * 修饰 path 参数，替换域名开头，变成数组
-     * @argument {string[] | string} pth 将要修饰的 path
+     *
+     * @param pth
+     * @param {string[] | string} pth 将要修饰的 path
      */
     pth_modify: (pth) => {
         if (!Array.isArray(pth)) {
@@ -52,13 +54,21 @@ const mod = {
 
     /**
      * 注册 v1 模块
-     * @argument {string} name 模块 ID
-     * @argument {string} info 模块信息
-     * @argument {string[] | string} path 模块生效的 path
-     * @argument {object | null} data 模块数据
-     * @argument {Function} func 运行函数
-     * @argument {string | null} styl 样式
-     * @argument {string} cate 模块类型
+     *
+     * @param name
+     * @param {string} name 模块 ID
+     * @param info
+     * @param {string} info 模块信息
+     * @param path
+     * @param {string[] | string} path 模块生效的 path
+     * @param data
+     * @param {object | null} data 模块数据
+     * @param func
+     * @param {Function} func 运行函数
+     * @param styl
+     * @param {string | null} styl 样式
+     * @param cate
+     * @param {string} cate 模块类型
      */
     reg: (name, info, path, data, func, styl, cate) => {
         path = mod.pth_modify(path);
@@ -132,24 +142,35 @@ const mod = {
 
     /**
      * 子模块注册器
+     *
      * @callback regerType
-     * @argument {{ name: string, info: string, path?: string | string[] }} desc 子模块的相关信息
-     * @argument {object | null} data 子模块的私有数据
-     * @argument {...Function} funcs 注册的一系列方法
+     * @param {{ name: string, info: string, path?: string | string[] }} desc 子模块的相关信息
+     * @param {object | null} data 子模块的私有数据
+     * @param {...Function} funcs 注册的一系列方法
      */
 
     /**
      * 用于注册子模块的函数
+     *
      * @callback reger
-     * @argument {{ chore: regerType, onload: regerType, preload: regerType, hook: regerType }} handler 用于注册子模块的主 handler
+     * @param {{ chore: regerType, onload: regerType, preload: regerType, hook: regerType }} handler 用于注册子模块的主 handler
      */
 
     /**
      * 注册 v2 模块
-     * @argument {{ name: string, info: string, path: string | string[], cate: string }} desc 模块信息
-     * @argument {object} data 模块公有数据
-     * @argument {reger} reger 注册子模块的函数
-     * @argument {string | null} styl 模块样式
+     *
+     * @param {{ name: string, info: string, path: string | string[], cate: string }} desc 模块信息
+     * @param root0
+     * @param root0.name
+     * @param root0.info
+     * @param {object} data 模块公有数据
+     * @param data
+     * @param reger
+     * @param styl
+     * @param root0.path
+     * @param {reger} reger 注册子模块的函数
+     * @param root0.cate
+     * @param {string | null} styl 模块样式
      */
     reg_v2: ({
         name, info, path, cate,
@@ -216,24 +237,39 @@ const mod = {
 
     /**
      * 注册唯一运行的模块，即主模块
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
+     *
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param path
+     * @param {string[] | string} path
+     * @param data
+     * @param {object | null} data
+     * @param func
+     * @param {Function} func
+     * @param styl
+     * @param {string | null} styl
      */
     reg_main: (name, info, path, data, func, styl) => mod.reg(name, info, path, data, (arg) => { func(arg); return false; }, styl, "core"),
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string} tab
-     * @argument {any} vars
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param tab
+     * @param {string} tab
+     * @param vars
+     * @param {any} vars
+     * @param data
+     * @param {object | null} data
+     * @param func
+     * @param {Function} func
+     * @param styl
+     * @param {string | null} styl
+     * @param cate
+     * @param {string} cate
      */
     reg_user_tab: (name, info, tab, vars, data, func, styl, cate) => mod.reg(
         name,
@@ -255,13 +291,20 @@ const mod = {
     ),
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string} period
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param period
+     * @param {string} period
+     * @param path
+     * @param {string[] | string} path
+     * @param data
+     * @param {object | null} data
+     * @param func
+     * @param {Function} func
+     * @param styl
+     * @param {string | null} styl
      */
     reg_chore: (name, info, period, path, data, func, styl) => {
         if (typeof period === "string") {
@@ -306,12 +349,18 @@ const mod = {
     },
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param data
+     * @param {object | null} data
+     * @param func
+     * @param {Function} func
+     * @param styl
+     * @param {string | null} styl
+     * @param cate
+     * @param {string} cate
      */
     reg_board: (name, info, data, func, styl, cate) => mod.reg(
         name,
@@ -333,15 +382,24 @@ const mod = {
     ),
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {Function} hook
-     * @argument {Function} darg
-     * @argument {string | null} styl
-     * @argument {string} cate
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param path
+     * @param {string[] | string} path
+     * @param data
+     * @param {object | null} data
+     * @param func
+     * @param {Function} func
+     * @param hook
+     * @param {Function} hook
+     * @param darg
+     * @param {Function} darg
+     * @param styl
+     * @param {string | null} styl
+     * @param cate
+     * @param {string} cate
      */
     reg_hook_new: (name, info, path, data, func, hook, darg, styl, cate) => mod.reg(
         name,
@@ -361,13 +419,20 @@ const mod = {
     ),
 
     /**
-     * @argument {string} name
-     * @argument {string} info
-     * @argument {string[] | string} path
-     * @argument {object | null} data
-     * @argument {Function} func
-     * @argument {string | null} styl
-     * @argument {string} cate
+     * @param name
+     * @param {string} name
+     * @param info
+     * @param {string} info
+     * @param path
+     * @param {string[] | string} path
+     * @param data
+     * @param {object | null} data
+     * @param func
+     * @param {Function} func
+     * @param styl
+     * @param {string | null} styl
+     * @param cate
+     * @param {string} cate
      */
     reg_lfe: (name, info, path, data, func, styl, cate) => {
         mod.reg(name, info, path, data, func, styl, cate);
@@ -375,25 +440,27 @@ const mod = {
     },
 
     /**
-     * @argument {string} name
+     * @param name
+     * @param {string} name
      * @returns {object}
      */
     find: (name) => mod._.get(name),
 
     /**
-     * @argument {string} name
+     * @param name
+     * @param {string} name
      * @returns {object}
      */
     has: (name) => mod._.has(name),
 
-    /** @argument {string} name */
+    /** @param {string} name */
     disable: (name) => {
         const x = mod.find(name);
         x.on = false;
         mod._.set(name, x);
     },
 
-    /** @argument {string} name */
+    /** @param {string} name */
     enable: (name) => {
         const x = mod.find(name);
         x.on = true;
@@ -468,7 +535,7 @@ const mod = {
         };
     },
 
-    /** @argument {string} name */
+    /** @param {string} name */
     execute: (name) => {
         const exe = (m, named) => {
             if (!m) error(`Executing named mod but not found: "${name}"`);

@@ -7,6 +7,10 @@ import css from "../resources/css/messages.css";
 mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
     const $container = $("body").append(`<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>`)
         .find("#exlg-messages-container");
+    /**
+     *
+     * @param msg
+     */
     function msg_show(msg) {
         const $curbd = $(`
         <div class="exlg-message-outter" id="exlg-message-${msg.id}">

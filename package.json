@@ -9,13 +9,13 @@
   "main": "./src/main.js",
   "scripts": {
     "build": "node ./scripts/build.js",
-    "lint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" && eslint src scripts",
+    "lint": "markdownlint-cli2-fix \"**/*.md\" \"#node_modules\" && eslint src scripts",
     "prepare": "husky install",
     "test": "node ./scripts/build.js -d build -b"
   },
   "repository": "git+https://github.com/extend-luogu/extend-luogu.git",
   "author": "extend-luogu-dev",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/extend-luogu/extend-luogu/issues"
   },
@@ -31,7 +31,8 @@
     "exlg-git-commit-msg-std": "^0.0.3",
     "husky": "^7.0.0",
     "minimist": "^1.2.6",
-    "markdownlint-cli2": "^0.4.0"
+    "markdownlint-cli2": "^0.4.0",
+    "eslint-plugin-jsdoc": "^39.2.9"
   },
   "dependencies": {}
 }
