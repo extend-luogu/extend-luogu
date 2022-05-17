@@ -1,3 +1,6 @@
+---
+title: Badge 注册 | Exlg
+---
 ## Badge 注册 / Register Badge
 
 ### 功能

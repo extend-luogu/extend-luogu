@@ -1,3 +1,6 @@
+---
+title: 公告板 | Exlg
+---
 ## exlg 公告板 / Exlg Dialog Board
 
 ### 功能

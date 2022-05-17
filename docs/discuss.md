@@ -1,3 +1,6 @@
+---
+title: 讨论和反馈
+---
 ## 讨论 & 反馈
 
 - [Issues](https://github.com/extend-luogu/extend-luogu/issues)。

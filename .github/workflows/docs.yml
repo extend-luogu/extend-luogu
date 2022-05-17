@@ -1,0 +1,27 @@
+name: Documentation
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Use CommonJS
+        run: |
+          sed -e 's/module/commonjs/' package.json > package-cjs.json
+          rm package.json
+          mv package-cjs.json package.json
+      - name: Build docs
+        run: yarn docs:build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: vuepress
+          path: docs/.vuepress/dist

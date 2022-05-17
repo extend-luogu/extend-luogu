@@ -11,7 +11,10 @@
     "build": "node ./scripts/build.js",
     "lint": "markdownlint-cli2-fix \"**/*.md\" \"#node_modules\" && eslint src scripts",
     "prepare": "husky install",
-    "test": "node ./scripts/build.js -d build -b"
+    "test": "node ./scripts/build.js -d build -b",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "docs:jsdoc": "jsdoc2md src/**.js"
   },
   "repository": "git+https://github.com/extend-luogu/extend-luogu.git",
   "author": "extend-luogu-dev",
@@ -32,7 +35,9 @@
     "husky": "^7.0.0",
     "minimist": "^1.2.6",
     "markdownlint-cli2": "^0.4.0",
-    "eslint-plugin-jsdoc": "^39.2.9"
+    "eslint-plugin-jsdoc": "^39.2.9",
+    "vuepress": "next",
+    "jsdoc-to-markdown": "^7.0.0"
   },
   "dependencies": {}
 }

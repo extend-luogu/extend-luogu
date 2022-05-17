@@ -16,10 +16,10 @@ readlines("./src/all-modules.js")
         })));
 
 const hsdm = [];
-readdirSync("./doc/module")
+readdirSync("./docs/modules")
     .forEach((v) => {
         const p = v.slice(0, -3);
-        if (v !== "module.md") {
+        if (v !== "README.md") {
             if (!mods.some((m, i, a) => (p === m) && a.splice(i, 1))) {
                 console.error(`error: unknown doc ${v}`);
                 process.exit(1);
@@ -38,7 +38,7 @@ if (mods.length) {
 //     .map(x => x[1].replaceAll("_", " "))
 //     .join("\n"))
 
-readlines("./doc/module/module.md")
+readlines("./docs/modules/README.md")
     .filter((e) => /\(/.test(e))
     .map((e) => e.match(/]\(.*?\)/g)[0].slice(2, -1))
     .forEach((n) => {
@@ -56,7 +56,7 @@ if (hsdm.length) {
 
 // Check docs for components
 
-const cdcs = readdirSync("./doc/component").map((s) => s.slice(0, -3));
+const cdcs = readdirSync("./docs/components").map((s) => s.slice(0, -3));
 readdirSync("./src/components").forEach((s) => {
     const tmp = cdcs.indexOf(s.slice(0, -3));
     if (tmp === -1) {

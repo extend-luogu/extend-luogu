@@ -1,3 +1,6 @@
+---
+title: 安装
+---
 ## 安装
 
 1. 安装 [TamperMonkey](https://www.tampermonkey.net) 或任何其它的脚本管理器，所安装的脚本管理器必须兼容 `GreaseMonkey/FireFox` 提供的 API（对于 Tampermonkey，将显示 `为了运行当前脚本，需要开启 GreaseMonkey/FireFox 兼容性选项。`）；
