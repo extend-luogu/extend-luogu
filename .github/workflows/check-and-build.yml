@@ -22,11 +22,8 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
-      - name: ESLint
+      - name: ESLint and Markdownlint
         run: yarn lint
-
-      - name: Check docs
-        run: node ./scripts/check-doc.js
         
       - name: AutoCorrect lint
         uses: huacnlee/autocorrect-action@main
