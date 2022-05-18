@@ -1,27 +1,42 @@
-name: Documentation
+---
+name: docs
 
-on: [push]
+on:
+  # 每当 push 到 main 分支时触发部署
+  push:
+    branches: [main]
+  # 手动触发部署
+  workflow_dispatch:
 
 jobs:
-  build:
+  docs:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: 'yarn'
+          cache: yarn
+
       - name: Install dependencies
-        run: yarn --frozen-lockfile
-      - name: Use CommonJS
-        run: |
-          sed -e 's/module/commonjs/' package.json > package-cjs.json
-          rm package.json
-          mv package-cjs.json package.json
-      - name: Build docs
-        run: yarn docs:build
-      - uses: actions/upload-artifact@v3
+        run: yarn workspace docs install --frozen-lockfile
+
+      # 运行构建脚本
+      - name: Build VuePress site
+        run: yarn workspace docs build
+
+      # 查看 workflow 的文档来获取更多信息
+      # @see https://github.com/crazy-max/ghaction-github-pages
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2
         with:
-          name: vuepress
-          path: docs/.vuepress/dist
+          # 部署到 gh-pages 分支
+          target_branch: gh-pages
+          # 部署目录为 VuePress 的默认输出目录
+          build_dir: docs/.vuepress/dist
+        env:
+          # @see https://docs.github.com/cn/actions/reference/authentication-in-a-workflow#about-the-github_token-secret
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

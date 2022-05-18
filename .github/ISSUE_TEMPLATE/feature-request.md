@@ -3,8 +3,7 @@ name: Feature request
 about: 提出新功能建议的 issue 模板
 title: 请在标题简单描述你的建议
 labels: enhancement
-assignees: ''
-
+assignees: ""
 ---
 
 **如果有多个建议，请分别提出，不要扎堆。**

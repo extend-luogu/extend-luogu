@@ -1,6 +1,7 @@
 ---
 title: Badge
 ---
+
 ## Badge
 
 Badge 是 exlg 贡献者的标识。

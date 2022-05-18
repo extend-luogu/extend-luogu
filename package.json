@@ -9,11 +9,10 @@
   "main": "./src/main.js",
   "scripts": {
     "build": "node ./scripts/build.js",
-    "lint": "markdownlint-cli2-fix \"**/*.md\" \"#node_modules\" && eslint src scripts",
+    "lint": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint src scripts",
+    "lint:fix": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint --fix src scripts",
     "prepare": "husky install",
     "test": "node ./scripts/build.js -d build -b",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
     "docs:jsdoc": "jsdoc2md src/**.js"
   },
   "repository": "git+https://github.com/extend-luogu/extend-luogu.git",
@@ -23,6 +22,11 @@
     "url": "https://github.com/extend-luogu/extend-luogu/issues"
   },
   "homepage": "https://exlg.cc",
+  "private": true,
+  "workspaces": [
+    ".",
+    "docs"
+  ],
   "devDependencies": {
     "@types/jquery": "^3.5.14",
     "@types/tampermonkey": "^4.0.5",
@@ -30,14 +34,14 @@
     "eslint": "^8.13.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsdoc": "^39.2.9",
     "eslint-plugin-promise": "^6.0.0",
     "exlg-git-commit-msg-std": "^0.0.3",
     "husky": "^7.0.0",
-    "minimist": "^1.2.6",
+    "jsdoc-to-markdown": "^7.0.0",
+    "lint-staged": "^12.4.1",
     "markdownlint-cli2": "^0.4.0",
-    "eslint-plugin-jsdoc": "^39.2.9",
-    "vuepress": "next",
-    "jsdoc-to-markdown": "^7.0.0"
-  },
-  "dependencies": {}
+    "minimist": "^1.2.6",
+    "prettier": "^2.6.2"
+  }
 }

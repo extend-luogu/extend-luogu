@@ -1,127 +1,118 @@
 {
-    "root": true,
-    "env": {
-        "browser": true,
-        "es2021": true,
-        "greasemonkey": true,
-        "jquery": true
-    },
-    "parserOptions": {
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "extends": "airbnb/base",
-    "plugins": [
-        "promise",
-        "jsdoc"
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "greasemonkey": true,
+    "jquery": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "extends": "airbnb/base",
+  "plugins": ["promise", "jsdoc"],
+  "rules": {
+    "no-tabs": 1,
+    "no-debugger": 2,
+    "arrow-body-style": [2, "as-needed"],
+    "indent": [2, 4],
+    "object-property-newline": 0,
+    "no-multiple-empty-lines": [
+      2,
+      {
+        "max": 2,
+        "maxEOF": 1,
+        "maxBOF": 0
+      }
     ],
-    "rules": {
-        "no-tabs": 1,
-        "no-debugger": 2,
-        "arrow-body-style": [
-            2,
-            "as-needed"
-        ],
-        "indent": [
-            2,
-            4
-        ],
-        "object-property-newline": 0,
-        "no-multiple-empty-lines": [
-            2,
-            {
-                "max": 2,
-                "maxEOF": 1,
-                "maxBOF": 0
-            }
-        ],
-        "quotes": [
-            2,
-            "double",
-            {
-                "allowTemplateLiterals": true
-            }
-        ],
-        "one-var": 0,
-        "no-unused-vars": [
-            2,
-            {
-                "varsIgnorePattern": "^_",
-                "argsIgnorePattern": "^_"
-            }
-        ],
-        "no-undef": 2,
-        "no-case-declarations": 0,
-        "no-fallthrough": 0,
-        "no-mixed-operators": 0,
-        "space-unary-ops": [
-            2,
-            {
-                "words": true,
-                "nonwords": false
-            }
-        ],
-        "operator-linebreak": 0,
-        // TODO: should be enabled, but I don't want to fix it right now
-        "max-len": 0,
-        "no-extend-native": 0,
-        "default-case": "off",
-        "no-return-assign": "off",
-        "func-names": "off",
-        "no-param-reassign": "off",
-        "camelcase": "off",
-        "no-bitwise": "off",
-        "guard-for-in": "off",
-        "no-nested-ternary": "off",
-        "no-restricted-syntax": "off",
-        // TODO: only allow _feInjection ?
-        "no-underscore-dangle": "off",
-        "consistent-return": "off",
-        "no-restricted-globals": "off",
-        "import/prefer-default-export": "off",
-        "import/extensions": "off",
-        "no-plusplus": "off",
-        "no-alert": "off",
-        "no-console": "off",
-        "no-multi-assign": "off",
-        "import/no-extraneous-dependencies": "off",
-        "no-script-url": "off",
-        "no-template-curly-in-string": "off",
-		"no-promise-executor-return": "off",
-		"arrow-parens": "off",
+    "quotes": [
+      2,
+      "double",
+      {
+        "allowTemplateLiterals": true
+      }
+    ],
+    "one-var": 0,
+    "no-unused-vars": [
+      2,
+      {
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-undef": 2,
+    "no-case-declarations": 0,
+    "no-fallthrough": 0,
+    "no-mixed-operators": 0,
+    "space-unary-ops": [
+      2,
+      {
+        "words": true,
+        "nonwords": false
+      }
+    ],
+    "operator-linebreak": 0,
+    // TODO: should be enabled, but I don't want to fix it right now
+    "max-len": 0,
+    "no-extend-native": 0,
+    "default-case": "off",
+    "no-return-assign": "off",
+    "func-names": "off",
+    "no-param-reassign": "off",
+    "camelcase": "off",
+    "no-bitwise": "off",
+    "guard-for-in": "off",
+    "no-nested-ternary": "off",
+    "no-restricted-syntax": "off",
+    // TODO: only allow _feInjection ?
+    "no-underscore-dangle": "off",
+    "consistent-return": "off",
+    "no-restricted-globals": "off",
+    "import/prefer-default-export": "off",
+    "import/extensions": "off",
+    "no-plusplus": "off",
+    "no-alert": "off",
+    "no-console": "off",
+    "no-multi-assign": "off",
+    "import/no-extraneous-dependencies": "off",
+    "no-script-url": "off",
+    "no-template-curly-in-string": "off",
+    "no-promise-executor-return": "off",
+    "arrow-parens": "off",
 
-        "jsdoc/check-access": 1, 
-        "jsdoc/check-alignment": 1, 
-        "jsdoc/check-property-names": 1, 
-        "jsdoc/check-types": 1, 
-        "jsdoc/check-values": 1, 
-        "jsdoc/empty-tags": 1, 
-        "jsdoc/implements-on-classes": 1, 
-        "jsdoc/multiline-blocks": 1, 
-        "jsdoc/newline-after-description": 1, 
-        "jsdoc/no-multi-asterisks": 1, 
-        "jsdoc/require-jsdoc": 1, 
-        "jsdoc/require-param": 1, 
-        "jsdoc/require-property": 1, 
-        "jsdoc/require-property-description": 1, 
-        "jsdoc/require-property-name": 1, 
-        "jsdoc/require-property-type": 1, 
-        "jsdoc/require-returns-check": 1, 
-        "jsdoc/require-yields": 1, 
-        "jsdoc/require-yields-check": 1, 
-        "jsdoc/tag-lines": 1
-    },
-    "globals": {
-        "marked": true,
-        "filterXSS": true,
-        "scrollToId": true,
-        "type_dat": true,
-        "proxy_dat": true,
-        "load_dat": true,
-        "save_dat": true,
-        "clear_dat": true,
-        "raw_dat": true,
-        "GM_listValues": true,
-        "_feInstance": true
-    }
+    "jsdoc/check-access": 1,
+    "jsdoc/check-alignment": 1,
+    "jsdoc/check-property-names": 1,
+    "jsdoc/check-types": 1,
+    "jsdoc/check-values": 1,
+    "jsdoc/empty-tags": 1,
+    "jsdoc/implements-on-classes": 1,
+    "jsdoc/multiline-blocks": 1,
+    "jsdoc/newline-after-description": 1,
+    "jsdoc/no-multi-asterisks": 1,
+    "jsdoc/require-jsdoc": 1,
+    "jsdoc/require-param": 1,
+    "jsdoc/require-property": 1,
+    "jsdoc/require-property-description": 1,
+    "jsdoc/require-property-name": 1,
+    "jsdoc/require-property-type": 1,
+    "jsdoc/require-returns-check": 1,
+    "jsdoc/require-yields": 1,
+    "jsdoc/require-yields-check": 1,
+    "jsdoc/tag-lines": 1
+  },
+  "globals": {
+    "marked": true,
+    "filterXSS": true,
+    "scrollToId": true,
+    "type_dat": true,
+    "proxy_dat": true,
+    "load_dat": true,
+    "save_dat": true,
+    "clear_dat": true,
+    "raw_dat": true,
+    "GM_listValues": true,
+    "_feInstance": true
+  }
 }
