@@ -1,4 +1,6 @@
-.eslintrc.js
-
-/dist/*
-extend-luogu.user.js
+!.vuepress/
+!.*rc.*
+.cache/
+.temp/
+build/
+dist/

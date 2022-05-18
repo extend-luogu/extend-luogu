@@ -1,4 +1,7 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
   "editor.formatOnSave": true,
-  "eslint.workingDirectories": ["./docs/"]
+  "eslint.format.enable": true
 }

@@ -1,5 +1,0 @@
-!.vuepress/
-!.*rc.*
-.cache/
-.temp/
-dist/

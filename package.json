@@ -9,8 +9,8 @@
   "main": "./src/main.js",
   "scripts": {
     "build": "node ./scripts/build.js",
-    "lint": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint src scripts",
-    "lint:fix": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint --fix src scripts",
+    "lint": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint --ext js --ext cjs .",
+    "lint:fix": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint --ext js --ext cjs --fix .",
     "prepare": "husky install",
     "test": "node ./scripts/build.js -d build -b",
     "docs:jsdoc": "jsdoc2md src/**.js"
@@ -33,8 +33,10 @@
     "esbuild": "^0.14.36",
     "eslint": "^8.13.0",
     "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsdoc": "^39.2.9",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "exlg-git-commit-msg-std": "^0.0.3",
     "husky": "^7.0.0",
