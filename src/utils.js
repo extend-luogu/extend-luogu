@@ -1,9 +1,8 @@
+import { filterXSS } from "xss";
+
 // declare global {
 //     interface String {
 //         toInitialCase: () => string;
-//     }
-//     interface Array<T> {
-//         lastElem: () => T
 //     }
 // }
 
@@ -132,14 +131,6 @@ Date.prototype.format = function (f, UTC) {
 String.prototype.toInitialCase = function () {
     return this[0].toUpperCase() + this.slice(1);
 };
-
-// Hack: 下面几行留着污染 prototype chain 会导致无法修改博客背景，原因不明。
-/*
-Array.prototype.lastElem = function () {
-    return this[this.length - 1];
-};
-*/
-// Hack: 5ab 我操你妈。
 
 // ==Utilities==Functions==
 

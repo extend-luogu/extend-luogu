@@ -1,6 +1,6 @@
 import { log } from "./utils.js";
 import category from "./category.js";
-import { datas } from "./storage.js";
+import { scm } from "./schema.js";
 import queues from "./run-queue.js";
 
 const compo = {
@@ -25,7 +25,7 @@ const compo = {
     reg: (name, info, data, pre, func, styl) => {
         const sn = category.alias("component") + name;
         info = info.replaceAll(" ", "_");
-        datas[sn] = {
+        scm[sn] = {
             ty: "object",
             lvs: {
                 on: { ty: "boolean", dft: true },

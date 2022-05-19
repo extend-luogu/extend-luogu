@@ -3,7 +3,7 @@ import uindow, {
 } from "./utils.js";
 import icon_b from "./resources/image/logo.svg";
 import category from "./category.js";
-import { datas } from "./storage.js";
+import { scm } from "./schema.js";
 import queues from "./run-queue.js";
 
 // eslint-disable-next-line import/no-mutable-exports
@@ -78,7 +78,7 @@ const mod = {
             lvs: data || {},
         };
         if (!("on" in mod.data[rawName].lvs)) mod.data[rawName].lvs.on = { ty: "boolean", dft: true };
-        datas[rawName] = mod.data[rawName];
+        scm[rawName] = mod.data[rawName];
 
         info = info.replaceAll(" ", "_");
 
@@ -186,7 +186,7 @@ const mod = {
         const rawName = category.alias(cate) + name;
         const pubdat = Object.entries(data ?? {}).filter(([e]) => e !== "on");
         gtolds(pubdat, "public");
-        datas[rawName] = {
+        scm[rawName] = {
             ty: "object",
             lvs: {
                 ...(pubdat && {
@@ -228,8 +228,8 @@ const mod = {
                 }),
             });
         };
-        reger(_regv2_data_reger(datas[rawName].lvs));
-        datas[rawName].lvs = { ...datas[rawName].lvs, ...olds };
+        reger(_regv2_data_reger(scm[rawName].lvs));
+        scm[rawName].lvs = { ...scm[rawName].lvs, ...olds };
         mod._.set(name, {
             info, path: mod.pth_modify(path), data, func: reger, subfuncs, migrlist: oll, styl, cate,
         });
@@ -487,12 +487,12 @@ const mod = {
                 if (m.subfuncs) {
                     if (Array.isArray(m.migrlist)) {
                         for (const [snm, dir] of m.migrlist) {
-                            if (sto[rawName][snm] !== datas[rawName].lvs[snm].dft) {
+                            if (sto[rawName][snm] !== scm[rawName].lvs[snm].dft) {
                                 let curr = sto[rawName];
                                 const tmpd = dir.slice(0, -1);
                                 for (const et of tmpd) curr = curr[et];
                                 curr[dir.at(-1)] = sto[rawName][snm];
-                                sto[rawName][snm] = datas[rawName].lvs[snm].dft;
+                                sto[rawName][snm] = scm[rawName].lvs[snm].dft;
                             }
                         }
                     }

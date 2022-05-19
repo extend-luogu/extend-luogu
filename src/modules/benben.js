@@ -1,3 +1,4 @@
+import { marked } from "marked";
 import uindow, { xss, cs_get, $ } from "../utils.js";
 import mod from "../core.js";
 import check_svg from "../resources/image/check.svg";

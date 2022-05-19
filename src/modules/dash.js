@@ -16,7 +16,7 @@ import css_dash from "../resources/css/beautified-dash.css";
 import css_dd from "../resources/css/beautified-dropdown.css";
 import category from "../category.js";
 import compo from "../compo-core.js";
-import { datas } from "../storage.js";
+import { scm } from "../schema.js";
 import exlg_alert from "../components/exlg-dialog-board.js";
 
 mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
@@ -67,7 +67,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
                     description: m.info,
                     unclosable,
                     // Note: 有个傻狗注释掉了然后出锅了，我不说是谁。
-                    settings: toSettings(datas[alias + nm]?.lvs ?? {}),
+                    settings: toSettings(scm[alias + nm]?.lvs ?? {}),
                 })),
         }));
     console.log(modules);
