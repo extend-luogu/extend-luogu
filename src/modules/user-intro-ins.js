@@ -2,7 +2,7 @@ import {
     $,
     springboard,
     xss,
-    lg_content
+    lg_content,
 } from "../utils.js";
 import mod from "../core.js";
 import css from "../resources/css/user-intro-ins.css";
