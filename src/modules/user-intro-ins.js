@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {
     $,
     springboard,
@@ -10,6 +11,16 @@ import { $, springboard, xss } from "../utils.js";
 =======
 import { $, springboard, xss, lg_content } from "../utils.js";
 >>>>>>> 89fa637 (Add html-paste features and fix bugs)
+||||||| parent of dfec415 (Fix eslint wrong)
+import { $, springboard, xss, lg_content } from "../utils.js";
+=======
+import {
+    $,
+    springboard,
+    xss,
+    lg_content
+} from "../utils.js";
+>>>>>>> dfec415 (Fix eslint wrong)
 import mod from "../core.js";
 import css from "../resources/css/user-intro-ins.css";
 
@@ -96,7 +107,7 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
                 $e.remove();
             } else if (ins === "html-paste") {
                 if (arg[0].trim() === "") return;
-                let res = await lg_content("/paste/" + arg[0].trim());
+                const res = await lg_content(`/paste/${arg[0].trim()}`);
                 $e.replaceWith($(`<p exlg="exlg">${xss.process(res.currentData.paste.data)}</p>`));
             }
         });
@@ -133,9 +144,9 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
     findSon($("section.main"), 3).addClass("lg-editt");
     // Note: 现在只做到按 cancel 时重加载
     $("button.lg-editt").on("click", async () => {
-        var $divv = findSon($("section.main"), 2);
-        var $son0 = $($divv.children()[0]);
-        var $son1 = $($divv.children()[1]);
+        let divv = findSon($("section.main"), 2);
+        let son0 = $($divv.children()[0]);
+        let $son1 = $($divv.children()[1]);
         $son0.addClass("lg-editt");
         $son1.addClass("lg-editt");
         regTab();
