@@ -144,9 +144,9 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
     findSon($("section.main"), 3).addClass("lg-editt");
     // Note: 现在只做到按 cancel 时重加载
     $("button.lg-editt").on("click", async () => {
-        let divv = findSon($("section.main"), 2);
-        let son0 = $($divv.children()[0]);
-        let $son1 = $($divv.children()[1]);
+        const $divv = findSon($("section.main"), 2);
+        const $son0 = $($divv.children()[0]);
+        const $son1 = $($divv.children()[1]);
         $son0.addClass("lg-editt");
         $son1.addClass("lg-editt");
         regTab();
