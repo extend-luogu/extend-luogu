@@ -2,16 +2,17 @@ import { $ } from "../utils.js";
 import mod from "../core.js";
 import exlg_alert from "../components/exlg-dialog-board.js";
 
-mod.reg_hook_new("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+(#.*)?", "@/record/.*"], null, ({ args }) => {
-    if (!args.length || window.location.href.search("/record/") !== -1) return;
+mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+(#.*)?", "@/record/.*"], null, () => {
+    if (!$("div.operation").length || window.location.href.search("/record/") !== -1) return;
 
     /**
-     *
+     * 注册 `传送至 cph` 按钮
      */
     function regi_exlg_cph() {
         $("button.exlg-cph").click(() => {
             $.get(window.location.href, (elem) => {
                 /**
+                 * 将 str 转 element
                  *
                  * @param html
                  */
@@ -70,20 +71,22 @@ mod.reg_hook_new("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-
         });
     }
 
+    $("button.lfe-form-sz-middle").addClass("lg-btm");
     if (window.location.href.search("#submit") === -1) {
-        $("button.lfe-form-sz-middle").addClass("lg-btm");
-        args.append("<button data-v-7ade990c=\"\" data-v-43063e73=\"\" type=\"button\" class=\"exlg-cph lfe-form-sz-middle\" data-v-2dfcfd35=\"\" style=\"border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);\"> 传送至 cph </button>");
-        regi_exlg_cph();
+        if ($("button.exlg-cph").length === 0) {
+            $("div.operation").append("<button data-v-7ade990c=\"\" data-v-43063e73=\"\" type=\"button\" class=\"exlg-cph lfe-form-sz-middle\" data-v-2dfcfd35=\"\" style=\"border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);\"> 传送至 cph </button>");
+            regi_exlg_cph();
+        }
     }
     $("button.lg-btm").click(() => {
         if (window.location.href.search("#submit") === -1) {
-            args.append("<button data-v-7ade990c=\"\" data-v-43063e73=\"\" type=\"button\" class=\"exlg-cph lfe-form-sz-middle\" data-v-2dfcfd35=\"\" style=\"border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);\"> 传送至 cph </button>");
-            regi_exlg_cph();
+            if ($("button.exlg-cph").length === 0) {
+                $("button.lfe-form-sz-middle").addClass("lg-btm");
+                $("div.operation").append("<button data-v-7ade990c=\"\" data-v-43063e73=\"\" type=\"button\" class=\"exlg-cph lfe-form-sz-middle\" data-v-2dfcfd35=\"\" style=\"border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);\"> 传送至 cph </button>");
+                regi_exlg_cph();
+            }
         } else {
             $("button.exlg-cph").remove();
         }
     });
-}, (e) => {
-    const $tmp = $(e.target).find("div.operation");
-    return { result: $tmp.length > 0, args: $tmp };
-}, () => $("div.operation"), "module");
+}, null, "module");
