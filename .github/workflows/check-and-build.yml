@@ -64,7 +64,7 @@ jobs:
         run: |
           export VER=$(./scripts/tag.py)
           yarn run build -d dist -o extend-luogu.min.user.js
-          git add .
+          git add -f dist
           HUSKY=0 git commit -m "Build $VER"
           git tag $VER
           echo "VER=$VER" >> $GITHUB_ENV
