@@ -4,7 +4,6 @@ import exlg_alert from "../components/exlg-dialog-board.js";
 
 mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+(#.*)?", "@/record/.*"], null, () => {
     if (!$("div.operation").length || window.location.href.search("/record/") !== -1) return;
-
     /**
      * 注册 `传送至 cph` 按钮
      */
