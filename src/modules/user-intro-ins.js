@@ -18,7 +18,7 @@ import {
     $,
     springboard,
     xss,
-    lg_content
+    lg_content,
 } from "../utils.js";
 >>>>>>> dfec415 (Fix eslint wrong)
 import mod from "../core.js";
