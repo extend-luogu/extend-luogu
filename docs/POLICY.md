@@ -1,6 +1,6 @@
 # 扩展洛谷用户协议
 
-原文在此：[链接](https://github.com/extend-luogu/extend-luogu/blob/main/POLICY.md)  
+原文在此：[链接](docs/POLICY.md)  
 本文件为用户协议的原文，一切条款以本文的**最新版本**为准。  
 不定期更新镜像：[链接](https://www.luogu.com.cn/paste/v4nz7uut)
 
