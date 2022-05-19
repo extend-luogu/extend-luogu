@@ -1,1 +1,11 @@
-** @optimize-2 @ForkKILLET @5ab-juruo @Minstdfx @wxh06 @YuzhenQin
+/.github/ISSUE_TEMPLATE/ @5ab-juruo
+/.github/workflows/ @wxh06 @YuzhenQin
+
+/.husky/* @5ab-juruo
+/scripts/ @5ab-juruo @wxh06
+
+.vscode/* @wxh06
+
+docs/** @wxh06 @YuzhenQin
+
+** @optimize-2 @ForkKILLET
