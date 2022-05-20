@@ -43,7 +43,7 @@ mod.reg_main("dash-board", "控制面板", mod.path_dash_board, {
         ty: "number", dft: 10, min: 0, max: 10, info: ["Dash animation speed", "dash 动画速度"],
     },
 }, () => {
-    const toSettings = (schroot, path = []) => Object.entries(schroot)
+    const toSettings = (scmRoot, path = []) => Object.entries(scmRoot)
         .filter(([k, s]) => (path.length || k !== "on") && !s.priv)
         .flatMap(([k, s]) => (s.ty === "object" ? toSettings(s.lvs, path.concat(k)) : {
             name: path.concat(k),

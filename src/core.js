@@ -49,7 +49,7 @@ const mod = {
     },
 
     path_dash_board: [
-        "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/exlg-setting-new/((index|bundle).html)?",
+        "@dash/((index|bundle)(.html)?)?", "@ghpage/exlg-setting-new/((index|bundle)(.html)?)?", "@debug/((index|bundle).html)?",
     ],
 
     /**

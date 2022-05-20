@@ -15,9 +15,11 @@ pyproject.toml @wxh06
 
 docs/ @wxh06 @YuzhenQin
 
-# 请模块/组建作者自行添加：
+# 请模块/组件作者自行添加：
 # Writing permission to this repo is required
 /src/components/register-badge.js @Minstdfx
 /src/modules/blog.js @YuzhenQin
 /src/modules/captcha.js @wxh06
 /src/modules/token.js @wxh06
+/src/modules/emoticon.js @ForkKILLET
+/src/modules/meta-discussion-guiding.js @ForkKILLET
