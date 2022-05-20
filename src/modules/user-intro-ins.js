@@ -1,8 +1,5 @@
 import {
-    $,
-    springboard,
-    xss,
-    lg_content,
+    $, springboard, xss, lg_content,
 } from "../utils.js";
 import mod from "../core.js";
 import css from "../resources/css/user-intro-ins.css";
@@ -13,7 +10,14 @@ mod.reg_user_tab("user-intro-ins", "用户首页_HTML_显示", "main", null, nul
      */
     function regTab() {
         $(".introduction > *").each(async (_, e, $e = $(e)) => {
-            const t = $e.text();
+            let t;
+            const eson = $e.children()[0];
+            if ($(eson).length !== 0 && eson.nodeName === "A") {
+                t = $(eson).attr("href");
+            } else {
+                t = $e.text();
+            }
+
             const [, , ins, _arg] = t.match(/^(exlg.|%)([a-z|-]+):([^]+)$/) ?? [];
             if (!ins) return;
             const arg = _arg.split(/(?<!!)%/g).map((s) => s.replace(/!%/g, "%"));
