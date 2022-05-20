@@ -9,7 +9,17 @@
 解析用户主页的 HTML 代码。
 有 XSS 保护。
 
-用法：在个人主页写下 `exlg.html: <HTML 代码>` 即可解析。
+用法：
+
+在个人主页写下：
+
+`exlg.html: <HTML 代码>`
+
+`exlg.html-paste: <luogu paste id>`
+
+`[](exlg.xxx:xxx)`（中间不得有空格）
+
+即可解析。
 
 示例：
 

@@ -382,7 +382,7 @@ export const sharedFunction = (channel, master, slave) => {
         } else if (msg === "Pong") {
             clearTimeout(timeoutId);
         } else if (msg === "Election") onElection();
-        else if (msg.split()[0] === "Alive") {
+        else if (msg.split(" ")[0] === "Alive") {
             console.log(Number(msg.split(" ")[1]));
             max = Math.max(max, Number(msg.split(" ")[1]));
         } else if (msg === "Victory") {

@@ -1,11 +1,23 @@
+* @optimize-2 @ForkKILLET
+
+LICENSE.md @optimize-2 @ForkKILLET @Minstdfx @5ab-juruo @undefined-moe @YuzhenQin @wxh06
+
 /.github/ISSUE_TEMPLATE/ @5ab-juruo
-/.github/workflows/ @wxh06 @YuzhenQin
-
-/.husky/* @5ab-juruo
+/.github/workflows/ @wxh06 @YuzhenQin @5ab-juruo
 /scripts/ @5ab-juruo @wxh06
+.husky/ @5ab-juruo @wxh06
+.vscode/ @wxh06
+.markdownlint.json @YuzhenQin
+.lintstagedrc.cjs @wxh06
+.eslintignore @wxh06
+.prettierignore @wxh06
+pyproject.toml @wxh06
 
-.vscode/* @wxh06
+docs/ @wxh06 @YuzhenQin
 
-docs/** @wxh06 @YuzhenQin
-
-** @optimize-2 @ForkKILLET
+# 请模块/组建作者自行添加：
+# Writing permission to this repo is required
+/src/components/register-badge.js @Minstdfx
+/src/modules/blog.js @YuzhenQin
+/src/modules/captcha.js @wxh06
+/src/modules/token.js @wxh06
