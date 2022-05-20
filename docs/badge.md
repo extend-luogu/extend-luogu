@@ -9,7 +9,7 @@ Badge 是 exlg 贡献者的标识。
 获取 badge 的方法：
 
 1. 给 [exlg](https://github.com/extend-luogu/extend-luogu) 提供代码。
-   - 见 [Contribution](./docs/CONTRIBUTING.md)。
+   - 见 [Contribution](./CONTRIBUTING.md)。
 2. 给 [exlg](https://github.com/extend-luogu/extend-luogu) 捐赠 5 人民币，支持 exlg 的开发。
    - 见 [Support](./support.md)。
 
