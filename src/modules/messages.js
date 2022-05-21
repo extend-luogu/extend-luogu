@@ -4,7 +4,11 @@ import {
 } from "../utils.js";
 import css from "../resources/css/messages.css";
 
-mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
+mod.reg("messages", "新消息提醒", ["@/.*"], {
+    message_tab_disappear_time: {
+        ty: "number", dft: 30, min: 0, max: 60, info: ["The Time before message tab disappear (second)", "信息自动消失时间（秒）"], strict: true,
+    },
+}, (msto) => {
     if (window.location.href.search("/chat") !== -1) {
         return;
     }
@@ -36,6 +40,9 @@ mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
             .on("click", `#exlg-message-close-${msg.id}, #exlg-message-show-${msg.id}`, () => { $curbd.remove(); });
         $(`#exlg-message-username-${msg.id}`).text(msg.sender.name);
         $(`#exlg-message-content-${msg.id}`).text(msg.content);
+        if (msto.msto.message_tab_disappear_time !== 0) {
+            window.setTimeout(() => { $curbd.remove(); }, msto.msto.message_tab_disappear_time * 1000);
+        }
     }
 
     sharedFunction("exlg-message", (bc) => {
