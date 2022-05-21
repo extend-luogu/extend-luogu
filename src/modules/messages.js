@@ -5,6 +5,9 @@ import {
 import css from "../resources/css/messages.css";
 
 mod.reg("messages", "新消息提醒", ["@/.*"], {}, () => {
+    if (window.location.href.search("/chat") !== -1) {
+        return;
+    }
     const $container = $("body").append(`<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>`)
         .find("#exlg-messages-container");
     /**
