@@ -15,6 +15,7 @@
 - [讨论保存](./discussion-save.md)
 - [表情输入](./emoticon.md)
 - [隐藏题解](./hide-solution.md)
+- [卷王监视器](./juan-inspector.md)
 - [键盘操作与命令行](./keyboard-and-cli.md)
 - [主页讨论个数限制](./mainpage-discuss-limit.md)
 - [有害代码检查器](./malicious-code-identifier.md)

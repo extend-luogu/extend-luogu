@@ -7,6 +7,7 @@ import "./modules/code-block-ex.js";
 import "./modules/dash.js";
 import "./modules/discussion-save.js";
 import "./modules/emoticon.js";
+import "./modules/juan-inspector.js";
 import "./modules/keyboard-cli.js";
 import "./modules/malicious-code-identifier.js";
 import "./modules/messages.js";
