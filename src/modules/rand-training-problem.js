@@ -21,11 +21,15 @@ mod.reg_hook_new("rand-training-problem", "题单内随机跳题", "@/training/[
             const candProbList = [];
 
             for (const pb of tInfo.problems) {
-                const score = tInfo.userScore.score[pb.problem.pid];
-                if (score === null && (ptypes & 1)) {
+                if (tInfo.userScore === null) { // Hack: 非 P 全未作时 tInfo.userScore 返回 null
                     candProbList.push(pb.problem.pid);
-                } else if (score < pb.problem.fullScore && (ptypes & 2)) {
-                    candProbList.push(pb.problem.pid);
+                } else {
+                    const score = tInfo.userScore.score[pb.problem.pid];
+                    if (score === null && (ptypes & 1)) {
+                        candProbList.push(pb.problem.pid);
+                    } else if (score < pb.problem.fullScore && (ptypes & 2)) {
+                        candProbList.push(pb.problem.pid);
+                    }
                 }
             }
 
