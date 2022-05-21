@@ -30,7 +30,8 @@ jobs:
         
       # 把 CNAME 文件添加到 dist 目录
       - name: Configure CNAME
-        run: echo docs.exlg.cc > docs/.vuepress/dist/CNAME
+        run: |
+          echo docs.exlg.cc > docs/.vuepress/dist/CNAME
 
       # 查看 workflow 的文档来获取更多信息
       # @see https://github.com/crazy-max/ghaction-github-pages
