@@ -1,0 +1,13 @@
+name: Docsearch
+
+on:
+  workflow_run:
+    workflows: [pages-build-deployment]
+    types:
+      - completed
+
+jobs:
+  artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
