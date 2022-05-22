@@ -1,5 +1,9 @@
 ---
 title: 构建
+tags:
+  - 打包
+  - build
+  - bundle
 ---
 
 ## 开发、自行构建

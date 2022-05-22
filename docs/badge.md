@@ -1,5 +1,7 @@
 ---
 title: Badge
+tags:
+  - 标签
 ---
 
 ## Badge

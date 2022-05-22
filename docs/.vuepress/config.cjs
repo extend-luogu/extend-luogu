@@ -19,6 +19,8 @@ module.exports = {
           placeholder: "搜索文档",
         },
       },
+      isSearchable: (page) => page.path !== "/",
+      getExtraFields: (page) => page.frontmatter.tags ?? [],
     }),
   ],
 };
