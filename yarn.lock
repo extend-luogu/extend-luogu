@@ -2593,10 +2593,10 @@ prismjs@^1.28.0:
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.28.0.tgz#0d8f561fa0f7cf6ebca901747828b149147044b6"
   integrity sha512-8aaXdYvl1F7iC7Xm1spqSaY/OJBpYW3v+KJ+F17iYxvdc8sfjW194COK5wVhMZX45tGteiBQgdvD/nhxcRwylw==
 
-proxy-dat@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.npmmirror.com/proxy-dat/-/proxy-dat-2.0.3.tgz#563b78b6bac328456915f5c35767830ad97e7b58"
-  integrity sha512-30/uQtS1Bdi3dbtZWSPNMoeIFC7bdomAaCp6JFXdcdIihQkq3ObjOy9R5vwXA/dT6vIOyELEDIu4Rly+qBgmnA==
+proxy-dat@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.npmmirror.com/proxy-dat/-/proxy-dat-2.0.4.tgz#d1bfe4ed39780df9b03e1ca3e0ae31998e430223"
+  integrity sha512-8ba0ZIjDSO6Rzrgq9OQzZ6uR6rP+89xlr4PKrTGLCgjI9k+PucDYL7kNJCLvwX2pCqTV87SoaBbAxQYQEyPYIQ==
 
 punycode@^2.1.0:
   version "2.1.1"

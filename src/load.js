@@ -11,6 +11,19 @@ import { scm } from "./schema.js";
 
 log("Exposing");
 
+// Settings migration: TM_dat to proxy-dat
+const pd1 = new ProxyData(),
+    ver = pd1.loadData({
+        settingVersion: { ty: "number", dft: 0 },
+    }, { access: TamperMonkeyAccess() });
+if (ver.settingVersion === 0) {
+    if (GM_listValues().every(e => typeof GM_getValue(e) === "string")) {
+        GM_listValues().forEach(e => GM_setValue(e, JSON.parse(GM_getValue(e))));
+    }
+    ver.settingVersion = 1;
+    pd1.saveData();
+}
+
 const pd = new ProxyData();
 const sto = pd.loadData(scm, {
     access: TamperMonkeyAccess(),
