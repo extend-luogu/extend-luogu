@@ -7,3 +7,8 @@
 ### 功能
 
 在题目页面内将题目推送至 [cph](https://github.com/agrawal-d/cph) 中
+
+### 设置
+
+- 自动隐藏按钮 / Auto Hide Button
+  - 字面意思。
