@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "marked": "^4.0.15",
-    "proxy-dat": "^2.0.2",
+    "proxy-dat": "^2.0.3",
     "xss": "^1.0.11"
   }
 }
