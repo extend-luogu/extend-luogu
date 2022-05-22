@@ -55,7 +55,7 @@ mod.reg("emoticon", "表情输入", ["@/paste", "@/discuss/.*", "@/"], {
     const emo_url = (msto.src === "github") ?
         (({ slug }) => `//cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${slug}`) : ((msto.src === "啧.tk") ?
             (({ name }) => `//${msto.src}/${name[0]}`) :
-            (({ slug }) => `//${msto.src}/${slug}`));
+            (({ slug, type }) => `//${msto.src}/${slug + (type === emt.TXT ? "!25" : "")}`));
 
     if (msto.benben && location.pathname === "/") {
         const $txt = $("#feed-content"),
