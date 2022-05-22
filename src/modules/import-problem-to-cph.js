@@ -2,8 +2,29 @@ import { $ } from "../utils.js";
 import mod from "../core.js";
 import exlg_alert from "../components/exlg-dialog-board.js";
 
-mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+[A-Z]*(#.*)?", "@/record/.*"], null, () => {
+mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+[A-Z]*(#.*)?", "@/record/.*"], {
+    auto_hide_button: {
+        ty: "boolean",
+        dft: true,
+        strict: true,
+        info: ["Auto Hide Button", "自动隐藏按钮"],
+    },
+}, async (msto) => {
     if (!$("div.operation").length || window.location.href.search("/record/") !== -1) return;
+
+    const pms = new Promise((resolve) => {
+        GM_xmlhttpRequest({
+            url: "http://localhost:27121/",
+            method: "POST",
+            onload() {
+                resolve(true);
+            },
+            onerror() {
+                resolve(false);
+            },
+        });
+    });
+
     /**
      * 注册 `传送至 cph` 按钮
      */
@@ -70,6 +91,10 @@ mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+[A
         });
     }
 
+    const enabled = await pms;
+    if (!enabled && msto.msto.auto_hide_button) {
+        return;
+    }
     $("button.lfe-form-sz-middle").addClass("lg-btm");
     if (window.location.href.search("#submit") === -1) {
         if ($("button.exlg-cph").length === 0) {
