@@ -29,9 +29,6 @@ jobs:
       - name: Check docs
         run: node ./scripts/check-doc.js
 
-      - name: AutoCorrect lint
-        uses: huacnlee/autocorrect-action@main
-
       - name: Check commit messages
         env:
           COMMIT_MSG: ${{ toJson(github.event.commits.*.message) }}
