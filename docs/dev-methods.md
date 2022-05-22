@@ -6,9 +6,23 @@ tags:
   - Contribute
 ---
 
-众所周知，源代码是最好的文档，所以请自行阅读源代码获取具体用法，简介可从函数名里读出。
+## 开发环境
+
+extend-luogu 使用如下工具，请确保你已经安装：
+
+- yarn
+- esbuild
+- eslint
+- husky
+- lint-staged
+- markdownlint
+- prettier
+
+VSCode 用户可以使用 /docs/.vscode 下的配置。
 
 ## Utility Functions
+
+众所周知，源代码是最好的文档，所以请自行阅读源代码获取具体用法，简介可从函数名里读出。
 
 ### Logs
 
