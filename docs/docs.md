@@ -1,10 +1,6 @@
-# extend-luogu
-
-~~大型网络游戏 👀 服务器加强插件，增添各种 ✨ 炫酷魔法 ✨。~~
-
-使[洛谷](https://luogu.com.cn)拥有更多功能。
-
-## 文档
+---
+title: 文档索引
+---
 
 - [安装](./installation.md)
 
