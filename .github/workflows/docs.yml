@@ -27,7 +27,7 @@ jobs:
       # 运行构建脚本
       - name: Build VuePress site
         run: yarn workspace docs build
-        
+
       # 把 CNAME 文件添加到 dist 目录
       - name: Configure CNAME
         run: |
