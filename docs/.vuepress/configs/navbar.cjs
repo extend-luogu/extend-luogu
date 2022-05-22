@@ -5,14 +5,14 @@ module.exports = [
   },
   {
     text: "模块",
-    link: "/",
+    link: "/modules/",
   },
   {
     text: "组件",
-    link: "/",
+    link: "/components/",
   },
   {
     text: "开发文档",
-    link: "/",
+    link: "/dev.html",
   },
 ];
