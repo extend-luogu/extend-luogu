@@ -7,7 +7,21 @@ on:
       - completed
 
 jobs:
-  artifact:
+  docsearch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install 0install
+        run: |
+          curl -O https://get.0install.net/0install.sh && chmod +x 0install.sh
+          ./0install.sh install home
+          export PATH=$PATH:~/bin
+          0install add jq https://apps.0install.net/utils/jq.xml
+
+      - name: Run docsearch
+        env:
+          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+          API_KEY: ${{ secrets.API_KEY }}
+        run: |
+          docker run -i -e ALGOLIA_APP_ID -e API_KEY -e "CONFIG=$(cat .docsearch.json | jq -r tostring)" algolia/docsearch-scraper
