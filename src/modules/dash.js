@@ -194,9 +194,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             {
                 tag: "source", title: "源码", buttons: [
                     { html: "OSS", url: "https://exlg.oss-cn-shanghai.aliyuncs.com/latest/dist/extend-luogu.min.user.js" },
-                    /*
-                    { html: "JsDelivr", url: "https://cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/dist/extend-luogu.min.user.js" },
-                    */
+                    { html: "JsDelivr", url: `https://fastly.jsdelivr.net/gh/extend-luogu/extend-luogu${sto["#get-latest"].fetch_preview ? "@preview" : ""}/dist/extend-luogu.min.user.js` },
                     { html: "Raw", url: `https://github.com/extend-luogu/extend-luogu/raw/${sto["#get-latest"].fetch_preview ? "preview" : "latest"}/dist/extend-luogu.min.user.js` },
                     /*
                     { html: "FastGit", url: "https://hub.fastgit.xyz/extend-luogu/extend-luogu/raw/latest/dist/extend-luogu.min.user.js" },
@@ -214,9 +212,8 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             },
             {
                 tag: "help", title: "帮助", buttons: [
-                    { html: "官方", url: "https://github.com/extend-luogu/extend-luogu/blob/main/README.md" },
-                    { html: "镜像", url: "https://hub.fastgit.xyz/extend-luogu/extend-luogu/blob/main/README.md" },
-                    { html: "用户协议", url: "https://github.com/extend-luogu/extend-luogu/blob/main/POLICY.md" },
+                    { html: "官方文档", url: "https://docs.exlg.cc" },
+                    { html: "用户协议", url: "https://docs.exlg.cc/POLICY.html" },
                 ],
             },
             {

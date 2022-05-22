@@ -149,7 +149,6 @@ mod.reg_v2({
         SUBMITTED_PROBLEMS: 0,
         PASSED_PROBLEMS: 1,
     };
-    /*
     const color = [
         [191, 191, 191],
         [254, 76, 97],
@@ -160,7 +159,6 @@ mod.reg_v2({
         [157, 61, 207],
         [14, 29, 105],
     ];
-    */
     let isPriv;
     let my_loader;
 
@@ -191,12 +189,12 @@ mod.reg_v2({
         if (isPriv) {
             return; // Note: 用户开启完全隐私保护
         }
-        // const getRGBColor = (id) => `rgb(${color[id][0]}, ${color[id][1]}, ${color[id][2]})`;
+        const getRGBColor = (id) => `rgb(${color[id][0]},${color[id][1]},${color[id][2]})`;
         args.forEach((arg) => {
             if (arg.target.href === "javascript:void 0") return;
             // if (! lg_dat[arg.board_id][arg.position])
-            // arg.target.style.setProperty("color", getRGBColor([(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty]), "important");
-            arg.target.classList.add(`p${(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty}`);
+            arg.target.style.setProperty("color", getRGBColor([(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty]), "important");
+            // arg.target.classList.add(`p${(arg.board_id ? lg_dat.passedProblems : lg_dat.submittedProblems)[arg.position].difficulty}`);
             if ((arg.board_id === brds.PASSED_PROBLEMS && arg.position === lg_dat.passedProblems.length - 1)
                 || (lg_dat.passedProblems.length === 0 && arg.board_id === brds.SUBMITTED_PROBLEMS && arg.position === lg_dat.submittedProblems.length - 1)) { // Note: 染色染到最后一个
                 $(".exlg-counter").remove();
@@ -227,7 +225,10 @@ mod.reg_v2({
             }
         });
     }, (e) => {
-        if (location.hash !== "#practice") return { result: false };
+        if (location.hash !== "#practice") {
+            console.log(e);
+            return { result: false };
+        }
         if ((!lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
             if (e.target.className === "card padding-default") {
                 if ($(e.target).children(".problems").length) {

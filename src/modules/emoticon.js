@@ -10,7 +10,7 @@ mod.reg("emoticon", "表情输入", ["@/paste", "@/discuss/.*", "@/"], {
     benben: { ty: "boolean", dft: true, info: ["Show in benben", "犇犇表情"] },
     show: { ty: "boolean", dft: true, info: ["Show in default", "是否默认显示表情栏"] },
     src: {
-        ty: "enum", vals: ["图.tk", "github", "妙.tk", "啧.tk"], dft: "图.tk", info: ["Emoticon Source", "表情源"],
+        ty: "enum", vals: ["图.tk", "啧.tk"], dft: "图.tk", info: ["Emoticon Source", "表情源"],
     },
     height_limit: { ty: "boolean", dft: true, info: ["Expand in default", "是否默认展开表情"] },
 }, ({ msto }) => {
@@ -52,10 +52,9 @@ mod.reg("emoticon", "表情输入", ["@/paste", "@/discuss/.*", "@/"], {
         return { type: emt.TXT, ...e };
     });
 
-    const emo_url = (msto.src === "github") ?
-        (({ slug }) => `//cdn.jsdelivr.net/gh/extend-luogu/extend-luogu/img/emoji/${slug}`) : ((msto.src === "啧.tk") ?
-            (({ name }) => `//${msto.src}/${name[0]}`) :
-            (({ slug, type }) => `//${msto.src}/${slug + (type === emt.TXT ? "!25" : "")}`));
+    const emo_url = (msto.src === "啧.tk") ?
+        (({ name }) => `//${msto.src}/${name[0]}`) :
+        (({ slug, type }) => `//${msto.src}/${slug + (type === emt.TXT ? "!25" : "")}`);
 
     if (msto.benben && location.pathname === "/") {
         const $txt = $("#feed-content"),
