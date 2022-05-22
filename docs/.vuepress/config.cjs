@@ -1,4 +1,5 @@
 const { defaultTheme } = require("@vuepress/theme-default");
+const { searchPlugin } = require("@vuepress/plugin-search");
 const navbar = require("./configs/navbar.cjs");
 
 module.exports = {
@@ -11,4 +12,13 @@ module.exports = {
     docsDir: "docs",
     navbar,
   }),
+  plugins: [
+    searchPlugin({
+      locales: {
+        "/": {
+          placeholder: "搜索文档",
+        },
+      },
+    }),
+  ],
 };
