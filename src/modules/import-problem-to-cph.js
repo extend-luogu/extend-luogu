@@ -2,7 +2,7 @@ import { $ } from "../utils.js";
 import mod from "../core.js";
 import exlg_alert from "../components/exlg-dialog-board.js";
 
-mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+[A-Z]*(#.*)?", "@/record/.*"], {
+mod.reg_lfe("import-problem-to-cph", "添加到 cph", ["@/problem/[A-Z]+[0-9]+[A-Z]*(#.*)?(\\?contestId=[0-9]*)?", "@/record/.*"], {
     auto_hide_button: {
         ty: "boolean",
         dft: true,
