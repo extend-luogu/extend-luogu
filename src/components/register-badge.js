@@ -10,13 +10,23 @@ import html from "../resources/badge-register.html";
 import css from "../resources/css/badge-register.css";
 
 const srd = { };
+
 /**
  * 进行一个 badge 的注册和修改
  *
  * @param {object} data 表示传入的 badge 配置
  * @returns {Void}
  */
+
 const register_badge = compo.reg("register-badge", "badge 注册", null, null, (configuration = null) => {
+    // Note: 暴露的接口，因为注册器坏掉了，过几天修
+    /*
+    uindow.postBadge = (data, uid) => cs_post("https://exlg.piterator.com/badge/set", {
+        uid,
+        token: sto["^token"].token,
+        data,
+    });
+    */
     // Note: 引入 API 即判断能否使用 eval
     try {
         // eslint-disable-next-line no-eval

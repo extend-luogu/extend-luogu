@@ -101,6 +101,7 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
             })
             .on("click", () => register_badge());
         if (Object.keys(pseudoTagWhitelist).includes(uid) && (!pseudo)) {
+            /*
             try {
                 const s = JSON.parse(text);
                 if (typeof s === "object") {
@@ -110,6 +111,7 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
                 // 说明是正常的 text 呗...
                 // 那就什么都不做，嗯嗯，啊对对对。
             }
+            */
             pseudo ??= pseudoTagWhitelist[uid]; // if still..
         }
         return {
