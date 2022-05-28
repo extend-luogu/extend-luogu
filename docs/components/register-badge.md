@@ -1,5 +1,5 @@
 ---
-title: Badge 注册 | Exlg
+title: Badge 注册
 ---
 
 ## Badge 注册 / Register Badge

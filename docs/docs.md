@@ -8,7 +8,7 @@ title: 文档索引
 
 - [贡献](./CONTRIBUTING.md)
 
-- [开发指南](./dev-methods.md)
+- [开发指南](./dev.md)
 
 - [讨论 & 反馈](./discuss.md)
 

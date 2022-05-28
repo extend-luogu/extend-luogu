@@ -1,5 +1,5 @@
 ---
-title: 公告板 | Exlg
+title: 公告板
 ---
 
 ## exlg 公告板 / Exlg Dialog Board

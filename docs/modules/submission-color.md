@@ -1,3 +1,7 @@
+---
+title: 记录难度可视化
+---
+
 ## 记录难度可视化 / Submission Color
 
 ### 分类

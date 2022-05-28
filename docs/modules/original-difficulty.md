@@ -1,3 +1,7 @@
+---
+title: 显示原始难度
+---
+
 ## 显示原始难度 / Original Difficulty
 
 ### 分类
