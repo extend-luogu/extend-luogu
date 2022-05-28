@@ -19,7 +19,7 @@ const allTargets = [
         type: { displayType: "luogu4", elementType: "prob", anceLevel: 0 },
     },
     { // 个人主页 - 动态
-        pathTest: ({ pathname, hash }) => (/^\/user\/[0-9]{0,}.*$/.test(pathname) && hash === "activity"),
+        pathTest: ({ pathname, hash }) => (/^\/user\/[0-9]{0,}.*$/.test(pathname) && hash === "#activity"),
         domSelector: ".feed a[target='_blank']",
         type: { displayType: "luogu4", elementType: "user-feed", anceLevel: 3 },
     },
