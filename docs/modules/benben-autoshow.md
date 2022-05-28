@@ -1,3 +1,7 @@
+---
+title: 犇犇自动展开
+---
+
 ## 犇犇自动展开 / Benben auto show
 
 ### 分类

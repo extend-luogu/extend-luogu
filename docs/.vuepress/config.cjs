@@ -1,6 +1,7 @@
 const { defaultTheme } = require("@vuepress/theme-default");
 const { searchPlugin } = require("@vuepress/plugin-search");
 const navbar = require("./configs/navbar.cjs");
+const sidebar = require("./configs/sidebar.cjs");
 
 module.exports = {
   lang: "zh-CN",
@@ -11,6 +12,7 @@ module.exports = {
     repo: "extend-luogu/extend-luogu",
     docsDir: "docs",
     navbar,
+    sidebar,
   }),
   plugins: [
     searchPlugin({

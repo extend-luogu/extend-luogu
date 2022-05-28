@@ -1,5 +1,5 @@
 ---
-title: 获取最新版本 | Exlg
+title: 获取最新版本
 ---
 
 ## 获取最新版本 / Get Latest

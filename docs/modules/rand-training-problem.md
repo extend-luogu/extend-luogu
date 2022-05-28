@@ -1,3 +1,7 @@
+---
+title: 题单内随机跳题
+---
+
 ## 题单内随机跳题 / Rand Training Problem
 
 ### 分类

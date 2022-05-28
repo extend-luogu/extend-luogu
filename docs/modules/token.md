@@ -1,3 +1,7 @@
+---
+title: EXLG 令牌
+---
+
 ## EXLG 令牌 / token
 
 ### 分类

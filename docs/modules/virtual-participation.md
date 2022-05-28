@@ -1,3 +1,7 @@
+---
+title: 创建重现赛
+---
+
 ## 创建重现赛 / Virtual Participation
 
 ### 分类

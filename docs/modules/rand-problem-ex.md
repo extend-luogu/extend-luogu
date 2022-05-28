@@ -1,3 +1,7 @@
+---
+title: 随机跳题 Ex
+---
+
 ## 随机跳题 Ex / Rand Problem Ex
 
 ### 分类

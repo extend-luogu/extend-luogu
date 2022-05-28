@@ -1,3 +1,7 @@
+---
+title: 主页讨论个数显示
+---
+
 ## 主页讨论个数显示 / Mainpage Discuss Limit
 
 ### 分类
