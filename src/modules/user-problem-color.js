@@ -50,7 +50,6 @@ let last_ptr = -1,
                 }
             });
         }
-
         $("#exlg-problem-count-1").html(`<span class="exlg-counter" exlg="exlg">${ta.length} <> ${my.size} : ${same}`
             + `<i class="exlg-icon exlg-info" name="ta 的 &lt;&gt; 我的 : 相同"></i></span>`);
     };
@@ -69,13 +68,11 @@ let last_ptr = -1,
             $(".exlg-counter").remove();
             const gf = arg.target.parentNode.parentNode.parentNode.parentNode;
             const $prb = [gf.firstChild.childNodes[2], gf.lastChild.childNodes[2]];
-
             for (let i = 0; i < 2; ++i) {
                 const $ps = $prb[i];
                 const my = lg_dat[["submittedProblems", "passedProblems"][i]];
                 $ps.before($(`<span id="exlg-problem-count-${i}" class="exlg-counter" exlg="exlg">${my.length}</span>`)[0]);
             }
-
             if ((!msto.problem_compare) || lg_dat.user.uid === lg_usr.uid) return;
             colorProblem($prb, true);
         }
@@ -226,7 +223,7 @@ mod.reg_v2({
         });
     }, (e) => {
         if (location.hash !== "#practice") {
-            console.log(e);
+            // console.log(e);
             return { result: false };
         }
         if ((!lg_dat.submittedProblems.length) && !lg_dat.passedProblems.length) {
