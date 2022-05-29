@@ -28,6 +28,24 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
     });
     */
     // Note: 引入 API 即判断能否使用 eval
+    const _test = (evalString) => {
+        try {
+            // eslint-disable-next-line no-eval
+            (0, eval)(evalString);
+        } catch (err) {
+            warn("Fail to execute the action: ", err);
+            return false;
+        }
+        return true;
+    };
+    if (_test(GM_getResourceText("colorpicker")) || _test(GM_getResourceText("colorpicker_old"))) {
+        log("起码至少有一个能用了");
+    } else {
+        log("废了废了");
+        exlg_alert(`这个狗屎页面不能用取色器，错误信息自己看控制台输出<br/>点击确定回到主页。`, "exlg 提醒您", () => location.href = location.origin);
+        return;
+    }
+    /*
     try {
         // eslint-disable-next-line no-eval
         (0, eval)(GM_getResourceText("colorpicker"));
@@ -38,6 +56,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         warn("错误信息: ", err);
         return;
     }
+    */
     const title_text = "exlg badge register ver.7.0: 暂不可用";
     exlg_alert(html, title_text, {
         onconfirm: async () => {
