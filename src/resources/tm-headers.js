@@ -32,7 +32,7 @@
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 //
-// @resource       colorpicker https://yuzhenqin.github.io/extend-luogu-fuck-the-xn-color-picker-shit/xncolorpicker.min.js
+// @resource       colorpicker_temp_new https://extend-luogu.github.io/exlg-color-picker/dist/xncolorpicker.min.js
 // @resource       colorpicker_old http://v.bootstrapmb.com/2021/6/yuydm10499/dist/xncolorpicker.min.js
 //
 // @grant          GM_addStyle

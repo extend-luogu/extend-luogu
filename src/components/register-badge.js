@@ -38,7 +38,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         }
         return true;
     };
-    if (_test(GM_getResourceText("colorpicker")) || _test(GM_getResourceText("colorpicker_old"))) {
+    if (_test(GM_getResourceText("colorpicker_temp_new")) || _test(GM_getResourceText("colorpicker_old"))) {
         log("起码至少有一个能用了");
     } else {
         log("废了废了");
