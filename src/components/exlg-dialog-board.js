@@ -154,14 +154,14 @@ const exlg_alert = compo.reg("exlg-dialog-board", "exlg 公告板", {
     }, {
         get(target, propKey, _proxy) {
             if (propKey === "width") return target.jsdom.container.style.width;
-            if (/$min(-h|_h|H)eight^/.test(propKey)) return target.jsdom.container.style.minHeight;
+            if (/^min(-h|_h|H)eight$/.test(propKey)) return target.jsdom.container.style.minHeight;
             if (propKey === "title") return target.jsdom.title.innerHTML;
             if (propKey === "content") return target.jsdom.content.innerHTML;
             return Reflect.get(target, propKey);
         },
         set(target, propKey, value, _proxy) {
             if (propKey === "width") return Reflect.set(target.jsdom.container.style, "width", value);
-            if (/$min(-h|_h|H)eight^/.test(propKey)) return Reflect.set(target.jsdom.container.style, "minHeight", value);
+            if (/^min(-h|_h|H)eight$/.test(propKey)) return Reflect.set(target.jsdom.container.style, "minHeight", value);
             if (propKey === "wait_time") {
                 if (typeof (value) === "number" && Object.keys(R_transitionSpeedTime).includes(value)) {
                     msto.animation_speed = R_transitionSpeedTime[value];
