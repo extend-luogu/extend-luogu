@@ -39,10 +39,10 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         return true;
     };
     if (_test(GM_getResourceText("colorpicker_temp_new")) || _test(GM_getResourceText("colorpicker_old"))) {
-        log("起码至少有一个能用了");
+        log("这个页面可以用取色器");
     } else {
-        log("废了废了");
-        exlg_alert(`这个狗屎页面不能用取色器，错误信息自己看控制台输出<br/>点击确定回到主页。`, "exlg 提醒您", () => location.href = location.origin);
+        log("这个页面不能用取色器");
+        exlg_alert(`这个页面不能用取色器呢<br/>点击确定回到主页<br/><br/>错误信息请自行查看控制台输出`, "exlg 提醒您", () => location.href = location.origin);
         return;
     }
     /*
