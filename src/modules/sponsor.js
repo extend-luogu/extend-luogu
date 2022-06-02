@@ -1,11 +1,72 @@
 import mod, { sto } from "../core.js";
-import {
+import uindow, {
     $, cur_time, cs_post, lg_usr,
 } from "../utils.js";
-import register_badge from "../components/register-badge.js";
+// import register_badge from "../components/register-badge.js";
 import css from "../resources/css/sponsor-tag.css";
 
 export const pseudoTagWhitelist = { 100250: "风神少女" };
+
+const _color = {
+    "lg-fg-purple": "#8e44ad",
+    "lg-fg-red": "#e74c3c",
+    "lg-fg-orange": "#e67e22",
+    "lg-fg-green": "#5eb95e",
+    "lg-fg-bluelight": "#0e90d2",
+    "lg-fg-gray": "#bbb",
+    "lg-fg-brown": "#996600",
+};
+
+const getColor = (e) => {
+    const tmpstr = e.className.slice(e.className.indexOf("lg-fg-"));
+    if (tmpstr) return tmpstr.slice(0, tmpstr.indexOf(" "));
+    if (e.childNodes.length) return e.childNodes[0].style.color;
+    return null;
+};
+
+export const getBadge = (uid, namecol, bdty, {
+    bg, fg, text, ft, fw, bd, fs, pseudo,
+}, onClickActive = true) => {
+    // Note: need to return null when there's no text qwq
+    const $badge = (!text) ? $("") : $(`<span class="exlg-badge" badge-uid="${uid}" badge-type="${bdty}">${text}</span>`)
+        .css({
+            background: (bg || "mediumturquoise").replaceAll("${luogu-default}", (namecol.includes("lg-fg-") ? _color[namecol] : namecol)),
+            color: fg || "#fff",
+            "font-family": ft || "",
+            "font-weight": fw || "700",
+            "font-size": fs || "",
+            border: bd || "",
+            /* "background-size": "contain", */
+            /* "background-repeat": "no-repeat", */
+        });
+    if (text && onClickActive) $badge.on("click", () => uindow.exlg.register_badge());
+    if (Object.keys(pseudoTagWhitelist).includes(uid) && (!pseudo)) {
+        /*
+        try {
+            const s = JSON.parse(text);
+            if (typeof s === "object") {
+                [$badge[0].innerText, pseudo] = s;
+            }
+        } catch (err) {
+            // 说明是正常的 text 呗...
+            // 那就什么都不做，嗯嗯，啊对对对。
+        }
+        */
+        pseudo ??= pseudoTagWhitelist[uid]; // if still..
+    }
+    return {
+        pseudoTag: ((Object.keys(pseudoTagWhitelist).includes(uid) && pseudo) ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${pseudo}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${pseudo}</span>`).css({
+            display: "inline-block",
+            padding: "0 8px",
+            "box-sizing": "border-box",
+            "font-weight": 400,
+            "line-height": 1.5,
+            "border-radius": "2px",
+            "margin-left": "0.2em",
+        }))[0] : null),
+        exlg: $badge[0],
+    };
+};
 
 const allTargets = [
     { // 题解
@@ -68,66 +129,6 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
     await Promise.all(promises);
     msto.badges = JSON.stringify(badges);
 
-    const _color = {
-        "lg-fg-purple": "#8e44ad",
-        "lg-fg-red": "#e74c3c",
-        "lg-fg-orange": "#e67e22",
-        "lg-fg-green": "#5eb95e",
-        "lg-fg-bluelight": "#0e90d2",
-        "lg-fg-gray": "#bbb",
-        "lg-fg-brown": "#996600",
-    };
-
-    const getColor = (e) => {
-        const tmpstr = e.className.slice(e.className.indexOf("lg-fg-"));
-        if (tmpstr) return tmpstr.slice(0, tmpstr.indexOf(" "));
-        if (e.childNodes.length) return e.childNodes[0].style.color;
-        return null;
-    };
-
-    const getBadge = (uid, namecol, bdty, {
-        bg, fg, text, ft, fw, bd, fs, pseudo,
-    }) => {
-        const $badge = $(`<span class="exlg-badge" badge-uid="${uid}" badge-type="${bdty}">${text}</span>`)
-            .css({
-                background: (bg || "mediumturquoise").replaceAll("${luogu-default}", (namecol.includes("lg-fg-") ? _color[namecol] : namecol)),
-                color: fg || "#fff",
-                "font-family": ft || "",
-                "font-weight": fw || "700",
-                "font-size": fs || "",
-                border: bd || "",
-                /* "background-size": "contain", */
-                /* "background-repeat": "no-repeat", */
-            })
-            .on("click", () => register_badge());
-        if (Object.keys(pseudoTagWhitelist).includes(uid) && (!pseudo)) {
-            /*
-            try {
-                const s = JSON.parse(text);
-                if (typeof s === "object") {
-                    [$badge[0].innerText, pseudo] = s;
-                }
-            } catch (err) {
-                // 说明是正常的 text 呗...
-                // 那就什么都不做，嗯嗯，啊对对对。
-            }
-            */
-            pseudo ??= pseudoTagWhitelist[uid]; // if still..
-        }
-        return {
-            pseudoTag: ((Object.keys(pseudoTagWhitelist).includes(uid) && pseudo) ? (bdty !== "luogu4" ? $(`<span class="am-badge am-radius lg-bg-${namecol.slice("lg-fg-".length)}">${pseudo}</span>`) : $(`<span class="lfe-caption" style="color: rgb(255, 255, 255); background: ${namecol};">${pseudo}</span>`).css({
-                display: "inline-block",
-                padding: "0 8px",
-                "box-sizing": "border-box",
-                "font-weight": 400,
-                "line-height": 1.5,
-                "border-radius": "2px",
-                "margin-left": "0.2em",
-            }))[0] : null),
-            exlg: $badge[0],
-        };
-    };
-
     const getStyleList = (badgeType, badgeData) => {
         if (badgeType === "luogu3" || !Object.keys(badgeData).includes("lg4")) return badgeData;
         const badgeClone = Object.clone(badgeData);
@@ -162,23 +163,23 @@ mod.reg_hook_new("sponsor-tag", "badge 显示", ["@/", "@/paste", "@/discuss/.*"
         const badge = badges[uid];
         if (!badge || (!badge.text && !(Object.keys(pseudoTagWhitelist).includes(uid) && badge.pseudo))) return;
 
-        let [tar, tarNext] = [e, e.nextElementSibling];
+        let [tar, tarNext, hasTag] = [e, e.nextElementSibling, false];
         if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("sb_amazeui"))) tar = tarNext;
         tarNext = tar.nextElementSibling;
-        if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("am-badge"))) tar = tarNext;
+        if (tarNext && ((tarNext.classList ? [...tarNext.classList] : tarNext.className.split(" ")).includes("am-badge"))) [tar, hasTag] = [tarNext, true]; // 有 tag 就不显示假的
 
         const badgeDom = getBadge(uid, displayType === "luogu4" ? e.childNodes[0].style.color : getColor(e), displayType, getStyleList(displayType, badge));
         let tmp = kthParentNode(tar, 3);
         if (tmp && ((tmp.classList ? [...tmp.classList] : tmp.className.split(" ")).includes("card"))) {
-            if (badgeDom.pseudoTag) tmp.parentNode.appendChild(badgeDom.pseudoTag);
-            tmp.parentNode.appendChild(badgeDom.exlg);
+            if (badgeDom.pseudoTag && !hasTag) tar.parentNode.appendChild(badgeDom.pseudoTag);
+            tar.parentNode.appendChild(badgeDom.exlg);
         } else {
             const _nbsp = document.createElement("span");
             _nbsp.innerHTML = "&nbsp;";
             tmp = kthParentNode(tar, anceLevel);
             tmp.after(badgeDom.exlg);
             if (anceLevel === 0) tmp.after(_nbsp);
-            if (badgeDom.pseudoTag) {
+            if (badgeDom.pseudoTag && !hasTag) {
                 tmp.after(badgeDom.pseudoTag);
                 if (anceLevel === 0) tmp.after(_nbsp);
             }
