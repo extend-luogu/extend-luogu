@@ -144,7 +144,10 @@ const mod = {
      * 子模块注册器
      *
      * @callback regerType
-     * @param {{ name: string, info: string, path?: string | string[] }} desc 子模块的相关信息
+     * @param {object} desc 子模块的相关信息
+     * @param {string} desc.name
+     * @param {string} desc.info
+     * @param {string | string[]} [desc.path]
      * @param {object | null} data 子模块的私有数据
      * @param {...Function} funcs 注册的一系列方法
      */

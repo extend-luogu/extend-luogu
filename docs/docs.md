@@ -10,6 +10,8 @@ title: 文档索引
 
 - [开发指南](./dev.md)
 
+- [API Reference](./api.md)
+
 - [讨论 & 反馈](./discuss.md)
 
 - [支持我们](./support.md)

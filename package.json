@@ -13,7 +13,7 @@
     "lint:fix": "markdownlint-cli2 \"**/*.md\" \"#**/node_modules\" && eslint --ext js --ext cjs --fix .",
     "prepare": "husky install",
     "test": "node ./scripts/build.js -d build -b",
-    "docs:jsdoc": "jsdoc2md src/**.js"
+    "jsdoc": "jsdoc2md src/**.js"
   },
   "repository": "git+https://github.com/extend-luogu/extend-luogu.git",
   "author": "extend-luogu-dev",

@@ -29,6 +29,9 @@ jobs:
       - name: Check docs
         run: node ./scripts/check-doc.js
 
+      - name: Check build JSDoc
+        run: yarn jsdoc 1> /dev/null
+
       - name: Check commit messages
         if: startsWith( github.event.head_commit.message, 'VER' )
         env:

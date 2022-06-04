@@ -6,7 +6,13 @@ import { filterXSS } from "xss";
 //     }
 // }
 
-/** @type {Window & { console: Console, _feInjection: any }} */
+/**
+ * @typedef {Window} LuoguUnsafeWindow
+ * @property {Console} console
+ * @property {*} _feInjection
+ */
+
+/** @type {LuoguUnsafeWindow} */
 const uindow = unsafeWindow;
 
 export default uindow;
@@ -15,7 +21,6 @@ export default uindow;
  * @template T
  * @param res
  * @param {Promise<T>} res
- * @returns {Promise<T> & T}
  */
 export function chain(res) {
     return new Proxy(res, {
@@ -63,7 +68,6 @@ export const toKeyCode = (e) => [
     e.key.toInitialCase(),
 ].join("");
 
-/** @type {import('jquery')} */
 export const $ = jQuery.extend({
     double: (func, first, second) => [func(first), func(second)],
 });
@@ -82,7 +86,6 @@ jQuery.fn.extend({
     },
 });
 
-/** @type {import('xss')} */
 export const xss = new filterXSS.FilterXSS({
     onTagAttr: (_, k, v) => {
         if (k === "style") return `${k}="${v}"`;
@@ -191,7 +194,9 @@ export const springboard = (param, styl) => {
  * @param root0.url
  * @param root0.onload
  * @param root0.onerror
- * @param {{ url: string, onload: Function, onerror?: Function }}
+ * @param {string} url
+ * @param {Function} onload
+ * @param {Function} [onerror]
  */
 export const cs_get = ({ url, onload, onerror = (err) => error(err) }) => GM_xmlhttpRequest({
     url,
