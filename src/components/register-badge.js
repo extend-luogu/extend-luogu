@@ -1,15 +1,32 @@
-/* global XNColorPicker */
+/* global Pickr */
+//* global XNColorPicker */
 /* eslint-disable no-new */
 import uindow, {
-    $, cur_time, lg_usr, cs_post, log, warn,
+    cur_time, lg_usr, cs_post, log, warn,
 } from "../utils.js";
 import exlg_alert from "./exlg-dialog-board.js";
 import compo from "../compo-core.js";
 import mod, { sto } from "../core.js";
 import html from "../resources/badge-register.html";
 import css from "../resources/css/badge-register.css";
+import presets from "../resources/badge-preset.json";
+// eslint-disable-next-line import/no-cycle
+import { pseudoTagWhitelist, getBadge } from "../modules/sponsor.js";
 
-const srd = { };
+// TODO: 修改、传参、切换页面、绑定action
+// TODO: 更改预览模式、精简 API
+let configData = { };
+let configProxy;
+const regBadge = { };
+const lg4NameColor = {
+    Red: "rgb(254, 76, 97)",
+    Orange: "rgb(243, 156, 17)",
+    Green: "rgb(82, 196, 26)",
+    Blue: "rgb(52, 152, 219)",
+    Gray: "rgb(191, 191, 191)",
+    Cheater: "rgb(173, 139, 0)",
+    Purple: "rgb(157, 61, 207)",
+};
 
 /**
  * 进行一个 badge 的注册和修改
@@ -19,15 +36,18 @@ const srd = { };
  */
 
 const register_badge = compo.reg("register-badge", "badge 注册", null, null, (configuration = null) => {
-    // Note: 暴露的接口，因为注册器坏掉了，过几天修
-    /*
-    uindow.postBadge = (data, uid) => cs_post("https://exlg.piterator.com/badge/set", {
-        uid,
-        token: sto["^token"].token,
-        data,
-    });
-    */
-    // Note: 引入 API 即判断能否使用 eval
+    // Note: Definitions
+    uindow.getconf = () => configData;
+    const _allcss = {
+        bg: { css: "background", name: "背景", default: "mediumturquoise" },
+        fg: { css: "color", name: "字色", default: "white" },
+        bd: { css: "border", name: "边框", default: "" },
+        ft: { css: "font-family", name: "字体", default: "" },
+        fs: { css: "font-size", name: "字号", default: "" }, // Note: max = 1.25rem 1.25em 20px
+        fw: { css: "font-weight", name: "字粗", default: "700" },
+    };
+    const cssKeys = Object.keys(_allcss);
+    // Note: import api-colorpicker
     const _test = (evalString) => {
         try {
             // eslint-disable-next-line no-eval
@@ -45,366 +65,503 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
         exlg_alert(`这个狗屎页面不能用取色器，错误信息自己看控制台输出<br/>点击确定回到主页。`, "exlg 提醒您", () => location.href = location.origin);
         return;
     }
-    /*
-    try {
-        // eslint-disable-next-line no-eval
-        (0, eval)(GM_getResourceText("colorpicker"));
-        log("这个页面可以用 eval 的说！芜湖，起飞~");
-    } catch (err) {
-        log("这个页面并不可以用 eval (悲");
-        exlg_alert("这个页面不可以用 eval 哇，能不能...试一下其他页面的说...<br/>可以吗可以吗可以吗~<br/> - 诶诶诶诶诶不可以？??!<br/>呜哇~达咩！<br/><small>(选项一：[确定] “*诶呦我操，这是好的*”)<br/>(选项二：[取消] *你够了，我无法忍受，你的行为*)&nbsp;</small>", "来自 exlg 娘的提示！", () => location.href = location.origin);
-        warn("错误信息: ", err);
+    if (_test(GM_getResourceText("pickr_resource"))) {
+        log("OK Well~");
+    } else {
+        log("废了废了");
+        exlg_alert(`这个狗屎页面不能用取色器，错误信息自己看控制台输出<br/>点击确定回到主页。`, "exlg 提醒您", () => location.href = location.origin);
         return;
     }
-    */
-    const title_text = "exlg badge register ver.7.0: 暂不可用";
-    exlg_alert(html, title_text, {
-        onconfirm: async () => {
-            srd.dom.$title.html("获取并验证令牌...");
-            mod.execute("token");
-            // eslint-disable-next-line prefer-const
-            let data = { text: srd.dom.$text_input[0].value };
-            Object.assign(data, srd.parse_data);
-            const request = {
-                uid: srd.dom.$uid[0].value,
-                token: sto["^token"].token,
-                data,
+
+    // Note: build panel
+    const boardTitle = "exlg badge register ver.7.0: 暂不可用";
+    exlg_alert(html.replaceAll("LG_USER_NAME", lg_usr.name)
+        .replaceAll("LG_USER_COLOR", lg4NameColor[lg_usr.color]), boardTitle, {
+        onopen: (brd) => {
+            // set the behavior of regBadge
+            // 创建每个窗口
+            regBadge.boards = {};
+            ["main", "showError", "getPreset", "setbgColor"].forEach(e => regBadge.boards[e] = brd.jsdom.content.querySelector(`div.exlg-regbadge-board[mode="${e}"]`));
+            // 搞点东西
+            regBadge.errorMessage = regBadge.boards.showError.querySelector(".error-message");
+
+            brd.jsdom.content.querySelector("input[key='uid']").value = lg_usr.uid;
+            regBadge.badgePreview = brd.jsdom.content.querySelector("[badge-preview]");
+            regBadge.pseudoPreview = brd.jsdom.content.querySelector("[tag-preview]");
+            regBadge.badgePresetList = brd.jsdom.content.querySelector(".exlg-regbadge-preset-list");
+
+            regBadge.pseudoInput = brd.jsdom.content.querySelector("input[key='tagText']");
+            regBadge.activeInput = brd.jsdom.content.querySelector("input[key='active']");
+            regBadge.badgeInput = brd.jsdom.content.querySelector("input[key='badgeText']");
+            regBadge.presetInput = brd.jsdom.content.querySelector("input[act='preset-json']");
+            regBadge.ccfBadge = brd.jsdom.content.querySelector(".ccf-badge");
+
+            regBadge.JSONerror = brd.jsdom.content.querySelector(".exlg-regbadge-board > span");
+            regBadge.JSONerror.style.display = "none";
+            // 处理data
+            const _data = JSON.parse(sto["sponsor-tag"].badges)[lg_usr.uid];
+            if (typeof _data === "undefined") {
+                regBadge.isactive = false;
+            } else {
+                if (configuration === null) {
+                    configData = _data;
+                } else configData = configuration;
+                regBadge.activeInput.value = "已激活";
+                regBadge.activeInput.setAttribute("disabled", "");
+            }
+            console.log(configData);
+            regBadge.badgeInput.value = configData.text ??= "";
+
+            if (lg_usr.uid in pseudoTagWhitelist) {
+                regBadge.pseudoInput.parentNode.style.display = "";
+                regBadge.pseudoInput.value = configData.pseudo ??= pseudoTagWhitelist[lg_usr.uid];
+            }
+            const _update = (data = configData) => {
+                const tmp = {};
+                Object.assign(tmp, data);
+                tmp.pseudo = lg_usr.badge ?? tmp.pseudo ?? pseudoTagWhitelist[lg_usr.uid];
+                const s = getBadge(lg_usr.uid, lg4NameColor[lg_usr.color], "luogu4", tmp, false);
+                regBadge.badgePreview.innerHTML = "";
+                regBadge.badgePreview.append(s.exlg ?? "(内容为空则不显示)");
+                if (s.pseudoTag) {
+                    regBadge.pseudoPreview.innerHTML = "";
+                    regBadge.pseudoPreview.append(s.pseudoTag);
+                }
             };
-            if (!srd.isactive) request.activation = srd.dom.$act.val();
-            if (!request.data.text) {
-                srd.gerr("[Err] 请填写 badge");
+            // 钩子也要初始化！
+            if (lg_usr.ccfLevel < 3) {
+                regBadge.ccfBadge.style.cssText = "display: none;";
+            } else if (lg_usr.ccfLevel < 6) {
+                regBadge.ccfBadge.style.cssText = "--fa-primary-color:#fff; --fa-secondary-color:#52c41a; --fa-secondary-opacity:1;";
+            } else if (lg_usr.ccfLevel < 8) {
+                regBadge.ccfBadge.style.cssText = "--fa-primary-color:#fff; --fa-secondary-color:#3498db; --fa-secondary-opacity:1;";
+            } else {
+                regBadge.ccfBadge.style.cssText = "--fa-primary-color:#fff; --fa-secondary-color:#ffc116; --fa-secondary-opacity:1;";
+            }
+            _update();// 进行一个预览的初始化
+
+            regBadge.setMode = function (md) {
+                this.mode = md;
+                Object.keys(this.boards).forEach(e => this.boards[e].style.display = "none");
+                this.boards[md].style.display = "";
+                brd.width = this.boards[md].getAttribute("wd") ?? "500px";
+                brd.minHeight = this.boards[md].getAttribute("mh") ?? "300px";
+                // 回到 main 的时候重新渲染并修改
+                if (md === "main") {
+                    _update();
+                }
+            };
+            regBadge.showError = function (message) {
+                this.setMode("showError");
+                this.errorMessage.innerText = message;
+            };
+            regBadge.setMode("main");
+            let selectedPreset = null;
+            regBadge.presetInput.oninput = () => {
+                if (selectedPreset) selectedPreset.style.border = "2px solid rgba(0, 0, 0, 0)";
+                let tmpData = null,
+                    isOK = true;
+                document.querySelector(".exlg-regbadge-board > span").style.display = "none";// 取消显示
+                try {
+                    tmpData = JSON.parse(regBadge.presetInput.value);
+                    if (typeof tmpData !== "object" || Array.isArray(tmpData)) {
+                        throw new TypeError("JSON ConfigData are supposed to be an Object!");
+                    }
+                } catch (err) {
+                    warn(err);
+                    isOK = false;
+                    document.querySelector(".exlg-regbadge-board > span").style.display = ""; // 显示
+                }
+                if (isOK) _update({ text: configData.text, pseudo: configData.pseudo, ...tmpData });
+            };
+            brd.jsdom.content.querySelector(`button[act="toPreset"]`).onclick = () => {
+                regBadge.setMode("getPreset");
+                const tmp = {};
+                cssKeys.forEach((key) => {
+                    tmp[key] = configData[key] ?? "";
+                });
+                regBadge.presetInput.value = JSON.stringify(tmp); // 记得去掉咱的 text 和 pseudo
+                regBadge.presetInput.oninput(); // 强行触发
+            };
+            // 这里先赋值上，post过去的时候去掉空的
+            cssKeys.forEach(e => configData[e] ??= "");
+            // 绑定事件
+            // proxy: text, ...
+            configProxy = new Proxy(configData, {
+                get(target, propKey, _proxy) {
+                    if (propKey === "pseudo") {
+                        return target.pseudo;
+                        // return proxy.pseudo = (regBadge.pseudoInput.value = target.pseudo);
+                    }
+                    if (propKey === "text") {
+                        return target.text;
+                        // return proxy.text = (regBadge.badgeInput.value = target.text);
+                    }
+                    if (cssKeys.includes(propKey)) {
+                        return target[propKey];
+                        // return proxy[propKey] = (_allcss[propKey].inputdom.value = target[propKey]);
+                    }
+                },
+                set(target, propKey, value, _proxy) {
+                    // update preview
+                    try {
+                        if (propKey === "pseudo" || propKey === "text") {
+                            (propKey === "pseudo" ? regBadge.pseudoInput : regBadge.badgeInput).value = value;
+                            return Reflect.set(target, propKey, value);
+                        }
+                        if (cssKeys.includes(propKey)) {
+                            _allcss[propKey].inputdom.value = value;
+                            return Reflect.set(target, propKey, value);
+                        }
+                        if (propKey === "configString") {
+                            regBadge.assignData(JSON.parse(value));
+                            return true;
+                        }
+                    } catch (err) {
+                        warn(err);
+                    } finally {
+                        _update();
+                    }
+                },
+            });
+            regBadge.assignData = (obj) => {
+                console.log("assign: ", obj);
+                // 不能用于设置 pseudo 和 text
+                if (typeof obj !== "object" || Array.isArray(obj)) {
+                    throw new TypeError("JSON ConfigData are supposed to be an Object!");
+                }
+                cssKeys.forEach((key) => {
+                    configProxy[key] = obj[key] ?? "";
+                });
+            };
+            regBadge.pseudoInput.oninput = () => configProxy.pseudo = regBadge.pseudoInput.value;
+            regBadge.badgeInput.oninput = () => configProxy.text = regBadge.badgeInput.value;
+            // eslint-disable-next-line no-unused-expressions
+            configProxy.pseudo; configProxy.text;
+            cssKeys.forEach((key) => {
+                const value = _allcss[key];
+                /*
+                brd.jsdom.content.querySelector("#regbadge-settings").innerHTML += `<span style="margin: 5px;">
+                    <span class="exlg-regbadge-fronttitle">${value.name}</span>
+                    <span style="float: right;margin-right: 3em;"></span>
+                    <input keyId="${key}" exlg-badge-register type="text" style="padding: .1em;" placeholder="" value=""/>
+                </span>
+                <br/>`;
+                */
+                const outspan = document.createElement("span");
+                outspan.style.margin = "5px";
+                const smallTitle = document.createElement("span");
+                smallTitle.className = "exlg-regbadge-fronttitle";
+                smallTitle.innerText = value.name;
+                const inp = document.createElement("input");
+                inp.setAttribute("keyId", key);
+                inp.setAttribute("exlg-badge-register", "");
+                inp.setAttribute("type", "text");
+                inp.setAttribute("placeholder", value.default);
+
+                inp.style.padding = ".1em";
+                inp.value = configData[key];
+
+                outspan.append(smallTitle);
+                outspan.append(inp);
+                brd.jsdom.content.querySelector("#regbadge-settings").append(outspan);
+                brd.jsdom.content.querySelector("#regbadge-settings").append(document.createElement("br"));
+                inp.oninput = () => {
+                    configProxy[key] = inp.value;
+                };
+                _allcss[key].inputdom = inp;
+                if (key === "bg") {
+                    const toSettings = document.createElement("button");
+                    toSettings.innerHTML = "+";
+                    outspan.append(toSettings);
+                    toSettings.onclick = () => regBadge.setMode("setbgColor");
+                }
+                if (key === "fg") {
+                    const pickerContainer = document.createElement("span");
+                    pickerContainer.classList.add("exlg-colpicker");
+                    pickerContainer.id = `exlg-pickr-${key}`;
+                    // <style>
+                    const pickrStyle = document.createElement("style");
+                    pickrStyle.innerHTML = GM_getResourceText("pickr_resource_css");
+                    outspan.append(pickrStyle);
+                    outspan.append(pickerContainer);
+                    const pickr = Pickr.create({
+                        el: `#exlg-pickr-${key}`,
+                        theme: "nano", // 'classic' or 'monolith', or 'nano'
+                        swatches: [
+                            "rgba(244, 67, 54, 1)",
+                            "rgba(233, 30, 99, 0.95)",
+                            "rgba(156, 39, 176, 0.9)",
+                            "rgba(103, 58, 183, 0.85)",
+                            "rgba(63, 81, 181, 0.8)",
+                            "rgba(33, 150, 243, 0.75)",
+                            "rgba(3, 169, 244, 0.7)",
+                            "rgba(0, 188, 212, 0.7)",
+                            "rgba(0, 150, 136, 0.75)",
+                            "rgba(76, 175, 80, 0.8)",
+                            "rgba(139, 195, 74, 0.85)",
+                            "rgba(205, 220, 57, 0.9)",
+                            "rgba(255, 235, 59, 0.95)",
+                            "rgba(255, 193, 7, 1)",
+                        ],
+                        components: {
+                            // Main components
+                            preview: true,
+                            opacity: true,
+                            hue: true,
+                            // Input / output Options
+                            interaction: {
+                                hex: false,
+                                rgba: false,
+                                hsla: false,
+                                hsva: false,
+                                cmyk: false,
+                                input: true,
+                                clear: true,
+                                save: true,
+                            },
+                        },
+                    });
+                    _allcss[key].isUserSave = false;
+                    pickr.on("init", instance => {
+                        console.log("Event: \"init\"", instance);
+                        // 开局不能被直接扬了
+                        const _tmp = configProxy[key];
+                        pickr.setColor(regBadge.pseudoPreview.lastElementChild.style[_allcss[key].css]);
+                        configProxy[key] = _tmp;
+                    })
+                        .on("save", (color, instance) => {
+                            console.log("Event: \"save\"", color, instance);
+                            if (color === null) return; // clear
+                            configProxy[key] = color.toHEXA().toString();
+                            _allcss[key].isUserSave = true;
+                        });
+                    _allcss[key].cp = pickr;
+                    // 记得取消
+                    inp.oninput = () => {
+                        configProxy[key] = inp.value;
+                        if (!_allcss[key].isUserSave) pickr.setColor(null); // clear
+                        _allcss[key].isUserSave = false;
+                    };
+                }
+            });
+            // Note: 设置预设
+            // Object.entries (presets.forEach())
+            Object.keys(presets).forEach((_k) => {
+                const title = document.createElement("div");
+                title.innerHTML = presets[_k].title;
+                title.className = "exlg-regbadge-preset-title";
+                regBadge.badgePresetList.append(title);
+                Object.keys(presets[_k].presetList).forEach((k, i) => {
+                    const { name, config } = presets[_k].presetList[k];
+                    const configObj = JSON.parse(config);
+                    console.log(name, config, configObj);
+                    const option = document.createElement("span");
+                    option.style.border = "2px solid rgba(0, 0, 0, 0)";
+                    option.append(getBadge(lg_usr.uid, lg4NameColor[lg_usr.color], "luogu4", { text: "exlg", ...configObj }, false).exlg);
+                    const nameText = document.createElement("span");
+                    nameText.append(name);
+                    option.append(nameText);
+                    option.onclick = () => {
+                        regBadge.presetInput.value = config;
+                        regBadge.presetInput.oninput();
+                        option.style.border = "2px solid grey";
+                        selectedPreset = option;
+                    };
+                    regBadge.badgePresetList.append(option);
+                    if (i & 1) regBadge.badgePresetList.append(document.createElement("br"));
+                });
+            });
+
+            // debug
+            uindow.regBadge = regBadge;
+            uindow.configProxy = configProxy;
+            // 修改 bg
+            regBadge.bgModeSelect = brd.jsdom.content.querySelector("#regbadge-setbgColor-type-select");
+            regBadge.bgBoard = {};
+            regBadge.bgModeSelect.childNodes.forEach(e => {
+                const keyv = e.value;
+                if (!keyv) return; // #text
+                regBadge.bgBoard[keyv] = brd.jsdom.content.querySelector(`.exlg-regbadge-bg-box[mode="${keyv}"]`);
+                console.log(e, keyv, regBadge.bgBoard[keyv]);
+            });
+            regBadge.bgModeSelect.onchange = function () {
+                Object.keys(regBadge.bgBoard).forEach((it) => {
+                    regBadge.bgBoard[it].style.display = "none";
+                });
+                regBadge.bgBoard[this.value].style.display = "";
+            };
+            regBadge.bgtextInput = regBadge.bgBoard.text.querySelector("input");
+            regBadge.bgtextInput.value = configProxy.bg;
+            regBadge.bgsingle = Pickr.create({
+                el: `span[exlg="bg-single-pickr"]`,
+                theme: "nano", // 'classic' or 'monolith', or 'nano'
+                swatches: [
+                    "rgba(244, 67, 54, 1)",
+                    "rgba(233, 30, 99, 0.95)",
+                    "rgba(156, 39, 176, 0.9)",
+                    "rgba(103, 58, 183, 0.85)",
+                    "rgba(63, 81, 181, 0.8)",
+                    "rgba(33, 150, 243, 0.75)",
+                    "rgba(3, 169, 244, 0.7)",
+                    "rgba(0, 188, 212, 0.7)",
+                    "rgba(0, 150, 136, 0.75)",
+                    "rgba(76, 175, 80, 0.8)",
+                    "rgba(139, 195, 74, 0.85)",
+                    "rgba(205, 220, 57, 0.9)",
+                    "rgba(255, 235, 59, 0.95)",
+                    "rgba(255, 193, 7, 1)",
+                ],
+                components: {
+                    // Main components
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+                    // Input / output Options
+                    interaction: {
+                        hex: false,
+                        rgba: false,
+                        hsla: false,
+                        hsva: false,
+                        cmyk: false,
+                        input: true,
+                        clear: true,
+                        save: true,
+                    },
+                },
+            });
+            /*
+            regBadge.bgxnpicker = new XNColorPicker({
+                color: "#ff0987",
+                selector: "#nopre",
+                showprecolor: false, // 显示预制颜色
+                prevcolors: null, // 预制颜色，不设置则默认
+                showhistorycolor: false, // 显示历史
+                historycolornum: 16, // 历史条数
+                format: "rgba", // rgba hex hsla,初始颜色类型
+                showPalette: true, // 显示色盘
+                show: false, // 初始化显示
+                lang: "cn", // cn 、en
+                colorTypeOption: "single,linear-gradient,radial-gradient",
+                onError() {
+
+                },
+                onCancel(color) {
+                    console.log("cancel", color);
+                },
+                onChange(color) {
+                    console.log("change", color);
+                },
+                onConfirm(color) {
+                    console.log("confirm", color);
+                },
+            });
+            */
+        },
+        oncancel: () => {
+            switch (regBadge.mode) {
+            case "success":
+            case "main":
+                return true;
+            default:
+                regBadge.setMode("main");
                 return false;
             }
-
-            srd.dom.$title.html("请求中...");
-            const res_json = await cs_post("https://exlg.piterator.com/badge/set", request).data;
-            if ("error" in res_json) {
-                srd.dom.$title.html("[Err] 失败");
-                exlg_alert(`<div style="margin-bottom: 1.5em;">
-                <div><strong style="color: red;">错误信息:</strong></div>
-                <div>${res_json.error}</div>
-            </div>
-            <small>点击确定以返回。</small>`, "激活 badge 出错", () => {
-                    register_badge(srd.parse_data);
-                    return false;
-                });
-            } else {
-                const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data);
-                badges[request.uid].ts = cur_time();
-                sto["sponsor-tag"].badges = JSON.stringify(badges);
-                srd.dom.$title.html("成功");
-                exlg_alert("badge 激活成功！感谢您对 exlg 的<del>打钱</del>支持。", "badge 激活成功", () => { location.reload(); });
-            }
-            return false;
-            /*
-            return cs_post("https://exlg.piterator.com/badge/set", request).then((res) => {
-                return new Promise((resolve, reject) => {
-                    const res_json = res.data;
-                    if ("error" in res_json) {
-                        $title.html("[Err] 失败");
-                        exlg_alert(res_json.error, "激活 badge 出错");
-                        resolve(false);
-                    } else {
-                        const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), res_json.data);
-                        badges[$input[0].value].ts = cur_time();
-                        sto["sponsor-tag"].badges = JSON.stringify(badges);
-                        $title.html("成功");
-                        exlg_alert("badge 激活成功！感谢您对 exlg 的支持。", "badge 激活成功", () => { location.reload(); });
-                        resolve(false);
-                    }
-                });
-            */
-            // Note: 不会写异步，爬了
         },
-        onopen: () => {
-            const lColor = {
-                Purple: ["#8e44ad", "rgb(157, 61, 207)"],
-                Red: ["#e74c3c", "rgb(254, 76, 97)"],
-                Orange: ["#e67e22", "rgb(243, 156, 17)"],
-                Green: ["#5eb95e", "rgb(82, 196, 26)"],
-                Blue: ["#0e90d2", "rgb(52, 152, 219)"],
-                Gray: ["#bbb", "rgb(191, 191, 191)"],
-                Cheater: ["#996600", "rgb(173, 139, 0)"],
-            };
-            const $cont = $("#exlg-container");
-            const $title = $cont.find("#exlg-dialog-title");
-            srd.gerr = (message, timeout = 1500) => {
-                $title.html(message);
-                setTimeout(() => $title.html(title_text), timeout);
-            };
-            srd.dom = {
-                $title: "#exlg-dialog-title",
-                $uid: "input[key='uid']",
-                $act: "input[key='active']",
-                $prvid: "#regbadge-preview-id",
-                $ccf: ".preview-ccf-tag",
-                $type: "select",
-                $lgbg: "#preview-lg-badge",
-                $exlg_badge_prev: ".exlg-badge-preview",
-                $text_input: "#regbadge-preview input",
-                $text_test: "#regbadge-preview span[fuck=o2]",
-                btn: {},
-            };
-
-            Object.keys(srd.dom).forEach((key) => srd.dom[key] = key.includes("$") ? $cont.find(srd.dom[key]) : srd.dom[key]);
-            srd.current_type = 3;
-            srd.refreshInputData = () => {
-                Object.keys(srd.customSettings).forEach((key) => srd.customSettings[key].refreshData(srd.current_type));
-            };
-
-            srd.customSettings = { };
-            srd.parse_data = { lg4: { } };
-
-            $cont.find("input[key][css-key]").each((_, e) => {
-                const key = e.getAttribute("key");
-                srd.customSettings[key] = {
-                    key,
-                    csskey: e.getAttribute("css-key"),
-                    jsdom: e,
-                    jqdom: $(e),
-                    defaultvalue: e.placeholder,
-                    setData(ty = srd.current_type) { // Note: 写入 parse-data
-                        (ty & 1 ? srd.parse_data : srd.parse_data.lg4)[this.key] = this.jsdom.value;
-                        if (this.jsdom.value && this.jsdom.value === (ty & 1 ? this.defaultvalue : (srd.parse_data[key] || this.defaultvalue))) delete (ty & 1 ? srd.parse_data : srd.parse_data.lg4)[this.key];
-                        // Note: 在改 3 的时候对 4 的影响
-                        // Note: 存在 4 并且 与当前 3 相同
-                        if ((ty & 1) && (Object.keys(srd.parse_data.lg4).includes(this.key)) && srd.parse_data.lg4[this.key] === srd.parse_data[this.key]) {
-                            delete srd.parse_data.lg4[this.key];
-                        }
-                    },
-                    refreshData(ty = srd.current_type) { // Note: 读入 parse-data
-                        this.jsdom.value = (srd.parse_data[this.key] || "");
-                        if (ty > 3) this.jsdom.value = srd.parse_data.lg4[this.key] || this.jsdom.value;
-                        if (this.colorpicker) this.colorpicker.refreshPicker();
-                    },
-                    resetHolder(ty = srd.current_type) {
-                        if (ty & 1) {
-                            this.jsdom.placeholder = this.defaultvalue;
-                        } else this.jsdom.placeholder = srd.parse_data[key] || this.defaultvalue;
-                    },
-                };
-                $(e).on("input", () => {
-                    srd.customSettings[key].setData(srd.current_type);
-                    if (srd.customSettings[key].colorpicker) srd.customSettings[key].colorpicker.refreshPicker();
-                    srd.updatePreview();
-                });
-            });
-            $cont.find(".exlg-badge-page button").each((_, e) => {
-                srd.dom.btn[e.id.slice("regbadge-button-".length)] = e;
-            });
-            $(srd.dom.btn.recoverall).on("click", () => {
-                srd.parse_data = { lg4: { } };
-                srd.refreshInputData();
-                srd.updatePreview();
-                srd.gerr("已清空所有设置选项至默认值");
-            });
-            $(srd.dom.btn.recover43).on("click", () => {
-                if (srd.dom.$type.val() === 3) return srd.gerr("处于 luogu3 编辑模式，操作无效");
-                srd.parse_data.lg4 = { };
-                srd.refreshInputData();
-                srd.updatePreview();
-                srd.gerr("成功以 luogu3 覆盖 luogu4 设置");
-            });
-            $(srd.dom.btn.exportJSON).on("click", () => {
-                let res = { };
-                try {
-                    res = JSON.stringify({ text: srd.dom.$text_input[0].value, ...srd.parse_data });
-                    if (res.lg4 && res.lg4.text) delete res.lg4.text;
-                    // 去掉 lg4.text
-                } catch (err) {
-                    srd.gerr("导出配置 json 失败");
-                    warn("导出配置 json 失败，错误信息: ", err);
-                    return;
-                }
-                try {
-                    GM_setClipboard(res, "text/plain");
-                } catch (err) {
-                    srd.gerr("复制至剪贴板失败");
-                    warn("复制到剪贴板失败，错误信息: ", err);
-                    return;
-                }
-                srd.gerr("成功复制 json 配置信息至剪贴板");
-            });
-            $(srd.dom.btn.importJSON).on("click", () => {
-                const _tmp_data = srd.parse_data;
-                exlg_alert(`<textarea class="exlg-regbadge-configinput" rows="8" style="font-family: 'Fira Code', 'Fira Mono', Consolas;"></textarea>`, "请输入 json 配置", {
-                    onconfirm: () => {
-                        const str = $("textarea.exlg-regbadge-configinput").val();
-                        let obj = null;
-                        try {
-                            obj = JSON.parse(str);
-                            if (typeof obj !== "object") throw new TypeError("obj are expected to be an object.");
-                        } catch (err) {
-                            log("无法正确解析配置: ", err);
-                            $("#exlg-dialog-title").html("无法正确解析配置");
-                            setTimeout(() => $("#exlg-dialog-title").html("请输入 json 配置"), 1500);
-                            $("textarea.exlg-regbadge-configinput").val("");
-                            return false;
-                        }
-                        register_badge(obj);
-                        return false;
-                    },
-                    onopen: () => {
-                        $("textarea.exlg-regbadge-configinput").val(JSON.stringify(_tmp_data));
-                    },
-                });
-            });
-            srd.dom.$type.on("change", () => {
-                srd.current_type = srd.dom.$type.val();
-                Object.keys(srd.customSettings).forEach((key) => {
-                    srd.customSettings[key].resetHolder();
-                    uindow.hsrd = srd;
-                });
-                srd.refreshInputData();
-                srd.updatePreview();
-            });
-
-            srd.recalcInputWidth = () => {
-                srd.dom.$text_test.text(srd.dom.$text_input[0].value);
-                srd.dom.$text_input.css("width", srd.dom.$text_test[0].offsetWidth + 4);
-            };
-
-            if (lg_usr?.uid && !srd.dom.$uid[0].value) srd.dom.$uid[0].value = lg_usr.uid;
-            srd.dom.$text_input.on("input", srd.recalcInputWidth);
-
-            srd.updatePreview = () => {
-                const wColor = ["Red", "Orange", "Purple", "Cheater"];
-                srd.dom.$prvid.removeAttr("style").text(lg_usr.name);
-                if (srd.current_type === 4 || wColor.includes(lg_usr.color)) srd.dom.$prvid.css("font-weight", "bold");
-                srd.dom.$prvid.css("color", lColor[lg_usr.color][srd.current_type - 3]);
-                [
-                    { l: [0, 1, 2], r: "display: none;" },
-                    { l: [3, 4, 5], r: "fill: #5eb95e;" },
-                    { l: [6, 7], r: "fill: #3498db;" },
-                    { l: [8, 9, 10], r: "fill: #f1c40f;" },
-                ].forEach((e) => {
-                    if (e.l.includes(lg_usr.ccfLevel)) {
-                        srd.dom.$ccf[0].style = e.r;
-                    }
-                });
-                // Hack: 千万不要忘了删掉测试代码！！！！！！！！
-                if (lg_usr.badge) {
-                    srd.dom.$lgbg.html(`<span class="lg${srd.current_type}-badge" style="background-color: ${lColor[lg_usr.color][srd.current_type - 3]};">${lg_usr.badge}</span>`).show();
-                } else srd.dom.$lgbg.hide();
-                srd.dom.$exlg_badge_prev.attr("style", `
-                    border-radius: 50px;
-                    padding-left: 10px;
-                    padding-right: 10px;
-                    padding-top: 4px;
-                    padding-bottom: 4px;
-                    transition: all .15s;
-                    display: inline-block;
-                    min-width: 10px;
-                    font-size: 1em;
-                    font-weight: 700;
-                    line-height: 1;
-                    vertical-align: baseline;
-                    white-space: nowrap;
-                    cursor: pointer;
-                    margin-left: 2px;
-                    margin-right: 2px;
-                `);
-                Object.keys(srd.customSettings).forEach((key, _index) => {
-                    const obj = srd.customSettings[key];
-                    let str = !(srd.current_type & 1)
-                        ? (srd.parse_data.lg4[key] || (srd.parse_data[key] || obj.defaultvalue))
-                        : (srd.parse_data[key] || obj.defaultvalue);
-                    if (key === "bg") {
-                        str = str.replaceAll("${luogu-default}", lColor[lg_usr.color][srd.current_type - 3]);
-                    }
-                    srd.dom.$exlg_badge_prev.css(obj.csskey, str);
-                });
-                [
-                    "minWidth",
-                    "fontSize",
-                    "fontWeight",
-                    "whiteSpace",
-                ].forEach((kv) => {
-                    srd.dom.$text_test[0].style[kv] = srd.dom.$exlg_badge_prev[0].style[kv];
-                }); // 需要的 css 复制过去
-                srd.recalcInputWidth();
-            };
-
-            const _data = JSON.parse(sto["sponsor-tag"].badges)[lg_usr.uid];
-            if (typeof _data !== "undefined" && typeof _data.text !== "undefined") {
-                srd.dom.$text_input[0].value = _data.text; // Note: 已经有了
-                delete _data.text;
-                if (configuration === null) Object.assign(srd.parse_data, _data);
-                srd.dom.$act.val("已激活").attr("disabled", "");
-                srd.isactive = true;
-            } else { // Note: 没有
-                srd.isactive = false;
+        onconfirm: async (brd) => {
+            if (regBadge.mode === "success") {
+                location.reload();
+                return true;
             }
-
-            // console.log(configuration);
-            if (configuration !== null) {
-                configuration.text = configuration.text ?? "";
-                Object.assign(srd.parse_data, configuration);
-                srd.dom.$text_input[0].value = configuration.text;
+            if (regBadge.mode === "showError") {
+                regBadge.setMode("main");
+                return false;
             }
-
-            $("input[key='bg'][css-key], input[key='fg'][css-key]").each((i, e, $e = $(e)) => $e.on("input", () => {
-                e.value = e.value.replaceAll("to top", "0deg")
-                    .replaceAll("to right", "90deg")
-                    .replaceAll("to bottom", "180deg")
-                    .replaceAll("to left", "270deg")
-                    .replaceAll("to top right", "45deg")
-                    .replaceAll("to right top", "45deg")
-                    .replaceAll("to bottom right", "135deg")
-                    .replaceAll("to right bottom", "135deg")
-                    .replaceAll("to bottom left", "225deg")
-                    .replaceAll("to left bottom", "225deg")
-                    .replaceAll("to top left", "315deg")
-                    .replaceAll("to left top", "315deg");
-            }));
-
-            srd.refreshInputData();
-            srd.updatePreview();
-            [
-                {
-                    selector: ".exlg-bg-colset",
-                    defaultColor: "mediumturquoise",
-                    id: "bg",
-                },
-                {
-                    selector: ".exlg-fg-colset",
-                    defaultColor: "#fff",
-                    id: "fg",
-                },
-            ].forEach((e) => {
-                const dominput = srd.customSettings[e.id].jsdom;
-                const getInputString = () => {
-                    let str = dominput.value || dominput.placeholder;
-                    if (e.id === "bg") str = str.replaceAll("${luogu-default}", lColor[lg_usr.color][srd.current_type - 3]);
-                    return str;
-                };
-                const colpicker = new XNColorPicker({
-                    color: getInputString() ?? e.defaultColor,
-                    selector: e.selector,
-                    colorTypeOption: "single,linear-gradient,radial-gradient",
-                    onError: () => { },
-                    onCancel: () => { },
-                    onChange: () => { },
-                    onConfirm: (color) => {
-                        const c = color.colorType === "single" ? color.color.hex : color.color.str;
-                        srd.customSettings[e.id].jsdom.value = c;
-                        srd.customSettings[e.id].setData();
-                        srd.updatePreview();
-                    },
-                });
-                colpicker.getColorString = getInputString;
-                colpicker.refreshPicker = function () {
-                    this.setColor(this.getColorString());
-                };
-                srd.customSettings[e.id].colorpicker = colpicker;
-                /*
-                $(dominput).on("input", () => {
-
-                });
-                */
-            });
+            if (regBadge.mode === "getPreset") {
+                try {
+                    regBadge.assignData(JSON.parse(regBadge.presetInput.value));
+                } catch (err) {
+                    brd.title = "[Err] 无效json";
+                    warn(err);
+                    setTimeout((() => brd.title = boardTitle), 1500);
+                    return false;
+                }
+                regBadge.setMode("main");
+                return false;
+            }
+            if (regBadge.mode === "setbgColor") {
+                switch (regBadge.bgModeSelect.value) {
+                case "text":
+                    configProxy.bg = regBadge.bgtextInput.value;
+                    break;
+                case "lgdefault":
+                    configProxy.bg = "${luogu-default}";
+                    break;
+                case "single":
+                    console.log(regBadge.bgsingle.getColor().toHEXA().toString());
+                    configProxy.bg = regBadge.bgsingle.getColor().toHEXA().toString();
+                    break;
+                case "xncolorpicker":
+                    configProxy.bg = regBadge.bgxnpicker.getColor();
+                    break;
+                }
+                regBadge.setMode("main");
+                return false;
+            }
+            // check 一下合法性
+            // 检查字号合法性
+            if (!((msg) => {
+                if (!msg) return true;
+                brd.title = msg;
+                setTimeout((() => brd.title = boardTitle), 1500);
+                return false;
+            })(((cfg) => {
+                if (cfg.fs) {
+                    if (/^\d{0,}(.\d{0,})?(px|em)$/.test(cfg.fs) && !["px", "em"].includes(cfg.fs)) {
+                        const fsnum = cfg.fs.slice(0, -2);
+                        if ((cfg.fs.includes("px") && fsnum > 16) || (cfg.fs.includes("em") && fsnum > 1.0)) {
+                            return "[Err] 字号过大，应不超过 16px/1em";
+                        }
+                    } else {
+                        return "[Err] 字号应以 px/em 为单位且合法";
+                    }
+                }
+            })(configData))) return false;
+            brd.title = "获取并验证令牌...";
+            mod.execute("token");
+            // configData 直接用
+            const request = {
+                uid: lg_usr.uid,
+                token: sto["^token"].token,
+                data: configData,
+            };
+            if (!regBadge.isactive) request.activation = regBadge.activeInput.value;
+            /*
+            if (!request.data.text) {
+                brd.title = "[Err] 请填写 badge";
+                setTimeout((() => brd.title = boardTitle), 1500);
+                return false;
+            }
+            */
+            brd.title = "请求中...";
+            const postResult = await cs_post("https://exlg.piterator.com/badge/set", request).data;
+            if ("error" in postResult) {
+                brd.title = "[Err] 失败";
+                regBadge.showError(postResult.error);
+                return false;
+            }
+            // console.log(postResult);
+            // Note: 本地缓存
+            const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), configData);
+            badges[request.uid].ts = cur_time();
+            sto["sponsor-tag"].badges = JSON.stringify(badges);
+            brd.title = "badge 激活成功";
+            brd.content = "badge 激活成功！感谢您对 exlg 的<del>打钱</del>支持。";
+            regBadge.mode = "success";
+            return false;
         },
     }, { width: "800px", min_height: "400px" });
+    return regBadge;
 }, css);
 
 export default register_badge;

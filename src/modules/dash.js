@@ -217,14 +217,9 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                 ],
             },
             {
-                tag: "badge", title: "badge", buttons: [
-                    { html: "注册/修改", onclick: () => register_badge() },
-                ],
-            },
-            {
                 tag: "debug", title: "debug", buttons: [
                     {
-                        html: "清除所有油猴缓存", onclick: () => {
+                        html: "清除所有油猴缓存", title: "清空所有数据，无法恢复。", onclick: () => {
                             exlg_alert(`你确定要这么做吗？<br/><strong style="color: red;">数据将不可恢复！</strong>`, "exlg 警告！", () => {
                                 GM_listValues().forEach(GM_deleteValue);
                                 location.reload();
@@ -233,7 +228,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                         },
                     },
                     {
-                        html: "刷新 token", onclick: () => {
+                        html: "刷新 token", title: "多用于犇犇、badge 等服务不能正确运行时。", onclick: () => {
                             exlg_alert(`点击确定以刷新用户 token。`, "exlg 提醒您", async () => {
                                 await mod.execute("token");
                                 location.reload();
@@ -241,6 +236,11 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
                             });
                         },
                     },
+                ],
+            },
+            {
+                tag: "badge", title: "badge", buttons: [
+                    { html: "注册/修改", onclick: () => register_badge() },
                 ],
             },
         ];
@@ -251,7 +251,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             e.buttons.forEach((btn) => {
                 const col = btn.col ?? "#66ccff";
                 $(`<span class="exlg-windiv-btnspan"></span>`)
-                    .append($(`<button class="exlg-windiv-btn" style="background-color: ${col};border-color: ${col};">${btn.html}</button>`)
+                    .append($(`<button class="exlg-windiv-btn"${(btn.title ? ` title="${btn.title}"` : "")}" style="background-color: ${col};border-color: ${col};">${btn.html}</button>`)
                         .on("click", btn.onclick ?? (() => location.href = btn.url)))
                     .appendTo($span);
             });

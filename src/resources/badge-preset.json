@@ -1,0 +1,57 @@
+{
+    "exlg-presets": {
+        "title": "exlg 预设",
+        "presetList": [
+            {
+                "name": "exlg 经典",
+                "id": "exlg-default",
+                "config": "{}"
+            },
+            {
+                "name": "洛谷经典",
+                "id": "luogu-default",
+                "config": "{\"bg\":\"${luogu-default}\"}"
+            },
+            {
+                "name": "西红柿炒鸡蛋",
+                "id": "flandre-scarlet",
+                "config": "{\"bg\":\"linear-gradient(90.0deg,rgb(254, 76, 97) 21.5%,rgba(255,213,79,1) 100.0%)\"}"
+            },
+            {
+                "name": "⑨baka 联名",
+                "id": "cirno",
+                "config": "{}"
+            },
+            {
+                "name": "复古控制台",
+                "id": "console",
+                "config": "{}"
+            },
+            {
+                "name": "迈恩克拉夫特",
+                "id": "minecraft",
+                "config": "{}"
+            },
+            {
+                "name": "妈妈我紫了",
+                "id": "be-purple",
+                "config": "{}"
+            },
+            {
+                "name": "铃酱同款",
+                "id": "green-hook",
+                "config": "{\"bg\":\"url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0 PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2IiBmaWxsPSIjNWViOTVlIiBzdHlsZT0ibWFyZ2luLWJv dHRvbTogLTNweDsiPjxwYXRoIGQ9Ik0xNiA4QzE2IDYuODQzNzUgMTUuMjUgNS44NDM3NSAxNC4x ODc1IDUuNDM3NUMxNC42NTYyIDQuNDM3NSAxNC40Njg4IDMuMTg3NSAxMy42NTYyIDIuMzQzNzVD MTIuODEyNSAxLjUzMTI1IDExLjU2MjUgMS4zNDM3NSAxMC41NjI1IDEuODEyNUMxMC4xNTYyIDAu NzUgOS4xNTYyNSAwIDggMEM2LjgxMjUgMCA1LjgxMjUgMC43NSA1LjQwNjI1IDEuODEyNUM0LjQw NjI1IDEuMzQzNzUgMy4xNTYyNSAxLjUzMTI1IDIuMzQzNzUgMi4zNDM3NUMxLjUgMy4xODc1IDEu MzEyNSA0LjQzNzUgMS43ODEyNSA1LjQzNzVDMC43MTg3NSA1Ljg0Mzc1IDAgNi44NDM3NSAwIDhD MCA5LjE4NzUgMC43MTg3NSAxMC4xODc1IDEuNzgxMjUgMTAuNTkzOEMxLjMxMjUgMTEuNTkzOCAx LjUgMTIuODQzOCAyLjM0Mzc1IDEzLjY1NjJDMy4xNTYyNSAxNC41IDQuNDA2MjUgMTQuNjg3NSA1 LjQwNjI1IDE0LjIxODhDNS44MTI1IDE1LjI4MTIgNi44MTI1IDE2IDggMTZDOS4xNTYyNSAxNiAx MC4xNTYyIDE1LjI4MTIgMTAuNTYyNSAxNC4yMTg4QzExLjU5MzggMTQuNjg3NSAxMi44MTI1IDE0 LjUgMTMuNjU2MiAxMy42NTYyQzE0LjQ2ODggMTIuODQzOCAxNC42NTYyIDExLjU5MzggMTQuMTg3 NSAxMC41OTM4QzE1LjI1IDEwLjE4NzUgMTYgOS4xODc1IDE2IDhaTTExLjQ2ODggNi42MjVMNy4z NzUgMTAuNjg3NUM3LjIxODc1IDEwLjg0MzggNyAxMC44MTI1IDYuODc1IDEwLjY4NzVMNC41IDgu MzEyNUM0LjM3NSA4LjE4NzUgNC4zNzUgNy45Njg3NSA0LjUgNy44MTI1TDUuMzEyNSA3QzUuNDY4 NzUgNi44NzUgNS42ODc1IDYuODc1IDUuODEyNSA3LjAzMTI1TDcuMTI1IDguMzQzNzVMMTAuMTU2 MiA1LjM0Mzc1QzEwLjMxMjUgNS4xODc1IDEwLjUzMTIgNS4xODc1IDEwLjY1NjIgNS4zNDM3NUwx MS40Njg4IDYuMTU2MjVDMTEuNTkzOCA2LjI4MTI1IDExLjU5MzggNi41IDExLjQ2ODggNi42MjVa Ij48L3BhdGg+PC9zdmc+') 0px center / 16px no-repeat\",\"fg\":\"rgba(0,0,0,0)\"}"
+            },
+            {
+                "name": "AKIOI",
+                "id": "ak-ioi",
+                "config": "{}"
+            },
+            {
+                "name": "三 哼 经",
+                "id": "tadokoro-koji",
+                "config": "{}"
+            }
+        ]
+    }
+}

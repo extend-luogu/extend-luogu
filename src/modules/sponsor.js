@@ -27,6 +27,7 @@ const getColor = (e) => {
 export const getBadge = (uid, namecol, bdty, {
     bg, fg, text, ft, fw, bd, fs, pseudo,
 }, onClickActive = true) => {
+    if (typeof uid === "number") uid = String(uid);
     // Note: need to return null when there's no text qwq
     const $badge = (!text) ? $("") : $(`<span class="exlg-badge" badge-uid="${uid}" badge-type="${bdty}">${text}</span>`)
         .css({
