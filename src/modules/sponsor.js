@@ -5,7 +5,13 @@ import uindow, {
 // import register_badge from "../components/register-badge.js";
 import css from "../resources/css/sponsor-tag.css";
 
-export const pseudoTagWhitelist = { 100250: "风神少女" };
+export const pseudoTagWhitelist = {
+    100250: "风神少女",
+    196899: "可爱",
+    89092: "", // just a test founding out whether empty white list(unvisible) can display as expected.
+    224978: "o2",
+    // 695842: "test",
+};
 
 const _color = {
     "lg-fg-purple": "#8e44ad",

@@ -74,7 +74,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
     }
 
     // Note: build panel
-    const boardTitle = "exlg badge register ver.7.0: 暂不可用";
+    const boardTitle = "exlg badge 注册器 ~ 奶奶的，还在测试，bug 巨他妈多";
     exlg_alert(html.replaceAll("LG_USER_NAME", lg_usr.name)
         .replaceAll("LG_USER_COLOR", lg4NameColor[lg_usr.color]), boardTitle, {
         onopen: (brd) => {
@@ -115,6 +115,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             if (lg_usr.uid in pseudoTagWhitelist) {
                 regBadge.pseudoInput.parentNode.style.display = "";
                 regBadge.pseudoInput.value = configData.pseudo ??= pseudoTagWhitelist[lg_usr.uid];
+            } else {
+                regBadge.pseudoInput.parentNode.style.display = "none";
             }
             const _update = (data = configData) => {
                 const tmp = {};
@@ -530,6 +532,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             brd.title = "获取并验证令牌...";
             mod.execute("token");
             // configData 直接用
+            console.log(configData);
             const request = {
                 uid: lg_usr.uid,
                 token: sto["^token"].token,
@@ -552,7 +555,8 @@ const register_badge = compo.reg("register-badge", "badge 注册", null, null, (
             }
             // console.log(postResult);
             // Note: 本地缓存
-            const badges = Object.assign(JSON.parse(sto["sponsor-tag"].badges), configData);
+            const badges = JSON.parse(sto["sponsor-tag"].badges);
+            badges[request.uid] = configData;
             badges[request.uid].ts = cur_time();
             sto["sponsor-tag"].badges = JSON.stringify(badges);
             brd.title = "badge 激活成功";
