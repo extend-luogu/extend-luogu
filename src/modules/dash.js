@@ -219,7 +219,7 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             {
                 tag: "debug", title: "debug", buttons: [
                     {
-                        html: "清除所有油猴缓存", title: "清空所有数据，无法恢复。", onclick: () => {
+                        html: "清除数据", title: "清空所有数据，无法恢复。", onclick: () => {
                             exlg_alert(`你确定要这么做吗？<br/><strong style="color: red;">数据将不可恢复！</strong>`, "exlg 警告！", () => {
                                 GM_listValues().forEach(GM_deleteValue);
                                 location.reload();
@@ -241,6 +241,15 @@ mod.reg_hook_new("dash-bridge", "控制桥", "@/.*", {
             {
                 tag: "badge", title: "badge", buttons: [
                     { html: "注册/修改", onclick: () => register_badge() },
+                    {
+                        html: "刷新 badge", title: "多用于 badge 数据滞后时。", onclick: () => {
+                            exlg_alert(`点击确定以刷新 badge 数据。`, "exlg 提醒您", async () => {
+                                sto["sponsor-tag"].badges = "{}";
+                                location.reload();
+                                return true;
+                            });
+                        },
+                    },
                 ],
             },
         ];

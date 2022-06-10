@@ -34,8 +34,8 @@
 //
 // @resource       colorpicker https://extend-luogu.github.io/exlg-color-picker/dist/xncolorpicker.min.js
 // @resource       colorpicker_old https://www.jq22.com/demo/xncolorpicker-main202101270059/dist/xncolorpicker.min.js
-// @resource       pickr_resource https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js
-// @resource       pickr_resource_css https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css
+// @resource       pickr_resource https://unpkg.com/@simonwep/pickr@1.8.2/dist/pickr.min.js
+// @resource       pickr_resource_css https://unpkg.com/@simonwep/pickr@1.8.2/dist/themes/nano.min.css
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
