@@ -18,7 +18,7 @@
 // @include        http://localhost:1634/*
 //
 // @connect        tencentcs.com
-// @connect        luogulo.gq
+// @connect        https://fx白丝.ml/
 // @connect        bens.rotriw.com
 // @connect        codeforces.com
 // @connect        codeforces.ml
