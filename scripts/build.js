@@ -57,6 +57,7 @@ buildSync({
         ".svg": "text",
     },
     bundle: true,
+    target: "es5",
     charset: "utf8",
     minify,
 });
