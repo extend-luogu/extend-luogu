@@ -1,6 +1,6 @@
 {
   "name": "extend-luogu",
-  "version": "6.7.4-pre2",
+  "version": "6.7.4",
   "description": "Make luogu more powerful.",
   "type": "module",
   "engines": {
