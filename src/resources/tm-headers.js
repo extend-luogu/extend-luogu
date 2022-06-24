@@ -18,7 +18,7 @@
 // @include        http://localhost:1634/*
 //
 // @connect        tencentcs.com
-// @connect        https://fx白丝.ml/
+// @connect        xn--fx-ex2c330n.ml
 // @connect        bens.rotriw.com
 // @connect        codeforces.com
 // @connect        codeforces.ml
