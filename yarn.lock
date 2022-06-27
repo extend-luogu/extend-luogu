@@ -217,6 +217,14 @@
   dependencies:
     tslib "^2.3.1"
 
+"@milkdown/plugin-listener@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-listener/-/plugin-listener-6.2.0.tgz#b7079be478dfccd4e8e75f116f340c6dc94fc30c"
+  integrity sha512-Yd9EvN7aLm4mNsg/026vqyPwh6UkGcYJUh7Hb9xiwzn7isg+IbY3yS7tTlK0rfQ1tlX//et4F5/sRYjiSTK6+A==
+  dependencies:
+    "@milkdown/utils" "6.2.0"
+    tslib "^2.3.1"
+
 "@milkdown/preset-commonmark@^6.2.0":
   version "6.2.0"
   resolved "https://registry.npmmirror.com/@milkdown/preset-commonmark/-/preset-commonmark-6.2.0.tgz#dc3c247c1039ce47dad2025fc8280c6ab5eb9192"
