@@ -51,7 +51,7 @@ mod.reg_v2({
             $(`<div data-v-6d5597b1 class="exlg-milkdown mp-editor-container"></div>`)
                 .appendTo($p);
 
-            const editor = Editor
+            (Editor
                 .make()
                 .config((ctx) => {
                     ctx.set(rootCtx, document.querySelector(".exlg-milkdown"));
@@ -75,12 +75,13 @@ mod.reg_v2({
                 .use(clipboard)
                 .use(math)
                 .use(listener)
-                .create();
-
-            const selectedTheme = gsto.milkdown_theme;
-            if (selectedTheme === "nord") editor.action(switchTheme(nord));
-            else
-            if (selectedTheme === "tokyo") editor.action(switchTheme(tokyo));
+                .create())
+                .then((editor) => {
+                    const selectedTheme = gsto.milkdown_theme;
+                    if (selectedTheme === "nord") editor.action(switchTheme(nord));
+                    else
+                    if (selectedTheme === "tokyo") editor.action(switchTheme(tokyo));
+                });
         });
     }, () => {
         const $tmp = $(".mp-editor-container[data-v-6d5597b1][data-v-aa62436e]");
