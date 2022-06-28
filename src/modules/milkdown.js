@@ -8,8 +8,8 @@ import { math } from "@milkdown/plugin-math";
 import { menu } from "@milkdown/plugin-menu";
 import { indent, indentPlugin } from "@milkdown/plugin-indent";
 import { emoji } from "@milkdown/plugin-emoji";
-import { switchTheme } from "@milkdown/utils";
 import { tokyo } from "@milkdown/theme-tokyo";
+import { gfm } from "@milkdown/preset-gfm";
 import uindow, { $ } from "../utils.js";
 import mod from "../core.js";
 
@@ -24,6 +24,11 @@ mod.reg_v2({
     milkdown_theme: {
         ty: "enum", dft: "nord", vals: ["nord", "tokyo"], info: [
             "Milkdown theme", "主题",
+        ], migration: true,
+    },
+    milkdown_preset: {
+        ty: "enum", dft: "commonmark", vals: ["commonmark", "gfm"], info: [
+            "preset", "预设",
         ], migration: true,
     },
 }, (handler) => {
@@ -68,14 +73,19 @@ mod.reg_v2({
                     }),
                 );
 
-            [clipboard, commonmark, emoji, history, listener, math, menu, nord].forEach((i) => { editor.use(i); });
+            const selectedPreset = gsto.milkdown_preset;
+            if (selectedPreset === "commonmark") editor.use(commonmark);
+            else
+            if (selectedPreset === "gfm") editor.use(gfm);
 
-            (editor.create()).then((ed) => {
-                const selectedTheme = gsto.milkdown_theme;
-                if (selectedTheme === "nord") ed.action(switchTheme(nord));
-                else
-                if (selectedTheme === "tokyo") ed.action(switchTheme(tokyo));
-            });
+            const selectedTheme = gsto.milkdown_theme;
+            if (selectedTheme === "nord") editor.use(nord);
+            else
+            if (selectedTheme === "tokyo") editor.use(tokyo);
+
+            [clipboard, emoji, history, listener, math, menu].forEach((i) => { editor.use(i); });
+
+            editor.create();
         });
     }, () => {
         const $tmp = $(".mp-editor-container[data-v-6d5597b1][data-v-aa62436e]");
