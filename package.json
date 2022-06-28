@@ -49,6 +49,7 @@
   "dependencies": {
     "@milkdown/core": "^6.2.0",
     "@milkdown/plugin-clipboard": "^6.2.0",
+    "@milkdown/plugin-emoji": "^6.2.0",
     "@milkdown/plugin-history": "^6.2.0",
     "@milkdown/plugin-indent": "^6.2.0",
     "@milkdown/plugin-listener": "^6.2.0",

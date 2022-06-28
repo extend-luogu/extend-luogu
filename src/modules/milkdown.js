@@ -7,6 +7,7 @@ import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { math } from "@milkdown/plugin-math";
 import { menu } from "@milkdown/plugin-menu";
 import { indent, indentPlugin } from "@milkdown/plugin-indent";
+import { emoji } from "@milkdown/plugin-emoji";
 import uindow, { $ } from "../utils.js";
 import mod from "../core.js";
 
@@ -47,6 +48,7 @@ mod.reg_v2({
                         size: 2,
                     }),
                 )
+                .use(emoji)
                 .use(menu)
                 .use(nord)
                 .use(commonmark)
