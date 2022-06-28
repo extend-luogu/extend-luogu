@@ -48,7 +48,11 @@
   },
   "dependencies": {
     "@milkdown/core": "^6.2.0",
+    "@milkdown/plugin-clipboard": "^6.2.0",
+    "@milkdown/plugin-history": "^6.2.0",
     "@milkdown/plugin-listener": "^6.2.0",
+    "@milkdown/plugin-math": "^6.2.0",
+    "@milkdown/plugin-upload": "^6.2.0",
     "@milkdown/preset-commonmark": "^6.2.0",
     "@milkdown/prose": "^6.2.0",
     "@milkdown/theme-nord": "^6.2.0",

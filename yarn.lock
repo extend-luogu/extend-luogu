@@ -217,10 +217,45 @@
   dependencies:
     tslib "^2.3.1"
 
+"@milkdown/plugin-clipboard@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-clipboard/-/plugin-clipboard-6.2.0.tgz#8c50429bac36148a270dd56bec97cac3629cb5f1"
+  integrity sha512-VXOna4Pkjy0rEzo2MAbXJGuv2lH5spC6dwny4Zx8Z4K6IpybKy8IzCMj1Pb0lGDANa5S9j8ZlkZncrYN6Cqk9g==
+  dependencies:
+    "@milkdown/utils" "6.2.0"
+    tslib "^2.3.1"
+
+"@milkdown/plugin-history@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-history/-/plugin-history-6.2.0.tgz#16a89ad8bfb5fe26c277be953fa2fcc3ef3dcd02"
+  integrity sha512-GzmrolnqceE5w6GBnxV6KU3vfJspujHxHNqEiWiANuGEfjaAN+fpWYK6/ethX8rijYBKhrsgxS303fIoG1S+hA==
+  dependencies:
+    "@milkdown/utils" "6.2.0"
+    tslib "^2.3.1"
+
 "@milkdown/plugin-listener@^6.2.0":
   version "6.2.0"
   resolved "https://registry.npmmirror.com/@milkdown/plugin-listener/-/plugin-listener-6.2.0.tgz#b7079be478dfccd4e8e75f116f340c6dc94fc30c"
   integrity sha512-Yd9EvN7aLm4mNsg/026vqyPwh6UkGcYJUh7Hb9xiwzn7isg+IbY3yS7tTlK0rfQ1tlX//et4F5/sRYjiSTK6+A==
+  dependencies:
+    "@milkdown/utils" "6.2.0"
+    tslib "^2.3.1"
+
+"@milkdown/plugin-math@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-math/-/plugin-math-6.2.0.tgz#25f9c4e6bef0364aee8ca98aa531fdf881d5a856"
+  integrity sha512-PYQl7PFjZeb6Nskco2nwi/gnE+J/fhf84t2zXks3YjyfI2hmVJT/zYPTS5kByvxrJN070rA1OrioGu5EJ5Kajw==
+  dependencies:
+    "@milkdown/utils" "6.2.0"
+    "@types/katex" "^0.14.0"
+    katex "^0.16.0"
+    remark-math "^5.1.0"
+    tslib "^2.3.1"
+
+"@milkdown/plugin-upload@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-upload/-/plugin-upload-6.2.0.tgz#d871a41091bba818f261258f847891c0af53b46f"
+  integrity sha512-8yiEu7y45Ee2BQLX0VM06/KMgke6jnPsw7Yroy0sPS2OISD6nFkmoiP7dF3vNjPjVzd4GDiwenytX13g2YBrOA==
   dependencies:
     "@milkdown/utils" "6.2.0"
     tslib "^2.3.1"
@@ -334,6 +369,16 @@
   version "0.0.29"
   resolved "https://registry.npmmirror.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
+
+"@types/katex@^0.11.0":
+  version "0.11.1"
+  resolved "https://registry.npmmirror.com/@types/katex/-/katex-0.11.1.tgz#34de04477dcf79e2ef6c8d23b41a3d81f9ebeaf5"
+  integrity sha512-DUlIj2nk0YnJdlWgsFuVKcX27MLW0KbKmGVoUHmFr+74FYYNUDAaj9ZqTADvsbE8rfxuVmSFc7KczYn5Y09ozg==
+
+"@types/katex@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.npmmirror.com/@types/katex/-/katex-0.14.0.tgz#b84c0afc3218069a5ad64fe2a95321881021b5fe"
+  integrity sha512-+2FW2CcT0K3P+JMR8YG846bmDwplKUTsWgT2ENwdQ1UdVfRk3GQrh6Mi4sTopy30gI8Uau5CEqHTDZ6YvWIUPA==
 
 "@types/linkify-it@*":
   version "3.0.2"
@@ -1187,6 +1232,11 @@ commander@^2.20.3:
   version "2.20.3"
   resolved "https://registry.npmmirror.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
+
+commander@^8.0.0:
+  version "8.3.0"
+  resolved "https://registry.npmmirror.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
+  integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
 commander@^9.3.0:
   version "9.3.0"
@@ -2472,6 +2522,20 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
+katex@^0.13.0:
+  version "0.13.24"
+  resolved "https://registry.npmmirror.com/katex/-/katex-0.13.24.tgz#fe55455eb455698cb24b911a353d16a3c855d905"
+  integrity sha512-jZxYuKCma3VS5UuxOx/rFV1QyGSl3Uy/i0kTJF3HgQ5xMinCQVF8Zd4bMY/9aI9b9A2pjIBOsjSSm68ykTAr8w==
+  dependencies:
+    commander "^8.0.0"
+
+katex@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.npmmirror.com/katex/-/katex-0.16.0.tgz#4faff4c905aad0c6010e85901c4d9140efb80a5e"
+  integrity sha512-wPRB4iUPysfH97wTgG5/tRLYxmKVq6Q4jRAWRVOUxXB1dsiv4cvcNjqabHkrOvJHM1Bpk3WrgmllSO1vIvP24w==
+  dependencies:
+    commander "^8.0.0"
+
 kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.npmmirror.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
@@ -2727,7 +2791,16 @@ mdast-util-from-markdown@^1.0.0:
     unist-util-stringify-position "^3.0.0"
     uvu "^0.5.0"
 
-mdast-util-to-markdown@^1.0.0:
+mdast-util-math@^2.0.0:
+  version "2.0.1"
+  resolved "https://registry.npmmirror.com/mdast-util-math/-/mdast-util-math-2.0.1.tgz#141b8e7e43731d2a7423c5eb8c0335c05d257ad2"
+  integrity sha512-ZZtjyRwobsiVg4bY0Q5CzAZztpbjRIA7ZlMMb0PNkwTXOnJTUoHvzBhVG95LIuek5Mlj1l2P+jBvWviqW7G+0A==
+  dependencies:
+    "@types/mdast" "^3.0.0"
+    longest-streak "^3.0.0"
+    mdast-util-to-markdown "^1.3.0"
+
+mdast-util-to-markdown@^1.0.0, mdast-util-to-markdown@^1.3.0:
   version "1.3.0"
   resolved "https://registry.npmmirror.com/mdast-util-to-markdown/-/mdast-util-to-markdown-1.3.0.tgz#38b6cdc8dc417de642a469c4fc2abdf8c931bd1e"
   integrity sha512-6tUSs4r+KK4JGTTiQ7FfHmVOaDrLQJPmpjD6wPMlHGUVXoG9Vjc3jIeP+uyBWRf8clwB2blM+W7+KrlMYQnftA==
@@ -2785,6 +2858,19 @@ micromark-core-commonmark@^1.0.1:
     micromark-util-subtokenize "^1.0.0"
     micromark-util-symbol "^1.0.0"
     micromark-util-types "^1.0.1"
+    uvu "^0.5.0"
+
+micromark-extension-math@^2.0.0:
+  version "2.0.2"
+  resolved "https://registry.npmmirror.com/micromark-extension-math/-/micromark-extension-math-2.0.2.tgz#bb7d28b907b17f1813dd3d0df2a6df6bb1a4d0e1"
+  integrity sha512-cFv2B/E4pFPBBFuGgLHkkNiFAIQv08iDgPH2HCuR2z3AUgMLecES5Cq7AVtwOtZeRrbA80QgMUk8VVW0Z+D2FA==
+  dependencies:
+    "@types/katex" "^0.11.0"
+    katex "^0.13.0"
+    micromark-factory-space "^1.0.0"
+    micromark-util-character "^1.0.0"
+    micromark-util-symbol "^1.0.0"
+    micromark-util-types "^1.0.0"
     uvu "^0.5.0"
 
 micromark-factory-destination@^1.0.0:
@@ -3459,6 +3545,16 @@ remark-inline-links@^6.0.0:
     mdast-util-definitions "^5.0.0"
     unified "^10.0.0"
     unist-util-visit "^4.0.0"
+
+remark-math@^5.1.0:
+  version "5.1.1"
+  resolved "https://registry.npmmirror.com/remark-math/-/remark-math-5.1.1.tgz#459e798d978d4ca032e745af0bac81ddcdf94964"
+  integrity sha512-cE5T2R/xLVtfFI4cCePtiRn+e6jKMtFDR3P8V3qpv8wpKjwvHoBA4eJzvX+nVrnlNy0911bdGmuspCSwetfYHw==
+  dependencies:
+    "@types/mdast" "^3.0.0"
+    mdast-util-math "^2.0.0"
+    micromark-extension-math "^2.0.0"
+    unified "^10.0.0"
 
 remark-parse@^10.0.0:
   version "10.0.1"
