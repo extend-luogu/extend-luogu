@@ -132,7 +132,7 @@ const mod = {
             // Note: 这东西被枪毙的时间不远了
             hook: ({ name, path }, _, fn, hook) => qpusher(name, path, "preload", (arg) => {
                 document.querySelector("body").addEventListener("DOMNodeInserted", (e) => {
-                    if (!e.target.tagName) { return false; }
+                    if (!e.target?.tagName) { return false; }
                     const res = hook(e);
                     return res.result && fn({ ...arg, ...res });
                 });
@@ -412,7 +412,7 @@ const mod = {
         (arg) => {
             func({ ...arg, ...{ result: false, args: darg() } });
             $("body").bind("DOMNodeInserted", (e) => {
-                if (!e.target.tagName) return false;
+                if (!e.target?.tagName) return false;
                 const res = hook(e);
                 return res.result && func({ ...arg, ...res });
             });
