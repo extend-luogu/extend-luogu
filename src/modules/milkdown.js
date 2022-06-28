@@ -11,6 +11,8 @@ import { emoji } from "@milkdown/plugin-emoji";
 import uindow, { $ } from "../utils.js";
 import mod from "../core.js";
 
+let cssAdded = false;
+
 mod.reg_v2({
     name: "milkdown",
     info: "Milkdown",
@@ -22,6 +24,15 @@ mod.reg_v2({
         info: "替换 markdown 编辑器",
     }, null, ({ result, target }) => {
         if (!result) return;
+
+        if (!cssAdded) {
+            cssAdded = true;
+            [
+                "roboto",
+                "material_icons",
+                "material_icons_outlined"
+            ].forEach((r) => { GM_addStyle(GM_getResourceText(r)) });
+        }
 
         target.each((_, e, $e = $(e), $p = $e.parent()) => {
             $e
