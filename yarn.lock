@@ -324,6 +324,13 @@
   dependencies:
     tslib "^2.3.1"
 
+"@milkdown/theme-tokyo@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/theme-tokyo/-/theme-tokyo-6.2.0.tgz#9431e8d69b0f78ffb71c475cc6237b8d20c771dd"
+  integrity sha512-zVJljNOGDxQc3aaiqdgsni1Dt2Hq+IQiDV4zCkP3AFaboIp5L6DoZLFHzrENTKUFRRP+0xtkOh2ioX9SFpFrxQ==
+  dependencies:
+    "@milkdown/theme-pack-helper" "6.2.0"
+
 "@milkdown/transformer@6.2.0":
   version "6.2.0"
   resolved "https://registry.npmmirror.com/@milkdown/transformer/-/transformer-6.2.0.tgz#d3f715f5d91002106fe98a13ea3a27c7eef1a131"
@@ -336,7 +343,7 @@
     tslib "^2.3.1"
     unified "^10.1.0"
 
-"@milkdown/utils@6.2.0":
+"@milkdown/utils@6.2.0", "@milkdown/utils@^6.2.0":
   version "6.2.0"
   resolved "https://registry.npmmirror.com/@milkdown/utils/-/utils-6.2.0.tgz#c940f27cf15511bf8e02fe571d68232756b268a0"
   integrity sha512-3xT/v3PfDhQ7s01dG6EKnveuZkklPL23GEY+mgo757EZ17OarjDIXF58c0HtNjG1t4D9nR74QJClVJVLR2afMA==

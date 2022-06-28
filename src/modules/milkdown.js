@@ -8,6 +8,8 @@ import { math } from "@milkdown/plugin-math";
 import { menu } from "@milkdown/plugin-menu";
 import { indent, indentPlugin } from "@milkdown/plugin-indent";
 import { emoji } from "@milkdown/plugin-emoji";
+import { switchTheme } from "@milkdown/utils";
+import { tokyo } from "@milkdown/theme-tokyo";
 import uindow, { $ } from "../utils.js";
 import mod from "../core.js";
 
@@ -18,11 +20,17 @@ mod.reg_v2({
     info: "Milkdown",
     path: ["@/.*"],
     cate: "module",
-}, {}, (handler) => {
+}, {
+    milkdown_theme: {
+        ty: "enum", dft: "nord", vals: ["nord", "tokyo"], info: [
+            "Milkdown theme", "主题",
+        ], migration: true,
+    },
+}, (handler) => {
     handler.hook({
         name: "markdown-replace",
         info: "替换 markdown 编辑器",
-    }, null, ({ result, target }) => {
+    }, null, ({ result, target, gsto }) => {
         if (!result) return;
 
         if (!cssAdded) {
@@ -30,8 +38,8 @@ mod.reg_v2({
             [
                 "roboto",
                 "material_icons",
-                "material_icons_outlined"
-            ].forEach((r) => { GM_addStyle(GM_getResourceText(r)) });
+                "material_icons_outlined",
+            ].forEach((r) => { GM_addStyle(GM_getResourceText(r)); });
         }
 
         target.each((_, e, $e = $(e), $p = $e.parent()) => {
@@ -43,7 +51,7 @@ mod.reg_v2({
             $(`<div data-v-6d5597b1 class="exlg-milkdown mp-editor-container"></div>`)
                 .appendTo($p);
 
-            Editor
+            const editor = Editor
                 .make()
                 .config((ctx) => {
                     ctx.set(rootCtx, document.querySelector(".exlg-milkdown"));
@@ -68,6 +76,11 @@ mod.reg_v2({
                 .use(math)
                 .use(listener)
                 .create();
+
+            const selectedTheme = gsto.milkdown_theme;
+            if (selectedTheme === "nord") editor.action(switchTheme(nord));
+            else
+            if (selectedTheme === "tokyo") editor.action(switchTheme(tokyo));
         });
     }, () => {
         const $tmp = $(".mp-editor-container[data-v-6d5597b1][data-v-aa62436e]");

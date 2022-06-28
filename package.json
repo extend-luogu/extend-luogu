@@ -58,6 +58,8 @@
     "@milkdown/preset-commonmark": "^6.2.0",
     "@milkdown/prose": "^6.2.0",
     "@milkdown/theme-nord": "^6.2.0",
+    "@milkdown/theme-tokyo": "^6.2.0",
+    "@milkdown/utils": "^6.2.0",
     "katex": "^0.16.0",
     "marked": "^4.0.15",
     "proxy-dat": "^2.0.4",
