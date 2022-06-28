@@ -233,6 +233,14 @@
     "@milkdown/utils" "6.2.0"
     tslib "^2.3.1"
 
+"@milkdown/plugin-indent@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-indent/-/plugin-indent-6.2.0.tgz#27c85813b3d38260fde34641057200f0216ad185"
+  integrity sha512-rWKUvb5UO60VMj4cvpezoPkBD+VlOG4xzzMotnRBM0EkXtLbmfNU9fZ7tVB9JXT6Cp/urrFAcNir5TP++i5uPw==
+  dependencies:
+    "@milkdown/utils" "6.2.0"
+    tslib "^2.3.1"
+
 "@milkdown/plugin-listener@^6.2.0":
   version "6.2.0"
   resolved "https://registry.npmmirror.com/@milkdown/plugin-listener/-/plugin-listener-6.2.0.tgz#b7079be478dfccd4e8e75f116f340c6dc94fc30c"
@@ -252,10 +260,10 @@
     remark-math "^5.1.0"
     tslib "^2.3.1"
 
-"@milkdown/plugin-upload@^6.2.0":
+"@milkdown/plugin-menu@^6.2.0":
   version "6.2.0"
-  resolved "https://registry.npmmirror.com/@milkdown/plugin-upload/-/plugin-upload-6.2.0.tgz#d871a41091bba818f261258f847891c0af53b46f"
-  integrity sha512-8yiEu7y45Ee2BQLX0VM06/KMgke6jnPsw7Yroy0sPS2OISD6nFkmoiP7dF3vNjPjVzd4GDiwenytX13g2YBrOA==
+  resolved "https://registry.npmmirror.com/@milkdown/plugin-menu/-/plugin-menu-6.2.0.tgz#1f47f0f811115a11802584ce04c8dcfa1f03f99f"
+  integrity sha512-0yoHHTcWzHUg8hacQNwcNtvijWcMbYz41Ujnyts4XoGYylPByHxbIitDplYiI+RMI47Qg0FUqGLnkdydqP6OuQ==
   dependencies:
     "@milkdown/utils" "6.2.0"
     tslib "^2.3.1"

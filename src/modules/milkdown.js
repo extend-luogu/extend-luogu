@@ -5,6 +5,8 @@ import { history } from "@milkdown/plugin-history";
 import { clipboard } from "@milkdown/plugin-clipboard";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { math } from "@milkdown/plugin-math";
+import { menu } from "@milkdown/plugin-menu";
+import { indent, indentPlugin } from "@milkdown/plugin-indent";
 import uindow, { $ } from "../utils.js";
 import mod from "../core.js";
 
@@ -39,6 +41,13 @@ mod.reg_v2({
                         uindow.markdownPalettes.content = markdown;
                     });
                 })
+                .use(
+                    indent.configure(indentPlugin, {
+                        type: "space", // Note: available values: 'tab', 'space',
+                        size: 2,
+                    }),
+                )
+                .use(menu)
                 .use(nord)
                 .use(commonmark)
                 .use(history)
