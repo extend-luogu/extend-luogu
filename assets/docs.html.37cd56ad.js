@@ -1,0 +1,1 @@
+const t=JSON.parse('{"key":"v-2fd1a0a5","path":"/docs.html","title":"\u6587\u6863\u7D22\u5F15","lang":"zh-CN","frontmatter":{"title":"\u6587\u6863\u7D22\u5F15"},"excerpt":"","headers":[],"git":{"updatedTime":1656463011000,"contributors":[{"name":"Qin Yuzhen","email":"1@jin-dan.site","commits":1}]},"filePathRelative":"docs.md"}');export{t as data};
