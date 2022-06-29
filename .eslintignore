@@ -1,0 +1,7 @@
+node_modules/
+.yarn/
+coverage/
+dist/
+!.*rc.js
+!.*rc.mjs
+!.*rc.cjs
