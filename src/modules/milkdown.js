@@ -21,6 +21,11 @@ mod.reg_v2({
     path: ["@/.*"],
     cate: "module",
 }, {
+    milkdown_enable: {
+        ty: "boolean", dft: false, info: [
+            "Enable", "启用",
+        ], migration: true,
+    },
     milkdown_theme: {
         ty: "enum", dft: "nord", vals: ["nord", "tokyo"], info: [
             "Milkdown theme", "主题",
@@ -28,7 +33,7 @@ mod.reg_v2({
     },
     milkdown_preset: {
         ty: "enum", dft: "commonmark", vals: ["commonmark", "gfm"], info: [
-            "preset", "预设",
+            "Milkdown preset", "预设",
         ], migration: true,
     },
 }, (handler) => {
@@ -36,7 +41,7 @@ mod.reg_v2({
         name: "markdown-replace",
         info: "替换 markdown 编辑器",
     }, null, ({ result, target, gsto }) => {
-        if (!result) return;
+        if (!result || !gsto.milkdown_enable) return;
 
         if (!cssAdded) {
             cssAdded = true;
