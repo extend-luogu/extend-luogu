@@ -47,6 +47,21 @@
     "prettier": "^2.6.2"
   },
   "dependencies": {
+    "@milkdown/core": "^6.2.0",
+    "@milkdown/plugin-clipboard": "^6.2.0",
+    "@milkdown/plugin-emoji": "^6.2.0",
+    "@milkdown/plugin-history": "^6.2.0",
+    "@milkdown/plugin-indent": "^6.2.0",
+    "@milkdown/plugin-listener": "^6.2.0",
+    "@milkdown/plugin-math": "^6.2.0",
+    "@milkdown/plugin-menu": "^6.2.0",
+    "@milkdown/preset-commonmark": "^6.2.0",
+    "@milkdown/preset-gfm": "^6.2.0",
+    "@milkdown/prose": "^6.2.0",
+    "@milkdown/theme-nord": "^6.2.0",
+    "@milkdown/theme-tokyo": "^6.2.0",
+    "@milkdown/utils": "^6.2.0",
+    "katex": "^0.16.0",
     "marked": "^4.0.15",
     "proxy-dat": "^2.0.4",
     "xss": "^1.0.11"

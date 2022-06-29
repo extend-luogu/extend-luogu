@@ -36,6 +36,9 @@
 // @resource       colorpicker_old https://www.jq22.com/demo/xncolorpicker-main202101270059/dist/xncolorpicker.min.js
 // @resource       pickr_resource https://unpkg.com/@simonwep/pickr@1.8.2/dist/pickr.min.js
 // @resource       pickr_resource_css https://unpkg.com/@simonwep/pickr@1.8.2/dist/themes/nano.min.css
+// @resource       roboto https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap
+// @resource       material_icons https://fonts.googleapis.com/icon?family=Material+Icons
+// @resource       material_icons_outlined https://fonts.googleapis.com/icon?family=Material+Icons+Outlined
 //
 // @grant          GM_addStyle
 // @grant          GM_getValue
