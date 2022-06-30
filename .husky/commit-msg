@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn exec commitlint --edit $1
+yarn exec commitlint -- --edit "$1"
