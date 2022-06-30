@@ -38,6 +38,7 @@ module.exports = {
                 'no-multi-assign': 'off',
                 'no-param-reassign': 'off',
                 'guard-for-in': 'off',
+                'no-return-assign': 'off',
                 '@typescript-eslint/naming-convention': 'off',
                 '@typescript-eslint/no-use-before-define': 'off'
             }

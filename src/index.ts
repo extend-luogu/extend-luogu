@@ -1,8 +1,7 @@
-import * as utils from './utils'
+import utils, { Utils } from './utils'
 import type { Schema, Schemas } from './storage'
-import type { Module, Modules } from './core'
+import { Module, Modules, launch } from './core'
 
-export type Utils = typeof utils
 export interface Exlg {
     utils: Utils
     modules: Modules
@@ -21,3 +20,5 @@ unsafeWindow.exlg = {
     modules: {},
     schemas: {}
 }
+
+launch()

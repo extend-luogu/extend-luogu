@@ -35,8 +35,9 @@ export const exlgLog = (subject: string): Record<string, LoggerFunction> =>
             (fmtString: string, ...params: unknown[]) =>
                 // eslint-disable-next-line no-console
                 console[level](
-                    `%s[exlg: ${subject}] ${fmtString}`,
+                    `%c[exlg: ${subject}]%c ${fmtString}`,
                     'color: #0e90d2;',
+                    '',
                     ...params
                 )
         ])

@@ -37,37 +37,37 @@ const storage = (
         },
         get: (key: string): any => {
             checkPrivate(key)
-            const data = GM_getValue(namespace) as any
+            const data = (GM_getValue(namespace) ?? {}) as any
             return data[key]
         },
         getAll: (): Record<string, any> => {
-            const data = GM_getValue(namespace) as any
+            const data = (GM_getValue(namespace) ?? {}) as any
             if (!direct) {
                 for (const key in data) if (key[0] === '_') delete data[key]
             }
-            return data
+            return data ?? {}
         },
         set: (key: string, value: any) => {
             checkPrivate(key)
-            const data = GM_getValue(namespace) as any
+            const data = (GM_getValue(namespace) ?? {}) as any
             data[key] = value
             GM_setValue(namespace, data)
         },
         inc: (key: string) => {
             checkPrivate(key)
-            const data = GM_getValue(namespace) as any
+            const data = (GM_getValue(namespace) ?? {}) as any
             data[key]++
             GM_setValue(namespace, data)
         },
         push: (key: string, ...values: any[]) => {
             checkPrivate(key)
-            const data = GM_getValue(namespace) as any
+            const data = (GM_getValue(namespace) ?? {}) as any
             data[key].push(...values)
             GM_setValue(namespace, data)
         },
         do: (key: string, fn: (value: any) => any) => {
             checkPrivate(key)
-            const data = GM_getValue(namespace) as any
+            const data = (GM_getValue(namespace) ?? {}) as any
             data[key] = fn(data[key])
             GM_setValue(namespace, data)
         }

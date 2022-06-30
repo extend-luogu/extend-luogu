@@ -1,6 +1,6 @@
-import { Utils } from '.'
+import { Utils } from './utils'
 import { defineStorage, Schema, Storage } from './storage'
-import { evalScript, LoggerFunction, exlgLog } from './utils'
+import { evalScript, LoggerFunction, exlgLog } from './utils/utils'
 
 export interface ModuleMetadata {
     name: string
@@ -17,6 +17,7 @@ export interface ModuleExports {
 }
 
 export type ModuleWrapper = (
+    exports: (e: ModuleExports) => void,
     module: ModuleRuntime,
     util: Utils,
     log: LoggerFunction,
@@ -26,7 +27,7 @@ export type ModuleWrapper = (
 ) => ModuleExports
 
 export interface ModuleRuntime {
-    export?: (exports: ModuleWrapper) => void
+    setWrapper?: (exports: ModuleWrapper) => void
     executeState?: Promise<void> | undefined
     storage?: Storage
 }
@@ -40,11 +41,11 @@ export interface Module {
 }
 export type Modules = Record<string, Module>
 
-const storage = defineStorage('modules', {})
+let storage: Storage
 
 const wrapModule = (module: Module) => `
-exlg.modules['${module.id}'].exports(new Function(
-    'self',
+exlg.modules['${module.id}'].runtime.setWrapper(new Function(
+    'exports', 'self',
     'utils',
     'log', 'info', 'warn', 'error',
     ${JSON.stringify(module.script)}
@@ -54,6 +55,7 @@ exlg.modules['${module.id}'].exports(new Function(
 export const installModule = (metadata: ModuleMetadata, script: string) => {
     const module: Module = {
         id: `${metadata.source}:${metadata.name}`,
+        active: true,
         metadata,
         script,
         runtime: {}
@@ -66,15 +68,21 @@ export const checkWhetherToRunModule = (exports: ModuleExports) => {
     return false
 }
 
-export const executeModule = (module: Module, force = false) => {
-    evalScript(wrapModule(module))
-    new Promise((res: (wrapper: ModuleWrapper) => void) => {
-        module.runtime.export = res
-    }).then((wrapper: ModuleWrapper) => {
-        const { log, info, warn, error } = exlgLog(
-            `${module.id}@${module.metadata.version}`
-        )
-        const exports = wrapper(
+export const executeModule = async (module: Module, force = false) => {
+    const wrapper = await new Promise<ModuleWrapper>((res) => {
+        module.runtime.setWrapper = (r) => {
+            delete module.runtime.setWrapper
+            res(r)
+        }
+        evalScript(wrapModule(module))
+    })
+    const { log, info, warn, error } = exlgLog(
+        `${module.id}@${module.metadata.version}`
+    )
+    let exports: ModuleExports | null = null
+    try {
+        wrapper(
+            (e) => (exports = e),
             module.runtime,
             unsafeWindow.exlg.utils,
             log,
@@ -82,18 +90,55 @@ export const executeModule = (module: Module, force = false) => {
             warn,
             error
         )
-        module.runtime.storage = defineStorage(module.id, exports.schema)
-        if (force || checkWhetherToRunModule(exports)) {
-            module.runtime.executeState = Promise.resolve(exports.entry())
+    } catch (err) {
+        error('Failed to unwrap: %o', err)
+        return
+    }
+
+    exports = exports as ModuleExports | null
+    if (!exports) {
+        error('Exports not found.')
+        return
+    }
+
+    module.runtime.storage = defineStorage(module.id, exports.schema)
+    if (force || checkWhetherToRunModule(exports)) {
+        log('Executing...')
+        try {
+            await exports.entry()
+        } catch (err) {
+            error('Failed to execute: %o', err)
         }
-    })
+    }
 }
 
+const logger = exlgLog('core')
+
 export const launch = async () => {
+    logger.log('Launching...')
+
+    storage = defineStorage('modules', {})
     const modules: Modules = (unsafeWindow.exlg.modules = storage.getAll())
+    logger.log('Loaded `modules` storage.')
+
+    const executeStates = []
 
     for (const module of Object.values(modules)) {
         Object.freeze(module)
-        if (module.active) executeModule(module)
+        if (module.active)
+            executeStates.push(
+                (module.runtime.executeState = executeModule(module))
+            )
     }
+
+    await Promise.all(executeStates)
+    logger.log('Launched.')
 }
+
+// Debug
+Object.assign(unsafeWindow, {
+    installModule,
+    executeModule,
+    checkWhetherToRunModule,
+    wrapModule
+})
