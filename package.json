@@ -10,8 +10,8 @@
     "private": true,
     "scripts": {
         "build": "node scripts/build.cjs",
-        "lint": "eslint --ext js,mjs,cjs,jsx,ts,mts,cts,tsx .",
-        "lint:fix": "eslint --ext js,mjs,cjs,jsx,ts,mts,cts,tsx --fix .",
+        "lint": "eslint --ext js,mjs,cjs,ts,jsx,tsx,html,vue .",
+        "lint:fix": "eslint --ext js,mjs,cjs,ts,jsx,tsx,html,vue --fix .",
         "postinstall": "husky install"
     },
     "devDependencies": {

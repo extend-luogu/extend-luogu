@@ -2,7 +2,6 @@ node_modules/
 .yarn/
 coverage/
 dist/
-scripts/
 !.*rc.js
 !.*rc.mjs
 !.*rc.cjs

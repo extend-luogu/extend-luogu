@@ -44,7 +44,7 @@ module.exports = {
             }
         },
         {
-            files: ['*.config.*', '.*rc.*'],
+            files: ['*.config.*', '.*rc.*', '*.cjs'],
             env: {
                 browser: false,
                 node: true
