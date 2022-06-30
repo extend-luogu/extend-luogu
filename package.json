@@ -1,32 +1,35 @@
 {
-  "name": "extend-luogu",
-  "packageManager": "yarn@3.2.1",
-  "version": "7.0.0",
-  "description": "Make luogu more powerful",
-  "main": "index.js",
-  "repository": "git@github.com:extend-luogu/extend-luogu.git",
-  "author": "optimize-2",
-  "license": "GPL-3.0",
-  "private": true,
-  "scripts": {
-    "lint": "eslint --ext js,mjs,cjs,jsx,ts,mts,cts,tsx .",
-    "lint:fix": "eslint --ext js,mjs,cjs,jsx,ts,mts,cts,tsx --fix .",
-    "postinstall": "husky install"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^17.0.3",
-    "@commitlint/config-conventional": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest",
-    "eslint": "^7.32.0 || ^8.2.0",
-    "eslint-config-airbnb-base": "latest",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-prettier": "^4.1.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "typescript": "^4.7.4"
-  }
+    "name": "extend-luogu",
+    "packageManager": "yarn@3.2.1",
+    "version": "7.0.0",
+    "description": "Make luogu more powerful",
+    "main": "index.js",
+    "repository": "git@github.com:extend-luogu/extend-luogu.git",
+    "author": "optimize-2",
+    "license": "GPL-3.0",
+    "private": true,
+    "scripts": {
+        "lint": "eslint --ext js,mjs,cjs,jsx,ts,mts,cts,tsx .",
+        "lint:fix": "eslint --ext js,mjs,cjs,jsx,ts,mts,cts,tsx --fix .",
+        "postinstall": "husky install"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^17.0.3",
+        "@commitlint/config-conventional": "^17.0.3",
+        "@typescript-eslint/eslint-plugin": "latest",
+        "@typescript-eslint/parser": "latest",
+        "eslint": "^7.32.0 || ^8.2.0",
+        "eslint-config-airbnb-base": "latest",
+        "eslint-config-airbnb-typescript": "^17.0.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-import": "^2.25.2",
+        "eslint-plugin-prettier": "^4.1.0",
+        "husky": "^8.0.0",
+        "lint-staged": "^13.0.3",
+        "prettier": "^2.7.1",
+        "typescript": "^4.7.4"
+    },
+    "dependencies": {
+        "@types/tampermonkey": "^4.0.5"
+    }
 }
