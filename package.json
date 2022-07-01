@@ -36,5 +36,8 @@
     "dependencies": {
         "@types/tampermonkey": "^4.0.5",
         "babel-polyfill": "^6.26.0"
-    }
+    },
+    "workspaces": [
+        "src/dash"
+    ]
 }

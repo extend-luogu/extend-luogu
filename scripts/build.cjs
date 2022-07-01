@@ -2,44 +2,63 @@
 
 const fs = require('node:fs/promises')
 const esbuild = require('esbuild')
-const babel = require('@babel/core')
+const vuePlugin = require('esbuild-plugin-vue3')
 const pkg = require('../package.json')
 
 /* eslint-disable no-console */
 
-const fail = (subject) => (err) => {
-    console.error(`${subject} failed: %o`, err)
+const fail = (err) => {
+    console.error(`Failed %o`, err)
     process.exit(1)
 }
 
 ;(async () => {
+    const startTime = Date.now()
+
+    console.log('Building core...')
     await esbuild
         .build({
-            entryPoints: ['src/index.ts'],
+            entryPoints: ['src/core/index.ts'],
             format: 'iife',
             bundle: true,
-            sourcemap: true,
-            outfile: 'dist/bundle.js'
+            minify: true,
+            outfile: 'dist/core.bundle.js'
         })
-        .catch(fail('Esbuild'))
-    const bundled = await fs.readFile('./dist/bundle.js', 'utf-8')
-    const babelResult = await babel
-        .transformAsync(bundled, {
-            presets: [
-                [
-                    '@babel/preset-env',
-                    {
-                        targets: 'ie 11'
-                    }
-                ]
-            ],
-            plugins: []
+        .catch(fail)
+
+    console.log('Building dash...')
+    await esbuild
+        .build({
+            entryPoints: ['src/dash/src/main.ts'],
+            plugins: [vuePlugin()],
+            format: 'iife',
+            bundle: true,
+            minify: true,
+            outfile: 'dist/dash.bundle.js'
         })
-        .catch(fail('Babel'))
+        .catch(fail)
 
-    const header = await fs.readFile('./src/resources/header.js', 'utf-8')
-    const headed = header.replace('{{version}}', pkg.version) + babelResult.code
-    await fs.writeFile('./dist/bundle.js', headed)
+    console.log('Concating... (header + dash + core)')
+    try {
+        const header = await fs.readFile('./resources/header.js', 'utf-8')
+        const coreJs = await fs.readFile('./dist/core.bundle.js', 'utf-8')
+        const dashJs = await fs.readFile('./dist/dash.bundle.js', 'utf-8')
+        const dashCss = await fs.readFile('./dist/dash.bundle.css', 'utf-8')
 
-    console.log('exlg is built successfully.')
+        const injectResource = (name, str) =>
+            `\n;unsafeWindow.exlgResources.${name} = ${JSON.stringify(str)};\n`
+
+        const concated = `${header.replace(
+            '{{version}}',
+            pkg.version
+        )}\n;unsafeWindow.exlgResources = {};\n${injectResource(
+            'dashJs',
+            dashJs
+        )}${injectResource('dashCss', dashCss)}\n${coreJs}`
+        await fs.writeFile('./dist/core.bundle.js', concated)
+    } catch (err) {
+        fail(err)
+    }
+
+    console.log('Exlg builded in %d ms.', Date.now() - startTime)
 })()
