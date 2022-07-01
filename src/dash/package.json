@@ -3,14 +3,20 @@
     "private": true,
     "version": "0.0.0",
     "scripts": {
-        "check": "vue-tsc --noEmit"
+        "check": "vue-tsc --noEmit",
+        "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
     },
     "dependencies": {
-        "vue": "^3.2.25"
+        "vue": "^3.2.37"
     },
     "devDependencies": {
-        "esbuild-plugin-vue3": "^0.3.0",
-        "typescript": "^4.5.4",
-        "vue-tsc": "^0.34.7"
+        "@rushstack/eslint-patch": "^1.1.4",
+        "@vue/eslint-config-prettier": "^7.0.0",
+        "@vue/eslint-config-typescript": "^11.0.0",
+        "eslint": "^8.18.0",
+        "eslint-plugin-vue": "^9.1.1",
+        "prettier": "^2.7.1",
+        "typescript": "^4.7.4",
+        "vue-tsc": "^0.34.17"
     }
 }
