@@ -44,7 +44,7 @@ exports = async () => {
         injectResource('dashJs', dashJs) +
         injectResource('dashCss', dashCss) +
         coreJs
-    await fs.writeFile('./dist/core.bundle.js', concated)
+    await fs.writeFile('./dist/extend-luogu.min.user.js', concated)
 
     console.log('Built exlg in %d ms.', Date.now() - startTime)
 }
