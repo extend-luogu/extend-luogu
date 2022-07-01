@@ -8,8 +8,12 @@ declare global {
     const _feInjection: object
 }
 
-export const evalScript = (script: string) => {
-    GM_addElement('script', { textContent: script })
+export const loadJs = (js: string) => {
+    GM_addElement('script', { textContent: js })
+}
+
+export const loadCss = (css: string) => {
+    GM_addElement('style', { textContent: css })
 }
 
 export function chain<T>(res: Promise<T>): Promise<T> {

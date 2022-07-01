@@ -1,6 +1,6 @@
 import { Utils } from './utils'
 import { defineStorage, Schema, Storage } from './storage'
-import { evalScript, LoggerFunction, exlgLog } from './utils/utils'
+import { loadJs, LoggerFunction, exlgLog, loadCss } from './utils/utils'
 
 export interface ModuleMetadata {
     name: string
@@ -74,10 +74,10 @@ export const executeModule = async (module: Module, force = false) => {
             delete module.runtime.setWrapper
             res(r)
         }
-        evalScript(wrapModule(module))
+        loadJs(wrapModule(module))
     })
     const { log, info, warn, error } = exlgLog(
-        `${module.id}@${module.metadata.version}`
+        `module/${module.id}@${module.metadata.version}`
     )
     let exports: ModuleExports | null = null
     try {
@@ -115,7 +115,7 @@ export const executeModule = async (module: Module, force = false) => {
 const logger = exlgLog('core')
 
 export const launch = async () => {
-    logger.log('Launching...')
+    logger.log('Launching... (Exlg exposed to window.exlg)')
 
     storage = defineStorage('modules', {})
     const modules: Modules = (unsafeWindow.exlg.modules = storage.getAll())
@@ -133,6 +133,13 @@ export const launch = async () => {
 
     await Promise.all(executeStates)
     logger.log('Launched.')
+
+    const dashRoot = unsafeWindow.document.createElement('div')
+    dashRoot.id = 'exlg-dash'
+    unsafeWindow.document.body.appendChild(dashRoot)
+    loadCss(unsafeWindow.exlgResources.dashCss)
+    loadJs(unsafeWindow.exlgResources.dashJs)
+    logger.log('Loaded dash. (Vue 3 exposed to window.exlgVue)')
 }
 
 // Debug
