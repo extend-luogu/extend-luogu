@@ -6,9 +6,17 @@ import App from './App.vue'
 declare global {
     interface Window {
         exlg: Exlg
-        exlgVue: typeof Vue
+        exlgDash: {
+            Vue: typeof Vue
+        }
     }
 }
 
-window.exlgVue = Vue
+window.exlgDash = {
+    Vue
+}
+
+export const logger = window.exlg.utils.exlgLog('dash')
+
 createApp(App).mount('#exlg-dash')
+logger.log('Mounted to #exlg-dash...')

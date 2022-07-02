@@ -114,12 +114,37 @@ export const executeModule = async (module: Module, force = false) => {
 
 const logger = exlgLog('core')
 
+export interface ModuleCtl {
+    storage: Storage
+    installModule: typeof installModule
+    checkWhetherToRunModule: typeof checkWhetherToRunModule
+    executeModule: typeof executeModule
+}
+
+const loadDash = () => {
+    unsafeWindow.exlg.moduleCtl = {
+        storage,
+        installModule,
+        checkWhetherToRunModule,
+        executeModule
+    }
+
+    const dashRoot = unsafeWindow.document.createElement('div')
+    dashRoot.id = 'exlg-dash'
+    unsafeWindow.document.body.appendChild(dashRoot)
+    loadCss(unsafeWindow.exlgResources.dashCss)
+    loadJs(unsafeWindow.exlgResources.dashJs)
+    logger.log('Loaded dash. (exposed to window.exlgDash)')
+}
+
 export const launch = async () => {
-    logger.log('Launching... (Exlg exposed to window.exlg)')
+    logger.log('Launching... (exposed to window.exlg)')
 
     storage = defineStorage('modules', {})
     const modules: Modules = (unsafeWindow.exlg.modules = storage.getAll())
     logger.log('Loaded `modules` storage.')
+
+    loadDash()
 
     const executeStates = []
 
@@ -133,19 +158,4 @@ export const launch = async () => {
 
     await Promise.all(executeStates)
     logger.log('Launched.')
-
-    const dashRoot = unsafeWindow.document.createElement('div')
-    dashRoot.id = 'exlg-dash'
-    unsafeWindow.document.body.appendChild(dashRoot)
-    loadCss(unsafeWindow.exlgResources.dashCss)
-    loadJs(unsafeWindow.exlgResources.dashJs)
-    logger.log('Loaded dash. (Vue 3 exposed to window.exlgVue)')
 }
-
-// Debug
-Object.assign(unsafeWindow, {
-    installModule,
-    executeModule,
-    checkWhetherToRunModule,
-    wrapModule
-})

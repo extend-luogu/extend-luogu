@@ -30,9 +30,11 @@ export function chain<T>(res: Promise<T>): Promise<T> {
     })
 }
 
+export type LoggerNames = 'log' | 'info' | 'warn' | 'error'
 export type LoggerFunction = (fmtString: string, ...params: unknown[]) => void
+export type Logger = Record<LoggerNames, LoggerFunction>
 
-export const exlgLog = (subject: string): Record<string, LoggerFunction> =>
+export const exlgLog = (subject: string): Logger =>
     Object.fromEntries(
         (['log', 'info', 'warn', 'error'] as const).map((level) => [
             level,
@@ -45,4 +47,4 @@ export const exlgLog = (subject: string): Record<string, LoggerFunction> =>
                     ...params
                 )
         ])
-    )
+    ) as Logger

@@ -1,10 +1,11 @@
 import utils, { Utils } from './utils'
 import type { Schema, Schemas } from './storage'
-import { Module, Modules, launch } from './module'
+import { Module, Modules, ModuleCtl, launch } from './module'
 
 export interface Exlg {
     utils: Utils
     modules: Modules
+    moduleCtl?: ModuleCtl
     schemas: Schemas
     dash: {
         script?: string
