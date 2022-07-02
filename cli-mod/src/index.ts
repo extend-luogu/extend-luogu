@@ -76,8 +76,8 @@ program
                     version: '1.0.0',
                     main: useScript ? `src/index.${scriptExt}` : undefined,
                     devDependencies: {
-                        'exlg-cli-mod': '^1.0.0',
-                        'exlg-core': scriptExt === 'ts' ? '^1.0.0' : undefined
+                        '@exlg/cli-mod': '^1.0.0',
+                        '@exlg/core': scriptExt === 'ts' ? '^1.0.0' : undefined
                     }
                 },
                 null,
