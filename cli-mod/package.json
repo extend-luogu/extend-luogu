@@ -1,5 +1,5 @@
 {
-    "name": "exlg-cli-mod",
+    "name": "@exlg/cli-mod",
     "version": "1.0.0",
     "description": "",
     "bin": {

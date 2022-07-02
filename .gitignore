@@ -141,3 +141,5 @@ dist
 #!.yarn/cache
 .pnp.*
 pnpm-lock.yaml
+
+cli-mod/bin

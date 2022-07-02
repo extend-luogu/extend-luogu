@@ -1,7 +1,7 @@
 {
-    "name": "dash",
+    "name": "exlg-dash-workspace",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.0",
     "scripts": {
         "check": "vue-tsc --noEmit",
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
