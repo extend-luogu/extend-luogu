@@ -1,15 +1,17 @@
-import { Exlg } from '..'
+import type { Exlg } from '..'
 import type { ModuleExports, ModuleRuntime } from '../module'
-import type { Logger } from '../utils/utils'
+import type { Utils } from '../utils'
+import type { LoggerFunction } from '../utils/utils'
 
 export * from '.'
 
 declare global {
     const define: (e: ModuleExports) => void
     const runtime: ModuleRuntime
-    const log: Logger
-    const info: Logger
-    const warn: Logger
-    const error: Logger
+    const utils: Utils
+    const log: LoggerFunction
+    const info: LoggerFunction
+    const warn: LoggerFunction
+    const error: LoggerFunction
     const exlg: Exlg
 }

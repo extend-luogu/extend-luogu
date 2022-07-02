@@ -17,12 +17,12 @@
     "author": "extend-luogu",
     "license": "ISC",
     "devDependencies": {
+        "@types/inquirer": "^8.2.1",
         "@types/dedent": "^0.7.0",
         "@types/node": "^18.0.0",
         "esbuild": "^0.14.48"
     },
     "dependencies": {
-        "@types/inquirer": "^8.2.1",
         "commander": "^9.3.0",
         "dedent": "^0.7.0",
         "inquirer": "^8.0.0",

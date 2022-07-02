@@ -48,3 +48,47 @@ export const exlgLog = (subject: string): Logger =>
                 )
         ])
     ) as Logger
+
+export type MaybeArray<T> = T | T[]
+
+export const wrapArray = <T>(value: MaybeArray<T>): T[] =>
+    Array.isArray(value) ? value : [value]
+
+export class MatchError extends Error {}
+
+export const match = (paths: MaybeArray<RegExp | string>) =>
+    wrapArray(paths).every((path) => unsafeWindow.location.pathname.match(path))
+
+export const mustMatch = (paths: MaybeArray<RegExp | string>) => {
+    if (!match(paths)) throw new MatchError()
+}
+
+export const csPost = (
+    url: string,
+    data: any,
+    header = {},
+    type = 'application/json'
+): any => {
+    const res = new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            url,
+            method: 'POST',
+            data: typeof data !== 'string' ? JSON.stringify(data) : data,
+            headers: {
+                'Content-Type':
+                    typeof data === 'string' ? type : 'application/json',
+                ...header
+            },
+            onload: (r: any) => {
+                try {
+                    r.data = JSON.parse(r.responseText)
+                } catch (err) {
+                    reject(err)
+                }
+                resolve(r)
+            },
+            onerror: reject
+        })
+    })
+    return chain(res)
+}

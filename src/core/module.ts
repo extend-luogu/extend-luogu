@@ -1,6 +1,12 @@
 import { Utils } from './utils'
 import { defineStorage, Schema, Storage } from './storage'
-import { loadJs, LoggerFunction, exlgLog, loadCss } from './utils/utils'
+import {
+    loadJs,
+    LoggerFunction,
+    exlgLog,
+    loadCss,
+    MatchError
+} from './utils/utils'
 
 export interface ModuleMetadata {
     name: string
@@ -18,8 +24,8 @@ export interface ModuleExports {
 
 export type ModuleWrapper = (
     define: (e: ModuleExports) => void,
-    module: ModuleRuntime,
-    util: Utils,
+    runtime: ModuleRuntime,
+    utils: Utils,
     log: LoggerFunction,
     info: LoggerFunction,
     warn: LoggerFunction,
@@ -63,12 +69,7 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
     storage.set(module.id, module)
 }
 
-export const checkWhetherToRunModule = (exports: ModuleExports) => {
-    if (exports.path.test(unsafeWindow.location.href)) return true
-    return false
-}
-
-export const executeModule = async (module: Module, force = false) => {
+export const executeModule = async (module: Module) => {
     const wrapper = await new Promise<ModuleWrapper>((res) => {
         module.runtime.setWrapper = (r) => {
             delete module.runtime.setWrapper
@@ -102,13 +103,12 @@ export const executeModule = async (module: Module, force = false) => {
     }
 
     module.runtime.storage = defineStorage(module.id, exports.schema)
-    if (force || checkWhetherToRunModule(exports)) {
-        log('Executing...')
-        try {
-            await exports.entry()
-        } catch (err) {
-            error('Failed to execute: %o', err)
-        }
+    log('Executing...')
+    try {
+        await exports.entry()
+    } catch (err) {
+        if (err instanceof MatchError) return
+        error('Failed to execute: %o', err)
     }
 }
 
@@ -117,7 +117,6 @@ const logger = exlgLog('core')
 export interface ModuleCtl {
     storage: Storage
     installModule: typeof installModule
-    checkWhetherToRunModule: typeof checkWhetherToRunModule
     executeModule: typeof executeModule
 }
 
@@ -125,7 +124,6 @@ const loadDash = () => {
     unsafeWindow.exlg.moduleCtl = {
         storage,
         installModule,
-        checkWhetherToRunModule,
         executeModule
     }
 
