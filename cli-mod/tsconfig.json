@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "lib": ["esnext"],
+        "module": "commonjs",
+        "outDir": "./bin/",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "resolveJsonModule": true
+    },
+    "include": ["./src/"],
+    "exclude": ["node_modules"]
+}

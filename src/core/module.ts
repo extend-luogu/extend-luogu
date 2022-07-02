@@ -17,7 +17,7 @@ export interface ModuleExports {
 }
 
 export type ModuleWrapper = (
-    exports: (e: ModuleExports) => void,
+    define: (e: ModuleExports) => void,
     module: ModuleRuntime,
     util: Utils,
     log: LoggerFunction,
@@ -27,7 +27,7 @@ export type ModuleWrapper = (
 ) => ModuleExports
 
 export interface ModuleRuntime {
-    setWrapper?: (exports: ModuleWrapper) => void
+    setWrapper?: (wrapper: ModuleWrapper) => void
     executeState?: Promise<void> | undefined
     storage?: Storage
 }
@@ -45,10 +45,10 @@ let storage: Storage
 
 const wrapModule = (module: Module) => `
 exlg.modules['${module.id}'].runtime.setWrapper(new Function(
-    'exports', 'self',
+    'define', 'runtime',
     'utils',
     'log', 'info', 'warn', 'error',
-    ${JSON.stringify(module.script)}
+    ${JSON.stringify(module.script)}nn
 ))
 `
 

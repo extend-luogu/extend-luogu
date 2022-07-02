@@ -1,5 +1,7 @@
 .yarn/
-pnpm-lock.yaml
-tsconfig.json
 coverage/
 dist/
+bin/
+!.*rc.js
+!.*rc.mjs
+!.*rc.cjs
