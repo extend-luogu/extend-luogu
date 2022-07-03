@@ -25,6 +25,12 @@ export function chain<T>(res: Promise<T>): Promise<T> {
                     return chain(target)
                 }
             }
+            if (prop === 'catch') {
+                return (cb: (r: T) => T | Promise<T>) => {
+                    target.catch(cb)
+                    return chain(target)
+                }
+            }
             return chain(target.then((r) => r[prop as keyof T]))
         }
     })
