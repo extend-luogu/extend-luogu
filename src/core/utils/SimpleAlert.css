@@ -1,0 +1,35 @@
+.simple-alert {
+    position: fixed;
+    z-index: 80000;
+    box-sizing: border-box;
+    top: 20%;
+    left: 30%;
+    width: 40%;
+    padding: 20px;
+    border: 1px solid black;
+    background-color: white;
+    text-align: center;
+}
+
+.simple-alert > .title {
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.simple-alert-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 79999;
+}
+
+.simple-alert > .accept,
+.simple-alert > .cancel {
+    border-radius: 0;
+    border: 1px solid black;
+    background: white;
+    padding: 3px 15px 5px 15px;
+}

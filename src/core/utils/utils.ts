@@ -1,3 +1,5 @@
+import './SimpleAlert.css'
+
 declare global {
     // TamperMonkey
 
@@ -6,6 +8,9 @@ declare global {
     // Luogu
 
     const _feInjection: any
+    const markdownPalettes: {
+        content?: string
+    } | void
 }
 
 export const loadJs = (js: string) => {
@@ -113,4 +118,85 @@ export const csGet = (url: string, headers = {}): any => {
         })
     })
     return chain(res)
+}
+
+export const sleep = (t: number): Promise<void> =>
+    new Promise((res) => {
+        setTimeout(res, t)
+    })
+
+export interface SimpleAlertCallback {
+    (args: {
+        event: MouseEvent
+        $content: HTMLDivElement
+        abort: () => void
+    }): void
+}
+
+export interface SimpleAlertOptions {
+    title?: string
+    noCancel?: boolean
+    onAccept?: SimpleAlertCallback
+    onCancel?: SimpleAlertCallback
+    onOpen?: ($content: HTMLDivElement) => void
+}
+
+export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
+    const $ = (selectors: string) => document.querySelector(selectors)
+
+    let $root = $('.simple-alert') as HTMLDivElement
+    if (!$root) {
+        $root = document.createElement('div')
+        $root.className = 'simple-alert'
+        $root.innerHTML = `
+            <p class='title'></p>
+            <div class='content'></div>
+            <button class='accept'>确定</button>
+            <button class='cancel'>取消</button>
+        `
+        document.body.appendChild($root)
+    } else $root.style.display = 'block'
+
+    let $mask = $('.simple-alert-mask') as HTMLDivElement
+    if (!$mask) {
+        $mask = document.createElement('div')
+        $mask.className = 'simple-alert-mask'
+        document.body.appendChild($mask)
+    } else $mask.style.display = 'block'
+
+    const $content = $root.querySelector('.content') as HTMLDivElement
+    $content.innerHTML = html
+
+    options.onOpen?.($content)
+
+    const $title = $root.querySelector('.title')!
+    $title.innerHTML = options.title ?? 'exlg 提醒您'
+
+    const $accept = $root.querySelector('.accept') as HTMLButtonElement
+    const $cancel = $root.querySelector('.cancel') as HTMLButtonElement
+
+    if (options.noCancel) $cancel.style.display = 'none'
+
+    const handleButton = (
+        $el: HTMLButtonElement,
+        listener: 'onAccept' | 'onCancel'
+    ) => {
+        const handler = (event: MouseEvent) => {
+            let aborted = false
+            const abort = () => {
+                aborted = true
+            }
+            options[listener]?.({ event, abort, $content })
+
+            if (!aborted) {
+                $el.removeEventListener('click', handler)
+                $root.style.display = 'none'
+                $mask.style.display = 'none'
+            }
+        }
+        $el.addEventListener('click', handler)
+    }
+
+    handleButton($accept, 'onAccept')
+    handleButton($cancel, 'onCancel')
 }

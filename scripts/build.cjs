@@ -31,6 +31,7 @@ exports = async () => {
     console.log('Concating... (header + dash + core)')
     const header = await fs.readFile('./resources/header.js', 'utf-8')
     const coreJs = await fs.readFile('./dist/core.bundle.js', 'utf-8')
+    const coreCss = await fs.readFile('./dist/core.bundle.css', 'utf-8')
     const dashJs = await fs.readFile('./dist/dash.bundle.js', 'utf-8')
     const dashCss = await fs.readFile('./dist/dash.bundle.css', 'utf-8')
 
@@ -43,7 +44,8 @@ exports = async () => {
         `\n;unsafeWindow.exlgResources = {};\n` +
         injectResource('dashJs', dashJs) +
         injectResource('dashCss', dashCss) +
-        coreJs
+        coreJs +
+        `\n;GM_addStyle(${JSON.stringify(coreCss)});\n`
     await fs.writeFile('./dist/extend-luogu.min.user.js', concated)
 
     console.log('Built exlg in %d ms.', Date.now() - startTime)
