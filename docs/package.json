@@ -1,0 +1,28 @@
+{
+    "name": "docs",
+    "version": "0.0.0",
+    "description": "Docs of Extend Luogu",
+    "scripts": {
+        "dev": "vuepress dev",
+        "build": "vuepress build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "CC-BY-SA-4.0",
+    "private": true,
+    "dependencies": {
+        "@vuepress/client": "next",
+        "@vuepress/plugin-search": "next",
+        "@vuepress/theme-default": "next",
+        "esbuild": "^0.14.36",
+        "eslint": "^8.13.0",
+        "eslint-plugin-jsdoc": "^39.2.9",
+        "lint-staged": "^12.4.1",
+        "marked": "^4.0.15",
+        "prettier": "^2.6.2",
+        "vue": "^3.2.33",
+        "vuepress": "next",
+        "xss": "^1.0.11"
+    }
+}

@@ -1,14 +1,12 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "lib": ["dom", "esnext"],
-    "module": "commonjs",
-    "outDir": "./dist/",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true
-  },
-  "include": [
-    "./src/"
-  ]
+    "compilerOptions": {
+        "target": "es6",
+        "lib": ["dom", "esnext"],
+        "module": "commonjs",
+        "outDir": "./dist/",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true
+    },
+    "include": ["./src/"]
 }
