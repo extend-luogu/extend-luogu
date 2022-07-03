@@ -52,12 +52,7 @@ const genToken = async () => {
                         token: sto.get('token')
                     })
                 ).data
-                if (
-                    // Note: Expires in more than 15 minutes
-                    ttl.status !== 401 &&
-                    ttl.data >= 60 * 15
-                )
-                    await genToken()
+                if (ttl.status === 401 || ttl.data <= 60 * 15) await genToken()
             } else await genToken()
         }
         sto.set('lastUpdate', new Date().valueOf())
