@@ -3,7 +3,7 @@ import { provide, reactive, ref } from 'vue'
 import { kModuleCtl } from './utils/injectionSymbols'
 import ModuleCtlView from './components/ModuleCtlView.vue'
 import MarketView from './components/MarketView.vue'
-import { ModuleCtl } from '../../core/module'
+import DevView from './components/DevView.vue'
 
 const { moduleCtl } = window.exlg
 provide(kModuleCtl, moduleCtl)
@@ -20,7 +20,8 @@ const tabs = reactive<
     >
 >({
     module: { display: '模块' },
-    market: { display: '市场' }
+    market: { display: '市场' },
+    dev: { display: '开发选项' }
 })
 
 const show = ref(false)
@@ -60,6 +61,7 @@ function updateModule() {
             v-show="currentTab === 'market'"
             @update-module="updateModule"
         />
+        <DevView v-show="currentTab === 'dev'" />
     </div>
 </template>
 
