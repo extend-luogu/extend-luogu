@@ -17,6 +17,7 @@ export interface Storage {
     set: (key: string, value: any) => void
     inc: (key: string) => void
     push: (key: string, ...values: any[]) => void
+    del: (key: string) => void
     do: (key: string, fn: (value: any) => any) => void
 }
 
@@ -63,6 +64,12 @@ const storage = (
             checkPrivate(key)
             const data = (GM_getValue(namespace) ?? {}) as any
             data[key].push(...values)
+            GM_setValue(namespace, data)
+        },
+        del: (key: string) => {
+            checkPrivate(key)
+            const data = (GM_getValue(namespace) ?? {}) as any
+            delete data[key]
             GM_setValue(namespace, data)
         },
         do: (key: string, fn: (value: any) => any) => {

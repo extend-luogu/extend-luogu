@@ -13,8 +13,7 @@ module.exports = {
         'vue/setup-compiler-macros': true
     },
     rules: {
-        'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        'prettier/prettier': 'error'
+        'prettier/prettier': 'error',
+        '@typescript-eslint/no-non-null-assertion': 'off'
     }
 }

@@ -90,3 +90,21 @@ export const csPost = (
     })
     return chain(res)
 }
+
+export const csGet = (url: string, headers = {}): any => {
+    const res = new Promise((resolve, onerror) => {
+        GM_xmlhttpRequest({
+            url,
+            method: 'GET',
+            headers,
+            onload: (r: any) => {
+                try {
+                    r.data = JSON.parse(r.responseText)
+                } catch (e) {} // eslint-disable-line no-empty
+                resolve(r)
+            },
+            onerror
+        })
+    })
+    return chain(res)
+}

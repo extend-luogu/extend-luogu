@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name           extend-luogu
+// @name           extend-luogu-ng
 // @namespace      http://tampermonkey.net/
 // @description    Make luogu more powerful.
 // @description:zh 使洛谷拥有更多功能
@@ -29,6 +29,8 @@
 // @connect        luogu-captcha-bypass.piterator.com
 // @connect        exlgcs.jin-dan.site
 // @connect        localhost
+// @connect        raw.githubusercontent.com
+// @connect        unpkg.com
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 //
