@@ -61,7 +61,7 @@ const sto = runtime.storage!
     }).css('margin-top', '5px')
     const $btn2 = $(
         // eslint-disable-next-line no-restricted-globals
-        `<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://luogulo.gq/show.php?url=${location.href}">查看备份</a>`
+        `<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://xn--fx-ex2c330n.ml/show.php?url=${location.href}">查看备份</a>`
     ).css('margin-top', '5px')
     $('section.lg-summary')
         .find('p')
