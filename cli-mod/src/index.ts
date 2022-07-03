@@ -27,7 +27,8 @@ program.version(version)
 program
     .command('create <mod-name>')
     .description('创建一个新的 exlg 模块')
-    .action(async (name) => {
+    .option('-o, --official', '作为官方包')
+    .action(async (name, options) => {
         const { description, author } = await inquirer.prompt([
             {
                 type: 'input',
@@ -70,14 +71,18 @@ program
             path.resolve(name, 'package.json'),
             JSON.stringify(
                 {
-                    name: `exlg-mod-${name}`,
+                    name: options.official
+                        ? `@exlg/mod-${name}`
+                        : `exlg-mod-${name}`,
                     description,
                     author,
                     version: '1.0.0',
                     main: useScript ? `src/index.${scriptExt}` : undefined,
-                    devDependencies: {
-                        '@exlg/cli-mod': '^1.0.2',
+                    dependencies: {
                         '@exlg/core': scriptExt === 'ts' ? '^1.0.1' : undefined
+                    },
+                    devDependencies: {
+                        '@exlg/cli-mod': '^1.0.3'
                     }
                 },
                 null,
@@ -97,8 +102,9 @@ program
                         log('hello exlg!') // your code here
                     `
                     : dedent`
-                        import 'exlg-core/types/module-entry'
-                        const sto = runtime.storage
+                        import '@exlg/core/types/module-entry'
+
+                        const sto = runtime.storage!
                         log('hello exlg: Exlg!')
                     `
             )
@@ -144,12 +150,16 @@ program
         }
 
         const pack = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
-        if (!pack.name.startsWith('exlg-mod-')) {
+        if (
+            !['exlg-mod-', '@exlg/mod-'].some((prefix) =>
+                pack.name.startsWith(prefix)
+            )
+        ) {
             const { con } = await inquirer.prompt({
                 type: 'confirm',
                 name: 'con',
                 message:
-                    '包名不以 exlg-mod- 开头，可能不是正确的 exlg 模块，是否继续构建？',
+                    '包名不是正确的官方或社区 npm 包名，可能不是正确的 exlg 模块，是否继续构建？',
                 default: false
             })
             if (!con) return console.error('💥 构建中断')
