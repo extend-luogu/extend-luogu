@@ -17,9 +17,8 @@ export interface ModuleMetadata {
 
 export interface ModuleExports {
     schema: Schema
-    path: RegExp
-    hook?: () => boolean
-    entry: () => Promise<void> | void
+    style?: string
+    entry?: () => Promise<void> | void
 }
 
 export type ModuleWrapper = (
@@ -54,7 +53,7 @@ exlg.modules['${module.id}'].runtime.setWrapper(new Function(
     'define', 'runtime',
     'utils',
     'log', 'info', 'warn', 'error',
-    ${JSON.stringify(module.script)}nn
+    ${JSON.stringify(module.script)}
 ))
 `
 
@@ -97,18 +96,25 @@ export const executeModule = async (module: Module) => {
     }
 
     exports = exports as ModuleExports | null
+
     if (!exports) {
         error('Exports not found.')
         return
     }
 
     module.runtime.storage = defineStorage(module.id, exports.schema)
-    log('Executing...')
+
     try {
-        await exports.entry()
+        await exports.entry?.()
     } catch (err) {
         if (err instanceof MatchError) return
         error('Failed to execute: %o', err)
+    }
+    log('Executed.')
+
+    if (exports.style) {
+        loadCss(exports.style)
+        log('Style loaded.')
     }
 }
 

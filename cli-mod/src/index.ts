@@ -26,7 +26,7 @@ program.version(version)
 
 program
     .command('create <mod-name>')
-    .description('create a new exlg module')
+    .description('创建一个新的 exlg 模块')
     .action(async (name) => {
         const { description, author } = await inquirer.prompt([
             {
@@ -76,8 +76,8 @@ program
                     version: '1.0.0',
                     main: useScript ? `src/index.${scriptExt}` : undefined,
                     devDependencies: {
-                        '@exlg/cli-mod': '^1.0.0',
-                        '@exlg/core': scriptExt === 'ts' ? '^1.0.0' : undefined
+                        '@exlg/cli-mod': '^1.0.2',
+                        '@exlg/core': scriptExt === 'ts' ? '^1.0.1' : undefined
                     }
                 },
                 null,
@@ -136,15 +136,29 @@ program
 
 program
     .command('build')
-    .description('build the module')
-    .action(async () => {
-        console.log('Building...')
+    .description('构建模块')
+    .option('-c, --console', '提供用于手动注册模块的脚本')
+    .action(async (options) => {
+        if (!(await fileOk('./package.json'))) {
+            return console.error('💥 当前目录没有 package.json，构建失败')
+        }
+
+        const pack = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
+        if (!pack.name.startsWith('exlg-mod-')) {
+            const { con } = await inquirer.prompt({
+                type: 'confirm',
+                name: 'con',
+                message:
+                    '包名不以 exlg-mod- 开头，可能不是正确的 exlg 模块，是否继续构建？',
+                default: false
+            })
+            if (!con) return console.error('💥 构建中断')
+        }
+
+        console.log('🍀 开始构建')
         const startTime = Date.now()
 
-        const exports: {
-            entry?: string
-            style?: string
-        } = {}
+        const exports: [string, string][] = []
 
         const useJs = await fileOk('./src/index.js')
         const useTs = await fileOk('./src/index.ts')
@@ -156,25 +170,50 @@ program
                 minify: true,
                 outfile: 'dist/bundle.js'
             })
-            exports.entry = await fs.readFile('./dist/bundle.js', 'utf-8')
+            exports.push([
+                'entry',
+                `()=>{${await fs.readFile('./dist/bundle.js', 'utf-8')}}`
+            ])
         }
 
-        if (await fileOk('./src/index.css')) {
-            exports.style = await fs.readFile('./src/index.css', 'utf-8')
+        const useCss = await fileOk('./src/index.css')
+        if (useCss) {
+            exports.push([
+                'style',
+                JSON.stringify(await fs.readFile('./src/index.css', 'utf-8'))
+            ])
         }
 
-        await fs.writeFile(
-            './dist/module.min.js',
-            `exports(${JSON.stringify(exports)})`
-        )
+        if (!useJs && !useTs && !useCss) {
+            return console.error('💥 未找到任何脚本或样式入口点，构建失败')
+        }
 
-        console.log('Done in %d ms.', Date.now() - startTime)
+        const exportString = exports.map(([k, v]) => `"${k}":${v}`).join(',')
+        const define = `define({${exportString}})`
+
+        fs.writeFile('./dist/module.define.js', define)
+
+        await fs.writeFile('./dist/module.min.js', define)
+
+        if (options.console) {
+            await fs.writeFile(
+                './dist/module.install.js',
+                `installModule(${JSON.stringify({
+                    name: pack.name,
+                    version: pack.version,
+                    description: pack.description,
+                    source: 'console'
+                })}, ${JSON.stringify(define)})`
+            )
+        }
+
+        console.log('⚡️ 构建完成，花费 %d 毫秒', Date.now() - startTime)
     })
 
 program
     .command('serve')
-    .description('serve a module source at localhost')
-    .option('-p, --port')
+    .description('启动调试源服务（暂不可用）')
+    .option('-p, --port', '端口')
     .action((options) => {
         console.log(options.port)
     })

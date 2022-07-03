@@ -57,7 +57,7 @@ export const wrapArray = <T>(value: MaybeArray<T>): T[] =>
 export class MatchError extends Error {}
 
 export const match = (paths: MaybeArray<RegExp | string>) =>
-    wrapArray(paths).every((path) => unsafeWindow.location.pathname.match(path))
+    wrapArray(paths).some((path) => unsafeWindow.location.pathname.match(path))
 
 export const mustMatch = (paths: MaybeArray<RegExp | string>) => {
     if (!match(paths)) throw new MatchError()
@@ -82,9 +82,7 @@ export const csPost = (
             onload: (r: any) => {
                 try {
                     r.data = JSON.parse(r.responseText)
-                } catch (err) {
-                    reject(err)
-                }
+                } catch {} // eslint-disable-line no-empty
                 resolve(r)
             },
             onerror: reject
