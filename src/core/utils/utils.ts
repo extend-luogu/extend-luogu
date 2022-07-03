@@ -5,7 +5,7 @@ declare global {
 
     // Luogu
 
-    const _feInjection: object
+    const _feInjection: any
 }
 
 export const loadJs = (js: string) => {

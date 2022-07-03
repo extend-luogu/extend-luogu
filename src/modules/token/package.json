@@ -1,0 +1,14 @@
+{
+    "name": "@exlg/mod-token",
+    "description": "自动更新 exlg 令牌",
+    "author": "wxh06",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "dependencies": {
+        "@exlg/core": "^1.0.1"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.0.2",
+        "@types/jquery": "^3.5.14"
+    }
+}
