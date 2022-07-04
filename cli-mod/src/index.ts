@@ -82,7 +82,12 @@ program
                         '@exlg/core': scriptExt === 'ts' ? '^1.0.3' : undefined
                     },
                     devDependencies: {
-                        '@exlg/cli-mod': '^1.0.4'
+                        '@exlg/cli-mod': '^1.1.0'
+                    },
+                    scripts: {
+                        build: 'exlg-mod build',
+                        'build:dev': 'exlg-mod build -c',
+                        prepublish: 'exlg-mod clean && exlg-mod build'
                     }
                 },
                 null,
@@ -218,6 +223,16 @@ program
         }
 
         console.log('⚡️ 构建完成，花费 %d 毫秒', Date.now() - startTime)
+    })
+
+program
+    .command('clean')
+    .description('清理构建')
+    .action(async () => {
+        await fs.rm('./dist', { recursive: true })
+        await fs.mkdir('./dist')
+
+        console.log('⚡ 清理完成')
     })
 
 program
