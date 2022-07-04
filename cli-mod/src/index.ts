@@ -79,10 +79,10 @@ program
                     version: '1.0.0',
                     main: useScript ? `src/index.${scriptExt}` : undefined,
                     dependencies: {
-                        '@exlg/core': scriptExt === 'ts' ? '^1.0.1' : undefined
+                        '@exlg/core': scriptExt === 'ts' ? '^1.0.3' : undefined
                     },
                     devDependencies: {
-                        '@exlg/cli-mod': '^1.0.3'
+                        '@exlg/cli-mod': '^1.0.4'
                     }
                 },
                 null,
