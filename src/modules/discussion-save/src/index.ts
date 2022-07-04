@@ -2,7 +2,11 @@ import '@exlg/core/types/module-entry'
 
 utils.mustMatch([/^\/discuss\/\d+(\?page=\d+)*$/])
 
-const sto = runtime.storage!
+const sto = runtime.storage!(
+    Schema.object({
+        auto_save_discussion: Schema.boolean()
+    })
+)
 
 ;(async () => {
     const $btn = $(
@@ -55,7 +59,7 @@ const sto = runtime.storage!
                 }
             })
             .catch((err: any) => {
-                log(`Error:${err}`)
+                log('Error: %o', err)
                 $btn.removeAttr('disabled')
             })
     }).css('margin-top', '5px')
@@ -69,5 +73,5 @@ const sto = runtime.storage!
         .append($btn)
         .append($('<span>&nbsp;</span>'))
         .append($btn2)
-    if (sto.get('auto_save_discussion')) $btn.click()
+    if (sto.get('auto_save_discussion')) $btn.trigger('click')
 })()

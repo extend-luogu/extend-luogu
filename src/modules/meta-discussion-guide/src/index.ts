@@ -61,3 +61,6 @@ $newpostSubmitWrapper[0].addEventListener(
     },
     true
 ) // Note: 使用事件捕获
+
+export const a = 1
+export const b = 2

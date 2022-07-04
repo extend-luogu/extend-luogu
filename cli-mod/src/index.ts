@@ -79,10 +79,10 @@ program
                     version: '1.0.0',
                     main: useScript ? `src/index.${scriptExt}` : undefined,
                     dependencies: {
-                        '@exlg/core': scriptExt === 'ts' ? '^1.0.3' : undefined
+                        '@exlg/core': scriptExt === 'ts' ? '^1.1.0' : undefined
                     },
                     devDependencies: {
-                        '@exlg/cli-mod': '^1.1.0'
+                        '@exlg/cli-mod': '^1.1.1'
                     },
                     scripts: {
                         build: 'exlg-mod build',
@@ -103,13 +103,13 @@ program
                 path.resolve(name, 'src', `index.${scriptExt}`),
                 scriptExt === 'js'
                     ? dedent`
-                        const sto = runtime.storage
+                        const sto = runtime.storage(Schema.object())
                         log('hello exlg!') // your code here
                     `
                     : dedent`
                         import '@exlg/core/types/module-entry'
 
-                        const sto = runtime.storage!
+                        const sto = runtime.storage!(Schema.object())
                         log('hello exlg: Exlg!')
                     `
             )
@@ -213,12 +213,15 @@ program
         if (options.console) {
             await fs.writeFile(
                 './dist/module.install.js',
-                `installModule(${JSON.stringify({
-                    name: pack.name,
-                    version: pack.version,
-                    description: pack.description,
-                    source: 'console'
-                })}, ${JSON.stringify(define)})`
+                `if (exlg.moduleCtl) exlg.moduleCtl.installModule(${JSON.stringify(
+                    {
+                        name: pack.name,
+                        version: pack.version,
+                        description: pack.description,
+                        source: 'console'
+                    }
+                )}, ${JSON.stringify(define)})\n` +
+                    'else console.log("请打开 exlg 调试模式")'
             )
         }
 

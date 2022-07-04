@@ -16,7 +16,6 @@ export interface ModuleMetadata {
 }
 
 export interface ModuleExports {
-    schema: Schema
     style?: string
     entry?: () => Promise<void> | void
 }
@@ -24,6 +23,7 @@ export interface ModuleExports {
 export type ModuleWrapper<T> = (
     define: (e: ModuleExports) => void,
     runtime: ModuleRuntime<T>,
+    Schema: Schema.Static,
     utils: Utils,
     log: LoggerFunction,
     info: LoggerFunction,
@@ -34,7 +34,7 @@ export type ModuleWrapper<T> = (
 export interface ModuleRuntime<T> {
     setWrapper?: (wrapper: ModuleWrapper<T>) => void
     executeState?: Promise<void> | undefined
-    storage?: Storage<T>
+    storage?: <U>(schema: Schema<U>) => Storage<U>
 }
 
 export interface ModuleReadonly {
@@ -47,14 +47,14 @@ export interface ModuleReadonly {
 export interface Module<T> extends ModuleReadonly {
     runtime: ModuleRuntime<T>
 }
-export type Modules = Record<string, Module<unknown>>
+export type Modules = Record<string, Module<any>>
 export type ModulesReadonly = Record<string, ModuleReadonly>
 
 let storage: Storage<ModulesReadonly>
 
 const wrapModule = <T>(module: Module<T>) => `
 exlg.modules['${module.id}'].runtime.setWrapper(new Function(
-    'define', 'runtime',
+    'define', 'runtime', 'Schema',
     'utils',
     'log', 'info', 'warn', 'error',
     ${JSON.stringify(module.script)}
@@ -87,6 +87,7 @@ export const executeModule = async <T>(module: Module<T>) => {
         wrapper(
             (e) => (exports = e),
             module.runtime,
+            Schema,
             unsafeWindow.exlg.utils,
             log,
             info,
@@ -105,7 +106,8 @@ export const executeModule = async <T>(module: Module<T>) => {
         return
     }
 
-    module.runtime.storage = defineStorage(module.id, exports.schema)
+    module.runtime.storage = <U>(schema: Schema<U>) =>
+        defineStorage(module.id, schema)
 
     try {
         await exports.entry?.()

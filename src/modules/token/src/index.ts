@@ -1,6 +1,11 @@
 import '@exlg/core/types/module-entry'
 
-const sto = runtime.storage!
+const sto = runtime.storage!(
+    Schema.object({
+        _token: Schema.string(),
+        _lastUpdate: Schema.number()
+    })
+)
 
 const genToken = async () => {
     const csrf_token = $("[name='csrf-token']").attr('content')
@@ -41,20 +46,20 @@ const genToken = async () => {
 }
 
 ;(async () => {
-    const d = sto.get('lastUpdate')
+    const d = sto.get('_lastUpdate')
     if (d === undefined || new Date().valueOf() - d > 300) {
         if (_feInjection.currentUser) {
-            if (sto.get('token')) {
+            if (sto.get('_token')) {
                 // Note: token exists
                 const ttl = (
                     await utils.csPost('https://exlg.piterator.com/token/ttl', {
                         uid: _feInjection.currentUser.uid,
-                        token: sto.get('token')
+                        token: sto.get('_token')
                     })
                 ).data
                 if (ttl.status === 401 || ttl.data <= 60 * 15) await genToken()
             } else await genToken()
         }
-        sto.set('lastUpdate', new Date().valueOf())
+        sto.set('_lastUpdate', new Date().valueOf())
     }
 })()
