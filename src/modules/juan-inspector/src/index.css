@@ -1,0 +1,23 @@
+.juan-rnkitm:nth-child(1)::marker {
+    color: red;
+    font-weight: 900;
+}
+
+.juan-rnkitm:nth-child(2)::marker {
+    color: orange;
+    font-weight: 900;
+}
+
+.juan-rnkitm:nth-child(3)::marker {
+    color: yellow;
+    font-weight: 900;
+}
+
+.juan-rnkitm > span {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.juan-rnkitm > span > span {
+    margin-left: auto;
+}
