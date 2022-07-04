@@ -12,8 +12,13 @@
 }
 
 .simple-alert > .title {
+    margin: 0;
     font-weight: bold;
     font-size: 25px;
+}
+
+.simple-alert > .content {
+    padding: 20px;
 }
 
 .simple-alert-mask {

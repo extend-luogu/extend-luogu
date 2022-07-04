@@ -4,6 +4,7 @@ import type { Modules } from '../../../core'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
 const moduleCtl = inject(kModuleCtl)!
+const { utils } = window.exlg
 
 const modules = ref<Modules | null>()
 
@@ -19,8 +20,12 @@ function updateModuleCache() {
 }
 
 function uninstall(id: string) {
-    moduleCtl.storage.del(id)
-    updateModuleCache()
+    utils.simpleAlert(`确定要删除模块 ${id}？`, {
+        onAccept: () => {
+            moduleCtl.storage.del(id)
+            updateModuleCache()
+        }
+    })
 }
 
 updateModuleCache()
