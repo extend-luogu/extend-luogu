@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
+import utils from '../../../core/utils'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
 const moduleCtl = inject(kModuleCtl)!
@@ -10,6 +11,10 @@ function debugClick() {
     if (++debugClickCount.value === 5) {
         debug.value = true
         window.exlg.moduleCtl = moduleCtl
+    }
+
+    if (debugClickCount.value === 10) {
+        utils.simpleAlert('……不要，不要再点了！QAQ', { noCancel: true })
     }
 }
 </script>
