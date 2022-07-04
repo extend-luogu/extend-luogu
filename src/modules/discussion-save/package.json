@@ -11,9 +11,9 @@
         "@exlg/cli-mod": "^1.1.1",
         "@types/jquery": "^3.5.14"
     },
-	"scripts": {
-		"build": "exlg-mod build",
-		"build:dev": "exlg-mod build -c",
-		"prepublish": "exlg-mod clean && exlg-mod build"
-	}
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublish": "exlg-mod clean && exlg-mod build"
+    }
 }
