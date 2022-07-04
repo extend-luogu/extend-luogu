@@ -87,7 +87,7 @@ async function install(it: AllSourceItem, vid: number) {
                     v-if="moduleCtl.storage.get(it.id)"
                     class="module-installed"
                 >
-                    [installed]
+                    [已安装]
                 </span>
             </span>
             <span>
@@ -130,9 +130,10 @@ async function install(it: AllSourceItem, vid: number) {
 .module-description:hover::after {
     content: attr(data-description);
     position: absolute;
-    right: -15px;
+    z-index: 70001;
+    right: 25px;
     top: 25px;
-    width: 335px;
+    width: 400px;
     padding: 5px;
     border: 1px solid black;
     background: white;

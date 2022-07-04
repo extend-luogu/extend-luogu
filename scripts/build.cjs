@@ -44,7 +44,7 @@ exports = async () => {
         `\n;unsafeWindow.exlgResources = {};\n` +
         injectResource('dashJs', dashJs) +
         injectResource('dashCss', dashCss) +
-        coreJs +
+        `\n${coreJs}\n` +
         `\n;GM_addStyle(${JSON.stringify(coreCss)});\n`
     await fs.writeFile('./dist/extend-luogu.min.user.js', concated)
 
