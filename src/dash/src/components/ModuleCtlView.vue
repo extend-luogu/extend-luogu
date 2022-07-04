@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import type { Modules } from '../../../core'
+import type { ModulesReadonly } from '../../../core'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
 const moduleCtl = inject(kModuleCtl)!
 const { utils } = window.exlg
 
-const modules = ref<Modules | null>()
+const modules = ref<ModulesReadonly | null>()
 
 function toggleModule(id: string) {
     moduleCtl.storage.do(id, (mod) => {

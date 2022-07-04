@@ -1,87 +1,78 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// TODO: 利用 Schema 标注类型
 
-type SchemaPrimitive = typeof String | typeof Number | typeof Boolean
-type SchemaType = SchemaPrimitive | [SchemaPrimitive]
-interface SchemaItem {
-    type: SchemaType
-    desc: string
-}
-export type Schema = Record<string, SchemaItem>
+import Schema from 'schemastery'
+
+export { Schema }
 export type Schemas = Record<string, Schema>
 
-export interface Storage {
-    from: (targetNamespace: string) => Storage | null
-    get: (key: string) => any
-    getAll: () => Record<string, any>
-    set: (key: string, value: any) => void
-    inc: (key: string) => void
-    push: (key: string, ...values: any[]) => void
-    del: (key: string) => void
-    do: (key: string, fn: (value: any) => any) => void
+export interface Storage<T> {
+    from: <U>(targetNamespace: string) => Storage<U> | null
+    get: <K extends keyof T & string>(key: K) => T[K]
+    getAll: () => T
+    set: <K extends keyof T & string>(key: K, value: T[K]) => void
+    del: <K extends keyof T & string>(key: K) => void
+    do: <K extends keyof T & string>(key: K, fn: (value: T[K]) => T[K]) => void
 }
 
-const storage = (
+export type FilterKeysWithValueType<O, V> = {
+    [K in keyof O]: V extends O[K] ? K : never
+}[keyof O]
+
+const storage = <T>(
     namespace: string,
-    schema: Schema,
+    schema: Schema<T>,
     direct: boolean
-): Storage => {
-    const checkPrivate = (key: string) => {
+): Storage<T> => {
+    const checkPrivate = (key: keyof T & string) => {
         if (key[0] === '_' && !direct)
             throw Error('Cannot access private storage of other modules.')
     }
+
+    const _get = () => schema(GM_getValue(namespace))
+
     return {
-        from: (newNamespace: string): Storage | null => {
+        from: <U>(newNamespace: string): Storage<U> | null => {
             const newSchema = unsafeWindow.exlg.schemas[newNamespace]
             if (!newSchema) return null
             return storage(newNamespace, newSchema, false)
         },
-        get: (key: string): any => {
+        get: <K extends keyof T & string>(key: K): T[K] => {
             checkPrivate(key)
-            const data = (GM_getValue(namespace) ?? {}) as any
+            const data = _get()
             return data[key]
         },
-        getAll: (): Record<string, any> => {
-            const data = (GM_getValue(namespace) ?? {}) as any
+        getAll: (): T => {
+            const data = _get()
             if (!direct) {
                 for (const key in data) if (key[0] === '_') delete data[key]
             }
-            return data ?? {}
+            return data
         },
-        set: (key: string, value: any) => {
+        set: <K extends keyof T & string>(key: K, value: T[K]) => {
             checkPrivate(key)
-            const data = (GM_getValue(namespace) ?? {}) as any
+            const data = _get()
             data[key] = value
             GM_setValue(namespace, data)
         },
-        inc: (key: string) => {
+        del: <K extends keyof T & string>(key: K) => {
             checkPrivate(key)
-            const data = (GM_getValue(namespace) ?? {}) as any
-            data[key]++
-            GM_setValue(namespace, data)
-        },
-        push: (key: string, ...values: any[]) => {
-            checkPrivate(key)
-            const data = (GM_getValue(namespace) ?? {}) as any
-            data[key].push(...values)
-            GM_setValue(namespace, data)
-        },
-        del: (key: string) => {
-            checkPrivate(key)
-            const data = (GM_getValue(namespace) ?? {}) as any
+            const data = _get()
             delete data[key]
             GM_setValue(namespace, data)
         },
-        do: (key: string, fn: (value: any) => any) => {
+        do: <K extends keyof T & string>(key: K, fn: (value: T[K]) => T[K]) => {
             checkPrivate(key)
-            const data = (GM_getValue(namespace) ?? {}) as any
+            const data = _get()
             data[key] = fn(data[key])
             GM_setValue(namespace, data)
         }
     }
 }
 
-export const defineStorage = (namespace: string, schema: Schema): Storage => {
+export const defineStorage = <T>(
+    namespace: string,
+    schema: Schema<T>
+): Storage<T> => {
     unsafeWindow.exlg.schemas[namespace] = schema
     return storage(namespace, schema, true)
 }

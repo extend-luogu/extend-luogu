@@ -1,6 +1,13 @@
 import utils, { Utils } from './utils'
 import type { Schema, Schemas } from './storage'
-import { Module, Modules, ModuleCtl, launch } from './module'
+import {
+    Module,
+    Modules,
+    ModuleReadonly,
+    ModulesReadonly,
+    ModuleCtl,
+    launch
+} from './module'
 
 export interface Exlg {
     utils: Utils
@@ -12,7 +19,7 @@ export interface Exlg {
     }
 }
 
-export { Schema, Schemas, Module, Modules }
+export { Schema, Schemas, Module, Modules, ModuleReadonly, ModulesReadonly }
 
 declare global {
     interface Window {
