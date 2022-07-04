@@ -2,7 +2,7 @@
     "name": "@exlg/mod-token",
     "description": "自动更新 exlg 令牌",
     "author": "wxh06",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "main": "src/index.ts",
     "dependencies": {
         "@exlg/core": "^1.1.0"
@@ -10,5 +10,10 @@
     "devDependencies": {
         "@exlg/cli-mod": "^1.1.1",
         "@types/jquery": "^3.5.14"
-    }
+    },
+	"scripts": {
+		"build": "exlg-mod build",
+		"build:dev": "exlg-mod build -c",
+		"prepublish": "exlg-mod clean && exlg-mod build"
+	}
 }
