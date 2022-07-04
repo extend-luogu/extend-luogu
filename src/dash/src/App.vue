@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { provide, reactive, ref } from 'vue'
-import { kModuleCtl } from './utils/injectionSymbols'
 import ModuleCtlView from './components/ModuleCtlView.vue'
 import MarketView from './components/MarketView.vue'
 import DevView from './components/DevView.vue'
+import { InstallState } from './utils'
+import { kModuleCtl } from './utils/injectionSymbols'
 
 const { moduleCtl } = window.exlg
 provide(kModuleCtl, moduleCtl)
@@ -27,6 +28,7 @@ const tabs = reactive<
 const show = ref(false)
 
 const moduleCtlView = ref<InstanceType<typeof ModuleCtlView>>()
+const marketView = ref<InstanceType<typeof MarketView>>()
 
 function switchTab(id: string) {
     currentTab.value = id
@@ -37,6 +39,10 @@ function switchTab(id: string) {
 function updateModule() {
     moduleCtlView.value!.updateModuleCache()
     if (currentTab.value !== 'module') tabs.module.note = true
+}
+
+function uninstallModule(id: string) {
+    marketView.value!.installStates[id] = InstallState.uninstalled
 }
 </script>
 
@@ -56,10 +62,15 @@ function updateModule() {
             </div>
         </div>
 
-        <ModuleCtlView v-show="currentTab === 'module'" ref="moduleCtlView" />
+        <ModuleCtlView
+            v-show="currentTab === 'module'"
+            ref="moduleCtlView"
+            @uninstall-module="uninstallModule"
+        />
         <MarketView
             v-show="currentTab === 'market'"
-            @update-module="updateModule"
+            ref="marketView"
+            @install-module="updateModule"
         />
         <DevView v-show="currentTab === 'dev'" />
     </div>
@@ -72,11 +83,12 @@ function updateModule() {
     right: 0;
     top: 100px;
     box-sizing: border-box;
+    width: 30%;
+    min-width: 350px;
     height: calc(100% - 200px);
     padding: 20px;
     background: white;
     box-shadow: 0 0 1px 1px black;
-    width: 30%;
 }
 
 .exlg-button {

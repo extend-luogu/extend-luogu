@@ -3,6 +3,10 @@ import { inject, ref } from 'vue'
 import type { ModulesReadonly } from '../../../core'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
+const emits = defineEmits<{
+    (e: 'uninstallModule', id: string): void
+}>()
+
 const moduleCtl = inject(kModuleCtl)!
 const { utils } = window.exlg
 
@@ -23,6 +27,7 @@ function uninstall(id: string) {
     utils.simpleAlert(`确定要删除模块 ${id}？`, {
         onAccept: () => {
             moduleCtl.storage.del(id)
+            emits('uninstallModule', id)
             updateModuleCache()
         }
     })

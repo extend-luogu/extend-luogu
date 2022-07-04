@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { inject, onMounted, ref } from 'vue'
+import { inject, onMounted, reactive, ref } from 'vue'
 import { ModuleMetadata } from '../../../core/module'
+import { InstallState } from '../utils'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
 const emits = defineEmits<{
-    (e: 'updateModule'): void
+    (e: 'installModule'): void
 }>()
 
 const moduleCtl = inject(kModuleCtl)!
@@ -36,10 +37,16 @@ onMounted(async () => {
     source.value = await window.exlg.utils.csGet(sourceUrl).data
     source.value!.forEach((it) => {
         it.id = `${it.type}:${it.name}`
+        installStates[it.id] = moduleCtl.storage.get(it.id)
+            ? InstallState.installed
+            : InstallState.uninstalled
     })
 })
 
 async function install(it: AllSourceItem, vid: number) {
+    if (installStates[it.id] === InstallState.installing) return
+    installStates[it.id] = InstallState.installing
+
     const version = it.versions[vid]
     const metadata: ModuleMetadata = {
         name: it.name,
@@ -73,8 +80,15 @@ async function install(it: AllSourceItem, vid: number) {
     )
 
     moduleCtl.installModule(metadata, script!)
-    emits('updateModule')
+    installStates[it.id] = InstallState.installed
+    emits('installModule')
 }
+
+const installStates = reactive<Record<string, InstallState>>({})
+
+defineExpose({
+    installStates
+})
 </script>
 
 <template>
@@ -83,14 +97,18 @@ async function install(it: AllSourceItem, vid: number) {
             <span>
                 {{ it.id }}
                 <span class="module-version">@{{ it.versions.at(-1) }}</span>
-                <span
-                    v-if="moduleCtl.storage.get(it.id)"
-                    class="module-installed"
-                >
-                    [已安装]
-                </span>
             </span>
             <span>
+                <span
+                    v-if="installStates[it.id] !== InstallState.uninstalled"
+                    class="module-install-state"
+                >
+                    {{
+                        installStates[it.id] === InstallState.installed
+                            ? '[已安装]'
+                            : '[安装中]'
+                    }}
+                </span>
                 <span
                     class="module-description"
                     :data-description="it.description"
@@ -99,6 +117,12 @@ async function install(it: AllSourceItem, vid: number) {
                 </span>
                 <span
                     class="module-install"
+                    :style="{
+                        visibility:
+                            installStates[it.id] === InstallState.installing
+                                ? 'hidden'
+                                : 'visible'
+                    }"
                     @click="install(it, it.versions.length - 1)"
                 >
                     ⬇️
@@ -119,7 +143,7 @@ async function install(it: AllSourceItem, vid: number) {
     color: blueviolet;
 }
 
-.module-installed {
+.module-install-state {
     color: gray;
 }
 
