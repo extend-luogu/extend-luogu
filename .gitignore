@@ -140,6 +140,6 @@ dist
 # Documentation here: https://yarnpkg.com/features/zero-installs
 #!.yarn/cache
 .pnp.*
-pnpm-lock.yaml
 
-cli-mod/bin
+
+bin/

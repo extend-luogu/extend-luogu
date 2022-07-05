@@ -6,16 +6,18 @@ module.exports = {
             2,
             'always',
             [
+                'build',
+                'chore',
+                'ci',
+                'docs',
                 'feat',
                 'fix',
-                'docs',
-                'style',
+                'perf',
                 'refactor',
-                'test',
+                'release',
                 'revert',
-                'chore',
-                'build',
-                'release'
+                'style',
+                'test'
             ]
         ]
     }
