@@ -142,8 +142,10 @@ importers:
       '@exlg/cli-mod': ^1.2.1
       '@exlg/core': workspace:^
       '@types/jquery': ^3.5.14
+      schemastery: ^3.4.3
     dependencies:
       '@exlg/core': link:../../core
+      schemastery: 3.4.3
     devDependencies:
       '@exlg/cli-mod': link:../../../cli-mod
       '@types/jquery': 3.5.14

@@ -1,77 +1,81 @@
 import '@exlg/core/types/module-entry'
+import { SchemaToStorage } from '@exlg/core/types'
+import type Schema from './schema'
 
 utils.mustMatch([/^\/discuss\/\d+(\?page=\d+)*$/])
 
-const sto = runtime.storage!(
-    Schema.object({
-        auto_save_discussion: Schema.boolean()
-    })
-)
+const sto = runtime.storage as SchemaToStorage<typeof Schema>
+const api = 'https://xn--fx-ex2c330n.ml'
 
-;(async () => {
-    const $btn = $(
-        '<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>'
-    )
-    $btn.on('click', () => {
-        $btn.prop('disabled', true)
-        $btn.text('保存中...')
+const $saveBtn = $(`
+    <button
+        class="am-btn am-btn-success am-btn-sm"
+        name="save-discuss"
+    >保存讨论</button>
+`)
+$saveBtn
+    .on('click', () => {
+        $saveBtn.prop('disabled', true)
+        $saveBtn.text('保存中...')
         utils
-            .csGet(
-                `https://xn--fx-ex2c330n.ml/save.php?url=${window.location.href}`
-            )
+            .csGet(`${api}/save.php?url=${window.location.href}`)
             .then((res: any) => {
                 if (res.status === 200) {
                     if (res.response === 'success') {
                         log('Discuss saved')
-                        $btn.text('保存成功')
+                        $saveBtn.text('保存成功')
                         setTimeout(() => {
-                            $btn.text('保存讨论')
-                            $btn.removeAttr('disabled')
+                            $saveBtn.text('保存讨论').removeAttr('disabled')
                         }, 1000)
                     } else {
-                        log(
-                            `Discuss unsuccessfully saved, return data: ${res.response}`
-                        )
-                        $btn.text('保存失败')
-                        $btn.toggleClass('am-btn-success').toggleClass(
-                            'am-btn-warning'
-                        )
+                        log('Failed to save, return data: %o', res.response)
+                        $saveBtn
+                            .text('保存失败')
+                            .toggleClass('am-btn-success')
+                            .toggleClass('am-btn-warning')
+
                         setTimeout(() => {
-                            $btn.text('保存讨论')
-                            $btn.removeAttr('disabled')
-                            $btn.toggleClass('am-btn-success').toggleClass(
-                                'am-btn-warning'
-                            )
+                            $saveBtn
+                                .text('保存讨论')
+                                .removeAttr('disabled')
+                                .toggleClass('am-btn-success')
+                                .toggleClass('am-btn-warning')
                         }, 1000)
                     }
                 } else {
                     log(`Fail to save discuss: ${res}`)
-                    $btn.toggleClass('am-btn-success').toggleClass(
-                        'am-btn-danger'
-                    )
+                    $saveBtn
+                        .toggleClass('am-btn-success')
+                        .toggleClass('am-btn-danger')
                     setTimeout(() => {
-                        $btn.text('保存讨论')
-                        $btn.removeAttr('disabled')
-                        $btn.toggleClass('am-btn-success').toggleClass(
-                            'am-btn-danger'
-                        )
+                        $saveBtn
+                            .text('保存讨论')
+                            .removeAttr('disabled')
+                            .toggleClass('am-btn-success')
+                            .toggleClass('am-btn-danger')
                     }, 1000)
                 }
             })
             .catch((err: any) => {
                 log('Error: %o', err)
-                $btn.removeAttr('disabled')
+                $saveBtn.removeAttr('disabled')
             })
-    }).css('margin-top', '5px')
-    const $btn2 = $(
-        // eslint-disable-next-line no-restricted-globals
-        `<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://xn--fx-ex2c330n.ml/show.php?url=${location.href}">查看备份</a>`
-    ).css('margin-top', '5px')
-    $('section.lg-summary')
-        .find('p')
-        .append($('<br>'))
-        .append($btn)
-        .append($('<span>&nbsp;</span>'))
-        .append($btn2)
-    if (sto.get('auto_save_discussion')) $btn.trigger('click')
-})()
+    })
+    .css('margin-top', '5px')
+const $showBtn = $(`
+    <a
+        class="am-btn am-btn-warning am-btn-sm"
+        name="save-discuss"
+        href="${api}/show.php?url=${window.location.href}"
+        target="_blank"
+    >查看备份</a>
+`).css('margin-top', '5px')
+
+$('section.lg-summary')
+    .find('p')
+    .append($('<br />'))
+    .append($saveBtn)
+    .append('&nbsp;')
+    .append($showBtn)
+
+if (sto.get('autoSaveDiscussion')) $saveBtn.trigger('click')

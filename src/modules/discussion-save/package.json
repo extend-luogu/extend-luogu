@@ -2,7 +2,7 @@
     "name": "@exlg/mod-discussion-save",
     "description": "洛谷帖子保存站集成",
     "author": "qinyuzhen",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
@@ -14,7 +14,8 @@
         "prepublish": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "workspace:^"
+        "@exlg/core": "workspace:^",
+        "schemastery": "^3.4.3"
     },
     "devDependencies": {
         "@exlg/cli-mod": "^1.2.1",
