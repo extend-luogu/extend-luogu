@@ -17,12 +17,13 @@ export interface ModuleMetadata {
 
 export interface ModuleExports {
     style?: string
+    schema: Schema
     entry?: () => Promise<void> | void
 }
 
-export type ModuleWrapper<T> = (
+export type ModuleWrapper = (
     define: (e: ModuleExports) => void,
-    runtime: ModuleRuntime<T>,
+    runtime: ModuleRuntime,
     Schema: Schema.Static,
     utils: Utils,
     log: LoggerFunction,
@@ -31,10 +32,10 @@ export type ModuleWrapper<T> = (
     error: LoggerFunction
 ) => ModuleExports
 
-export interface ModuleRuntime<T> {
-    setWrapper?: (wrapper: ModuleWrapper<T>) => void
+export interface ModuleRuntime {
+    setWrapper?: (wrapper: ModuleWrapper) => void
     executeState?: Promise<void> | undefined
-    storage?: <U>(schema: Schema<U>) => Storage<U>
+    storage?: Storage
 }
 
 export interface ModuleReadonly {
@@ -44,15 +45,15 @@ export interface ModuleReadonly {
     metadata: ModuleMetadata
 }
 
-export interface Module<T> extends ModuleReadonly {
-    runtime: ModuleRuntime<T>
+export interface Module extends ModuleReadonly {
+    runtime: ModuleRuntime
 }
-export type Modules = Record<string, Module<any>>
+export type Modules = Record<string, Module>
 export type ModulesReadonly = Record<string, ModuleReadonly>
 
 let storage: Storage<ModulesReadonly>
 
-const wrapModule = <T>(module: Module<T>) => `
+const wrapModule = (module: Module) => `
 exlg.modules['${module.id}'].runtime.setWrapper(new Function(
     'define', 'runtime', 'Schema',
     'utils',
@@ -71,8 +72,8 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
     storage.set(module.id, module)
 }
 
-export const executeModule = async <T>(module: Module<T>) => {
-    const wrapper = await new Promise<ModuleWrapper<T>>((res) => {
+export const executeModule = async (module: Module) => {
+    const wrapper = await new Promise<ModuleWrapper>((res) => {
         module.runtime.setWrapper = (r) => {
             delete module.runtime.setWrapper
             res(r)
@@ -106,8 +107,9 @@ export const executeModule = async <T>(module: Module<T>) => {
         return
     }
 
-    module.runtime.storage = <U>(schema: Schema<U>) =>
-        defineStorage(module.id, schema)
+    module.runtime.storage = defineStorage(module.id, Schema(exports.schema))
+
+    if (!module.active) return
 
     try {
         await exports.entry?.()
@@ -183,10 +185,9 @@ export const launch = async () => {
 
     for (const module of Object.values(exlg.modules)) {
         Object.freeze(module)
-        if (module.active)
-            executeStates.push(
-                (module.runtime.executeState = executeModule(module))
-            )
+        executeStates.push(
+            (module.runtime.executeState = executeModule(module))
+        )
     }
 
     await Promise.all(executeStates)

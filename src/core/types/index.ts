@@ -12,7 +12,13 @@ export type {
 
 export type { Utils } from '../utils'
 
-export type { Storage, Schema, Schemas } from '../storage'
+export type {
+    Storage,
+    Schema,
+    Schemas,
+    SchemaToStorage,
+    SchemaToType
+} from '../storage'
 
 export type { Exlg } from '..'
 

@@ -170,6 +170,17 @@ importers:
     devDependencies:
       '@exlg/cli-mod': link:../../../cli-mod
 
+  src/modules/test:
+    specifiers:
+      '@exlg/cli-mod': ^1.1.1
+      '@exlg/core': ^1.1.0
+      schemastery: ^3.4.3
+    dependencies:
+      '@exlg/core': link:../../core
+      schemastery: 3.4.3
+    devDependencies:
+      '@exlg/cli-mod': link:../../../cli-mod
+
   src/modules/token:
     specifiers:
       '@exlg/cli-mod': ^1.1.0

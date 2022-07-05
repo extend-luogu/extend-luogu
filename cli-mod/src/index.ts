@@ -53,17 +53,27 @@ program
         const useScript = langs.includes('脚本 script')
         const useStyle = langs.includes('样式 style')
 
-        let scriptExt
-        if (useScript)
-            scriptExt = (
-                await inquirer.prompt({
+        let scriptExt: 'ts' | 'js' | void
+        let moduleExt: 'ts' | 'mjs' | void
+        let typescript: boolean | void
+        let useSchema: boolean | void
+
+        if (useScript) {
+            ;({ typescript, useSchema } = await inquirer.prompt([
+                {
                     type: 'confirm',
                     name: 'typescript',
                     message: '是否使用 TypeScript?'
-                })
-            ).typescript
-                ? 'ts'
-                : 'js'
+                },
+                {
+                    type: 'confirm',
+                    name: 'useSchema',
+                    message: '是否使用 Schema？'
+                }
+            ]))
+            scriptExt = typescript ? 'ts' : 'js'
+            moduleExt = typescript ? 'ts' : 'mjs'
+        }
 
         await fs.mkdir(name)
 
@@ -89,7 +99,8 @@ program
                             (scriptExt === 'ts' &&
                                 ((options.official && 'workspace:^') ||
                                     '^1.1.0')) ||
-                            undefined
+                            undefined,
+                        schemastery: useSchema ? '^3.4.3' : undefined
                     },
                     devDependencies: {
                         '@exlg/cli-mod': '^1.1.1'
@@ -104,19 +115,46 @@ program
         await fs.mkdir(path.resolve(name, 'dist'))
 
         if (useScript) {
+            const imports = []
+            const main = []
+            if (typescript) {
+                imports.push("import '@exlg/core/types/module-entry'")
+                main.push("log('hello exlg: Exlg!')")
+            } else {
+                main.push("log('hello exlg!') // your code here")
+            }
+
+            if (useSchema) {
+                await fs.writeFile(
+                    path.resolve(name, 'src', `schema.${moduleExt}`),
+                    dedent`
+                    import Schema from 'schemastery'
+
+                    export default Schema.object({
+                        // your static schema here
+                        // see <https://github.com/shigma/schemastery>
+                        hello: Schema.string().default('world')
+                    })
+                    ` + '\n'
+                )
+
+                if (typescript) {
+                    imports.push(
+                        "import type { SchemaToStorage } from '@exlg/core/types'",
+                        "import type Scm from './schema'"
+                    )
+                    main.push(
+                        'const sto = runtime.storage as SchemaToStorage<typeof Scm>',
+                        "log('hello %s', sto.get('hello'))"
+                    )
+                } else {
+                    main.push('const sto = runtime.storage')
+                }
+            }
+
             await fs.writeFile(
                 path.resolve(name, 'src', `index.${scriptExt}`),
-                scriptExt === 'js'
-                    ? dedent`
-                        const sto = runtime.storage(Schema.object())
-                        log('hello exlg!') // your code here
-                    `
-                    : dedent`
-                        import '@exlg/core/types/module-entry'
-
-                        const sto = runtime.storage!(Schema.object())
-                        log('hello exlg: Exlg!')
-                    `
+                imports.join('\n') + '\n\n' + main.join('\n') + '\n'
             )
 
             if (scriptExt === 'ts') {
@@ -182,6 +220,7 @@ program
 
         const useJs = await fileOk('./src/index.js')
         const useTs = await fileOk('./src/index.ts')
+
         if (useJs || useTs) {
             await esbuild.build({
                 entryPoints: [`./src/index.${useTs ? 'ts' : 'js'}`],
@@ -190,10 +229,32 @@ program
                 minify: true,
                 outfile: 'dist/bundle.js'
             })
+
             exports.push([
                 'entry',
                 `()=>{${await fs.readFile('./dist/bundle.js', 'utf-8')}}`
             ])
+
+            const useSchema =
+                (useJs && (await fileOk('./src/schema.mjs'))) ||
+                (useTs && (await fileOk('./src/schema.ts')))
+
+            if (useSchema) {
+                await esbuild.build({
+                    entryPoints: [`./src/schema.${useTs ? 'ts' : 'mjs'}`],
+                    format: 'esm',
+                    bundle: true,
+                    outfile: 'dist/schema.mjs'
+                })
+
+                const schema = (
+                    await import(
+                        path.resolve(process.cwd(), 'dist', 'schema.mjs')
+                    )
+                ).default
+
+                exports.push(['schema', JSON.stringify(schema)])
+            }
         }
 
         const useCss = await fileOk('./src/index.css')
@@ -211,11 +272,11 @@ program
         const exportString = exports.map(([k, v]) => `"${k}":${v}`).join(',')
         const define = `define({${exportString}})`
 
-        fs.writeFile('./dist/module.define.js', define)
-
         await fs.writeFile('./dist/module.min.js', define)
 
         if (options.console) {
+            await fs.writeFile('./dist/module.define.js', define)
+
             await fs.writeFile(
                 './dist/module.install.js',
                 `if (exlg.moduleCtl) exlg.moduleCtl.installModule(${JSON.stringify(

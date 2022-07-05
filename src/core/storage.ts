@@ -5,7 +5,7 @@ import Schema from 'schemastery'
 export { Schema }
 export type Schemas = Record<string, Schema>
 
-export interface Storage<T> {
+export interface Storage<T = any> {
     from: <U>(targetNamespace: string) => Storage<U> | null
     get: <K extends keyof T & string>(key: K) => T[K]
     getAll: () => T
@@ -17,6 +17,9 @@ export interface Storage<T> {
 export type FilterKeysWithValueType<O, V> = {
     [K in keyof O]: V extends O[K] ? K : never
 }[keyof O]
+
+export type SchemaToType<S> = S extends Schema<infer T> ? T : never
+export type SchemaToStorage<S> = S extends Schema<infer T> ? Storage<T> : never
 
 const storage = <T>(
     namespace: string,
