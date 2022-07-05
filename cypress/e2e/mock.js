@@ -1,3 +1,6 @@
+/* eslint-disable no-eval */
+/* eslint-disable no-unused-vars */
+
 const utils = {
     mustMatch: (_urls) => {},
     csGet: (url) => {
@@ -11,11 +14,12 @@ const utils = {
 
 const runtime = {
     storage: {
-        // eslint-disable-next-line no-eval
         get: (x) => eval(x),
         set: (x, y) => {
-            // eslint-disable-next-line no-eval,no-unused-expressions
-            eval(x) === undefined ? eval(`var ${x} = ${y}`) : eval(`${x} = ${y}`)
+            // eslint-disable-next-line no-unused-expressions
+            eval(x) === undefined
+                ? eval(`var ${x} = ${y}`)
+                : eval(`${x} = ${y}`)
         }
     }
 }

@@ -1,4 +1,4 @@
 {
     "extends": "./tsconfig.json",
-    "include": ["./src/", "./__tests__/", "./cli-mod/src/"]
+    "include": ["./src/", "./__tests__/", "./cli-mod/src/", "./cypress/"]
 }

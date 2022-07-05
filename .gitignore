@@ -141,5 +141,10 @@ dist
 #!.yarn/cache
 .pnp.*
 
+# module dist
 
 bin/
+
+# cypress
+
+cypress/videos
