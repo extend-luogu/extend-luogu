@@ -78,16 +78,21 @@ program
                     author,
                     version: '1.0.0',
                     main: useScript ? `src/index.${scriptExt}` : undefined,
-                    dependencies: {
-                        '@exlg/core': scriptExt === 'ts' ? '^1.1.0' : undefined
-                    },
-                    devDependencies: {
-                        '@exlg/cli-mod': '^1.1.1'
-                    },
+                    keywords: ['exlg', 'exlg-module'],
                     scripts: {
                         build: 'exlg-mod build',
                         'build:dev': 'exlg-mod build -c',
-                        prepublish: 'exlg-mod clean && exlg-mod build'
+                        prepublishOnly: 'exlg-mod clean && exlg-mod build'
+                    },
+                    dependencies: {
+                        '@exlg/core':
+                            (scriptExt === 'ts' &&
+                                ((options.official && 'workspace:^') ||
+                                    '^1.1.0')) ||
+                            undefined
+                    },
+                    devDependencies: {
+                        '@exlg/cli-mod': '^1.1.1'
                     }
                 },
                 null,
