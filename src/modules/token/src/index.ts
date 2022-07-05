@@ -1,11 +1,8 @@
 import '@exlg/core/types/module-entry'
+import { SchemaToStorage } from '@exlg/core/types'
+import type Scm from './schema'
 
-const sto = runtime.storage!(
-    Schema.object({
-        _token: Schema.string(),
-        _lastUpdate: Schema.number()
-    })
-)
+const sto = runtime.storage as SchemaToStorage<typeof Scm>
 
 const genToken = async () => {
     const csrf_token = $("[name='csrf-token']").attr('content')
@@ -28,7 +25,7 @@ const genToken = async () => {
         )
     ).data.id
     sto.set(
-        'token',
+        '_token',
         (
             await utils.csGet(
                 `https://exlg.piterator.com/token/verify/${paste_id}`

@@ -6,7 +6,7 @@
         "email": "wangxinhe06@gmail.com",
         "url": "https://wxh06.github.io/"
     },
-    "version": "1.0.3",
+    "version": "1.0.4",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
@@ -21,7 +21,8 @@
         "prepublish": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "workspace:^"
+        "@exlg/core": "workspace:^",
+        "schemastery": "^3.4.3"
     },
     "devDependencies": {
         "@exlg/cli-mod": "^1.1.0",
