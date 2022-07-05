@@ -1,19 +1,30 @@
 {
     "name": "@exlg/mod-token",
     "description": "自动更新 exlg 令牌",
-    "author": "wxh06",
+    "author": {
+        "name": "汪心禾",
+        "email": "wangxinhe06@gmail.com",
+        "url": "https://wxh06.github.io/"
+    },
     "version": "1.0.3",
     "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "contributors": [
+        "Qin Yuzhen"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublish": "exlg-mod clean && exlg-mod build"
+    },
     "dependencies": {
-        "@exlg/core": "^1.1.0"
+        "@exlg/core": "workspace:^"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.1.1",
+        "@exlg/cli-mod": "^1.1.0",
         "@types/jquery": "^3.5.14"
-    },
-	"scripts": {
-		"build": "exlg-mod build",
-		"build:dev": "exlg-mod build -c",
-		"prepublish": "exlg-mod clean && exlg-mod build"
-	}
+    }
 }

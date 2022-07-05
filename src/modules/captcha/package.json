@@ -1,14 +1,30 @@
 {
     "name": "@exlg/mod-captcha",
     "description": "自动洛谷填充验证码。后端由 TensorFlow 及 Flask 提供支持",
-    "author": "wxh06",
+    "author": {
+        "name": "汪心禾",
+        "email": "wangxinhe06@gmail.com",
+        "url": "https://wxh06.github.io/"
+    },
     "version": "1.0.0",
     "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "contributors": [
+        "ForkKILLET"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublish": "exlg-mod clean && exlg-mod build"
+    },
     "dependencies": {
-        "@exlg/core": "^1.0.1"
+        "@exlg/core": "workspace:^"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.0.2",
+        "@exlg/cli-mod": "^1.1.0",
         "@types/jquery": "^3.5.14"
     }
 }

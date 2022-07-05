@@ -8,7 +8,8 @@
     "type": "commonjs",
     "scripts": {
         "test": "ts-node src/index.ts",
-        "build": "esbuild src/index.ts --minify --bundle --platform=node --external:esbuild --outfile=bin/index.js"
+        "build": "esbuild src/index.ts --minify --bundle --platform=node --external:esbuild --outfile=bin/index.js",
+        "prepublishOnly": "npm run build"
     },
     "keywords": [
         "exlg",

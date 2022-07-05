@@ -4,16 +4,20 @@
     "author": "qinyuzhen",
     "version": "1.0.4",
     "main": "src/index.ts",
-    "dependencies": {
-        "@exlg/core": "^1.1.0"
-    },
-    "devDependencies": {
-        "@exlg/cli-mod": "^1.1.1",
-        "@types/jquery": "^3.5.14"
-    },
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
     "scripts": {
         "build": "exlg-mod build",
         "build:dev": "exlg-mod build -c",
         "prepublish": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.1.0",
+        "@types/jquery": "^3.5.14"
     }
 }
