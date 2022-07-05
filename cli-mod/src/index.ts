@@ -298,7 +298,7 @@ program
     .command('clean')
     .description('清理构建')
     .action(async () => {
-        await fs.rm('./dist', { recursive: true })
+        if (await fileOk('./dist')) await fs.rm('./dist', { recursive: true })
         await fs.mkdir('./dist')
 
         console.log('⚡ 清理完成')
