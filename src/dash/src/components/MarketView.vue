@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, onMounted, reactive, ref } from 'vue'
+import compareVersions from 'compare-versions'
 import { ModuleMetadata } from '../../../core/module'
 import { InstallState } from '../utils'
 import { kModuleCtl } from '../utils/injectionSymbols'
@@ -89,6 +90,25 @@ const installStates = reactive<Record<string, InstallState>>({})
 defineExpose({
     installStates
 })
+
+function installStateText(it: AllSourceItem): string {
+    const state = installStates[it.id]
+    switch (state) {
+        case InstallState.installed:
+            if (
+                compareVersions(
+                    moduleCtl.storage.get(it.id).metadata.version,
+                    it.versions.at(-1)!
+                ) < 0
+            )
+                return '<span class="update">[有更新]</span>'
+            return '[已安装]'
+        case InstallState.installing:
+            return '[安装中]'
+        case InstallState.uninstalled:
+            return ''
+    }
+}
 </script>
 
 <template>
@@ -100,14 +120,9 @@ defineExpose({
             </span>
             <span>
                 <span
-                    v-if="installStates[it.id] !== InstallState.uninstalled"
                     class="module-install-state"
+                    v-html="installStateText(it)"
                 >
-                    {{
-                        installStates[it.id] === InstallState.installed
-                            ? '[已安装]'
-                            : '[安装中]'
-                    }}
                 </span>
                 <span
                     class="module-description"
@@ -145,6 +160,10 @@ defineExpose({
 
 .module-install-state {
     color: gray;
+}
+
+.module-install-state > :deep(.update) {
+    color: blueviolet;
 }
 
 .module-description {
