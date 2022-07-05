@@ -1,0 +1,15 @@
+{
+    "name": "exlg-cypress-workspace",
+    "version": "1.0.0",
+    "description": "Cypress",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "qinyuzhen",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^18.0.0"
+    }
+}
