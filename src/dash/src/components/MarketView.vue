@@ -118,7 +118,7 @@ function installStateText(it: AllSourceItem): string {
                 {{ it.id }}
                 <span class="module-version">@{{ it.versions.at(-1) }}</span>
             </span>
-            <span>
+            <div style="white-space: nowrap">
                 <span
                     class="module-install-state"
                     v-html="installStateText(it)"
@@ -142,7 +142,7 @@ function installStateText(it: AllSourceItem): string {
                 >
                     ⬇️
                 </span>
-            </span>
+            </div>
         </li>
     </ul>
     <p v-else>Loading...</p>
