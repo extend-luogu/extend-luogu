@@ -67,7 +67,6 @@ defineExpose({
 <style>
 .module-list {
     list-style: none;
-    margin: 15px 0;
     padding: 0;
 }
 

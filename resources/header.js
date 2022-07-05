@@ -32,6 +32,8 @@
 // @connect        localhost
 // @connect        raw.githubusercontent.com
 // @connect        unpkg.com
+// @connect        cdn.jsdelivr.net
+// @connect        fastly.jsdelivr.net
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 //

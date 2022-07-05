@@ -1,5 +1,6 @@
 export enum InstallState {
     uninstalled,
     installed,
-    installing
+    installing,
+    installFailed
 }

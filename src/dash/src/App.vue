@@ -96,10 +96,6 @@ function uninstallModule(id: string) {
     z-index: 70000;
     right: 20px;
     top: 60px;
-    border-radius: 0;
-    border: 1px solid black;
-    background: white;
-    padding: 3px 15px 5px 15px;
     transition: color 0.5s, border-color 0.5s;
 }
 
@@ -111,6 +107,7 @@ function uninstallModule(id: string) {
 .tabs {
     border-bottom: 1px solid;
     padding: 0px 5px;
+    margin-bottom: 15px;
 }
 
 .tab-head {
