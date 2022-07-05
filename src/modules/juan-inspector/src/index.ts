@@ -1,4 +1,6 @@
 import '@exlg/core/types/module-entry'
+import { SchemaToStorage } from '@exlg/core/types'
+import type Schema from './schema'
 
 interface SubscribedUserInfo {
     uid: number
@@ -6,9 +8,10 @@ interface SubscribedUserInfo {
     passedProblemCount: number
 }
 
-utils.mustMatch(/\/$/)
-const sto = runtime.storage!
-const lastFetched = sto.get('lastFetched') ?? '[]'
+utils.mustMatch('/')
+
+const sto = runtime.storage as SchemaToStorage<typeof Schema>
+const lastFetched = sto.get('_lastFetched')
 
 $('[name=punch]').on('click', async () => {
     const { users } = await $.get(
@@ -45,9 +48,9 @@ $('[name=punch]').on('click', async () => {
         }
     )
     userInfo.sort((a: number[], b: number[]) => a[0] - b[0])
-    const origCnt = JSON.parse(lastFetched)
+    const origCnt = lastFetched
     const juans = []
-    sto.set('lastFetched', JSON.stringify(userInfo))
+    sto.set('_lastFetched', userInfo)
 
     let i = 0
     let j = 0
