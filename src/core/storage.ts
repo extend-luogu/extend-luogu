@@ -76,6 +76,8 @@ export const defineStorage = <T>(
     namespace: string,
     schema: Schema<T>
 ): Storage<T> => {
+    if (unsafeWindow.exlg.schemas[namespace])
+        throw Error(`Namespace \`${namespace}\` already exists`)
     unsafeWindow.exlg.schemas[namespace] = schema
     return storage(namespace, schema, true)
 }

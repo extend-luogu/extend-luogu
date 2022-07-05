@@ -1,4 +1,5 @@
 import utils, { Utils } from './utils'
+import { defineStorage } from './storage'
 import type { Schema, Schemas } from './storage'
 import {
     Module,
@@ -13,6 +14,7 @@ export interface Exlg {
     utils: Utils
     modules: Modules
     moduleCtl?: ModuleCtl
+    defineStorage: typeof defineStorage
     schemas: Schemas
     dash: {
         script?: string
@@ -29,6 +31,7 @@ declare global {
 }
 unsafeWindow.exlg = {
     utils,
+    defineStorage,
     modules: {},
     schemas: {},
     dash: {}
