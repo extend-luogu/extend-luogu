@@ -107,7 +107,11 @@ export const executeModule = async (module: Module) => {
         return
     }
 
-    module.runtime.storage = defineStorage(module.id, Schema(exports.schema))
+    if (exports.schema)
+        module.runtime.storage = defineStorage(
+            module.id,
+            Schema(exports.schema)
+        )
 
     if (!module.active) return
 
