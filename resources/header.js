@@ -17,6 +17,7 @@
 // @match          https://dash.exlg.cc/*
 // @include        http://localhost:1634/*
 //
+// @connect        *
 // @connect        tencentcs.com
 // @connect        xn--fx-ex2c330n.ml
 // @connect        bens.rotriw.com
