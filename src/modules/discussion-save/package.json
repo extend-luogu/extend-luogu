@@ -17,7 +17,7 @@
         "@exlg/core": "workspace:^"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.1.0",
+        "@exlg/cli-mod": "^1.2.1",
         "@types/jquery": "^3.5.14"
     }
 }

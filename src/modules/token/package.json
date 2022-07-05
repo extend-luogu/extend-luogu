@@ -25,7 +25,7 @@
         "schemastery": "^3.4.3"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.1.0",
+        "@exlg/cli-mod": "^1.2.1",
         "@types/jquery": "^3.5.14"
     }
 }
