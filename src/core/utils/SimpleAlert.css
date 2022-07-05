@@ -30,11 +30,3 @@
     background-color: rgba(0, 0, 0, 0.4);
     z-index: 79999;
 }
-
-.simple-alert > .accept,
-.simple-alert > .cancel {
-    border-radius: 0;
-    border: 1px solid black;
-    background: white;
-    padding: 3px 15px 5px 15px;
-}

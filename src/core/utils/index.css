@@ -1,0 +1,17 @@
+.exlg-button {
+    border-radius: 0;
+    border: 1px solid black;
+    outline: none;
+    background: white;
+    padding: 3px 15px 5px 15px;
+}
+
+.exlg-hr {
+    border-top: 1px solid black;
+}
+
+.exlg-select {
+    border: 1px solid black;
+    outline: none;
+    background: white;
+}

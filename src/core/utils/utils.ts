@@ -1,3 +1,4 @@
+import './index.css'
 import './SimpleAlert.css'
 
 declare global {
@@ -103,7 +104,7 @@ export const csPost = (
 }
 
 export const csGet = (url: string, headers = {}): any => {
-    const res = new Promise((resolve, onerror) => {
+    const res = new Promise((resolve, reject) => {
         GM_xmlhttpRequest({
             url,
             method: 'GET',
@@ -114,7 +115,7 @@ export const csGet = (url: string, headers = {}): any => {
                 } catch (e) {} // eslint-disable-line no-empty
                 resolve(r)
             },
-            onerror
+            onerror: reject
         })
     })
     return chain(res)
@@ -151,8 +152,8 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
         $root.innerHTML = `
             <p class='title'></p>
             <div class='content'></div>
-            <button class='accept'>确定</button>
-            <button class='cancel'>取消</button>
+            <button class='accept exlg-button'>确定</button>
+            <button class='cancel exlg-button'>取消</button>
         `
         document.body.appendChild($root)
     } else $root.style.display = 'block'
