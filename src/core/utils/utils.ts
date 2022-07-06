@@ -1,6 +1,8 @@
 import './index.css'
 import './SimpleAlert.css'
 
+import { Schema } from '../storage'
+
 declare global {
     // TamperMonkey
 
@@ -13,6 +15,8 @@ declare global {
         content?: string
     } | void
 }
+
+export { Schema }
 
 export const loadJs = (js: string) => {
     GM_addElement('script', { textContent: js })
