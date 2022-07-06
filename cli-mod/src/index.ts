@@ -249,7 +249,8 @@ program
 
                 const schema = (
                     await import(
-                        path.resolve(process.cwd(), 'dist', 'schema.mjs')
+                        'file://' +
+                            path.resolve(process.cwd(), 'dist', 'schema.mjs')
                     )
                 ).default
 
