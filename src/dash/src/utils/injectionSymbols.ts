@@ -1,4 +1,4 @@
 import { InjectionKey } from 'vue'
-import { ModuleCtl } from '../../../core/module'
+import type { ModuleCtl } from '../../../core/types'
 
 export const kModuleCtl = Symbol('ModuleCtl') as InjectionKey<ModuleCtl>

@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue'
-import type { ModulesReadonly } from '../../../core'
+import { computed, inject, reactive, ref } from 'vue'
+import type { ModulesReadonly, Schema } from '../../../core/types'
 import { kModuleCtl } from '../utils/injectionSymbols'
+import ConfigItem from './ConfigItem.vue'
 
 const emits = defineEmits<{
     (e: 'uninstallModule', id: string): void
 }>()
 
 const moduleCtl = inject(kModuleCtl)!
-const { utils } = window.exlg
+const { utils, schemas } = window.exlg
 
 const modules = ref<ModulesReadonly | null>()
 
@@ -47,6 +48,13 @@ function uninstall(id: string) {
     )
 }
 
+const configModuleId = ref<string | null>(null)
+const configStorage = computed(() =>
+    configModuleId.value
+        ? moduleCtl.moduleStorages[configModuleId.value]
+        : undefined
+)
+
 updateModuleCache()
 
 defineExpose({
@@ -55,26 +63,52 @@ defineExpose({
 </script>
 
 <template>
-    <div>
-        <ul class="module-list" v-if="modules">
-            <li v-for="mod of modules" :key="mod.id" class="module-entry">
-                <span>
-                    {{ mod.id }}
-                    <span class="module-version">
-                        @{{ mod.metadata.version }}
+    <div class="root">
+        <div class="module-config" v-if="configModuleId">
+            设置 {{ configModuleId }}
+
+            <hr class="exlg-hr" />
+
+            <div class="module-config-list">
+                <template
+                    v-for="(schema, name) of schemas[configModuleId].dict"
+                    :key="name"
+                >
+                    <div v-if="schema?.meta?.description">
+                        {{ name }}
+                        <ConfigItem :schema="schema" :storage="configStorage" />
+                        {{ schema.meta.description }}
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div>
+            <ul class="module-list" v-if="modules">
+                <li v-for="mod of modules" :key="mod.id" class="module-entry">
+                    <span>
+                        {{ mod.id }}
+                        <span class="module-version">
+                            @{{ mod.metadata.version }}
+                        </span>
                     </span>
-                </span>
-                <span>
-                    <span @click="uninstall(mod.id)">🗑️</span>
-                    <input
-                        class="module-toggle"
-                        type="checkbox"
-                        :checked="mod.active"
-                        @change="toggleModule(mod.id)"
-                    />
-                </span>
-            </li>
-        </ul>
+                    <span style="white-space: nowrap">
+                        <span
+                            v-if="schemas[mod.id]"
+                            @click="configModuleId = mod.id"
+                        >
+                            ⚙️
+                        </span>
+                        <span @click="uninstall(mod.id)">🗑️</span>
+                        <input
+                            class="module-toggle exlg-checkbox"
+                            type="checkbox"
+                            :checked="mod.active"
+                            @change="toggleModule(mod.id)"
+                        />
+                    </span>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -91,5 +125,21 @@ defineExpose({
 
 .module-version {
     color: blueviolet;
+}
+
+.module-config {
+    top: 0;
+    right: calc(100% + 20px);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 1px 1px #000;
+}
+
+.module-config-list:empty::before {
+    content: '没有可用配置项';
 }
 </style>

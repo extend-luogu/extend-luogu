@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { inject, onMounted, reactive, ref, watch } from 'vue'
 import compareVersions from 'compare-versions'
-import { ModuleMetadata } from '../../../core/module'
-import { defineStorage, Schema } from '../../../core/storage'
+import { ModuleMetadata } from '../../../core/types'
 import { InstallState } from '../utils'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
@@ -10,6 +9,7 @@ const emits = defineEmits<{
     (e: 'installModule'): void
 }>()
 
+const { Schema } = window.exlg.utils
 const moduleCtl = inject(kModuleCtl)!
 const sourceUrl =
     'https://raw.githubusercontent.com/extend-luogu/exlg-module-registry/dist/index.json'

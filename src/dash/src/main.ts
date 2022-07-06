@@ -1,6 +1,6 @@
 import * as Vue from 'vue'
 import { createApp } from 'vue'
-import type { Exlg } from '../../core'
+import { Exlg } from '../../core/types'
 import App from './App.vue'
 
 declare global {

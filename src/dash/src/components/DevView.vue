@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import utils from '../../../core/utils'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
+const { utils } = window.exlg
 const moduleCtl = inject(kModuleCtl)!
 
 const debug = ref(false)
