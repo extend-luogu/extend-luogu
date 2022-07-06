@@ -1,5 +1,6 @@
 describe('discussion-save', () => {
     const { $ } = Cypress
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const define = ({ entry, style }) => {
         if (style) {
@@ -19,29 +20,39 @@ describe('discussion-save', () => {
         }
     }
 
-    before(() => {
-        cy.exec('cd src/modules/discussion-save && pnpm exlg-mod build -c')
-        cy.log('module built')
-    })
-
-    const beforeEachFunc = (autoSaveDiscussion: boolean) => {
+    const beforeFunc = (module: string) => {
         return () => {
-            cy.visit('https://www.luogu.com.cn/discuss/241461')
-            cy.window().then((win) => {
-                Object.assign(win, {
-                    $,
-                    autoSaveDiscussion
-                })
-            })
-            cy.readFile(
-                'src/modules/discussion-save/dist/module.define.js'
-            ).then((text) => {
-                // eslint-disable-next-line no-eval
-                eval(text)
-            })
+            cy.exec(`cd src/modules/${module} && pnpm exlg-mod build -c`)
+            cy.log('module built')
         }
     }
-    beforeEach(beforeEachFunc(false))
+
+    const beforeEachFunc = (
+        module: string,
+        url: string,
+        toAssign: any = {}
+    ) => {
+        return () => {
+            cy.visit(`https://www.luogu.com.cn${url}`)
+            cy.window().then((win) => {
+                Object.assign(win, { $ })
+                Object.assign(win, toAssign)
+            })
+            cy.readFile(`src/modules/${module}/dist/module.define.js`).then(
+                (text) => {
+                    // eslint-disable-next-line no-eval
+                    eval(text)
+                }
+            )
+        }
+    }
+
+    before(beforeFunc('discussion-save'))
+    beforeEach(
+        beforeEachFunc('discussion-save', '/discuss/241461', {
+            autoSaveDiscussion: false
+        })
+    )
 
     it('显示界面', () => {
         cy.contains('保存讨论').should('have.length', 1)
@@ -61,7 +72,11 @@ describe('discussion-save', () => {
     })
 
     describe('自动保存', () => {
-        beforeEach(beforeEachFunc(true))
+        beforeEach(
+            beforeEachFunc('discussion-save', '/discuss/241461', {
+                autoSaveDiscussion: true
+            })
+        )
 
         it('自动保存', () => {
             cy.contains('保存中...').should('have.length', 1)
@@ -80,7 +95,7 @@ describe('discussion-save', () => {
                 { fixture: 'discussion-save/success.json' }
             )
             cy.contains('保存讨论').click()
-            cy.wait(800)
+            cy.wait(100)
             cy.contains('保存成功').should('have.length', 1)
         })
 
@@ -90,7 +105,7 @@ describe('discussion-save', () => {
                 { fixture: 'discussion-save/fail.json' }
             )
             cy.contains('保存讨论').click()
-            cy.wait(800)
+            cy.wait(100)
             cy.contains('保存失败').should('have.length', 1)
         })
     })
