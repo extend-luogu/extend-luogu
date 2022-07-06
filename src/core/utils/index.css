@@ -6,6 +6,11 @@
     padding: 3px 15px 5px 15px;
 }
 
+.exlg-button:disabled {
+    color: gray;
+    text-decoration: line-through;
+}
+
 .exlg-hr {
     border-top: 1px solid black;
 }

@@ -12,6 +12,7 @@ export interface Storage<T = any> {
     set: <K extends keyof T & string>(key: K, value: T[K]) => void
     del: <K extends keyof T & string>(key: K) => void
     do: <K extends keyof T & string>(key: K, fn: (value: T[K]) => T[K]) => void
+    clear: () => void
 }
 
 export type FilterKeysWithValueType<O, V> = {
@@ -28,7 +29,7 @@ const storage = <T>(
 ): Storage<T> => {
     const checkPrivate = (key: keyof T & string) => {
         if (key[0] === '_' && !direct)
-            throw Error('Cannot access private storage of other modules.')
+            throw Error('Cannot access private property of other storages.')
     }
 
     const _get = () => schema(GM_getValue(namespace))
@@ -68,6 +69,9 @@ const storage = <T>(
             const data = _get()
             data[key] = fn(data[key])
             GM_setValue(namespace, data)
+        },
+        clear: () => {
+            if (!direct) throw Error('Cannot clear other storages.')
         }
     }
 }

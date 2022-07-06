@@ -216,5 +216,6 @@ function installStateText(it: AllSourceItem): string {
     padding: 5px;
     border: 1px solid black;
     background: white;
+    white-space: normal;
 }
 </style>

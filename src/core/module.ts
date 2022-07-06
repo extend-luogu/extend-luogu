@@ -52,6 +52,7 @@ export type Modules = Record<string, Module>
 export type ModulesReadonly = Record<string, ModuleReadonly>
 
 let storage: Storage<ModulesReadonly>
+const moduleStorages: Record<string, Storage> = {}
 
 const wrapModule = (module: Module) => `
 exlg.modules['${module.id}'].runtime.setWrapper(new Function(
@@ -107,11 +108,12 @@ export const executeModule = async (module: Module) => {
         return
     }
 
-    if (exports.schema)
-        module.runtime.storage = defineStorage(
+    if (exports.schema) {
+        moduleStorages[module.id] = module.runtime.storage = defineStorage(
             module.id,
             Schema(exports.schema)
         )
+    }
 
     if (!module.active) return
 
@@ -133,6 +135,7 @@ const logger = exlgLog('core')
 
 export interface ModuleCtl {
     storage: Storage<ModulesReadonly>
+    moduleStorages: Record<string, Storage>
     installModule: typeof installModule
     executeModule: typeof executeModule
 }
@@ -140,6 +143,7 @@ export interface ModuleCtl {
 const loadDash = () => {
     unsafeWindow.exlg.moduleCtl = {
         storage,
+        moduleStorages,
         installModule,
         executeModule
     }
