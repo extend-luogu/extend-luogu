@@ -20,3 +20,11 @@
     outline: none;
     background: white;
 }
+
+.exlg-checkbox {
+    accent-color: blueviolet;
+    width: 1em;
+    height: 1em;
+    vertical-align: text-bottom;
+    margin: 2px 3px !important;
+}
