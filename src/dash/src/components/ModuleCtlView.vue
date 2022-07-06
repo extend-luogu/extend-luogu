@@ -65,9 +65,14 @@ defineExpose({
 <template>
     <div class="root">
         <div class="module-config" v-if="configModuleId">
-            设置 {{ configModuleId }}
+            <span class="module-config-header">
+                设置 {{ configModuleId }}
+                <span @click="configModuleId = null" style="cursor: pointer">
+                    关闭
+                </span>
+            </span>
 
-            <hr class="exlg-hr" />
+            <hr class="exlg-hr close-to-top" />
 
             <div class="module-config-list">
                 <template
@@ -137,6 +142,11 @@ defineExpose({
     padding: 20px;
     background: white;
     box-shadow: 0 0 1px 1px #000;
+}
+
+.module-config-header {
+    display: flex;
+    justify-content: space-between;
 }
 
 .module-config-list:empty::before {

@@ -5,7 +5,6 @@
     background: white;
     padding: 3px 15px 5px 15px;
 }
-
 .exlg-button:disabled {
     color: gray;
     text-decoration: line-through;
@@ -13,6 +12,12 @@
 
 .exlg-hr {
     border-top: 1px solid black;
+}
+.exlg-hr.close-to-top {
+    margin-top: 0;
+}
+.exlg-hr.close-to-bottom {
+    margin-bottom: 0;
 }
 
 .exlg-select {
