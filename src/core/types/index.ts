@@ -7,7 +7,9 @@ export type {
     ModuleMetadata,
     ModuleRuntime,
     ModuleWrapper,
-    Modules
+    Modules,
+    ModuleReadonly,
+    ModulesReadonly
 } from '../module'
 
 export type { Utils } from '../utils'
