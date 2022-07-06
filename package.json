@@ -40,7 +40,6 @@
         "typescript": "^4.7.4"
     },
     "dependencies": {
-        "@types/mocha": "^9.1.1",
         "schemastery": "^3.4.3"
     }
 }

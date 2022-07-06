@@ -1,6 +1,6 @@
 import '@exlg/core/types/module-entry'
 import { SchemaToStorage } from '@exlg/core/types'
-import type Schema from './schema'
+import type Scm from './schema'
 
 interface SubscribedUserInfo {
     uid: number
@@ -8,77 +8,89 @@ interface SubscribedUserInfo {
     passedProblemCount: number
 }
 
+type JuanInfo = Record<
+    number,
+    {
+        name: string
+        count: number
+    }
+>
+
 utils.mustMatch('/')
 
-const sto = runtime.storage as SchemaToStorage<typeof Schema>
-const lastFetched = sto.get('_lastFetched')
+const sto = runtime.storage as SchemaToStorage<typeof Scm>
 
-$('[name=punch]').on('click', async () => {
-    const { users } = await $.get(
-        `/api/user/followings?user=${_feInjection.currentUser.uid}`
-    )
-    const { result, perPage } = users
-    const pmList = []
-    const userInfo: number[][] = []
-    let count = users.count - perPage
-    for (let pid = 2; count > 0; pid++, count -= perPage) {
-        pmList.push(
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
-            new Promise<void>((resolve, reject) => {
-                $.get(
-                    `/api/user/followings?user=${_feInjection.currentUser.uid}&page=${pid}`
-                )
-                    .then((res) => {
-                        result.push(res.users.result)
-                        resolve()
-                    })
-                    .catch((err) => {
-                        reject(err)
-                    })
-            })
+const inspect = async () => {
+    const api = `/api/user/followings?user=${_feInjection.currentUser.uid}`
+
+    const pendingResults = []
+
+    const {
+        result: firstResult,
+        count,
+        perPage
+    } = await utils.csGet(api).data.users
+
+    for (
+        let countNow = perPage, pid = 2;
+        countNow < count;
+        pid++, countNow += perPage
+    ) {
+        pendingResults.push(utils.csGet(api + '&pid='))
+    }
+
+    const results = [
+        firstResult,
+        ...(await Promise.all(pendingResults)).map(
+            ({ data }) => data.users.result
         )
-    }
-    await Promise.all(pmList)
+    ].flat()
 
-    const uidMap = new Map()
-    result.forEach(
-        ({ uid, name, passedProblemCount }: SubscribedUserInfo, i: number) => {
-            userInfo[i] = [uid, passedProblemCount]
-            uidMap.set(uid, name)
+    const juanInfo: JuanInfo = Object.fromEntries(
+        results.map(({ uid, name, passedProblemCount }: SubscribedUserInfo) => [
+            uid,
+            { name, count: passedProblemCount }
+        ])
+    )
+
+    const lastJuanInfo = sto.get('_lastFetched')
+    sto.set('_lastFetched', juanInfo)
+
+    const juans = []
+    for (const uid in juanInfo) {
+        if (lastJuanInfo[uid])
+            juans.push({
+                uid,
+                name: juanInfo[uid].name,
+                delta: juanInfo[uid].count - lastJuanInfo[uid]!.count
+            })
+    }
+
+    const juanList = juans
+        .sort((a, b) => b.delta - a.delta)
+        .slice(0, 3)
+        .filter((x) => x)
+        .map(
+            ({ uid, name, delta }) => `
+                    <li class="juan-rnkitm">
+                        <span>
+                            <a href="/user/${uid}">${name}</a> <span>${delta} 道</span>
+                        </span>
+                    </li>
+                `
+        )
+        .join('')
+
+    utils.simpleAlert(
+        `
+            <p>从上一次打卡到现在，关注用户中卷题量前三为：</p>
+            ${juans.length < 3 ? '<p>卷题人数不足三位，明天再看看吧</p>' : ''}
+            <ol style="margin: 0 25% 0 20%;">${juanList}</ol>
+        `,
+        {
+            title: '卷王监视器'
         }
     )
-    userInfo.sort((a: number[], b: number[]) => a[0] - b[0])
-    const origCnt = lastFetched
-    const juans = []
-    sto.set('_lastFetched', userInfo)
+}
 
-    let i = 0
-    let j = 0
-    while (i < userInfo.length && j < origCnt.length) {
-        if (userInfo[i][0] === origCnt[j][0]) {
-            juans.push([userInfo[i][0], userInfo[i][1] - origCnt[j][1]])
-            i++
-            j++
-        } else if (userInfo[i][0] > origCnt[j][0]) {
-            j++
-        } else {
-            i++
-        }
-    }
-    juans.sort((a, b) => b[1] - a[1])
-
-    if (juans.length) {
-        utils.simpleAlert(`<p>从上一次打卡到现在，关注用户中卷题量前三为：</p>
-        <ol style="margin: 0 25% 0 20%;">
-            ${juans
-                .slice(0, 3)
-                .map(
-                    ([uid, cnt]) =>
-                        `<li class="juan-rnkitm"><span><a href="/user/${uid}">${uidMap.get(
-                            uid
-                        )}</a><span>${cnt} 道</span></span></li>`
-                )
-                .join('')}
-        </ol>`)
-    }
-})
+$('[name=punch]').on('click', inspect)

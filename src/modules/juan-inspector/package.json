@@ -2,7 +2,7 @@
     "name": "@exlg/mod-juan-inspector",
     "description": "监视关注用户中的卷王",
     "author": "5ab-juruo",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "main": "src/index.ts",
     "keywords": [
         "exlg",

@@ -1,5 +1,10 @@
 import Schema from 'schemastery'
 
 export default Schema.object({
-    _lastFetched: Schema.array(Schema.array(Schema.number()))
+    _lastFetched: Schema.dict(
+        Schema.object({
+            name: Schema.string().required(),
+            count: Schema.number().required()
+        })
+    )
 })
