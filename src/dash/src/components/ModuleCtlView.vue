@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref } from 'vue'
-import type { ModulesReadonly, Schema } from '../../../core/types'
+import { computed, inject, ref } from 'vue'
+import type { ModulesReadonly } from '../../../core/types'
 import { kModuleCtl } from '../utils/injectionSymbols'
 import ConfigItem from './ConfigItem.vue'
 

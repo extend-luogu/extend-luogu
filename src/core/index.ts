@@ -9,8 +9,10 @@ import {
     ModuleCtl,
     launch
 } from './module'
+import pack from './package.json'
 
 export interface Exlg {
+    coreVersion: string
     utils: Utils
     modules: Modules
     moduleCtl?: ModuleCtl
@@ -30,6 +32,7 @@ declare global {
     }
 }
 unsafeWindow.exlg = {
+    coreVersion: pack.version,
     utils,
     defineStorage,
     modules: {},

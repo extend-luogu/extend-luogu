@@ -2,7 +2,7 @@
 import { inject, ref } from 'vue'
 import { kModuleCtl } from '../utils/injectionSymbols'
 
-const { utils } = window.exlg
+const { utils, coreVersion } = window.exlg
 const moduleCtl = inject(kModuleCtl)!
 
 const debug = ref(false)
@@ -20,9 +20,13 @@ function debugClick() {
 </script>
 
 <template>
-    <p @click.prevent="debugClick" class="debug-button" :class="{ debug }">
-        DEBUG
-    </p>
+    <div>
+        core <span class="module-version">@{{ coreVersion }}</span>
+        <hr class="exlg-hr" />
+        <p @click.prevent="debugClick" class="debug-button" :class="{ debug }">
+            DEBUG
+        </p>
+    </div>
 </template>
 
 <style scoped>
