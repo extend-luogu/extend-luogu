@@ -33,3 +33,16 @@
     vertical-align: text-bottom;
     margin: 2px 3px !important;
 }
+
+.exlg-tooltip {
+    position: relative;
+    cursor: help;
+}
+.exlg-tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 70001;
+    border: 1px solid black;
+    background: white;
+    white-space: normal;
+}

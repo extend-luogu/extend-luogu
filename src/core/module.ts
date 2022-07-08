@@ -32,9 +32,18 @@ export type ModuleWrapper = (
     error: LoggerFunction
 ) => ModuleExports
 
+export type ExecuteState =
+    | 'done'
+    | 'inactive'
+    | 'throwed'
+    | 'mismatched'
+    | 'storageBroken'
+    | 'notExported'
+    | 'unwrapThrowed'
+
 export interface ModuleRuntime {
     setWrapper?: (wrapper: ModuleWrapper) => void
-    executeState?: Promise<void> | undefined
+    executeState?: Promise<ExecuteState> | undefined
     storage?: Storage
 }
 
@@ -73,7 +82,7 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
     storage.set(module.id, module)
 }
 
-export const executeModule = async (module: Module) => {
+export const executeModule = async (module: Module): Promise<ExecuteState> => {
     const wrapper = await new Promise<ModuleWrapper>((res) => {
         module.runtime.setWrapper = (r) => {
             delete module.runtime.setWrapper
@@ -98,14 +107,14 @@ export const executeModule = async (module: Module) => {
         )
     } catch (err) {
         error('Failed to unwrap: %o', err)
-        return
+        return 'unwrapThrowed'
     }
 
     exports = exports as ModuleExports | null
 
     if (!exports) {
         error('Exports not found.')
-        return
+        return 'notExported'
     }
 
     if (exports.schema) {
@@ -115,13 +124,14 @@ export const executeModule = async (module: Module) => {
         )
     }
 
-    if (!module.active) return
+    if (!module.active) return 'inactive'
 
     try {
         await exports.entry?.()
     } catch (err) {
-        if (err instanceof MatchError) return
+        if (err instanceof MatchError) return 'mismatched'
         error('Failed to execute: %o', err)
+        return 'throwed'
     }
     log('Executed.')
 
@@ -129,6 +139,8 @@ export const executeModule = async (module: Module) => {
         loadCss(exports.style)
         log('Style loaded.')
     }
+
+    return 'done'
 }
 
 const logger = exlgLog('core')
@@ -187,8 +199,6 @@ export const launch = async () => {
 
     logger.log('Loaded `modules` storage.')
 
-    loadDash()
-
     const executeStates = []
 
     for (const module of Object.values(exlg.modules)) {
@@ -197,6 +207,8 @@ export const launch = async () => {
             (module.runtime.executeState = executeModule(module))
         )
     }
+
+    loadDash()
 
     await Promise.all(executeStates)
     logger.log('Launched.')

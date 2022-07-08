@@ -158,13 +158,13 @@ function installStateText(it: AllSourceItem): string {
                     >
                     </span>
                     <span
-                        class="module-description"
-                        :data-description="it.description"
+                        class="module-description exlg-tooltip"
+                        :data-tooltip="it.description"
                     >
                         📙
                     </span>
                     <span
-                        class="module-install"
+                        class="emoji-button module-install"
                         :style="{
                             visibility:
                                 installStates[it.id] === InstallState.installing
@@ -186,9 +186,7 @@ function installStateText(it: AllSourceItem): string {
 .module-install {
     transition: color 0.5s;
 }
-
 .module-install:hover {
-    cursor: pointer;
     color: blueviolet;
 }
 
@@ -206,16 +204,10 @@ function installStateText(it: AllSourceItem): string {
     position: relative;
 }
 
-.module-description:hover::after {
-    content: attr(data-description);
-    position: absolute;
-    z-index: 70001;
+.module-description::after {
     right: 25px;
     top: 25px;
     width: 400px;
     padding: 5px;
-    border: 1px solid black;
-    background: white;
-    white-space: normal;
 }
 </style>

@@ -9,7 +9,8 @@ export type {
     ModuleWrapper,
     Modules,
     ModuleReadonly,
-    ModulesReadonly
+    ModulesReadonly,
+    ExecuteState
 } from '../module'
 
 export type { Utils } from '../utils'
