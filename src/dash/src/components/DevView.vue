@@ -9,11 +9,18 @@ const debug = ref(false)
 const debugClickCount = ref(0)
 function debugClick() {
     if (++debugClickCount.value === 5) {
-        debug.value = true
+        debug.value = true // 开启调试模式
         window.exlg.moduleCtl = moduleCtl
     }
 
     if (debugClickCount.value === 10) {
+        utils.simpleAlert('尝试一下《Celeste 蔚蓝》吧！一款震撼心灵的游戏', {
+            noCancel: true,
+            title: 'To: Madeline'
+        })
+    }
+
+    if (debugClickCount.value === 15) {
         utils.simpleAlert('……不要，不要再点了！QAQ', { noCancel: true })
     }
 }
