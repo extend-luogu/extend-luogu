@@ -1,8 +1,8 @@
 import '@exlg/core/types/module-entry'
 
-utils.mustMatch('/discuss/lists')
+utils.mustMatch(/^\/discuss\/lists\?forumname=/, { withSearch: true })
 
-const meta_discussion_id = '432028'
+const metaDiscussionId = '432028'
 const metaWordRegex = [/exlg/i, /ex(tend)?[- ]luogu/i, /badge/i]
 
 const $newpostSection = $('#newpost')
@@ -11,8 +11,8 @@ const $newpostSubmit: JQuery<HTMLInputElement> = $('#submitpost')
 const $newpostSubmitWrapper = $newpostSubmit.wrap('<div></div>').parent()
 
 // Note: 添加专贴说明和链接
-const discuss_link = `<a href="/discuss/${meta_discussion_id}"><b>专贴</b></a>`
-$newpostSection.after(`<p>exlg 相关问题请在 ${discuss_link} 讨论</p>`)
+const discussLink = `<a href="/discuss/${metaDiscussionId}"><b>专贴</b></a>`
+$newpostSection.after(`<p>exlg 相关问题请在 ${discussLink} 讨论</p>`)
 
 // Note: 识别 "exlg" 关键字，引导用户去专贴讨论
 $newpostSubmitWrapper[0].addEventListener(
@@ -31,7 +31,7 @@ $newpostSubmitWrapper[0].addEventListener(
             utils.simpleAlert(
                 '检测到您将要发送的讨论内容包含与 exlg 有关的关键词：<br />' +
                     `${existMetaWords.map((s) => `“${s}”`).join(', ')}<br />` +
-                    `建议前往 ${discuss_link} 讨论。<br />` +
+                    `建议前往 ${discussLink} 讨论。<br />` +
                     '这是为了防止占用讨论资源，营造一个更高质量的社区。 <br />' +
                     '我们很担心 exlg 相关讨论霸占版面，造成负面影响。<br />' +
                     '<span style="color: orange">' +

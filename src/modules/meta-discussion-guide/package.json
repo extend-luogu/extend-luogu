@@ -2,7 +2,7 @@
     "name": "@exlg/mod-meta-discussion-guide",
     "description": "引导用户前往转贴讨论 exlg 相关问题",
     "author": "ForkKILLET",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
