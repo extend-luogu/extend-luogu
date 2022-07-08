@@ -96,6 +96,7 @@ function uninstallModule(id: string) {
     min-width: 350px;
     height: calc(100% - 200px);
     padding: 20px;
+    line-height: 1.6;
     background: white;
     box-shadow: 0 0 1px 1px black;
 }

@@ -11,6 +11,7 @@
 }
 
 .exlg-hr {
+    margin: 16px 0;
     border-top: 1px solid black;
 }
 .exlg-hr.close-to-top {
