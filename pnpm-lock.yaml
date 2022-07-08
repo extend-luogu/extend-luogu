@@ -6,6 +6,7 @@ importers:
     specifiers:
       '@commitlint/cli': ^17.0.3
       '@commitlint/config-conventional': ^17.0.3
+      '@types/jquery': ^3.5.14
       '@types/tampermonkey': ^4.0.5
       '@typescript-eslint/eslint-plugin': latest
       '@typescript-eslint/parser': latest
@@ -30,6 +31,7 @@ importers:
     devDependencies:
       '@commitlint/cli': 17.0.3
       '@commitlint/config-conventional': 17.0.3
+      '@types/jquery': 3.5.14
       '@types/tampermonkey': 4.0.5
       '@typescript-eslint/eslint-plugin': 5.30.5_6zdoc3rn4mpiddqwhppni2mnnm
       '@typescript-eslint/parser': 5.30.5_4x5o4skxv6sl53vpwefgt23khm

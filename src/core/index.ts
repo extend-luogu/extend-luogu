@@ -27,6 +27,7 @@ export { Schema, Schemas, Module, Modules, ModuleReadonly, ModulesReadonly }
 
 declare global {
     interface Window {
+        $: JQueryStatic
         exlg: Exlg
         exlgResources: Record<string, string>
     }

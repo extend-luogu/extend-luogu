@@ -18,6 +18,8 @@ declare global {
 
 export { Schema }
 
+unsafeWindow.$ ??= $
+
 export const loadJs = (js: string) => {
     GM_addElement('script', { textContent: js })
 }

@@ -20,6 +20,7 @@
     "devDependencies": {
         "@commitlint/cli": "^17.0.3",
         "@commitlint/config-conventional": "^17.0.3",
+        "@types/jquery": "^3.5.14",
         "@types/tampermonkey": "^4.0.5",
         "@typescript-eslint/eslint-plugin": "latest",
         "@typescript-eslint/parser": "latest",
