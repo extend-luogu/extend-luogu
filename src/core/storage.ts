@@ -72,6 +72,7 @@ const storage = <T>(
         },
         clear: () => {
             if (!direct) throw Error('Cannot clear other storages.')
+            GM_setValue(namespace, {})
         }
     }
 }
