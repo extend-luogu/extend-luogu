@@ -1,6 +1,6 @@
 {
     "name": "@exlg/cli-mod",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "Command line interface for rapid exlg module development",
     "bin": {
         "exlg-mod": "bin/index.js"

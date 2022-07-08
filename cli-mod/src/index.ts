@@ -225,6 +225,7 @@ program
             await esbuild.build({
                 entryPoints: [`./src/index.${useTs ? 'ts' : 'js'}`],
                 format: 'iife',
+                charset: 'utf8',
                 bundle: true,
                 minify: true,
                 outfile: 'dist/bundle.js'
@@ -243,6 +244,7 @@ program
                 await esbuild.build({
                     entryPoints: [`./src/schema.${useTs ? 'ts' : 'mjs'}`],
                     format: 'esm',
+                    charset: 'utf8',
                     bundle: true,
                     outfile: 'dist/schema.mjs'
                 })
@@ -265,6 +267,7 @@ program
                     await fs.readFile('./src/index.css', 'utf-8'),
                     {
                         loader: 'css',
+                        charset: 'utf8',
                         minify: true
                     }
                 )
