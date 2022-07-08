@@ -51,22 +51,22 @@ function uninstall(id: string) {
 
 const executeStateIcons: Record<ExecuteState, string> = {
     done: '✨',
-    throwed: '💥',
+    threw: '💥',
     inactive: '❄️',
     mismatched: '🌙',
     storageBroken: '💥',
     notExported: '💥',
-    unwrapThrowed: '💥'
+    unwrapThrew: '💥'
 }
 
 const executeStateTexts: Record<ExecuteState, string> = {
     done: '已加载',
-    throwed: '出错了',
+    threw: '出错了',
     inactive: '未开启',
     mismatched: '未匹配',
     storageBroken: '数据错误',
     notExported: '无导出',
-    unwrapThrowed: '解包错误'
+    unwrapThrew: '解包错误'
 }
 
 updateModuleCache()

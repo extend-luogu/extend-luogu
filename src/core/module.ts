@@ -35,11 +35,11 @@ export type ModuleWrapper = (
 export type ExecuteState =
     | 'done'
     | 'inactive'
-    | 'throwed'
+    | 'threw'
     | 'mismatched'
     | 'storageBroken'
     | 'notExported'
-    | 'unwrapThrowed'
+    | 'unwrapThrew'
 
 export interface ModuleRuntime {
     setWrapper?: (wrapper: ModuleWrapper) => void
@@ -108,7 +108,7 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         )
     } catch (err) {
         error('Failed to unwrap: %o', err)
-        return 'unwrapThrowed'
+        return 'unwrapThrew'
     }
 
     exports = exports as ModuleExports | null
@@ -132,7 +132,7 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
     } catch (err) {
         if (err instanceof MatchError) return 'mismatched'
         error('Failed to execute: %o', err)
-        return 'throwed'
+        return 'threw'
     }
     log('Executed.')
 
