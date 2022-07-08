@@ -1,38 +1,41 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Schema, Storage } from '../../../core/types'
 
 const props = defineProps<{
+    name: string
     schema: Schema
     storage?: Storage
 }>()
 
-const value = ref(props.storage!.get(props.schema.name))
-watch(value, (newValue) => props.storage!.set(props.schema.name, newValue))
+const type = computed(() => props.schema.type)
 
-const inputAttr = () => {
-    switch (props.schema.type) {
-        case 'boolean':
-            return {
-                type: 'checkbox',
-                className: 'exlg-checkbox'
-            }
-        case 'string':
-            return {
-                type: 'text',
-                className: 'exlg-input'
-            }
-        case 'number':
-            return {
-                type: 'number',
-                className: 'exlg-input'
-            }
-        default:
-            return null
-    }
-}
+const value = ref(props.storage!.get(props.name))
+watch(value, (newValue) => props.storage!.set(props.name, newValue))
 </script>
 
 <template>
-    <input v-bind="inputAttr()" v-model="value" />
+    <input
+        v-if="type === 'boolean'"
+        v-model="value"
+        type="checkbox"
+        class="exlg-checkbox"
+    />
+    <input
+        v-else-if="type === 'string'"
+        v-model="value"
+        type="text"
+        class="exlg-input"
+    />
+    <input
+        v-else-if="type === 'number'"
+        v-model="value"
+        type="number"
+        class="exlg-input"
+    />
+    <select v-else-if="type === 'union'" v-model="value" class="exlg-select">
+        <option v-for="(it, i) of props.schema.list" :key="i" :value="it.value">
+            {{ it.meta?.description }}
+        </option>
+    </select>
 </template>

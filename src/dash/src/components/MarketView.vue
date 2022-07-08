@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { inject, onMounted, reactive, ref, watch } from 'vue'
+import { inject, onMounted, reactive, ref } from 'vue'
 import compareVersions from 'compare-versions'
-import { ModuleMetadata } from '../../../core/types'
+import { ModuleMetadata, Schema } from '../../../core/types'
 import { InstallState } from '../utils'
-import { kModuleCtl } from '../utils/injectionSymbols'
+import { kModuleCtl, kShowConfig } from '../utils/injectionSymbols'
 
 const emits = defineEmits<{
     (e: 'installModule'): void
 }>()
 
-const { Schema } = window.exlg.utils
+const { Schema: Scm } = window.exlg.utils
 const moduleCtl = inject(kModuleCtl)!
+const showConfig = inject(kShowConfig)!
+
 const sourceUrl =
     'https://raw.githubusercontent.com/extend-luogu/exlg-module-registry/dist/index.json'
 
@@ -35,28 +37,45 @@ const npmSources = [
     { url: 'https://fastly.jsdelivr.net/npm', name: 'jsdelivr (fastly)' }
 ] as const
 
+const githubSources = [
+    { url: '', name: 'github raw' },
+    { url: 'https://ghproxy.com/', name: 'ghproxy' }
+] as const
+
+const sourceSchema = <
+    T extends readonly { readonly url: string; readonly name: string }[],
+    K extends keyof T & number
+>(
+    sources: T
+): Schema<T[K]['url']> =>
+    Scm.union(
+        sources.map(({ url, name }) => Scm.const(url).description(name))
+    ).default(sources[0].url)
+
 const logger = window.exlg.utils.exlgLog('market')
 const storage = window.exlg.defineStorage(
     'market',
-    Schema.object({
-        _npmSource: Schema.union(npmSources.map(({ url }) => url)).default(
-            npmSources[0].url
-        )
+    Scm.object({
+        npmSource: sourceSchema(npmSources).description('NPM 源'),
+        githubSource: sourceSchema(githubSources).description('github 源')
     })
 )
+moduleCtl.moduleStorages.market = storage // Note: For config
 
-const npmSource = ref(storage.get('_npmSource'))
-watch(npmSource, (val) => storage.set('_npmSource', val))
-
-onMounted(async () => {
-    source.value = await window.exlg.utils.csGet(sourceUrl).data
+async function loadSource() {
+    source.value = null
+    source.value = await window.exlg.utils.csGet(
+        storage.get('githubSource') + sourceUrl
+    ).data
     source.value!.forEach((it) => {
         it.id = `${it.type}:${it.name}`
         installStates[it.id] = moduleCtl.storage.get(it.id)
             ? InstallState.installed
             : InstallState.uninstalled
     })
-})
+}
+
+onMounted(loadSource)
 
 async function install(it: AllSourceItem, vid: number) {
     if (installStates[it.id] === InstallState.installing) return
@@ -75,7 +94,9 @@ async function install(it: AllSourceItem, vid: number) {
         switch (it.type) {
             case 'npm':
                 script = await window.exlg.utils.csGet(
-                    `${npmSource.value}/${it.package}@${version}/${it.bin}`
+                    `${storage.get('npmSource')}/${it.package}@${version}/${
+                        it.bin
+                    }`
                 ).response
         }
     } catch (err) {
@@ -130,16 +151,8 @@ function installStateText(it: AllSourceItem): string {
 
 <template>
     <div class="root">
-        Npm source
-        <select v-model="npmSource" class="exlg-select">
-            <option
-                v-for="(source, key) of npmSources"
-                :value="source.url"
-                :key="key"
-            >
-                {{ source.name }}
-            </option>
-        </select>
+        <span class="emoji-button" @click="showConfig('market')">⚙️</span>
+        <span class="emoji-button" @click="loadSource()">🔄</span>
 
         <hr class="exlg-hr" />
 

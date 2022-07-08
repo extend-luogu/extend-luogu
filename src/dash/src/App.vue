@@ -3,12 +3,13 @@ import { provide, reactive, ref } from 'vue'
 import ModuleCtlView from './components/ModuleCtlView.vue'
 import MarketView from './components/MarketView.vue'
 import DevView from './components/DevView.vue'
+import ConfigView from './components/ConfigView.vue'
 import { InstallState } from './utils'
-import { kModuleCtl } from './utils/injectionSymbols'
+import { kModuleCtl, kShowConfig } from './utils/injectionSymbols'
 
 const { moduleCtl } = window.exlg
-provide(kModuleCtl, moduleCtl)
 delete window.exlg.moduleCtl
+provide(kModuleCtl, moduleCtl)
 
 const currentTab = ref('module')
 const tabs = reactive<
@@ -30,6 +31,11 @@ const show = ref(false)
 const moduleCtlView = ref<InstanceType<typeof ModuleCtlView>>()
 const marketView = ref<InstanceType<typeof MarketView>>()
 
+const configView = ref<InstanceType<typeof ConfigView>>()
+provide(kShowConfig, (configId: string) => {
+    configView.value!.showConfig(configId)
+})
+
 function switchTab(id: string) {
     currentTab.value = id
     const tab = tabs[id]
@@ -48,7 +54,10 @@ function uninstallModule(id: string) {
 
 <template>
     <button class="exlg-button" @click="show = !show">exlg ng</button>
+
     <div class="exlg-root" v-show="show">
+        <ConfigView ref="configView" />
+
         <div class="tabs">
             <div
                 v-for="(tab, id) of tabs"

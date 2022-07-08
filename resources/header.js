@@ -31,6 +31,7 @@
 // @connect        exlgcs.jin-dan.site
 // @connect        localhost
 // @connect        raw.githubusercontent.com
+// @connect        ghproxy.com
 // @connect        unpkg.com
 // @connect        cdn.jsdelivr.net
 // @connect        fastly.jsdelivr.net

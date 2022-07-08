@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'
+import { inject, ref } from 'vue'
 import type { ModulesReadonly, ExecuteState } from '../../../core/types'
-import { kModuleCtl } from '../utils/injectionSymbols'
-import ConfigItem from './ConfigItem.vue'
+import { kModuleCtl, kShowConfig } from '../utils/injectionSymbols'
 import Await from './utils/Await.vue'
 
 const emits = defineEmits<{
@@ -10,6 +9,7 @@ const emits = defineEmits<{
 }>()
 
 const moduleCtl = inject(kModuleCtl)!
+const showConfig = inject(kShowConfig)!
 const { utils, schemas, modules } = window.exlg
 
 const modulesRo = ref<ModulesReadonly | null>()
@@ -49,13 +49,6 @@ function uninstall(id: string) {
     )
 }
 
-const configModuleId = ref<string | null>(null)
-const configStorage = computed(() =>
-    configModuleId.value
-        ? moduleCtl.moduleStorages[configModuleId.value]
-        : undefined
-)
-
 const executeStateIcons: Record<ExecuteState, string> = {
     done: '✨',
     throwed: '💥',
@@ -85,29 +78,6 @@ defineExpose({
 
 <template>
     <div class="root">
-        <div class="module-config" v-if="configModuleId">
-            <span class="module-config-header">
-                设置 {{ configModuleId }}
-                <span @click="configModuleId = null" style="cursor: pointer">
-                    关闭
-                </span>
-            </span>
-
-            <hr class="exlg-hr close-to-top" />
-
-            <div class="module-config-list">
-                <template
-                    v-for="(schema, name) of schemas[configModuleId].dict"
-                    :key="name"
-                >
-                    <div v-if="schema?.meta?.description">
-                        {{ name }}
-                        <ConfigItem :schema="schema" :storage="configStorage" />
-                        {{ schema.meta.description }}
-                    </div>
-                </template>
-            </div>
-        </div>
         <div>
             <ul class="module-list" v-if="modulesRo">
                 <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
@@ -121,7 +91,7 @@ defineExpose({
                         <span
                             v-if="schemas[mod.id]"
                             class="emoji-button"
-                            @click="configModuleId = mod.id"
+                            @click="showConfig(mod.id)"
                         >
                             ⚙️
                         </span>
@@ -172,27 +142,6 @@ defineExpose({
 
 .module-version {
     color: blueviolet;
-}
-
-.module-config {
-    top: 0;
-    right: calc(100% + 20px);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 1px 1px #000;
-}
-
-.module-config-header {
-    display: flex;
-    justify-content: space-between;
-}
-
-.module-config-list:empty::before {
-    content: '没有可用配置项';
 }
 
 .emoji-button {
