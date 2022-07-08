@@ -74,11 +74,20 @@ export const wrapArray = <T>(value: MaybeArray<T>): T[] =>
 
 export class MatchError extends Error {}
 
-export const match = (paths: MaybeArray<RegExp | string>) =>
-    wrapArray(paths).some((path) => unsafeWindow.location.pathname.match(path))
+export const match = (
+    patterns: MaybeArray<RegExp | string>,
+    options: {
+        withSearch?: boolean
+    } = {}
+) => {
+    const { location } = unsafeWindow
+    let now = location.pathname
+    if (options.withSearch) now += location.search
+    return wrapArray(patterns).some((pattern) => now.match(pattern))
+}
 
-export const mustMatch = (paths: MaybeArray<RegExp | string>) => {
-    if (!match(paths)) throw new MatchError()
+export const mustMatch = (...args: Parameters<typeof match>) => {
+    if (!match(...args)) throw new MatchError()
 }
 
 export const csPost = (
