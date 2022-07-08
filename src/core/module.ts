@@ -64,12 +64,13 @@ let storage: Storage<ModulesReadonly>
 const moduleStorages: Record<string, Storage> = {}
 
 const wrapModule = (module: Module) => `
-exlg.modules['${module.id}'].runtime.setWrapper(new Function(
-    'define', 'runtime', 'Schema',
-    'utils',
-    'log', 'info', 'warn', 'error',
-    ${JSON.stringify(module.script)}
-))
+exlg.modules['${module.id}'].runtime.setWrapper(function(
+    define, runtime, Schema,
+    utils,
+    log, info, warn, error
+) {
+    ${module.script}
+})
 `
 
 export const installModule = (metadata: ModuleMetadata, script: string) => {
