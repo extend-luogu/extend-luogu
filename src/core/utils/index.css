@@ -21,10 +21,19 @@
     margin-bottom: 0;
 }
 
-.exlg-select {
+.exlg-select,
+.exlg-input {
     border: 1px solid black;
     outline: none;
+    line-height: 1.6;
+    vertical-align: baseline !important;
     background: white;
+    transition: border-color 0.5s;
+}
+
+.exlg-select:focus,
+.exlg-input:focus {
+    border-color: blueviolet;
 }
 
 .exlg-checkbox {

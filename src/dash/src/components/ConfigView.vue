@@ -67,4 +67,8 @@ defineExpose({
 .config-list:empty::before {
     content: '没有可用配置项';
 }
+
+.config-list > * {
+    margin-bottom: 10px;
+}
 </style>
