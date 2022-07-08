@@ -260,10 +260,16 @@ program
 
         const useCss = await fileOk('./src/index.css')
         if (useCss) {
-            exports.push([
-                'style',
-                JSON.stringify(await fs.readFile('./src/index.css', 'utf-8'))
-            ])
+            const minifiedCss = (
+                await esbuild.transform(
+                    await fs.readFile('./src/index.css', 'utf-8'),
+                    {
+                        loader: 'css',
+                        minify: true
+                    }
+                )
+            ).code
+            exports.push(['style', JSON.stringify(minifiedCss)])
         }
 
         if (!useJs && !useTs && !useCss) {
