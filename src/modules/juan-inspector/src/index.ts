@@ -36,7 +36,7 @@ const inspect = async () => {
         countNow < count;
         pid++, countNow += perPage
     ) {
-        pendingResults.push(utils.csGet(api + '&pid='))
+        pendingResults.push(utils.csGet(api + '&page=' + pid))
     }
 
     const results = [
@@ -72,12 +72,12 @@ const inspect = async () => {
         .filter((x) => x)
         .map(
             ({ uid, name, delta }) => `
-                    <li class="juan-rnkitm">
-                        <span>
-                            <a href="/user/${uid}">${name}</a> <span>${delta} 道</span>
-                        </span>
-                    </li>
-                `
+                <li class="juan-rnkitm">
+                    <span>
+                        <a href="/user/${uid}">${name}</a> <span>${delta} 道</span>
+                    </span>
+                </li>
+            `
         )
         .join('')
 
@@ -94,3 +94,5 @@ const inspect = async () => {
 }
 
 $('[name=punch]').on('click', inspect)
+
+Object.assign(window, { inspect })
