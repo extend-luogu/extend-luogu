@@ -184,9 +184,9 @@ export const launch = async () => {
                     source: Schema.string().required(),
                     version: Schema.string().required(),
                     description: Schema.string().required()
-                }).required()
-            }).required()
-        ).required()
+                })
+            })
+        )
     ) as Storage<ModulesReadonly> // hack SNC
 
     const modules = storage.getAll()
