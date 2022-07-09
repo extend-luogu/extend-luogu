@@ -82,6 +82,24 @@ defineExpose({
             <ul class="module-list" v-if="modulesRo">
                 <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
                     <span>
+                        <Await :promise="modules[mod.id].runtime.executeState">
+                            <template #first>🕒</template>
+                            <template #then="{ result }">
+                                <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
+                                <span
+                                    class="execute-state exlg-tooltip"
+                                    :data-tooltip="
+                                        /* @ts-expect-error */
+                                        executeStateTexts[result]
+                                    "
+                                >
+                                    {{
+                                        /* @ts-expect-error */
+                                        executeStateIcons[result]
+                                    }}
+                                </span>
+                            </template>
+                        </Await>
                         {{ mod.id }}
                         <span class="module-version">
                             @{{ mod.metadata.version }}
@@ -104,24 +122,6 @@ defineExpose({
                             :checked="mod.active"
                             @change="toggleModule(mod.id)"
                         />
-                        <Await :promise="modules[mod.id].runtime.executeState">
-                            <template #first>🕒</template>
-                            <template #then="{ result }">
-                                <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
-                                <span
-                                    class="execute-state exlg-tooltip"
-                                    :data-tooltip="
-                                        /* @ts-expect-error */
-                                        executeStateTexts[result]
-                                    "
-                                >
-                                    {{
-                                        /* @ts-expect-error */
-                                        executeStateIcons[result]
-                                    }}
-                                </span>
-                            </template>
-                        </Await>
                     </span>
                 </li>
             </ul>
