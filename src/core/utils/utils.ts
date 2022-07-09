@@ -1,6 +1,7 @@
 import './index.css'
 import './SimpleAlert.css'
 
+import $ from 'jquery'
 import { Schema } from '../storage'
 
 declare global {
@@ -158,9 +159,9 @@ export interface SimpleAlertOptions {
 }
 
 export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
-    const $ = (selectors: string) => document.querySelector(selectors)
+    const q = (selectors: string) => document.querySelector(selectors)
 
-    let $root = $('.simple-alert') as HTMLDivElement
+    let $root = q('.simple-alert') as HTMLDivElement
     if (!$root) {
         $root = document.createElement('div')
         $root.className = 'simple-alert'
@@ -173,7 +174,7 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
         document.body.appendChild($root)
     } else $root.style.display = 'block'
 
-    let $mask = $('.simple-alert-mask') as HTMLDivElement
+    let $mask = q('.simple-alert-mask') as HTMLDivElement
     if (!$mask) {
         $mask = document.createElement('div')
         $mask.className = 'simple-alert-mask'

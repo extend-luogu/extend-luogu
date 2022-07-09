@@ -9,6 +9,7 @@
     "author": "extend-luogu",
     "license": "ISC",
     "dependencies": {
-        "schemastery": "^3.4.3"
+        "schemastery": "^3.4.3",
+        "jquery": "^3.6.0"
     }
 }
