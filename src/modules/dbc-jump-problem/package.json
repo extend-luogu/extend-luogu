@@ -1,0 +1,23 @@
+{
+    "name": "@exlg/mod-dbc-jump-problem",
+    "description": "双击跳题",
+    "author": "5ab-juruo",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.2.1",
+        "@types/jquery": "^3.5.14"
+    }
+}

@@ -147,6 +147,17 @@ importers:
       '@exlg/cli-mod': link:../../../cli-mod
       '@types/jquery': 3.5.14
 
+  src/modules/dbc-jump-problem:
+    specifiers:
+      '@exlg/cli-mod': ^1.2.1
+      '@exlg/core': workspace:^
+      '@types/jquery': ^3.5.14
+    dependencies:
+      '@exlg/core': link:../../core
+    devDependencies:
+      '@exlg/cli-mod': link:../../../cli-mod
+      '@types/jquery': 3.5.14
+
   src/modules/discussion-save:
     specifiers:
       '@exlg/cli-mod': ^1.2.1
