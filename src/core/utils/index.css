@@ -56,3 +56,9 @@
     background: white;
     white-space: normal;
 }
+
+.emoji-button {
+    user-select: none;
+    cursor: pointer;
+    font-family: 'Noto Color Emoji';
+}

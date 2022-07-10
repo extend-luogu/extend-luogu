@@ -146,11 +146,6 @@ defineExpose({
     color: blueviolet;
 }
 
-.emoji-button {
-    user-select: none;
-    cursor: pointer;
-}
-
 .execute-state {
     user-select: none;
 }
