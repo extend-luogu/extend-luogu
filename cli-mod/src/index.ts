@@ -298,45 +298,23 @@ program
         const startTime = Date.now()
 
         const exports: [string, string][] = []
+        const entryPoints = []
+        const plugins = []
 
         const useJs = await fileOk('./src/index.js')
         const useTs = await fileOk('./src/index.ts')
         const useCss = await fileOk('./src/index.css')
 
+        if (useCss) entryPoints.push('./src/index.css')
         if (useJs || useTs) {
             const useVue = await fileOk('./src/App.vue')
-            const plugins = []
 
             if (useVue) {
                 const vuePlugin = await import('esbuild-plugin-vue3')
                 plugins.push(vuePlugin.default() as esbuild.Plugin)
             }
 
-            const entryPoints = [`./src/index.${useTs ? 'ts' : 'js'}`]
-            if (useCss) entryPoints.push('./src/index.css')
-
-            await esbuild.build({
-                entryPoints: [`./src/index.${useTs ? 'ts' : 'js'}`],
-                format: 'iife',
-                charset: 'utf8',
-                bundle: true,
-                // minify: true,
-                plugins,
-                outfile: 'dist/bundle.js'
-            })
-
-            if (await fileOk('./dist/bundle.css'))
-                exports.push([
-                    'style',
-                    JSON.stringify(
-                        await fs.readFile('./dist/bundle.css', 'utf-8')
-                    )
-                ])
-
-            exports.push([
-                'entry',
-                `()=>{${await fs.readFile('./dist/bundle.js', 'utf-8')}}`
-            ])
+            entryPoints.push(`./src/index.${useTs ? 'ts' : 'js'}`)
 
             const useSchema =
                 (useJs && (await fileOk('./src/schema.mjs'))) ||
@@ -347,7 +325,6 @@ program
                     entryPoints: [`./src/schema.${useTs ? 'ts' : 'mjs'}`],
                     format: 'esm',
                     charset: 'utf8',
-                    bundle: true,
                     outfile: 'dist/schema.mjs'
                 })
 
@@ -361,6 +338,28 @@ program
                 exports.push(['schema', JSON.stringify(schema)])
             }
         }
+
+        await esbuild.build({
+            entryPoints,
+            format: 'iife',
+            charset: 'utf8',
+            bundle: true,
+            minify: true,
+            plugins,
+            outdir: 'dist'
+        })
+
+        if (await fileOk('./dist/index.js'))
+            exports.push([
+                'entry',
+                `()=>{${await fs.readFile('./dist/index.js', 'utf-8')}}`
+            ])
+
+        if (await fileOk('./dist/index.css'))
+            exports.push([
+                'style',
+                JSON.stringify(await fs.readFile('./dist/index.css', 'utf-8'))
+            ])
 
         if (!useJs && !useTs && !useCss) {
             return console.error('💥 未找到任何脚本或样式入口点，构建失败')
