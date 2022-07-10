@@ -9,6 +9,7 @@ import { Command } from 'commander'
 import inquirer from 'inquirer'
 import dedent from 'dedent'
 import esbuild from 'esbuild'
+import packageJson from 'package-json'
 import { version } from '../package.json'
 
 const fileOk = async (file: string) => {
@@ -406,6 +407,46 @@ program
     .option('-p, --port', '端口')
     .action((options) => {
         console.log(options.port)
+    })
+
+const checkPkgVer = async (name: string) => {
+    try {
+        return (await packageJson(name)).version
+    } catch (e) {
+        return undefined
+    }
+}
+
+program
+    .command('add <mod-name>')
+    .description('添加依赖')
+    .action(async (name) => {
+        if (!(await fileOk('./package.json'))) {
+            console.log('💥 未找到 package.json，添加依赖失败')
+            return
+        }
+
+        const pkg = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
+        if (!pkg.exlgDependencies) pkg.exlgDependencies = {}
+
+        const official = await checkPkgVer(`@exlg/mod-${name}`)
+        const third = await checkPkgVer(`exlg-mod-${name}`)
+
+        if (official) pkg.exlgDependencies[`@exlg/mod-${name}`] = `^${official}`
+        else if (third) pkg.exlgDependencies[`exlg-mod-${name}`] = `^${third}`
+        else console.log('💥 未找到匹配的依赖，添加依赖失败')
+
+        pkg.exlgDependencies = Object.fromEntries(
+            Object.entries(pkg.exlgDependencies).sort()
+        )
+        await fs.writeFile(
+            './package.json',
+            JSON.stringify(
+                Object.fromEntries(Object.entries(pkg).sort()),
+                null,
+                4
+            )
+        )
     })
 
 program.parse(process.argv)

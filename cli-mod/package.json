@@ -28,6 +28,7 @@
         "dedent": "^0.7.0",
         "esbuild": "^0.14.48",
         "esbuild-plugin-vue3": "^0.3.0",
-        "inquirer": "^8.0.0"
+        "inquirer": "^8.0.0",
+        "package-json": "^8.1.0"
     }
 }
