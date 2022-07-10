@@ -56,14 +56,21 @@ program
         let scriptExt: 'ts' | 'js' | void
         let moduleExt: 'ts' | 'mjs' | void
         let typescript: boolean | void
+        let useVue: boolean | void
         let useSchema: boolean | void
 
         if (useScript) {
-            ;({ typescript, useSchema } = await inquirer.prompt([
+            ;({ typescript, useVue, useSchema } = await inquirer.prompt([
                 {
                     type: 'confirm',
                     name: 'typescript',
                     message: '是否使用 TypeScript?'
+                },
+                {
+                    type: 'confirm',
+                    name: 'useVue',
+                    message: '是否使用 Vue？',
+                    default: false
                 },
                 {
                     type: 'confirm',
@@ -98,16 +105,17 @@ program
                         '@exlg/core':
                             (scriptExt === 'ts' &&
                                 ((options.official && 'workspace:^') ||
-                                    '^1.1.0')) ||
+                                    '^1.3.0')) ||
                             undefined,
                         schemastery: useSchema ? '^3.4.3' : undefined
                     },
                     devDependencies: {
-                        '@exlg/cli-mod': '^1.1.1'
+                        '@exlg/cli-mod': '^1.1.1',
+                        vue: useVue ? '^3.2.37' : undefined
                     }
                 },
                 null,
-                2
+                4
             )
         )
 
@@ -128,13 +136,13 @@ program
                 await fs.writeFile(
                     path.resolve(name, 'src', `schema.${moduleExt}`),
                     dedent`
-                    import Schema from 'schemastery'
+                        import Schema from 'schemastery'
 
-                    export default Schema.object({
-                        // your static schema here
-                        // see <https://github.com/shigma/schemastery>
-                        hello: Schema.string().default('world')
-                    })
+                        export default Schema.object({
+                            // your static schema here
+                            // see <https://github.com/shigma/schemastery>
+                            hello: Schema.string().default('world')
+                        })
                     ` + '\n'
                 )
 
@@ -152,6 +160,42 @@ program
                 }
             }
 
+            if (useVue) {
+                imports.push("import App from './App.vue'")
+
+                main.push(
+                    '',
+                    'const { Vue } = window.exlgDash',
+                    'const { createApp } = Vue',
+                    "createApp(App).mount('#id') // mount the app to the element you want"
+                )
+
+                await fs.writeFile(
+                    path.resolve(name, 'src', 'App.vue'),
+                    dedent`
+                        <script setup${typescript ? ' lang="ts"' : ''}>
+                        import '@exlg/core/types'
+
+                        const { Vue } = window.exlgDash
+                        const { ref } = Vue
+
+                        const count = ref(0)
+                        </script>
+
+                        <template>
+                            <div>
+                                <p>You clicked {{ count }} times</p>
+                                <button class="exlg-button" @click="count++">+1s</button>
+                            </div>
+                        </template>
+
+                        <style>
+                            /* style is OK, but not scoped */
+                        </style>
+                    `
+                )
+            }
+
             await fs.writeFile(
                 path.resolve(name, 'src', `index.${scriptExt}`),
                 imports.join('\n') + '\n\n' + main.join('\n') + '\n'
@@ -161,21 +205,58 @@ program
                 await fs.writeFile(
                     path.resolve(name, 'tsconfig.json'),
                     JSON.stringify(
-                        {
-                            compilerOptions: {
-                                target: 'es6',
-                                lib: ['esnext', 'dom'],
-                                module: 'commonjs',
-                                esModuleInterop: true,
-                                forceConsistentCasingInFileNames: true,
-                                strict: true
-                            },
-                            include: ['./src/']
-                        },
+                        useVue
+                            ? {
+                                  compilerOptions: {
+                                      target: 'es6',
+                                      useDefineForClassFields: true,
+                                      module: 'esnext',
+                                      moduleResolution: 'node',
+                                      strict: true,
+                                      jsx: 'preserve',
+                                      sourceMap: true,
+                                      resolveJsonModule: true,
+                                      isolatedModules: true,
+                                      esModuleInterop: true,
+                                      lib: ['esnext', 'dom'],
+                                      skipLibCheck: true
+                                  },
+                                  include: [
+                                      'src/**/*.ts',
+                                      'src/**/*.d.ts',
+                                      'src/**/*.tsx',
+                                      'src/**/*.vue'
+                                  ]
+                              }
+                            : {
+                                  compilerOptions: {
+                                      target: 'es6',
+                                      lib: ['esnext', 'dom'],
+                                      module: 'commonjs',
+                                      esModuleInterop: true,
+                                      forceConsistentCasingInFileNames: true,
+                                      strict: true
+                                  },
+                                  include: ['./src/']
+                              },
                         null,
-                        2
+                        4
                     )
                 )
+
+                if (useVue) {
+                    await fs.writeFile(
+                        path.resolve(name, 'src', 'env.d.ts'),
+                        dedent`
+                            declare module '*.vue' {
+                                import type { DefineComponent } from 'vue'
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
+                                const component: DefineComponent<{}, {}, any>
+                                export default component
+                            }
+                        `
+                    )
+                }
             }
         }
 
@@ -220,16 +301,37 @@ program
 
         const useJs = await fileOk('./src/index.js')
         const useTs = await fileOk('./src/index.ts')
+        const useCss = await fileOk('./src/index.css')
 
         if (useJs || useTs) {
+            const useVue = await fileOk('./src/App.vue')
+            const plugins = []
+
+            if (useVue) {
+                const vuePlugin = await import('esbuild-plugin-vue3')
+                plugins.push(vuePlugin.default() as esbuild.Plugin)
+            }
+
+            const entryPoints = [`./src/index.${useTs ? 'ts' : 'js'}`]
+            if (useCss) entryPoints.push('./src/index.css')
+
             await esbuild.build({
                 entryPoints: [`./src/index.${useTs ? 'ts' : 'js'}`],
                 format: 'iife',
                 charset: 'utf8',
                 bundle: true,
-                minify: true,
+                // minify: true,
+                plugins,
                 outfile: 'dist/bundle.js'
             })
+
+            if (await fileOk('./dist/bundle.css'))
+                exports.push([
+                    'style',
+                    JSON.stringify(
+                        await fs.readFile('./dist/bundle.css', 'utf-8')
+                    )
+                ])
 
             exports.push([
                 'entry',
@@ -258,21 +360,6 @@ program
 
                 exports.push(['schema', JSON.stringify(schema)])
             }
-        }
-
-        const useCss = await fileOk('./src/index.css')
-        if (useCss) {
-            const minifiedCss = (
-                await esbuild.transform(
-                    await fs.readFile('./src/index.css', 'utf-8'),
-                    {
-                        loader: 'css',
-                        charset: 'utf8',
-                        minify: true
-                    }
-                )
-            ).code
-            exports.push(['style', JSON.stringify(minifiedCss)])
         }
 
         if (!useJs && !useTs && !useCss) {
