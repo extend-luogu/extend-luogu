@@ -7,7 +7,7 @@ export * from '.'
 
 declare global {
     const define: (e: ModuleExports) => void
-    const runtime: ModuleRuntime<any>
+    const runtime: ModuleRuntime
     const Schema: Schema.Static
     const utils: Utils
     const log: LoggerFunction

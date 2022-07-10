@@ -1,4 +1,7 @@
 import { Exlg } from '..'
+import { ExlgDash } from './dash'
+
+export type { VueType, VueAll } from './dash'
 
 export type {
     Module,
@@ -28,5 +31,6 @@ export type { Exlg } from '..'
 declare global {
     interface Window {
         exlg: Exlg
+        exlgDash: ExlgDash
     }
 }
