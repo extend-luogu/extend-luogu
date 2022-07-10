@@ -79,10 +79,12 @@ defineExpose({
 <template>
     <div class="root">
         <div>
-            <ul class="module-list" v-if="modulesRo">
+            <ul class="module-list">
                 <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
                     <span>
-                        <Await :promise="modules[mod.id].runtime.executeState">
+                        <Await
+                            :promise="modules[mod.id]?.runtime?.executeState"
+                        >
                             <template #first>🕒</template>
                             <template #then="{ result }">
                                 <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
