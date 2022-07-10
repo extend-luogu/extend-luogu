@@ -1,16 +1,7 @@
 import * as Vue from 'vue'
 import { createApp } from 'vue'
-import { Exlg } from '../../core/types'
+import '../../core/types'
 import App from './App.vue'
-
-declare global {
-    interface Window {
-        exlg: Exlg
-        exlgDash: {
-            Vue: typeof Vue
-        }
-    }
-}
 
 window.exlgDash = {
     Vue
