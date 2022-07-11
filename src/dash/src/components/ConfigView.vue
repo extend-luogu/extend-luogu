@@ -4,7 +4,7 @@ import { kModuleCtl } from '../utils/injectionSymbols'
 import ConfigItem from './ConfigItem.vue'
 
 const moduleCtl = inject(kModuleCtl)!
-const { schemas } = window.exlg
+const { utils, schemas } = window.exlg
 
 const configId = ref<string | null>(null)
 const configStorage = computed(() =>
@@ -16,18 +16,32 @@ defineExpose({
         configId.value = id
     }
 })
+
+const clearTime = ref(0)
+
+function clearConfig() {
+    utils.simpleAlert('确定要清空配置？', {
+        onAccept: () => {
+            moduleCtl.moduleStorages[configId.value!].clear()
+            clearTime.value++ // Note: 重新加载配置列表
+        }
+    })
+}
 </script>
 
 <template>
     <div class="config" v-if="configId">
         <span class="config-header">
             设置 {{ configId }}
-            <span @click="configId = null" style="cursor: pointer">关闭</span>
+            <span>
+                <span class="emoji-button" @click="clearConfig">🗑️</span>
+                <span class="emoji-button" @click="configId = null">❎</span>
+            </span>
         </span>
 
         <hr class="exlg-hr close-to-top" />
 
-        <div class="config-list">
+        <div class="config-list" :key="clearTime">
             <template
                 v-for="(schema, name) of schemas[configId].dict"
                 :key="name"

@@ -26,27 +26,13 @@ function updateModuleCache() {
 }
 
 function uninstall(id: string) {
-    utils.simpleAlert(
-        `确定要删除模块 ${id}？` +
-            (moduleCtl.moduleStorages[id]
-                ? `<button class="exlg-button">清除存储</button>`
-                : ''),
-        {
-            onOpen: ($con) => {
-                const $clear = $con.querySelector('button')
-                $clear?.addEventListener('click', () => {
-                    moduleCtl.moduleStorages[id].clear()
-                    $clear.innerHTML = '已清除'
-                    $clear.disabled = true
-                })
-            },
-            onAccept: () => {
-                moduleCtl.storage.del(id)
-                emits('uninstallModule', id)
-                updateModuleCache()
-            }
+    utils.simpleAlert(`确定要删除模块 ${id}？`, {
+        onAccept: () => {
+            moduleCtl.storage.del(id)
+            emits('uninstallModule', id)
+            updateModuleCache()
         }
-    )
+    })
 }
 
 const executeStateIcons: Record<ExecuteState, string> = {
