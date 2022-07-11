@@ -1,6 +1,5 @@
 import './index.css'
 import './SimpleAlert.css'
-import 'https://fonts.googleapis.com/css?family=Noto+Color+Emoji'
 
 import $ from 'jquery'
 import { Schema } from '../storage'
