@@ -3,6 +3,10 @@ import type { SchemaToStorage } from '@exlg/core/types'
 import type Scm from './schema'
 import { emos, size, Emo } from './assets'
 
+utils.mustMatch([/^\/discuss\/\d+/, /^\/discuss\/lists\?forumname=/], {
+    withSearch: true
+})
+
 const sto = runtime.storage as SchemaToStorage<typeof Scm>
 
 const emoUrl = (emo: Emo) => {
