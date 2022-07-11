@@ -29,6 +29,7 @@ program
     .command('create <mod-name>')
     .description('创建一个新的 exlg 模块')
     .option('-o, --official', '作为官方包')
+    .option('-t, --theme', '作为主题模块')
     .action(async (name, options) => {
         const { description, author } = await inquirer.prompt([
             {
@@ -85,13 +86,14 @@ program
 
         await fs.mkdir(name)
 
+        const prefix = options.theme ? 'theme' : 'mod'
         await fs.writeFile(
             path.resolve(name, 'package.json'),
             JSON.stringify(
                 {
                     name: options.official
-                        ? `@exlg/mod-${name}`
-                        : `exlg-mod-${name}`,
+                        ? `@exlg/${prefix}-${name}`
+                        : `exlg-${prefix}-${name}`,
                     description,
                     author,
                     version: '1.0.0',
