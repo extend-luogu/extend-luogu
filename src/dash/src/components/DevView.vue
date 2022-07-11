@@ -42,6 +42,6 @@ function debugClick() {
 }
 
 .debug-button.debug {
-    color: blueviolet;
+    color: var(--accent-color);
 }
 </style>

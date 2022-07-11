@@ -197,14 +197,14 @@ function installStateText(it: AllSourceItem): string {
     transition: color 0.5s;
 }
 .module-install:hover {
-    color: blueviolet;
+    color: var(--accent-color);
 }
 
 .module-install-state {
     color: gray;
 }
 .module-install-state > :deep(.update) {
-    color: blueviolet;
+    color: var(--accent-color);
 }
 .module-install-state > :deep(.update::after) {
     color: black;
@@ -213,7 +213,7 @@ function installStateText(it: AllSourceItem): string {
 }
 
 .module-install-state > :deep(.error) {
-    color: red;
+    color: var(--accent-color);
 }
 
 .module-description {

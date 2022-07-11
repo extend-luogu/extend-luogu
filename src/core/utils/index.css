@@ -1,3 +1,7 @@
+:root {
+    --accent-color: blueviolet;
+}
+
 .exlg-button {
     border-radius: 0;
     border: 1px solid black;
@@ -33,11 +37,11 @@
 
 .exlg-select:focus,
 .exlg-input:focus {
-    border-color: blueviolet;
+    border-color: var(--accent-color);
 }
 
 .exlg-checkbox {
-    accent-color: blueviolet;
+    accent-color: var(--accent-color);
     width: 1em;
     height: 1em;
     vertical-align: text-bottom;

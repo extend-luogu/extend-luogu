@@ -110,8 +110,8 @@ function uninstallModule(id: string) {
 }
 
 .exlg-button:hover {
-    border-color: blueviolet;
-    color: blueviolet;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
 }
 
 .tabs {

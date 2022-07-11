@@ -223,6 +223,17 @@ importers:
       '@exlg/cli-mod': link:../../../cli-mod
       '@types/jquery': 3.5.14
 
+  src/themes/default:
+    specifiers:
+      '@exlg/cli-mod': ^1.1.1
+      '@exlg/core': workspace:^
+      schemastery: ^3.4.3
+    dependencies:
+      '@exlg/core': link:../../core
+      schemastery: 3.4.3
+    devDependencies:
+      '@exlg/cli-mod': link:../../../cli-mod
+
 packages:
 
   /@babel/code-frame/7.18.6:

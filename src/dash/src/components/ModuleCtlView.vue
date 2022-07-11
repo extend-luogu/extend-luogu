@@ -143,7 +143,7 @@ defineExpose({
 }
 
 .module-version {
-    color: blueviolet;
+    color: var(--accent-color);
 }
 
 .emoji-button {

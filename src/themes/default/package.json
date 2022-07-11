@@ -1,0 +1,23 @@
+{
+    "name": "@exlg/theme-default",
+    "description": "exlg 的默认主题",
+    "author": "ForkKILLET",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^",
+        "schemastery": "^3.4.3"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.1.1"
+    }
+}
