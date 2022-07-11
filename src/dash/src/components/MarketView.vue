@@ -130,15 +130,12 @@ defineExpose({
 function installStateText(it: AllSourceItem): string {
     const state = installStates[it.id]
     switch (state) {
-        case InstallState.installed:
-            if (
-                compareVersions(
-                    moduleCtl.storage.get(it.id).metadata.version,
-                    it.versions.at(-1)!
-                ) < 0
-            )
-                return '<span class="update">[有更新]</span>'
+        case InstallState.installed: {
+            const current = moduleCtl.storage.get(it.id).metadata.version
+            if (compareVersions(current, it.versions.at(-1)!) < 0)
+                return `<span class="update exlg-tooltip" data-tooltip="当前版本 ${current}">[有更新]</span>`
             return '[已安装]'
+        }
         case InstallState.installing:
             return '[安装中]'
         case InstallState.installFailed:
@@ -209,6 +206,12 @@ function installStateText(it: AllSourceItem): string {
 .module-install-state > :deep(.update) {
     color: blueviolet;
 }
+.module-install-state > :deep(.update::after) {
+    color: black;
+    right: calc(100% + 3px);
+    width: max-content;
+}
+
 .module-install-state > :deep(.error) {
     color: red;
 }
