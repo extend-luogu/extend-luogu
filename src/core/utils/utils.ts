@@ -217,3 +217,18 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
     handleButton($accept, 'onAccept')
     handleButton($cancel, 'onCancel')
 }
+
+export interface EditModElementCallback {
+    (el: Element | null): void
+}
+
+export const editModElement = async (
+    mod: string,
+    selector: string,
+    callback: EditModElementCallback
+) => {
+    await unsafeWindow.exlg.modules[mod].runtime.executeState
+    $(selector).hide()
+    callback(document.querySelector(selector))
+    $(selector).show()
+}
