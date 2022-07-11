@@ -1,1 +1,35 @@
-/* your code here */
+.exlg-emo-btn {
+    border: none;
+    border-radius: 0.7em;
+    margin: 0.2em;
+    background-color: white;
+    color: cornflowerblue;
+    transition: background-color 0.5s, color 0.5s;
+    box-shadow: 0 0 0.1em 0.1em cornflowerblue;
+}
+.exlg-emo-btn:hover {
+    background-color: cornflowerblue;
+    color: white;
+}
+.exlg-emo-btn.emo {
+    width: 40px;
+}
+.exlg-emo-btn.txt {
+    width: 83px;
+}
+.exlg-emo-menu {
+    margin: -5px 0 5px 0 !important;
+    /* Note: height: calc(100% - 38px + 5px); */
+    transition: height 0.5s;
+}
+.mp-editor-container {
+    display: flex;
+    flex-direction: column;
+}
+.mp-editor-toolbar {
+    height: unset !important;
+}
+.mp-editor-ground {
+    position: unset !important;
+    height: 100%;
+}
