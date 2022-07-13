@@ -3,6 +3,7 @@ import './SimpleAlert.css'
 
 import $ from 'jquery'
 import { Schema } from '../storage'
+import type { ExecuteState } from '../module'
 
 declare global {
     // TamperMonkey
@@ -218,17 +219,29 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
     handleButton($cancel, 'onCancel')
 }
 
-export interface EditModElementCallback {
-    (el: Element | null): void
+export interface HookModElementOption {
+    onLoad: (selector: string) => void
+    onError?: (state: Omit<ExecuteState, 'done'> | undefined) => void
 }
 
-export const editModElement = async (
+export const hookModElement = async (
     mod: string,
     selector: string,
-    callback: EditModElementCallback
+    { onLoad, onError }: HookModElementOption
 ) => {
-    await unsafeWindow.exlg.modules[mod].runtime.executeState
-    $(selector).hide()
-    callback(document.querySelector(selector))
-    $(selector).show()
+    const statePromise = unsafeWindow.exlg.modules[mod].runtime.executeState
+    if (!statePromise) {
+        onError?.(undefined)
+        return
+    }
+
+    const cloakStyle: HTMLStyleElement | void = GM_addStyle(
+        `${selector} { display: none; }`
+    )
+
+    const state = await unsafeWindow.exlg.modules[mod].runtime.executeState
+    if (state === 'done') onLoad(selector)
+    else onError?.(state)
+
+    cloakStyle!.remove()
 }
