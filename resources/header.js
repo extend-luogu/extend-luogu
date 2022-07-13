@@ -19,7 +19,7 @@
 //
 // @connect        *
 // @connect        tencentcs.com
-// @connect        xn--fx-ex2c330n.ml
+// @connect        lglg.top
 // @connect        bens.rotriw.com
 // @connect        codeforces.com
 // @connect        codeforces.ml
