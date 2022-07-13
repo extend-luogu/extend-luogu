@@ -8,6 +8,7 @@
     outline: none;
     background: white;
     padding: 3px 15px 5px 15px;
+    line-height: 1.15;
 }
 .exlg-button:disabled {
     color: gray;

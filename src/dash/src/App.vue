@@ -85,6 +85,23 @@ function uninstallModule(id: string) {
     </div>
 </template>
 
+<style>
+#exlg-dash {
+    line-height: 1.6;
+    font-weight: 400;
+    color: #333;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'San Francisco',
+        'Helvetica Neue', 'Noto Sans CJK SC', 'Noto Sans CJK', 'Source Han Sans',
+        'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+#exlg-dash * {
+    font-size: inherit;
+    font-family: inherit;
+}
+</style>
+
 <style scoped>
 .exlg-root {
     position: fixed;
@@ -96,7 +113,6 @@ function uninstallModule(id: string) {
     min-width: 350px;
     height: calc(100% - 200px);
     padding: 20px;
-    line-height: 1.6;
     background: white;
     box-shadow: 0 0 1px 1px black;
 }
