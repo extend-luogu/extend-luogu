@@ -1,0 +1,21 @@
+.exlg-root,
+.exlg-button,
+.exlg-select,
+.exlg-input,
+.exlg-tooltip:hover::after,
+.simple-alert,
+.config {
+    color: white !important;
+    background-color: #333 !important;
+}
+
+.exlg-tooltip:hover::after {
+    border-color: white;
+}
+
+.module-version,
+.module-install:hover,
+.exlg-button:hover,
+.debug-button.debug {
+    color: var(--accent-color) !important;
+}
