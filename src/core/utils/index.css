@@ -54,7 +54,7 @@
     cursor: help;
 }
 .exlg-tooltip:hover::after {
-    content: attr(data-tooltip);
+    content: attr(data-exlg-tooltip);
     position: absolute;
     z-index: 70001;
     border: 1px solid black;

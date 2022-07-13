@@ -133,7 +133,7 @@ function installStateText(it: AllSourceItem): string {
         case InstallState.installed: {
             const current = moduleCtl.storage.get(it.id).metadata.version
             if (compareVersions(current, it.versions.at(-1)!) < 0)
-                return `<span class="update exlg-tooltip" data-tooltip="当前版本 ${current}">[有更新]</span>`
+                return `<span class="update exlg-tooltip" data-exlg-tooltip="当前版本 ${current}">[有更新]</span>`
             return '[已安装]'
         }
         case InstallState.installing:
@@ -169,7 +169,7 @@ function installStateText(it: AllSourceItem): string {
                     </span>
                     <span
                         class="module-description exlg-tooltip"
-                        :data-tooltip="it.description"
+                        :data-exlg-tooltip="it.description"
                     >
                         📙
                     </span>

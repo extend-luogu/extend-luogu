@@ -76,7 +76,7 @@ defineExpose({
                                 <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
                                 <span
                                     class="execute-state exlg-tooltip"
-                                    :data-tooltip="
+                                    :data-exlg-tooltip="
                                         /* @ts-expect-error */
                                         executeStateTexts[result]
                                     "

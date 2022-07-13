@@ -153,6 +153,6 @@ function uninstallModule(id: string) {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: red;
+    background-color: var(--accent-color);
 }
 </style>
