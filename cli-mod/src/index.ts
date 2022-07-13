@@ -276,6 +276,7 @@ program
     .command('build')
     .description('构建模块')
     .option('-c, --console', '提供用于手动注册模块的脚本')
+    .option('-m, --minify', '最小化', false)
     .action(async (options) => {
         if (!(await fileOk('./package.json'))) {
             return console.error('💥 当前目录没有 package.json，构建失败')
@@ -347,7 +348,7 @@ program
             format: 'iife',
             charset: 'utf8',
             bundle: true,
-            minify: true,
+            minify: options.minify,
             plugins,
             outdir: 'dist'
         })
