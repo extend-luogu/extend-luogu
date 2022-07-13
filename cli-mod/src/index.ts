@@ -284,8 +284,8 @@ program
 
         const pack = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
         if (
-            !['exlg-mod-', '@exlg/mod-'].some((prefix) =>
-                pack.name.startsWith(prefix)
+            !['exlg-mod-', '@exlg/mod-', 'exlg-theme-', '@exlg/theme-'].some(
+                (prefix) => pack.name.startsWith(prefix)
             )
         ) {
             const { con } = await inquirer.prompt({
