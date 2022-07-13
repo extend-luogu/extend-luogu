@@ -3,6 +3,7 @@ import { inject, ref } from 'vue'
 import type { ModulesReadonly, ExecuteState } from '../../../core/types'
 import { kModuleCtl, kShowConfig } from '../utils/injectionSymbols'
 import Await from './utils/Await.vue'
+import TextCheckbox from './utils/TextCheckbox.vue'
 
 const emits = defineEmits<{
     (e: 'uninstallModule', id: string): void
@@ -67,10 +68,7 @@ const showId = ref(false)
 <template>
     <div class="root">
         <div>
-            <label>
-                显示 ID
-                <input type="checkbox" class="exlg-checkbox" v-model="showId" />
-            </label>
+            <TextCheckbox text="🆔" v-model="showId" />
             <ul class="module-list">
                 <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
                     <span>

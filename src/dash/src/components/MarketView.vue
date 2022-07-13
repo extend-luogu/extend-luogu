@@ -4,6 +4,7 @@ import compareVersions from 'compare-versions'
 import { ModuleMetadata, Schema } from '../../../core/types'
 import { InstallState } from '../utils'
 import { kModuleCtl, kShowConfig } from '../utils/injectionSymbols'
+import TextCheckbox from './utils/TextCheckbox.vue'
 
 const emits = defineEmits<{
     (e: 'installModule'): void
@@ -152,12 +153,9 @@ const showId = ref(false)
 
 <template>
     <div class="root">
-        <span class="emoji-button" @click="showConfig('market')">⚙️</span>
-        <span class="emoji-button" @click="loadSource()">🔄</span>
-        <label>
-            显示 ID
-            <input type="checkbox" class="exlg-checkbox" v-model="showId" />
-        </label>
+        <span class="emoji-button" @click="showConfig('market')"> ⚙️ </span>
+        <span class="emoji-button" @click="loadSource()"> 🔄 </span>
+        <TextCheckbox text="🆔" v-model="showId" />
 
         <hr class="exlg-hr" />
 
