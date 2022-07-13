@@ -21,6 +21,7 @@ interface SourceItem {
     name: string
     description: string
     versions: string[]
+    display: string
     bin: string
 }
 interface NpmSourceItem extends SourceItem {
@@ -86,7 +87,8 @@ async function install(it: AllSourceItem, vid: number) {
         name: it.name,
         source: it.type,
         version,
-        description: it.description
+        description: it.description,
+        display: it.display
     }
     let script: string | void
 
@@ -144,22 +146,28 @@ function installStateText(it: AllSourceItem): string {
             return ''
     }
 }
+
+const showId = ref(false)
 </script>
 
 <template>
     <div class="root">
         <span class="emoji-button" @click="showConfig('market')">⚙️</span>
         <span class="emoji-button" @click="loadSource()">🔄</span>
+        <label>
+            显示 ID
+            <input type="checkbox" class="exlg-checkbox" v-model="showId" />
+        </label>
 
         <hr class="exlg-hr" />
 
         <ul class="module-list" v-if="source">
             <li v-for="it of source" :key="it.id" class="module-entry">
                 <span>
-                    {{ it.id }}
-                    <span class="module-version"
-                        >@{{ it.versions.at(-1) }}</span
-                    >
+                    {{ showId ? it.id : it.display }}
+                    <span class="module-version">
+                        @{{ it.versions.at(-1) }}
+                    </span>
                 </span>
                 <div style="white-space: nowrap">
                     <span

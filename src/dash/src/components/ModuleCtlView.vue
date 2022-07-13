@@ -60,11 +60,17 @@ updateModuleCache()
 defineExpose({
     updateModuleCache
 })
+
+const showId = ref(false)
 </script>
 
 <template>
     <div class="root">
         <div>
+            <label>
+                显示 ID
+                <input type="checkbox" class="exlg-checkbox" v-model="showId" />
+            </label>
             <ul class="module-list">
                 <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
                     <span>
@@ -88,7 +94,7 @@ defineExpose({
                                 </span>
                             </template>
                         </Await>
-                        {{ mod.id }}
+                        {{ showId ? mod.id : mod.metadata.display }}
                         <span class="module-version">
                             @{{ mod.metadata.version }}
                         </span>

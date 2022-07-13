@@ -13,6 +13,7 @@ export interface ModuleMetadata {
     source: string
     version: string
     description: string
+    display: string
 }
 
 export interface ModuleExports {
@@ -176,14 +177,15 @@ export const launch = async () => {
         'modules',
         Schema.dict(
             Schema.object({
-                id: Schema.string().required(),
+                id: Schema.string(),
                 active: Schema.boolean(),
-                script: Schema.string().required(),
+                script: Schema.string(),
                 metadata: Schema.object({
-                    name: Schema.string().required(),
-                    source: Schema.string().required(),
-                    version: Schema.string().required(),
-                    description: Schema.string().required()
+                    name: Schema.string(),
+                    source: Schema.string(),
+                    version: Schema.string(),
+                    description: Schema.string(),
+                    display: Schema.string()
                 })
             })
         )

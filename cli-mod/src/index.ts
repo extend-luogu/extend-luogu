@@ -384,6 +384,7 @@ program
                         name: pack.name,
                         version: pack.version,
                         description: pack.description,
+                        display: pack.name,
                         source: 'console'
                     }
                 )}, ${JSON.stringify(define)})\n` +
