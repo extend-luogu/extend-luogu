@@ -5,7 +5,7 @@ import type Schema from './schema'
 utils.mustMatch([/^\/discuss\/\d+(\?page=\d+)*$/])
 
 const sto = runtime.storage as SchemaToStorage<typeof Schema>
-const api = 'https://xn--fx-ex2c330n.ml'
+const api = 'https://lglg.top'
 
 const $saveBtn = $(`
     <button

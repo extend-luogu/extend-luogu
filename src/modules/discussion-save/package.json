@@ -2,7 +2,7 @@
     "name": "@exlg/mod-discussion-save",
     "description": "洛谷帖子保存站集成",
     "author": "qinyuzhen",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
