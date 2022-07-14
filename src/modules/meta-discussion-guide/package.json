@@ -1,5 +1,6 @@
 {
     "name": "@exlg/mod-meta-discussion-guide",
+    "display": "元讨论引导",
     "description": "引导用户前往转贴讨论 exlg 相关问题",
     "author": "ForkKILLET",
     "version": "1.0.1",

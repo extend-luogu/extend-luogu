@@ -1,23 +1,27 @@
 {
-    "name": "@exlg/mod-emoticon",
-    "description": "在讨论区发送 QQ 和 exlg 表情",
     "author": "ForkKILLET",
-    "version": "1.0.0",
-    "main": "src/index.ts",
-    "keywords": [
-        "exlg",
-        "exlg-module"
-    ],
-    "scripts": {
-        "build": "exlg-mod build",
-        "build:dev": "exlg-mod build -c",
-        "prepublishOnly": "exlg-mod clean && exlg-mod build"
-    },
+    "display": "表情输入",
+    "description": "在讨论区发送 QQ 和 exlg 表情",
     "dependencies": {
         "@exlg/core": "workspace:^",
         "schemastery": "^3.4.3"
     },
     "devDependencies": {
         "@exlg/cli-mod": "^1.1.1"
-    }
+    },
+    "exlgDependencies": {
+        "@exlg/mod-captcha": "^1.0.0"
+    },
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "main": "src/index.ts",
+    "name": "@exlg/mod-emoticon",
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "version": "1.0.0"
 }

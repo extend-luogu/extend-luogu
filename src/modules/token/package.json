@@ -1,5 +1,6 @@
 {
     "name": "@exlg/mod-token",
+    "display": "令牌",
     "description": "自动更新 exlg 令牌",
     "author": {
         "name": "汪心禾",

@@ -1,5 +1,6 @@
 {
     "name": "@exlg/mod-discussion-save",
+    "display": "讨论保存",
     "description": "洛谷帖子保存站集成",
     "author": "qinyuzhen",
     "version": "1.0.6",

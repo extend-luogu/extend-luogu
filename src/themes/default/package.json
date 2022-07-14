@@ -1,5 +1,6 @@
 {
     "name": "@exlg/theme-default",
+    "display": "默认主题",
     "description": "exlg 的默认主题",
     "author": "ForkKILLET",
     "version": "1.0.0",
