@@ -60,4 +60,8 @@
     border: 1px solid black;
     background: white;
     white-space: normal;
+    line-height: 1.3em;
+    padding-bottom: 0.15em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
 }
