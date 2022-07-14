@@ -21,3 +21,8 @@
 .juan-rnkitm > span > span {
     margin-left: auto;
 }
+
+.exlg-bar {
+    height: 8px;
+    border-radius: 5px;
+}

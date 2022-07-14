@@ -24,19 +24,56 @@ const inspect = async () => {
     const api = `/api/user/followings?user=${_feInjection.currentUser.uid}`
 
     const pendingResults = []
+    let isHalted = false
+
+    const change = (ratio: number) => {
+        if (isHalted) return
+        utils.simpleAlert(
+            $(`<span>
+                <span>加载用户中</span>
+                <div class="exlg-bar" style="background: lightgray;margin-top: 5px;">
+                    <div class="exlg-bar" id="process" style="background: blue;">
+                    </div>
+                </div>
+            </span>`)
+                .find('#process')
+                .css('width', `${Math.floor(ratio * 100)}%`)
+                .parent()
+                .parent()
+                .html(),
+            {
+                noAccept: true,
+                title: '正在监视卷王',
+                onCancel() {
+                    isHalted = true
+                }
+            }
+        )
+    }
+    change(0)
 
     const {
         result: firstResult,
         count,
         perPage
     } = await utils.csGet(api).data.users
+    change(perPage / count)
 
+    let currentFetched = perPage
     for (
         let countNow = perPage, pid = 2;
         countNow < count;
         pid++, countNow += perPage
     ) {
-        pendingResults.push(utils.csGet(api + '&page=' + pid))
+        pendingResults.push(
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            (async () => {
+                const result = await utils.csGet(api + '&page=' + pid)
+                currentFetched += result.data.users.result.length
+                change(currentFetched / count)
+                return result
+            })()
+        )
     }
 
     const results = [
@@ -55,6 +92,8 @@ const inspect = async () => {
 
     const lastJuanInfo = sto.get('_lastFetched')
     sto.set('_lastFetched', juanInfo)
+
+    if (isHalted) return
 
     const juans = []
     for (const uid in juanInfo) {
@@ -88,7 +127,8 @@ const inspect = async () => {
             <ol style="margin: 0 25% 0 20%;">${juanList}</ol>
         `,
         {
-            title: '卷王监视器'
+            title: '卷王监视器',
+            noCancel: true
         }
     )
 }
