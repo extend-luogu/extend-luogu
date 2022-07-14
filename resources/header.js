@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name           extend-luogu-ng
+// @name           extend-luogu-celeste
 // @namespace      http://tampermonkey.net/
 // @description    Make luogu more powerful.
 // @description:zh 使洛谷拥有更多功能

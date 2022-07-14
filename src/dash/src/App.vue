@@ -53,7 +53,7 @@ function uninstallModule(id: string) {
 </script>
 
 <template>
-    <button class="exlg-button" @click="show = !show">exlg ng</button>
+    <button class="exlg-button" @click="show = !show">exlg celeste</button>
 
     <div class="exlg-root" v-show="show">
         <ConfigView ref="configView" />
