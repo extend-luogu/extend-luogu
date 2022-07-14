@@ -194,8 +194,8 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
     const $accept = $root.querySelector('.accept') as HTMLButtonElement
     const $cancel = $root.querySelector('.cancel') as HTMLButtonElement
 
-    if (options.noAccept) $accept.style.display = 'none'
-    if (options.noCancel) $cancel.style.display = 'none'
+    $accept.style.display = options.noAccept ? 'none' : ''
+    $cancel.style.display = options.noCancel ? 'none' : ''
 
     const handleButton = (
         $el: HTMLButtonElement,
