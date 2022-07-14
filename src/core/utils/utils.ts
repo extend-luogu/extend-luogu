@@ -153,6 +153,7 @@ export interface SimpleAlertCallback {
 
 export interface SimpleAlertOptions {
     title?: string
+    noAccept?: boolean
     noCancel?: boolean
     onAccept?: SimpleAlertCallback
     onCancel?: SimpleAlertCallback
@@ -193,6 +194,7 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
     const $accept = $root.querySelector('.accept') as HTMLButtonElement
     const $cancel = $root.querySelector('.cancel') as HTMLButtonElement
 
+    if (options.noAccept) $accept.style.display = 'none'
     if (options.noCancel) $cancel.style.display = 'none'
 
     const handleButton = (
