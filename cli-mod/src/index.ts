@@ -10,6 +10,7 @@ import inquirer from 'inquirer'
 import dedent from 'dedent'
 import esbuild from 'esbuild'
 import packageJson from 'package-json'
+import yaml from 'js-yaml'
 import { version } from '../package.json'
 
 const fileOk = async (file: string) => {
@@ -20,6 +21,40 @@ const fileOk = async (file: string) => {
         return false
     }
 }
+
+const checkPkgFile = async (op: string) => {
+    if (!(await fileOk('./package.json'))) {
+        return console.error(`💥 当前目录没有 package.json，${op}失败`)
+    }
+
+    const pkg = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
+    if (
+        !['exlg-mod-', '@exlg/mod-', 'exlg-theme-', '@exlg/theme-'].some(
+            (prefix) => pkg.name.startsWith(prefix)
+        )
+    ) {
+        const { con } = await inquirer.prompt({
+            type: 'confirm',
+            name: 'con',
+            message: `包名不是正确的官方或社区 npm 包名，可能不是正确的 exlg 模块，是否继续${op}？`,
+            default: false
+        })
+        if (!con) return console.error(`💥 ${op}中断`)
+    }
+
+    return pkg
+}
+
+const checkPkgVer = async (name: string) => {
+    try {
+        return (await packageJson(name)).version
+    } catch {
+        return undefined
+    }
+}
+
+const pkgNameToModName = (pkgName: string) =>
+    pkgName.replace(/^(@exlg\/|exlg-)(mod|theme)-/, '')
 
 const program = new Command('exlg-mod')
 
@@ -278,25 +313,7 @@ program
     .option('-c, --console', '提供用于手动注册模块的脚本')
     .option('-m, --minify', '最小化', false)
     .action(async (options) => {
-        if (!(await fileOk('./package.json'))) {
-            return console.error('💥 当前目录没有 package.json，构建失败')
-        }
-
-        const pack = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
-        if (
-            !['exlg-mod-', '@exlg/mod-', 'exlg-theme-', '@exlg/theme-'].some(
-                (prefix) => pack.name.startsWith(prefix)
-            )
-        ) {
-            const { con } = await inquirer.prompt({
-                type: 'confirm',
-                name: 'con',
-                message:
-                    '包名不是正确的官方或社区 npm 包名，可能不是正确的 exlg 模块，是否继续构建？',
-                default: false
-            })
-            if (!con) return console.error('💥 构建中断')
-        }
+        const pkg = await checkPkgFile('构建')
 
         console.log('🍀 开始构建')
         const startTime = Date.now()
@@ -381,10 +398,10 @@ program
                 './dist/module.install.js',
                 `if (exlg.moduleCtl) exlg.moduleCtl.installModule(${JSON.stringify(
                     {
-                        name: pack.name,
-                        version: pack.version,
-                        description: pack.description,
-                        display: pack.name,
+                        name: pkg.name,
+                        version: pkg.version,
+                        description: pkg.description,
+                        display: pkg.name,
                         source: 'console'
                     }
                 )}, ${JSON.stringify(define)})\n` +
@@ -406,31 +423,30 @@ program
     })
 
 program
-    .command('serve')
-    .description('启动调试源服务（暂不可用）')
-    .option('-p, --port', '端口')
-    .action((options) => {
-        console.log(options.port)
-    })
+    .command('registry')
+    .description('为当前模块生成 yaml 格式的 registry')
+    .action(async () => {
+        const pkg = await checkPkgFile('生成')
 
-const checkPkgVer = async (name: string) => {
-    try {
-        return (await packageJson(name)).version
-    } catch (e) {
-        return undefined
-    }
-}
+        const registry = {
+            name: pkgNameToModName(pkg.name),
+            display: pkg.display,
+            description: pkg.description,
+            type: 'npm',
+            package: pkg.name,
+            bin: 'dist/module.min.js',
+            versions: [pkg.version]
+        }
+
+        console.log(yaml.dump(registry))
+    })
 
 program
     .command('add <mod-name>')
     .description('添加依赖')
     .action(async (name) => {
-        if (!(await fileOk('./package.json'))) {
-            console.log('💥 未找到 package.json，添加依赖失败')
-            return
-        }
+        const pkg = await checkPkgFile('添加依赖')
 
-        const pkg = JSON.parse(await fs.readFile('./package.json', 'utf-8'))
         if (!pkg.exlgDependencies) pkg.exlgDependencies = {}
 
         const official = await checkPkgVer(`@exlg/mod-${name}`)
@@ -438,7 +454,7 @@ program
 
         if (official) pkg.exlgDependencies[`@exlg/mod-${name}`] = `^${official}`
         else if (third) pkg.exlgDependencies[`exlg-mod-${name}`] = `^${third}`
-        else console.log('💥 未找到匹配的依赖，添加依赖失败')
+        else return console.error('💥 未找到匹配的依赖，添加依赖失败')
 
         pkg.exlgDependencies = Object.fromEntries(
             Object.entries(pkg.exlgDependencies).sort()
@@ -450,6 +466,13 @@ program
                 null,
                 4
             )
+        )
+
+        console.log(
+            '⚡ 添加依赖：%s',
+            official
+                ? `@exlg/mod-${name} ^${official}`
+                : `exlg-mod-${name} ^${third}`
         )
     })
 
