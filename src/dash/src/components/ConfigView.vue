@@ -34,8 +34,20 @@ function clearConfig() {
         <span class="config-header">
             设置 {{ configId }}
             <span>
-                <span class="emoji-button" @click="clearConfig">🗑️</span>
-                <span class="emoji-button" @click="configId = null">❎</span>
+                <span
+                    class="emoji-button"
+                    title="清空配置"
+                    @click="clearConfig"
+                >
+                    🗑️
+                </span>
+                <span
+                    class="emoji-button"
+                    title="关闭"
+                    @click="configId = null"
+                >
+                    ❎
+                </span>
             </span>
         </span>
 

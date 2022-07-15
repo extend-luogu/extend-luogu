@@ -29,7 +29,12 @@ function change(evt: Event) {
             {{ version }}
         </option>
     </select>
-    <span v-else class="module-version" @click="selecting = true">
+    <span
+        v-else
+        class="module-version"
+        title="选择版本"
+        @click="selecting = true"
+    >
         @{{ source.selectedVersion }}
     </span>
 </template>

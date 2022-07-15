@@ -68,7 +68,7 @@ const showId = ref(false)
 <template>
     <div class="root">
         <div>
-            <TextCheckbox text="🆔" v-model="showId" />
+            <TextCheckbox text="🆔" title="显示 ID" v-model="showId" />
             <ul class="module-list">
                 <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
                     <span>
@@ -101,11 +101,16 @@ const showId = ref(false)
                         <span
                             v-if="schemas[mod.id]"
                             class="emoji-button"
+                            title="配置"
                             @click="showConfig(mod.id)"
                         >
                             ⚙️
                         </span>
-                        <span class="emoji-button" @click="uninstall(mod.id)">
+                        <span
+                            class="emoji-button"
+                            title="卸载"
+                            @click="uninstall(mod.id)"
+                        >
                             🗑️
                         </span>
                         <input

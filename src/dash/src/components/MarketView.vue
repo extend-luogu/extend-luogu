@@ -141,9 +141,13 @@ const showId = ref(false)
 
 <template>
     <div class="root">
-        <span class="emoji-button" @click="showConfig('market')"> ⚙️ </span>
-        <span class="emoji-button" @click="loadSource()"> 🔄 </span>
-        <TextCheckbox text="🆔" v-model="showId" />
+        <span class="emoji-button" title="配置" @click="showConfig('market')">
+            ⚙️
+        </span>
+        <span class="emoji-button" title="重新加载" @click="loadSource()">
+            🔄
+        </span>
+        <TextCheckbox text="🆔" title="显示 ID" v-model="showId" />
 
         <hr class="exlg-hr" />
 
@@ -170,6 +174,7 @@ const showId = ref(false)
                     </span>
                     <span
                         class="emoji-button module-install"
+                        title="安装"
                         :style="{
                             visibility:
                                 installStates[it.id] === InstallState.installing
