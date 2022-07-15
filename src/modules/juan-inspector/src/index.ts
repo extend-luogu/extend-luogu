@@ -26,38 +26,38 @@ const inspect = async () => {
     const pendingResults = []
     let isHalted = false
 
-    const change = (ratio: number) => {
+    const updateProgress = (ratio: number) => {
         if (isHalted) return
         utils.simpleAlert(
-            $(`<span>
-                <span>加载用户中</span>
-                <div class="exlg-bar" style="background: lightgray;margin-top: 5px;">
-                    <div class="exlg-bar" id="process" style="background: blue;">
+            `
+                <span>
+                    <span>加载用户中</span>
+                    <br />
+                    <div class="exlg-bar" style="background: lightgray">
+                        <div
+                            class="exlg-bar"
+                            style="background: blue; width: ${ratio * 100}%"
+                        ></div>
                     </div>
-                </div>
-            </span>`)
-                .find('#process')
-                .css('width', `${Math.floor(ratio * 100)}%`)
-                .parent()
-                .parent()
-                .html(),
+                </span>
+            `,
             {
-                noAccept: true,
                 title: '正在监视卷王',
+                noAccept: true,
                 onCancel() {
                     isHalted = true
                 }
             }
         )
     }
-    change(0)
+    updateProgress(0)
 
     const {
         result: firstResult,
         count,
         perPage
     } = await utils.csGet(api).data.users
-    change(perPage / count)
+    updateProgress(perPage / count)
 
     let currentFetched = perPage
     for (
@@ -70,7 +70,7 @@ const inspect = async () => {
             (async () => {
                 const result = await utils.csGet(api + '&page=' + pid)
                 currentFetched += result.data.users.result.length
-                change(currentFetched / count)
+                updateProgress(currentFetched / count)
                 return result
             })()
         )
