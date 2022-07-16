@@ -9,9 +9,6 @@
     "devDependencies": {
         "@exlg/cli-mod": "^1.1.1"
     },
-    "exlgDependencies": {
-        "@exlg/mod-captcha": "^1.0.0"
-    },
     "keywords": [
         "exlg",
         "exlg-module"
