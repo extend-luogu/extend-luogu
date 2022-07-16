@@ -32,7 +32,7 @@ function clearConfig() {
 <template>
     <div class="config" v-if="configId">
         <span class="config-header">
-            设置 {{ configId }}
+            配置 {{ configId }}
             <span>
                 <span
                     class="emoji-button"
