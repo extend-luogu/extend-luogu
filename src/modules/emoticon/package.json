@@ -20,5 +20,5 @@
         "build:dev": "exlg-mod build -c",
         "prepublishOnly": "exlg-mod clean && exlg-mod build"
     },
-    "version": "1.0.0"
+    "version": "1.0.1"
 }

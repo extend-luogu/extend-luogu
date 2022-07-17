@@ -3,7 +3,7 @@
     "display": "双击跳题",
     "description": "双击跳题",
     "author": "5ab-juruo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "src/index.ts",
     "keywords": [
         "exlg",

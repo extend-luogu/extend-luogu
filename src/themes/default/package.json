@@ -3,7 +3,7 @@
     "display": "默认主题",
     "description": "exlg 的默认主题",
     "author": "ForkKILLET",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "src/index.ts",
     "keywords": [
         "exlg",

@@ -1,5 +1,7 @@
 # extend-luogu
 
+> Special thanks to [JetBrains](https://www.jetbrains.com/?from=extend-luogu) for sponsoring the opensource license to this project.
+
 ## Official Modules
 
 <!-- prettier-ignore -->
@@ -11,4 +13,4 @@
 | @exlg/mod-meta-discussion-guide | [![](https://img.shields.io/npm/v/@exlg/mod-meta-discussion-guide?style=flat-square)](https://www.npmjs.com/package/@exlg/mod-meta-discussion-guide) |
 | @exlg/mod-token                 | [![](https://img.shields.io/npm/v/@exlg/mod-token?style=flat-square)](https://www.npmjs.com/package/@exlg/mod-token)                                 |
 
-更多模块即将到来......
+More modules coming soon...
