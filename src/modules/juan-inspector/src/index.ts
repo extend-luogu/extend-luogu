@@ -69,6 +69,8 @@ const inspect = async () => {
             // eslint-disable-next-line @typescript-eslint/no-loop-func
             (async () => {
                 const result = await utils.csGet(api + '&page=' + pid)
+                log('pid=%d', pid)
+
                 currentFetched += result.data.users.result.length
                 updateProgress(currentFetched / count)
                 return result
@@ -135,4 +137,9 @@ const inspect = async () => {
 
 $('[name=punch]').on('click', inspect)
 
-Object.assign(window, { inspect })
+runtime.interfaces = {
+    inspect: {
+        description: '手动监视',
+        fn: inspect
+    }
+}
