@@ -311,7 +311,7 @@ program
     .command('build')
     .description('构建模块')
     .option('-c, --console', '提供用于手动注册模块的脚本')
-    .option('-m, --minify', '最小化', false)
+    .option('-m, --minify', '最小化', true)
     .action(async (options) => {
         const pkg = await checkPkgFile('构建')
 
