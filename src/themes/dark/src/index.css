@@ -4,7 +4,7 @@
 .exlg-input,
 .exlg-tooltip:hover::after,
 .simple-alert,
-.config {
+.exlg-window {
     color: white !important;
     background-color: #333 !important;
 }
