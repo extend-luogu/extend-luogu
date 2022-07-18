@@ -13,6 +13,8 @@ export type {
     Modules,
     ModuleReadonly,
     ModulesReadonly,
+    ModuleInterface,
+    ModuleInterfaces,
     ExecuteState
 } from '../module'
 

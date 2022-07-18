@@ -42,10 +42,18 @@ export type ExecuteState =
     | 'notExported'
     | 'unwrapThrew'
 
+export interface ModuleInterface {
+    description: string
+    fn: () => void
+}
+
+export type ModuleInterfaces = Record<string, ModuleInterface>
+
 export interface ModuleRuntime {
     setWrapper?: (wrapper: ModuleWrapper) => void
     executeState?: Promise<ExecuteState> | undefined
     storage?: Storage
+    interfaces: ModuleInterfaces
 }
 
 export interface ModuleReadonly {
@@ -196,7 +204,7 @@ export const launch = async () => {
     for (const id in modules) {
         unsafeWindow.exlg.modules[id] = {
             ...modules[id],
-            runtime: {}
+            runtime: { interfaces: {} }
         }
     }
 
