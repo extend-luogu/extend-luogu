@@ -14,19 +14,25 @@ exports = async () => {
         entryPoints: ['src/core/index.ts'],
         format: 'iife',
         bundle: true,
-        minify: true,
+        // minify: true,
         outfile: 'dist/core.bundle.js'
     })
 
+    // Let esbuild-plugin-vue3 know which `tsconfig.json` to use.
+    // See <https://github.com/pipe01/esbuild-plugin-vue3/issues/6>
+    process.chdir('src/dash')
+
     console.log('Building dash...')
     await esbuild.build({
-        entryPoints: ['src/dash/src/main.ts'],
+        entryPoints: ['src/main.ts'],
         plugins: [vuePlugin()],
         format: 'iife',
         bundle: true,
-        minify: true,
+        // minify: true,
         outfile: 'dist/dash.bundle.js'
     })
+
+    process.chdir('../..')
 
     console.log('Concating... (header + dash + core)')
     const header = await fs.readFile('./resources/header.js', 'utf-8')
