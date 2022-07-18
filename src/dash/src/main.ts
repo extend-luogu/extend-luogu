@@ -1,6 +1,7 @@
 import * as Vue from 'vue'
 import { createApp } from 'vue'
-import '../../core/types'
+import { createPinia } from 'pinia'
+import '@core/types'
 import App from './App.vue'
 
 window.exlgDash = {
@@ -9,5 +10,5 @@ window.exlgDash = {
 
 export const logger = window.exlg.utils.exlgLog('dash')
 
-createApp(App).mount('#exlg-dash')
+createApp(App).use(createPinia()).mount('#exlg-dash')
 logger.log('Mounted to #exlg-dash...')

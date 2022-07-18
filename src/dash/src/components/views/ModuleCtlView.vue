@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import type { ModulesReadonly, ExecuteState } from '../../../core/types'
-import { kModuleCtl, kShowConfig } from '../utils/injectionSymbols'
-import Await from './utils/Await.vue'
-import TextCheckbox from './utils/TextCheckbox.vue'
+import type { ModulesReadonly, ExecuteState } from '@core/types'
+import {
+    kModuleCtl,
+    kShowConfig,
+    kShowInterface
+} from '@/utils/injectionSymbols'
+import Await from '@comp/utils/Await.vue'
+import TextCheckbox from '@comp/utils/TextCheckbox.vue'
 
 const emits = defineEmits<{
     (e: 'uninstallModule', id: string): void
@@ -11,6 +15,7 @@ const emits = defineEmits<{
 
 const moduleCtl = inject(kModuleCtl)!
 const showConfig = inject(kShowConfig)!
+const showInterface = inject(kShowInterface)!
 const { utils, schemas, modules } = window.exlg
 
 const modulesRo = ref<ModulesReadonly | null>()
@@ -98,6 +103,17 @@ const showId = ref(false)
                         </span>
                     </span>
                     <span style="white-space: nowrap">
+                        <span
+                            v-if="
+                                Object.keys(modules[mod.id].runtime.interfaces)
+                                    .length
+                            "
+                            class="emoji-button"
+                            title="执行命令"
+                            @click="showInterface(mod.id)"
+                        >
+                            💈
+                        </span>
                         <span
                             v-if="schemas[mod.id]"
                             class="emoji-button"

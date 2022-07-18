@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { inject, onMounted, reactive, ref } from 'vue'
 import compareVersions from 'compare-versions'
-import { ModuleMetadata, Schema } from '../../../core/types'
-import { AllSourceItem, InstallState, Source } from '../utils'
-import { kModuleCtl, kShowConfig } from '../utils/injectionSymbols'
-import TextCheckbox from './utils/TextCheckbox.vue'
-import VersionSelect from './VersionSelect.vue'
+import { ModuleMetadata, Schema } from '@core/types'
+import { AllSourceItem, InstallState, Source } from '@/utils'
+import { kModuleCtl, kShowConfig } from '@/utils/injectionSymbols'
+import TextCheckbox from '@comp/utils/TextCheckbox.vue'
+import VersionSelect from '@comp/VersionSelect.vue'
 
 const emits = defineEmits<{
     (e: 'installModule'): void

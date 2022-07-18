@@ -1,21 +1,38 @@
 <script setup lang="ts">
 import { computed, inject, ref } from 'vue'
-import { kModuleCtl } from '../utils/injectionSymbols'
-import ConfigItem from './ConfigItem.vue'
+import { kModuleCtl } from '@/utils/injectionSymbols'
+import ConfigItem from '@comp/ConfigItem.vue'
+import useWindowStore from '@/stores/window'
 
 const moduleCtl = inject(kModuleCtl)!
-const { utils, schemas } = window.exlg
+const { utils, schemas, modules } = window.exlg
 
 const configId = ref<string | null>(null)
 const configStorage = computed(() =>
     configId.value ? moduleCtl.moduleStorages[configId.value] : undefined
 )
+const configDisplay = computed(() =>
+    configId.value === 'market'
+        ? '市场'
+        : modules[configId.value!].metadata.display
+)
+
+const windowStore = useWindowStore()
+console.log(windowStore)
+Object.assign(window, { windowStore })
 
 defineExpose({
     showConfig(id: string) {
         configId.value = id
+        windowStore.focus('config')
+        console.log(windowStore.active)
     }
 })
+
+function close() {
+    configId.value = null
+    windowStore.blur()
+}
 
 const clearTime = ref(0)
 
@@ -30,9 +47,13 @@ function clearConfig() {
 </script>
 
 <template>
-    <div class="config" v-if="configId">
-        <span class="config-header">
-            配置 {{ configId }}
+    <div
+        class="exlg-window"
+        v-if="configId"
+        v-show="windowStore.active === 'config'"
+    >
+        <span class="exlg-window-header">
+            配置 {{ configDisplay }}
             <span>
                 <span
                     class="emoji-button"
@@ -41,11 +62,7 @@ function clearConfig() {
                 >
                     🗑️
                 </span>
-                <span
-                    class="emoji-button"
-                    title="关闭"
-                    @click="configId = null"
-                >
+                <span class="emoji-button" title="关闭" @click="close">
                     ❎
                 </span>
             </span>
@@ -73,23 +90,6 @@ function clearConfig() {
 </template>
 
 <style scoped>
-.config {
-    top: 0;
-    right: calc(100% + 20px);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 1px 1px #000;
-}
-
-.config-header {
-    display: flex;
-    justify-content: space-between;
-}
-
 .config-list:empty::before {
     content: '没有可用配置项';
 }

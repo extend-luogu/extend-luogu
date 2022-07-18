@@ -11,7 +11,13 @@
         "isolatedModules": true,
         "esModuleInterop": true,
         "lib": ["esnext", "dom"],
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"],
+            "@comp/*": ["./src/components/*"],
+            "@core/*": ["../core/*"]
+        }
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

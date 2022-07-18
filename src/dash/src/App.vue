@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { provide, reactive, ref } from 'vue'
-import ModuleCtlView from './components/ModuleCtlView.vue'
-import MarketView from './components/MarketView.vue'
-import DevView from './components/DevView.vue'
-import ConfigView from './components/ConfigView.vue'
-import { InstallState } from './utils'
-import { kModuleCtl, kShowConfig } from './utils/injectionSymbols'
+import ModuleCtlView from '@comp/views/ModuleCtlView.vue'
+import MarketView from '@comp/views/MarketView.vue'
+import DevView from '@comp/views/DevView.vue'
+import ConfigView from '@comp/views/ConfigView.vue'
+import InterfaceView from '@comp/views/InterfaceView.vue'
+import { InstallState } from '@/utils'
+import {
+    kModuleCtl,
+    kShowConfig,
+    kShowInterface
+} from './utils/injectionSymbols'
 
 const { moduleCtl } = window.exlg
 delete window.exlg.moduleCtl
@@ -36,6 +41,11 @@ provide(kShowConfig, (configId: string) => {
     configView.value!.showConfig(configId)
 })
 
+const interfaceView = ref<InstanceType<typeof InterfaceView>>()
+provide(kShowInterface, (modId: string) => {
+    interfaceView.value!.showInterface(modId)
+})
+
 function switchTab(id: string) {
     currentTab.value = id
     const tab = tabs[id]
@@ -57,6 +67,7 @@ function uninstallModule(id: string) {
 
     <div class="exlg-root" v-show="show">
         <ConfigView ref="configView" />
+        <InterfaceView ref="interfaceView" />
 
         <div class="tabs">
             <div

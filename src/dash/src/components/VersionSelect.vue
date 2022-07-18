@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
-import { AllSourceItem } from '../utils'
+import { AllSourceItem } from '@/utils'
 
-const props = defineProps<{
+defineProps<{
     source: AllSourceItem
 }>()
 
@@ -19,7 +19,7 @@ function change(evt: Event) {
 
 function startSelecting() {
     selecting.value = true
-    // nextTick(() => select.value!.focus())
+    nextTick(() => select.value!.focus())
 }
 </script>
 
