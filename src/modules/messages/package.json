@@ -1,0 +1,22 @@
+{
+    "name": "@exlg/mod-messages",
+    "description": "新消息提醒",
+    "author": "bohanjun & YuzhenQin",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.1.1"
+    }
+}
