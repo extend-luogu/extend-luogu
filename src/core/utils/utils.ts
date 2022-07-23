@@ -2,6 +2,7 @@ import './index.css'
 import './SimpleAlert.css'
 
 import $ from 'jquery'
+import { is } from 'schemastery'
 import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
@@ -13,6 +14,7 @@ declare global {
     // Luogu
 
     const _feInjection: any
+    const _feInstance: any
     const markdownPalettes: {
         content?: string
     } | void
@@ -247,3 +249,41 @@ export const hookModElement = async (
 
     cloakStyle!.remove()
 }
+
+type NodeListLike = Node[] | NodeList
+type hookType = (insertedNodes: NodeListLike) => Node[]
+type callbackType = (hookedNodes: NodeListLike) => void
+type hookCallbackType = (insertedNodes: NodeListLike) => void
+
+const hookList: hookCallbackType[] = []
+const hooker = new MutationObserver((records) => {
+    const tmpNodeList: NodeListLike = []
+    records.forEach((record) => {
+        record.addedNodes.forEach((addedNode) => tmpNodeList.push(addedNode))
+    })
+    hookList.forEach((hook) => hook(tmpNodeList))
+})
+
+export function addHook(hook: hookCallbackType) {
+    hookList.push(hook)
+}
+
+export function addHookAndCallback(hook: hookType, callback: callbackType) {
+    addHook((insertedNodes) => {
+        const hookedNodes = hook(insertedNodes)
+        if (hookedNodes.length) callback(hookedNodes)
+    })
+}
+
+export function addHookSelector(selector: string, callback: callbackType) {
+    addHookAndCallback((insertedNodes) => {
+        const hookedNodes: NodeListLike = []
+        insertedNodes.forEach((node) => {
+            if ($(node).is(selector)) hookedNodes.push(node)
+            hookedNodes.push(...$(node).find(selector).get())
+        })
+        return hookedNodes
+    }, callback)
+}
+
+hooker.observe(document.body, { childList: true, subtree: true })
