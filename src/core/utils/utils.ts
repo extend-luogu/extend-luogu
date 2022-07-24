@@ -7,6 +7,10 @@ import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
 declare global {
+    // TamperMonkey
+
+    function GM_addElement(tagName: string, attributes: object): void
+
     // Luogu
 
     const _feInjection: any
