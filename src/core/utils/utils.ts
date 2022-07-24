@@ -7,10 +7,6 @@ import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
 declare global {
-    // TamperMonkey
-
-    function GM_addElement(tagName: string, attributes: object): void
-
     // Luogu
 
     const _feInjection: any
@@ -25,11 +21,13 @@ export { Schema }
 unsafeWindow.$ ??= $
 
 export const loadJs = (js: string) => {
-    GM_addElement('script', { textContent: js })
+    const e = document.createElement('script')
+    e.textContent = js
+    document.head.appendChild(e)
 }
 
 export const loadCss = (css: string) => {
-    GM_addElement('style', { textContent: css })
+    GM_addStyle(css)
 }
 
 export function chain<T>(res: Promise<T>): Promise<T> {
