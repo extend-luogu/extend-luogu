@@ -15,14 +15,14 @@
         "@vuepress/client": "next",
         "@vuepress/plugin-search": "next",
         "@vuepress/theme-default": "next",
-        "esbuild": "^0.14.36",
-        "eslint": "^8.13.0",
-        "eslint-plugin-jsdoc": "^39.2.9",
-        "lint-staged": "^12.4.1",
-        "marked": "^4.0.15",
-        "prettier": "^2.6.2",
-        "vue": "^3.2.33",
+        "esbuild": "^0.14.49",
+        "eslint": "^8.20.0",
+        "eslint-plugin-jsdoc": "^39.3.3",
+        "lint-staged": "^12.5.0",
+        "marked": "^4.0.18",
+        "prettier": "^2.7.1",
+        "vue": "^3.2.37",
         "vuepress": "next",
-        "xss": "^1.0.11"
+        "xss": "^1.0.13"
     }
 }

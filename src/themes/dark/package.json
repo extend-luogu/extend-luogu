@@ -13,8 +13,7 @@
         "build:dev": "exlg-mod build -c",
         "prepublishOnly": "exlg-mod clean && exlg-mod build"
     },
-    "dependencies": {},
     "devDependencies": {
-        "@exlg/cli-mod": "^1.1.1"
+        "@exlg/cli-mod": "workspace:^1.3.2"
     }
 }
