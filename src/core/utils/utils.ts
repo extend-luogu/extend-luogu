@@ -24,12 +24,13 @@ export { Schema }
 
 unsafeWindow.$ ??= $
 
-function addElement = (typeof GM_addElement === 'function') ?
-    (tagName, attributes) => GM_addElement(tagName, attributes)
-    : (tagName, attributes) => {
-        const e = document.createElement(tagName)
-        document.head.appendChild(Object.assign(e, attributes))
-    }
+const addElement =
+    typeof GM_addElement === 'function'
+        ? (tagName, attributes) => GM_addElement(tagName, attributes)
+        : (tagName, attributes) => {
+              const e = document.createElement(tagName)
+              document.head.appendChild(Object.assign(e, attributes))
+          }
 
 export const loadJs = (js: string) => {
     addElement('script', { textContent: js })
