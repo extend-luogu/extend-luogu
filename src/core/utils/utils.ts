@@ -12,8 +12,8 @@ declare global {
 
     // Luogu
 
-    const _feInjection: object
-    const _feInstance: object
+    const _feInjection: any
+    const _feInstance: any
     const markdownPalettes: {
         content?: string
     } | void
@@ -134,13 +134,17 @@ export const csPost = (
     return chain(res)
 }
 
+interface CSGetReturn extends Tampermonkey.ResponseBase {
+    data?: object
+}
+
 export const csGet = (url: string, headers = {}) => {
-    const res = new Promise((resolve, reject) => {
+    const res = new Promise<CSGetReturn>((resolve, reject) => {
         GM_xmlhttpRequest({
             url,
             method: 'GET',
             headers,
-            onload: (r) => {
+            onload: (r: Tampermonkey.ResponseBase) => {
                 let parsedData
                 try {
                     parsedData = JSON.parse(r.responseText)
@@ -308,8 +312,8 @@ export function loadChore(
     lastOperated: number,
     duration: string,
     setLast: (curTime: number) => void,
-    callback: () => void
-): void {
+    callback: () => void | Promise<void>
+): Promise<void> {
     const tm = (
         [
             ['s', 1000],
@@ -331,6 +335,9 @@ export function loadChore(
 
     if (Date.now() - lastOperated > tm) {
         setLast(Date.now())
-        callback()
+        return (async () => {
+            await callback()
+        })()
     }
+    return (async () => {})()
 }

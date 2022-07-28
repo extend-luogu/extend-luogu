@@ -1,0 +1,25 @@
+{
+    "name": "@exlg/mod-original-difficulty",
+    "display": "RmJ 原始难度显示",
+    "description": "显示 CF，AT 题目原始的难度，提供更准确的难度参考",
+    "author": "5ab-juruo",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^",
+        "schemastery": "^3.4.3"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.2.1",
+        "@types/jquery": "^3.5.14"
+    }
+}
