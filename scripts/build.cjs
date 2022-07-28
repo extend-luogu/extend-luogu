@@ -8,13 +8,14 @@ const pkg = require('../package.json')
 
 exports = async () => {
     const startTime = Date.now()
+    const minify = process.env.MINIFY !== '0'
 
     console.log('Building core...')
     await esbuild.build({
         entryPoints: ['src/core/index.ts'],
         format: 'iife',
         bundle: true,
-        // minify: true,
+        minify,
         outfile: 'dist/core.bundle.js'
     })
 
@@ -28,7 +29,7 @@ exports = async () => {
         plugins: [vuePlugin()],
         format: 'iife',
         bundle: true,
-        // minify: true,
+        minify,
         outfile: 'dist/dash.bundle.js'
     })
 
