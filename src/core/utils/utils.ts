@@ -2,7 +2,6 @@ import './index.css'
 import './SimpleAlert.css'
 
 import $ from 'jquery'
-import { is } from 'schemastery'
 import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
@@ -13,8 +12,8 @@ declare global {
 
     // Luogu
 
-    const _feInjection: any
-    const _feInstance: any
+    const _feInjection: object
+    const _feInstance: object
     const markdownPalettes: {
         content?: string
     } | void
@@ -26,8 +25,9 @@ unsafeWindow.$ ??= $
 
 const addElement =
     typeof GM_addElement === 'function'
-        ? (tagName, attributes) => GM_addElement(tagName, attributes)
-        : (tagName, attributes) => {
+        ? (tagName: string, attributes: object) =>
+              GM_addElement(tagName, attributes)
+        : (tagName: string, attributes: object) => {
               const e = document.createElement(tagName)
               document.head.appendChild(Object.assign(e, attributes))
           }
@@ -104,7 +104,7 @@ export const mustMatch = (...args: Parameters<typeof match>) => {
 
 export const csPost = (
     url: string,
-    data: any,
+    data: string | object,
     header = {},
     type = 'application/json'
 ): any => {
@@ -118,11 +118,15 @@ export const csPost = (
                     typeof data === 'string' ? type : 'application/json',
                 ...header
             },
-            onload: (r: any) => {
+            onload: (r) => {
+                let parsedData
                 try {
-                    r.data = JSON.parse(r.responseText)
+                    parsedData = JSON.parse(r.responseText)
                 } catch {} // eslint-disable-line no-empty
-                resolve(r)
+                resolve({
+                    ...r,
+                    data: parsedData
+                })
             },
             onerror: reject
         })
@@ -130,17 +134,21 @@ export const csPost = (
     return chain(res)
 }
 
-export const csGet = (url: string, headers = {}): any => {
+export const csGet = (url: string, headers = {}) => {
     const res = new Promise((resolve, reject) => {
         GM_xmlhttpRequest({
             url,
             method: 'GET',
             headers,
-            onload: (r: any) => {
+            onload: (r) => {
+                let parsedData
                 try {
-                    r.data = JSON.parse(r.responseText)
+                    parsedData = JSON.parse(r.responseText)
                 } catch (e) {} // eslint-disable-line no-empty
-                resolve(r)
+                resolve({
+                    ...r,
+                    data: parsedData
+                })
             },
             onerror: reject
         })
@@ -295,3 +303,34 @@ export function addHookSelector(selector: string, callback: callbackType) {
 }
 
 hooker.observe(document.body, { childList: true, subtree: true })
+
+export function loadChore(
+    lastOperated: number,
+    duration: string,
+    setLast: (curTime: number) => void,
+    callback: () => void
+): void {
+    const tm = (
+        [
+            ['s', 1000],
+            ['m', 60],
+            ['h', 60],
+            ['D', 24]
+        ] as [string, number][]
+    ).reduce(
+        (
+            [curUnit, curTime]: [string, number],
+            [key, value]: [string, number]
+        ) => {
+            if (curUnit) curTime *= value
+            if (curUnit === key) curUnit = ''
+            return [curUnit, curTime]
+        },
+        [duration.at(-1)!, +duration.slice(0, -1)] as [string, number]
+    )[1]
+
+    if (Date.now() - lastOperated > tm) {
+        setLast(Date.now())
+        callback()
+    }
+}
