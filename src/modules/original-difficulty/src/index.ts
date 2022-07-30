@@ -83,6 +83,7 @@ const fetchProcess = (async () => {
 let lastHookedUrl = ''
 utils.addHookSelector('div.stat > div.field', (hookedNodes) => {
     if (window.location.href === lastHookedUrl) return
+    if (!/CF|AT/.test(window.location.pathname)) return
     lastHookedUrl = window.location.href
 
     const $tar = $(hookedNodes[3])
@@ -97,8 +98,13 @@ utils.addHookSelector('div.stat > div.field', (hookedNodes) => {
 
     fetchProcess.then(() =>
         $status.text(
-            difficulty[_feInstance.currentData.problem.pid as string] ??
-                '不可用'
+            difficulty[
+                window.location.pathname.includes('CF')
+                    ? _feInstance.currentData.problem.pid
+                    : _feInstance.currentData.problem.description
+                          .match(/^.{22}[-./A-Za-z0-9_]*/)[0]
+                          .match(/[^/]*$/)[0]
+            ] ?? '不可用'
         )
     )
 })
