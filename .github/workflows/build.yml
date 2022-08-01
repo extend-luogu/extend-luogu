@@ -39,12 +39,12 @@ jobs:
 
       - name: Push preview
         run: |
-          git push origin main:preview --tags -f
+          git push origin legacy:preview --tags -f
 
       - name: Push latest
         if: "!contains( env.VER, '-' )" # Neither `-pre` nor `-rc`
         run: |
-          git push origin main:latest --tags -f
+          git push origin legacy:latest --tags -f
 
       - name: Release
         uses: softprops/action-gh-release@v1
