@@ -12,7 +12,7 @@ mod.reg("discussion-save", "讨论保存", ["@/discuss/\\d+(\\?page\\=\\d+)*$"],
         $btn.prop("disabled", true);
         $btn.text("保存中...");
         cs_get({
-            url: `https://fx白丝.ml/save.php?url=${window.location.href}`,
+            url: `https://lglg.top/save.php?url=${window.location.href}`,
             onload: (res) => {
                 if (res.status === 200) {
                     if (res.response === "success") {
@@ -49,7 +49,7 @@ mod.reg("discussion-save", "讨论保存", ["@/discuss/\\d+(\\?page\\=\\d+)*$"],
         });
     })
         .css("margin-top", "5px");
-    const $btn2 = $(`<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://fx白丝.ml/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px");
+    const $btn2 = $(`<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://lglg.top/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px");
     $("section.lg-summary").find("p").append($(`<br>`)).append($btn)
         .append($("<span>&nbsp;</span>"))
         .append($btn2);
