@@ -36,44 +36,45 @@ const lg4NameColor = {
  */
 
 const register_badge = compo.reg("register-badge", "badge 注册", {
-    isFirst: { ty: "boolean", dft: true, priv: true }
+    isFirst: { ty: "boolean", dft: true, priv: true },
 }, null, async ({ msto }, configuration = null) => {
     if (msto.isFirst) {
         if (confirm("看起来您是第一次使用注册器，您是否要注册 badge？\n出于各种原因，badge 只能对实名认证的用户注册，且 badge 注册以后不能更改用户。\n如果选择“否”，您仍然可以在官网（exlg.cc）注册。")) {
-            const code = prompt('请输入激活码')
-            const text = prompt('请输入你要的 badge 文字（可以后续修改，包括样式）')
-            log('开始注册')
-            await mod.execute('token')
-            log('成功生成 token')
+            const code = prompt("请输入激活码");
+            const text = prompt("请输入你要的 badge 文字（可以后续修改，包括样式）");
+            log("开始注册");
+            await mod.execute("token");
+            log("成功生成 token");
             GM_xmlhttpRequest({
-                url: 'https://exlg.piterator.com/badge/set',
-                method: 'POST',
+                url: "https://exlg.piterator.com/badge/set",
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json",
                 },
                 data: JSON.stringify({
-                    token: exlg.sto['^token'].token,
-                    uid: _feInjection.currentUser.uid,
+                    token: sto["^token"].token,
+                    uid: lg_usr.uid,
                     activation: code,
                     data: {
-                        text
-                    }
+                        text,
+                    },
                 }),
                 onload(resp) {
-                    const fetched = JSON.parse(resp.responseText)
-                    if (fetched.status === 200)
-                        console.log('OK. 请手动刷新 badge 以查看效果，后续的修改可使用注册器。')
-                    else
-                        console.warn(fetched.error)
+                    const fetched = JSON.parse(resp.responseText);
+                    if (fetched.status === 200) {
+                        log("OK. 请手动刷新 badge 以查看效果，后续的修改可使用注册器。");
+                    } else {
+                        warn(fetched.error);
+                    }
                 },
                 onerror(err) {
-                    console.warn(err)
-                }
-            })
+                    warn(err);
+                },
+            });
         }
         msto.isFirst = false;
     }
-    
+
     // Note: Definitions
     uindow.getconf = () => configData;
     const _allcss = {
