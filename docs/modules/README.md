@@ -24,7 +24,6 @@ title: 模块
 - [主页讨论个数限制](./mainpage-discuss-limit.md)
 - [有害代码检查器](./malicious-code-identifier.md)
 - [新消息提醒](./messages.md)
-- [Milkdown](./milkdown.md)
 - [显示原始难度](./original-difficulty.md)
 - [随机跳题 ex](./rand-problem-ex.md)
 - [题单内随机跳题](./rand-training-problem.md)

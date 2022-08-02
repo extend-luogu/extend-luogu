@@ -11,7 +11,6 @@ import "./modules/juan-inspector.js";
 import "./modules/keyboard-cli.js";
 import "./modules/malicious-code-identifier.js";
 import "./modules/messages.js";
-import "./modules/milkdown.js";
 import "./modules/misc.js";
 import "./modules/original-difficulty.js";
 import "./modules/rand-problem-ex.js";
