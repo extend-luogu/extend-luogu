@@ -37,7 +37,7 @@ const lg4NameColor = {
 
 const register_badge = compo.reg("register-badge", "badge 注册", {
     isFirst: { ty: "boolean", dft: true, priv: true }
-}, null, ({ msto }, configuration = null) => {
+}, null, async ({ msto }, configuration = null) => {
     if (msto.isFirst) {
         if (confirm("看起来您是第一次使用注册器，您是否要注册 badge？\n出于各种原因，badge 只能对实名认证的用户注册，且 badge 注册以后不能更改用户。\n如果选择“否”，您仍然可以在官网（exlg.cc）注册。")) {
             const code = prompt('请输入激活码')
@@ -69,7 +69,7 @@ const register_badge = compo.reg("register-badge", "badge 注册", {
                 onerror(err) {
                     console.warn(err)
                 }
-            }
+            })
         }
         msto.isFirst = false;
     }
