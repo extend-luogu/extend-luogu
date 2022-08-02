@@ -63,12 +63,15 @@ const register_badge = compo.reg("register-badge", "badge 注册", {
                     const fetched = JSON.parse(resp.responseText);
                     if (fetched.status === 200) {
                         log("OK. 请手动刷新 badge 以查看效果，后续的修改可使用注册器。");
+                        alert("OK. 请手动刷新 badge 以查看效果，后续的修改可使用注册器。");
                     } else {
                         warn(fetched.error);
+                        alert("出现了一点问题。请在控制台中查看");
                     }
                 },
                 onerror(err) {
                     warn(err);
+                    alert("出现了一点问题。请在控制台中查看");
                 },
             });
         }
