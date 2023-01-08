@@ -43,3 +43,13 @@ const state = props.mod?.runtime?.executeState
         </span>
     </template>
 </template>
+
+<style>
+.execute-state {
+    user-select: none;
+}
+.execute-state:after {
+    right: 100%;
+    width: max-content;
+}
+</style>

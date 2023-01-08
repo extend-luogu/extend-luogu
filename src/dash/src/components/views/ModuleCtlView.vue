@@ -55,6 +55,9 @@ const showId = ref(false)
     <div class="root">
         <div>
             <TextCheckbox text="🆔" title="显示 ID" v-model="showId" />
+
+            <hr class="exlg-hr" />
+
             <ul class="module-list">
                 <li v-for="mod in modulesRo" :key="mod.id" class="module-entry">
                     <span>
@@ -143,13 +146,5 @@ const showId = ref(false)
 .emoji-button {
     user-select: none;
     cursor: pointer;
-}
-
-.execute-state {
-    user-select: none;
-}
-.execute-state:after {
-    right: 100%;
-    width: max-content;
 }
 </style>
