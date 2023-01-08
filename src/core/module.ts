@@ -83,13 +83,21 @@ exlg.modules['${module.id}'].runtime.setWrapper(function(
 `
 
 export const installModule = (metadata: ModuleMetadata, script: string) => {
+    const id = `${metadata.source}:${metadata.name}`
+
     const module: ModuleReadonly = {
-        id: `${metadata.source}:${metadata.name}`,
+        id,
         active: true,
         metadata,
         script
     }
-    storage.set(module.id, module)
+    storage.set(id, module)
+    const { modules } = unsafeWindow.exlg
+    modules[id] = {
+        ...module,
+        runtime: { interfaces: {} }
+    }
+    modules[id].runtime.executeState = executeModule(modules[id])
 }
 
 export const executeModule = async (module: Module): Promise<ExecuteState> => {

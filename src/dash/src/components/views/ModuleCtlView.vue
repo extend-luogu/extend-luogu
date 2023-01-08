@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue'
-import type { ModulesReadonly, ExecuteState } from '@core/types'
+import type { ModulesReadonly } from '@core/types'
 import {
     kModuleCtl,
     kShowConfig,
     kShowInterface
 } from '@/utils/injectionSymbols'
-import Await from '@comp/utils/Await.vue'
+// import Await from '@comp/utils/Await.vue'
 import TextCheckbox from '@comp/utils/TextCheckbox.vue'
+import ModuleState from './ModuleState.vue'
 
 const emits = defineEmits<{
     (e: 'uninstallModule', id: string): void
@@ -41,26 +42,6 @@ function uninstall(id: string) {
     })
 }
 
-const executeStateIcons: Record<ExecuteState, string> = {
-    done: '✨',
-    threw: '💥',
-    inactive: '❄️',
-    mismatched: '🌙',
-    storageBroken: '💥',
-    notExported: '💥',
-    unwrapThrew: '💥'
-}
-
-const executeStateTexts: Record<ExecuteState, string> = {
-    done: '已加载',
-    threw: '出错了',
-    inactive: '未开启',
-    mismatched: '未匹配',
-    storageBroken: '数据错误',
-    notExported: '无导出',
-    unwrapThrew: '解包错误'
-}
-
 updateModuleCache()
 
 defineExpose({
@@ -75,15 +56,16 @@ const showId = ref(false)
         <div>
             <TextCheckbox text="🆔" title="显示 ID" v-model="showId" />
             <ul class="module-list">
-                <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
+                <li v-for="mod in modulesRo" :key="mod.id" class="module-entry">
                     <span>
-                        <Await
+                        <ModuleState :mod="modules[mod.id]"></ModuleState>
+                        <!-- <Await
                             :promise="modules[mod.id]?.runtime?.executeState"
                         >
                             <template #first>🕒</template>
-                            <template #then="{ result }">
-                                <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
-                                <span
+                            <template #then="{ result }"> -->
+                        <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
+                        <!-- <span
                                     class="execute-state exlg-tooltip"
                                     :data-exlg-tooltip="
                                         /* @ts-expect-error */
@@ -96,7 +78,7 @@ const showId = ref(false)
                                     }}
                                 </span>
                             </template>
-                        </Await>
+                        </Await> -->
                         {{ showId ? mod.id : mod.metadata.display }}
                         <span class="module-version">
                             @{{ mod.metadata.version }}
