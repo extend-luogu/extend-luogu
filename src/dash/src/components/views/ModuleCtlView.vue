@@ -105,8 +105,9 @@ const showId = ref(false)
                     <span style="white-space: nowrap">
                         <span
                             v-if="
-                                Object.keys(modules[mod.id].runtime.interfaces)
-                                    .length
+                                Object.keys(
+                                    modules[mod.id]?.runtime?.interfaces ?? {}
+                                ).length
                             "
                             class="emoji-button"
                             title="执行命令"
