@@ -8,6 +8,12 @@ interface SubscribedUserInfo {
     passedProblemCount: number
 }
 
+interface JuanDelta {
+    uid: string
+    name: string
+    delta: number
+}
+
 type JuanInfo = Record<
     number,
     {
@@ -97,7 +103,7 @@ const inspect = async () => {
 
     if (isHalted) return
 
-    const juans = []
+    const juans: JuanDelta[] = []
     for (const uid in juanInfo) {
         if (lastJuanInfo[uid])
             juans.push({
@@ -127,12 +133,38 @@ const inspect = async () => {
             <p>从上一次打卡到现在，关注用户中卷题量前三为：</p>
             ${juans.length < 3 ? '<p>卷题人数不足三位，明天再看看吧</p>' : ''}
             <ol style="margin: 0 25% 0 20%;">${juanList}</ol>
+            <input id="ji-input" placeholder="输入 uid 或用户名查询用户卷题数" style="
+                width: 60%;
+                padding: 3px;
+                margin: 10px 20% 0px 20%;
+            ">
         `,
         {
             title: '卷王监视器',
             noCancel: true
         }
     )
+    let searchResultNode: null | JQuery<HTMLElement> = null
+    $('#ji-input').on('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (searchResultNode === null) {
+                searchResultNode = $('<p>').insertAfter(e.currentTarget)
+            }
+            const inputUid = (e.currentTarget as HTMLInputElement).value
+            const target = juans.find(
+                ({ uid, name }) =>
+                    uid === inputUid ||
+                    name.toLocaleUpperCase() === inputUid.toLocaleUpperCase()
+            )
+            if (target === undefined) {
+                searchResultNode.text('该用户不在你的关注列表中')
+            } else {
+                searchResultNode.text(
+                    `${target.name} 卷了 ${target.delta} 道题`
+                )
+            }
+        }
+    })
 }
 
 $('[name=punch]').on('click', inspect)
