@@ -29,6 +29,7 @@
 // @connect        luogu-captcha-bypass.piterator.com
 // @connect        exlgcs.jin-dan.site
 // @connect        localhost
+// @connect        lglg.top
 //
 // @require        https://cdn.luogu.com.cn/js/jquery-2.1.1.min.js
 //
