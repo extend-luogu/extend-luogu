@@ -8,32 +8,23 @@ mod.reg("discussion-save", "讨论保存", ["@/discuss/\\d+(\\?page\\=\\d+)*$"],
     },
 }, ({ msto }) => {
     const $btn = $(`<button class="am-btn am-btn-success am-btn-sm" name="save-discuss">保存讨论</button>`);
+    const id = window.location.pathname.split("/")[2];
     $btn.on("click", () => {
         $btn.prop("disabled", true);
         $btn.text("保存中...");
         cs_get({
-            url: `https://lglg.top/save.php?url=${window.location.href}`,
+            url: `https://lda.piterator.com/${id}`,
             onload: (res) => {
-                if (res.status === 200) {
-                    if (res.response === "success") {
-                        log("Discuss saved");
-                        $btn.text("保存成功");
-                        setTimeout(() => {
-                            $btn.text("保存讨论");
-                            $btn.removeAttr("disabled");
-                        }, 1000);
-                    } else {
-                        log(`Discuss unsuccessfully saved, return data: ${res.response}`);
-                        $btn.text("保存失败");
-                        $btn.toggleClass("am-btn-success").toggleClass("am-btn-warning");
-                        setTimeout(() => {
-                            $btn.text("保存讨论");
-                            $btn.removeAttr("disabled");
-                            $btn.toggleClass("am-btn-success").toggleClass("am-btn-warning");
-                        }, 1000);
-                    }
+                if (res.status <= 400) {
+                    log("Discuss saved");
+                    $btn.text("保存成功");
+                    setTimeout(() => {
+                        $btn.text("保存讨论");
+                        $btn.removeAttr("disabled");
+                    }, 1000);
                 } else {
-                    log(`Fail to save discuss: ${res}`);
+                    log("Fail to save discuss: ", res);
+                    $btn.text("保存失败");
                     $btn.toggleClass("am-btn-success").toggleClass("am-btn-danger");
                     setTimeout(() => {
                         $btn.text("保存讨论");
@@ -49,7 +40,7 @@ mod.reg("discussion-save", "讨论保存", ["@/discuss/\\d+(\\?page\\=\\d+)*$"],
         });
     })
         .css("margin-top", "5px");
-    const $btn2 = $(`<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://lglg.top/show.php?url=${location.href}">查看备份</a>`).css("margin-top", "5px");
+    const $btn2 = $(`<a class="am-btn am-btn-warning am-btn-sm" name="save-discuss" href="https://lglg.top/${id}">查看备份</a>`).css("margin-top", "5px");
     $("section.lg-summary").find("p").append($(`<br>`)).append($btn)
         .append($("<span>&nbsp;</span>"))
         .append($btn2);
