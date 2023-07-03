@@ -149,7 +149,7 @@ program
                     },
                     devDependencies: {
                         '@exlg/cli-mod': '^1.1.1',
-                        vue: useVue ? '^3.2.37' : undefined
+                        vue: useVue ? '^3.3.4' : undefined
                     }
                 },
                 null,

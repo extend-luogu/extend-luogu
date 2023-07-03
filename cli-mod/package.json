@@ -31,6 +31,7 @@
         "esbuild-plugin-vue3": "^0.3.0",
         "inquirer": "^8.2.4",
         "js-yaml": "^4.1.0",
-        "package-json": "^8.1.0"
+        "package-json": "^8.1.0",
+        "semver": "^7.5.3"
     }
 }
