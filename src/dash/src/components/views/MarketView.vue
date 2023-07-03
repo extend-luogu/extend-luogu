@@ -56,7 +56,7 @@ async function loadSource() {
 
     source.value = (
         await window.exlg.utils.csGet(storage.get('githubSource') + sourceUrl)
-    ).data
+    ).json
 
     if (source.value === null) {
         return

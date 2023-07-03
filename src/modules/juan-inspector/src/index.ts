@@ -56,7 +56,7 @@ const inspect = async () => {
         result: firstResult,
         count,
         perPage
-    } = (await utils.csGet(api)).data.users
+    } = (await utils.csGet(api)).json.users
     updateProgress(perPage / count)
 
     let currentFetched = perPage
@@ -71,7 +71,7 @@ const inspect = async () => {
                 const result = await utils.csGet(api + '&page=' + pid)
                 log('pid=%d', pid)
 
-                currentFetched += result.data.users.result.length
+                currentFetched += result.json.users.result.length
                 updateProgress(currentFetched / count)
                 return result
             })()
@@ -81,7 +81,7 @@ const inspect = async () => {
     const results = [
         firstResult,
         ...(await Promise.all(pendingResults)).map(
-            ({ data }) => data.users.result
+            ({ json: data }) => data.users.result
         )
     ].flat()
 

@@ -43,7 +43,7 @@ const fetchProcess = (async () => {
                 await utils.csGet(
                     'https://codeforces.com/api/problemset.problems?lang=en'
                 )
-            ).data as CFResponse<{
+            ).json as CFResponse<{
                 problems: CFProblem[]
                 problemStatistics: unknown[]
             }>
@@ -69,7 +69,7 @@ const fetchProcess = (async () => {
                 await utils.csGet(
                     'https://kenkoooo.com/atcoder/resources/problem-models.json'
                 )
-            ).data as Record<string, ATProblemStatistics>
+            ).json as Record<string, ATProblemStatistics>
             for (const key in resp) {
                 const tmpDiff = resp[key].difficulty
                 if (tmpDiff) difficulty[key] = makeDifficulty(tmpDiff)
