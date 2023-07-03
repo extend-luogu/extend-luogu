@@ -56,7 +56,7 @@ const inspect = async () => {
         result: firstResult,
         count,
         perPage
-    } = await utils.csGet(api).data.users
+    } = (await utils.csGet(api)).data.users
     updateProgress(perPage / count)
 
     let currentFetched = perPage
