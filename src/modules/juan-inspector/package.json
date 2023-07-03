@@ -3,7 +3,7 @@
     "display": "卷王监视器",
     "description": "监视关注用户中的卷王",
     "author": "5ab-juruo",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
