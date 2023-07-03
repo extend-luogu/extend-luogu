@@ -21,7 +21,7 @@
         "lint-staged": "^12.5.0",
         "marked": "^4.0.18",
         "prettier": "^2.7.1",
-        "vue": "^3.2.37",
+        "vue": "^3.3.4",
         "vuepress": "next",
         "xss": "^1.0.13"
     }
