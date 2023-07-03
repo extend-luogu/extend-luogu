@@ -111,7 +111,7 @@ export const mustMatch = (...args: Parameters<typeof match>) => {
 }
 
 interface Response extends Tampermonkey.ResponseBase {
-    get data(): any
+    get json(): any
 }
 
 const request = (options: {
@@ -129,7 +129,7 @@ const request = (options: {
                     response: r.response,
                     responseText: r.responseText,
                     responseXML: r.responseXML,
-                    get data(): any {
+                    get json(): any {
                         try {
                             return JSON.parse(response.response)
                         } catch (e) {

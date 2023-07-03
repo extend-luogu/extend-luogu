@@ -15,7 +15,7 @@ const genToken = async () => {
                     await utils.csGet(
                         'https://exlg.piterator.com/token/generate'
                     )
-                ).data.data,
+                ).json.data,
                 public: true
             },
             {
@@ -23,14 +23,14 @@ const genToken = async () => {
                 referer: 'https://www.luogu.com.cn/paste'
             }
         )
-    ).data.id
+    ).json.id
     sto.set(
         '_token',
         (
             await utils.csGet(
                 `https://exlg.piterator.com/token/verify/${paste_id}`
             )
-        ).data.data.token
+        ).json.data.token
     )
     await utils.csPost(
         `https://www.luogu.com.cn/paste/delete/${paste_id}?_contentOnly`,
@@ -53,7 +53,7 @@ const genToken = async () => {
                         uid: _feInjection.currentUser.uid,
                         token: sto.get('_token')
                     })
-                ).data
+                ).json
                 if (ttl.status === 401 || ttl.data <= 60 * 15) await genToken()
             } else await genToken()
         }
