@@ -5,6 +5,14 @@ import $ from 'jquery'
 import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
+interface FeInjectionType {
+    code: number
+    currentData: any
+    currentTemplate: string
+    currentTheme: any
+    currentUser: any
+}
+
 declare global {
     // TamperMonkey
 
@@ -12,7 +20,7 @@ declare global {
 
     // Luogu
 
-    const _feInjection: any
+    const _feInjection: FeInjectionType
     const _feInstance: any
     const markdownPalettes: {
         content?: string
@@ -125,6 +133,9 @@ export const csPost = (
                 } catch {} // eslint-disable-line no-empty
                 resolve({
                     ...r,
+                    response: r.response,
+                    responseText: r.responseText,
+                    responseXML: r.responseXML,
                     data: parsedData
                 })
             },
@@ -151,6 +162,9 @@ export const csGet = (url: string, headers = {}) => {
                 } catch (e) {} // eslint-disable-line no-empty
                 resolve({
                     ...r,
+                    response: r.response,
+                    responseText: r.responseText,
+                    responseXML: r.responseXML,
                     data: parsedData
                 })
             },

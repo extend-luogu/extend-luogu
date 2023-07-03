@@ -13,12 +13,13 @@ const autofill = async () => {
     canvas.getContext('2d')?.drawImage(img[0], 0, 0)
 
     const input = $("input[placeholder$='验证码']")
-    input.val(
-        await utils.csPost(
-            'https://luogu-captcha-bypass.piterator.com/predict/',
-            canvas.toDataURL('image/jpeg')
-        ).responseText
-    )
+
+    const res = await utils.csPost(
+        'https://luogu-captcha-bypass.piterator.com/predict/',
+        canvas.toDataURL('image/jpeg')
+    ).responseText
+    log(res)
+    input.val(res)
     input.trigger('input')
 }
 

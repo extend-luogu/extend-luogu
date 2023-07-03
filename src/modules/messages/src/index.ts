@@ -1,15 +1,25 @@
 import '@exlg/core/types/module-entry'
 
+interface MessageType {
+    sender: any
+    id: string
+    content: string
+}
+
 // Note: 兼容
 const uindow = window
-const lg_usr = uindow._feInjection.currentUser
-const sharedFunction = (channel: string, master: Function, slave: Function) => {
+const lg_usr = _feInjection.currentUser
+const sharedFunction = (
+    channel: string,
+    master: (bc: BroadcastChannel) => void,
+    slave: (data: any) => void
+) => {
     const id = new Date().valueOf()
     const ctrl = new BroadcastChannel(`${channel}-ctrl`)
     const data = new BroadcastChannel(`${channel}-data`)
     let isMaster = false
-    let max
-    let timeoutId
+    let max: number
+    let timeoutId: number
     const onElection = () => {
         max = 0
         ctrl.postMessage(`Alive ${id}`)
@@ -57,7 +67,7 @@ const $container = $('body')
         '<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>'
     )
     .find('#exlg-messages-container')
-function msg_show(msg) {
+function msg_show(msg: MessageType) {
     const $curbd = $(`
         <div class="exlg-message-outter" id="exlg-message-${msg.id}">
             <div class="exlg-message-inner">
@@ -93,7 +103,7 @@ function msg_show(msg) {
 
 sharedFunction(
     'exlg-message',
-    (bc) => {
+    (bc: BroadcastChannel) => {
         const socket = new WebSocket('wss://ws.luogu.com.cn/ws')
         socket.onopen = () =>
             socket.send(
@@ -116,7 +126,7 @@ sharedFunction(
             }
         }
     },
-    (msg) => {
+    (msg: string) => {
         const u = JSON.parse(msg)
         if (
             u._ws_type === 'server_broadcast' &&
@@ -128,7 +138,7 @@ sharedFunction(
     }
 )
 
-const listenBroadcast = (channel) => {
+const listenBroadcast = (channel: string) => {
     const ch = new BroadcastChannel(channel)
     ch.onmessage = (ev) => {
         log(channel, ': ', ev.data)
