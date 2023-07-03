@@ -110,68 +110,63 @@ export const mustMatch = (...args: Parameters<typeof match>) => {
     if (!match(...args)) throw new MatchError()
 }
 
+interface Response extends Tampermonkey.ResponseBase {
+    get data(): any
+}
+
+const request = (options: {
+    url: string
+    method: 'GET' | 'POST'
+    headers: Record<string, string>
+    data?: string
+}) => {
+    const res = new Promise<Response>((resolve, reject) => {
+        GM_xmlhttpRequest({
+            ...options,
+            onload: (r) => {
+                const response = {
+                    ...r,
+                    response: r.response,
+                    responseText: r.responseText,
+                    responseXML: r.responseXML,
+                    get data(): any {
+                        try {
+                            return JSON.parse(response.response)
+                        } catch (e) {
+                            throw new Error(
+                                `JSON 解析错误！ ${(e as Error).message}`
+                            )
+                        }
+                    }
+                }
+                resolve(response)
+            },
+            onerror: reject
+        })
+    })
+    return chain(res)
+}
+
 export const csPost = (
     url: string,
     data: string | object,
     header = {},
     type = 'application/json'
-): any => {
-    const res = new Promise((resolve, reject) => {
-        GM_xmlhttpRequest({
-            url,
-            method: 'POST',
-            data: typeof data !== 'string' ? JSON.stringify(data) : data,
-            headers: {
-                'Content-Type':
-                    typeof data === 'string' ? type : 'application/json',
-                ...header
-            },
-            onload: (r) => {
-                let parsedData
-                try {
-                    parsedData = JSON.parse(r.responseText)
-                } catch {} // eslint-disable-line no-empty
-                resolve({
-                    ...r,
-                    response: r.response,
-                    responseText: r.responseText,
-                    responseXML: r.responseXML,
-                    data: parsedData
-                })
-            },
-            onerror: reject
-        })
+): Promise<Response> => {
+    return request({
+        url,
+        method: 'POST',
+        data: typeof data !== 'string' ? JSON.stringify(data) : data,
+        headers: {
+            'Content-Type':
+                typeof data === 'string' ? type : 'application/json',
+            ...header
+        }
     })
-    return chain(res)
-}
-
-interface CSGetReturn extends Tampermonkey.ResponseBase {
-    data?: object
 }
 
 export const csGet = (url: string, headers = {}) => {
-    const res = new Promise<CSGetReturn>((resolve, reject) => {
-        GM_xmlhttpRequest({
-            url,
-            method: 'GET',
-            headers,
-            onload: (r: Tampermonkey.ResponseBase) => {
-                let parsedData
-                try {
-                    parsedData = JSON.parse(r.responseText)
-                } catch (e) {} // eslint-disable-line no-empty
-                resolve({
-                    ...r,
-                    response: r.response,
-                    responseText: r.responseText,
-                    responseXML: r.responseXML,
-                    data: parsedData
-                })
-            },
-            onerror: reject
-        })
-    })
-    return chain(res)
+    return request({ url, method: 'GET', headers })
 }
 
 export const sleep = (t: number): Promise<void> =>
