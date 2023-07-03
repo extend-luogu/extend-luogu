@@ -19,7 +19,7 @@ $saveBtn
         $saveBtn.text('保存中...')
         utils
             .csGet(`${api}/save.php?url=${window.location.href}`)
-            .then((res: any) => {
+            .then((res) => {
                 if (res.status === 200) {
                     if (res.response === 'success') {
                         log('Discuss saved')
@@ -56,7 +56,7 @@ $saveBtn
                     }, 1000)
                 }
             })
-            .catch((err: any) => {
+            .catch((err) => {
                 log('Error: %o', err)
                 $saveBtn.removeAttr('disabled')
             })

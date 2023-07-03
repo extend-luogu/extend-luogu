@@ -53,10 +53,16 @@ moduleCtl.moduleStorages.market = storage // Note: For config
 
 async function loadSource() {
     source.value = null
-    source.value = await window.exlg.utils.csGet(
-        storage.get('githubSource') + sourceUrl
+
+    source.value = (
+        await window.exlg.utils.csGet(storage.get('githubSource') + sourceUrl)
     ).data
-    source.value!.forEach((it) => {
+
+    if (source.value === null) {
+        return
+    }
+
+    source.value.forEach((it) => {
         it.id = `${it.type}:${it.name}`
         it.selectedVersion = it.versions.at(-1)! // Note: latest version
         installStates[it.id] = moduleCtl.storage.get(it.id)
@@ -84,10 +90,12 @@ async function install(it: AllSourceItem) {
     try {
         switch (it.type) {
             case 'npm':
-                script = await window.exlg.utils.csGet(
-                    `${storage.get('npmSource')}/${it.package}@${version}/${
-                        it.bin
-                    }`
+                script = (
+                    await window.exlg.utils.csGet(
+                        `${storage.get('npmSource')}/${it.package}@${version}/${
+                            it.bin
+                        }`
+                    )
                 ).response
         }
     } catch (err) {

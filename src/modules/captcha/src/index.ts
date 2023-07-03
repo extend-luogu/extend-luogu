@@ -14,9 +14,11 @@ const autofill = async () => {
 
     const input = $("input[placeholder$='验证码']")
 
-    const res = await utils.csPost(
-        'https://luogu-captcha-bypass.piterator.com/predict/',
-        canvas.toDataURL('image/jpeg')
+    const res = (
+        await utils.csPost(
+            'https://luogu-captcha-bypass.piterator.com/predict/',
+            canvas.toDataURL('image/jpeg')
+        )
     ).responseText
     log(res)
     input.val(res)
