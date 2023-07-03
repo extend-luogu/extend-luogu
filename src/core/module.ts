@@ -90,6 +90,12 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
         script
     }
     storage.set(module.id, module)
+    const { modules } = unsafeWindow.exlg
+    modules[module.id] = {
+        ...module,
+        runtime: { interfaces: {} }
+    }
+    modules[module.id].runtime.executeState = executeModule(modules[module.id])
 }
 
 export const executeModule = async (module: Module): Promise<ExecuteState> => {
