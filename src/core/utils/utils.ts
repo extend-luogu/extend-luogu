@@ -151,6 +151,9 @@ export const csGet = (url: string, headers = {}) => {
                 } catch (e) {} // eslint-disable-line no-empty
                 resolve({
                     ...r,
+                    response: r.response,
+                    responseText: r.responseText,
+                    responseXML: r.responseXML,
                     data: parsedData
                 })
             },
