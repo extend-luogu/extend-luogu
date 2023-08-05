@@ -1,16 +1,15 @@
 module.exports = {
     env: {
         browser: true,
-        es2021: true
+        es2021: true,
     },
     extends: [
         'eslint:recommended',
         'airbnb-base',
-        'plugin:prettier/recommended'
     ],
     parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'module'
+        sourceType: 'module',
     },
     overrides: [
         {
@@ -20,17 +19,17 @@ module.exports = {
                 'airbnb-base',
                 'airbnb-typescript/base',
                 'plugin:@typescript-eslint/recommended',
-                'plugin:prettier/recommended'
             ],
             parser: '@typescript-eslint/parser',
             parserOptions: {
-                project: './tsconfig.eslint.json'
+                project: './tsconfig.eslint.json',
             },
             rules: {
+                'semi-style': ['error', 'first'],
                 quotes: [
                     'error',
                     'single',
-                    { avoidEscape: true, allowTemplateLiterals: false }
+                    { avoidEscape: true, allowTemplateLiterals: false },
                 ],
                 'no-underscore-dangle': 'off',
                 'no-plusplus': 'off',
@@ -41,23 +40,28 @@ module.exports = {
                 'no-return-assign': 'off',
                 'consistent-return': 'off',
                 'prefer-template': 'off',
+                '@typescript-eslint/indent': ['error', 4],
+                '@typescript-eslint/semi': ['error', 'never'],
                 '@typescript-eslint/naming-convention': 'off',
                 '@typescript-eslint/no-use-before-define': 'off',
-                '@typescript-eslint/no-non-null-assertion': 'off'
-            }
+                '@typescript-eslint/no-non-null-assertion': 'off',
+                '@typescript-eslint/brace-style': ['error', 'stroustrup']
+            },
         },
         {
             files: ['*.config.*', '.*rc.*', '*.cjs'],
             env: {
                 browser: false,
-                node: true
+                node: true,
             },
             rules: {
+                indent: ['error', 4],
+                semi: ['error', 'never'],
                 'import/no-extraneous-dependencies': [
                     'error',
-                    { devDependencies: true }
-                ]
-            }
-        }
-    ]
-}
+                    { devDependencies: true },
+                ],
+            },
+        },
+    ],
+};

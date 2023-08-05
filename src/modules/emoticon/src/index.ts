@@ -4,7 +4,7 @@ import type Scm from './schema'
 import { emos, size, Emo } from './assets'
 
 utils.mustMatch([/^\/discuss\/\d+/, /^\/discuss\/lists\?forumname=/], {
-    withSearch: true
+    withSearch: true,
 })
 
 const sto = runtime.storage as SchemaToStorage<typeof Scm>
@@ -45,8 +45,7 @@ $emoSwitch
 
 if (!sto.get('emoMenuOpen')) $emoMenu.hide()
 
-const insertText = (txt: string) =>
-    $txt.trigger('focus').val(txt).trigger('input')
+const insertText = (txt: string) => $txt.trigger('focus').val(txt).trigger('input')
 
 // Note: 点击按钮插入标签
 emos.forEach((emo) => {
@@ -65,7 +64,7 @@ $txt[0].addEventListener('input', (evt) => {
         let i = 0
         while (i++ < 5) {
             $txt[0].dispatchEvent(
-                new KeyboardEvent('keydown', { keyCode: 37, shiftKey: true }) // Note: Shift + LeftArrow
+                new KeyboardEvent('keydown', { keyCode: 37, shiftKey: true }), // Note: Shift + LeftArrow
             )
             selection = document.getSelection()!.toString()
 
@@ -80,7 +79,7 @@ $txt[0].addEventListener('input', (evt) => {
             if (targetEmo) {
                 // Note: 匹配到表情，删除选区后插入
                 $txt[0].dispatchEvent(
-                    new KeyboardEvent('keydown', { keyCode: 8 }) // Note: Backspace
+                    new KeyboardEvent('keydown', { keyCode: 8 }), // Note: Backspace
                 )
                 insertText(`![](${emoUrl(targetEmo)})`)
             }
@@ -91,8 +90,8 @@ $txt[0].addEventListener('input', (evt) => {
             $txt[0].dispatchEvent(
                 new KeyboardEvent('keydown', {
                     keyCode: 39,
-                    shiftKey: true
-                }) // Note: Shift + RightArrow
+                    shiftKey: true,
+                }), // Note: Shift + RightArrow
             )
         }
     }

@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { provide, reactive, ref } from 'vue'
-import ModuleCtlView from '@comp/views/ModuleCtlView.vue'
+import { reactive, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import ModuleControlView from '@comp/views/ModuleControlView.vue'
 import MarketView from '@comp/views/MarketView.vue'
 import DevView from '@comp/views/DevView.vue'
 import ConfigView from '@comp/views/ConfigView.vue'
 import InterfaceView from '@comp/views/InterfaceView.vue'
 import { InstallState } from '@/utils'
-import {
-    kModuleCtl,
-    kShowConfig,
-    kShowInterface
-} from './utils/injectionSymbols'
+import { useModules } from '@/stores/module'
 
-const { moduleCtl } = window.exlg
-delete window.exlg.moduleCtl
-provide(kModuleCtl, moduleCtl)
+const { moduleControl } = window.exlg
+delete window.exlg.moduleControl
+
+const moduleStore = useModules()
+moduleStore.moduleControl = moduleControl!
+const { installStates } = storeToRefs(useModules())
 
 const currentTab = ref('module')
 const tabs = reactive<
@@ -33,18 +33,6 @@ const tabs = reactive<
 
 const show = ref(false)
 
-const moduleCtlView = ref<InstanceType<typeof ModuleCtlView>>()
-const marketView = ref<InstanceType<typeof MarketView>>()
-
-const configView = ref<InstanceType<typeof ConfigView>>()
-provide(kShowConfig, (configId: string) => {
-    configView.value!.showConfig(configId)
-})
-
-const interfaceView = ref<InstanceType<typeof InterfaceView>>()
-provide(kShowInterface, (modId: string) => {
-    interfaceView.value!.showInterface(modId)
-})
 
 function switchTab(id: string) {
     currentTab.value = id
@@ -53,19 +41,27 @@ function switchTab(id: string) {
 }
 
 function updateModule() {
-    moduleCtlView.value!.updateModuleCache()
+    moduleStore.loadLocalModules()
     if (currentTab.value !== 'module') tabs.module.note = true
 }
 
 function uninstallModule(id: string) {
-    marketView.value!.installStates[id] = InstallState.uninstalled
+    installStates.value[id] = InstallState.uninstalled
 }
 </script>
 
 <template>
-    <button class="exlg-button" @click="show = !show">exlg celeste</button>
+    <button
+        class="exlg-button"
+        @click="show = !show"
+    >
+        exlg celeste
+    </button>
 
-    <div class="exlg-root" v-show="show">
+    <div
+        v-show="show"
+        class="exlg-root"
+    >
         <ConfigView ref="configView" />
         <InterfaceView ref="interfaceView" />
 
@@ -78,13 +74,16 @@ function uninstallModule(id: string) {
                 @click="switchTab(id)"
             >
                 {{ tab.display }}
-                <span v-if="tab.note" class="tab-note"></span>
+                <span
+                    v-if="tab.note"
+                    class="tab-note"
+                />
             </div>
         </div>
 
-        <ModuleCtlView
+        <ModuleControlView
             v-show="currentTab === 'module'"
-            ref="moduleCtlView"
+            ref="moduleControlView"
             @uninstall-module="uninstallModule"
         />
         <MarketView

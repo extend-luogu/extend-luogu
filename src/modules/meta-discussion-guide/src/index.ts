@@ -29,17 +29,17 @@ $newpostSubmitWrapper[0].addEventListener(
             evt.stopPropagation()
             let $confirmInput: JQuery<HTMLInputElement>
             utils.simpleAlert(
-                '检测到您将要发送的讨论内容包含与 exlg 有关的关键词：<br />' +
-                    `${existMetaWords.map((s) => `“${s}”`).join(', ')}<br />` +
-                    `建议前往 ${discussLink} 讨论。<br />` +
-                    '这是为了防止占用讨论资源，营造一个更高质量的社区。 <br />' +
-                    '我们很担心 exlg 相关讨论霸占版面，造成负面影响。<br />' +
-                    '<span style="color: orange">' +
-                    '<b>洛谷管理员提醒您：发布无意义讨论可能导致禁言。</b> <br />' +
-                    '<small>* 无意义讨论包括但不限于“大家看得到我的 badge 吗” 等等</small>' +
-                    '</span> <br />' +
-                    '如果您确定要发送，请在下方输入框键入 “放心” 后确定。<br />' +
-                    '<small class="comment">（输入框过一会才会出现）</small>',
+                '检测到您将要发送的讨论内容包含与 exlg 有关的关键词：<br />'
+                    + `${existMetaWords.map((s) => `“${s}”`).join(', ')}<br />`
+                    + `建议前往 ${discussLink} 讨论。<br />`
+                    + '这是为了防止占用讨论资源，营造一个更高质量的社区。 <br />'
+                    + '我们很担心 exlg 相关讨论霸占版面，造成负面影响。<br />'
+                    + '<span style="color: orange">'
+                    + '<b>洛谷管理员提醒您：发布无意义讨论可能导致禁言。</b> <br />'
+                    + '<small>* 无意义讨论包括但不限于“大家看得到我的 badge 吗” 等等</small>'
+                    + '</span> <br />'
+                    + '如果您确定要发送，请在下方输入框键入 “放心” 后确定。<br />'
+                    + '<small class="comment">（输入框过一会才会出现）</small>',
                 {
                     onAccept: () => {
                         if (!$confirmInput) return false
@@ -52,14 +52,14 @@ $newpostSubmitWrapper[0].addEventListener(
                         await utils.sleep(3000)
                         $($content).find('small.comment').remove()
                         $confirmInput = $('<input type="text" />').appendTo(
-                            $content
+                            $content,
                         ) as JQuery<HTMLInputElement>
-                    }
-                }
+                    },
+                },
             )
         }
     },
-    true
+    true,
 ) // Note: 使用事件捕获
 
 export const a = 1

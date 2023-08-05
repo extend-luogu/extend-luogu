@@ -15,11 +15,11 @@ interface JuanDelta {
 }
 
 type JuanInfo = Record<
-    number,
-    {
-        name: string
-        count: number
-    }
+number,
+{
+    name: string
+    count: number
+}
 >
 
 utils.mustMatch('/')
@@ -52,8 +52,8 @@ const inspect = async () => {
                 noAccept: true,
                 onCancel() {
                     isHalted = true
-                }
-            }
+                },
+            },
         )
     }
     updateProgress(0)
@@ -61,7 +61,7 @@ const inspect = async () => {
     const {
         result: firstResult,
         count,
-        perPage
+        perPage,
     } = (await utils.csGet(api)).json.users
     updateProgress(perPage / count)
 
@@ -80,22 +80,22 @@ const inspect = async () => {
                 currentFetched += result.json.users.result.length
                 updateProgress(currentFetched / count)
                 return result
-            })()
+            })(),
         )
     }
 
     const results = [
         firstResult,
         ...(await Promise.all(pendingResults)).map(
-            ({ json: data }) => data.users.result
-        )
+            ({ json: data }) => data.users.result,
+        ),
     ].flat()
 
     const juanInfo: JuanInfo = Object.fromEntries(
         results.map(({ uid, name, passedProblemCount }: SubscribedUserInfo) => [
             uid,
-            { name, count: passedProblemCount }
-        ])
+            { name, count: passedProblemCount },
+        ]),
     )
 
     const lastJuanInfo = sto.get('_lastFetched')
@@ -105,12 +105,13 @@ const inspect = async () => {
 
     const juans: JuanDelta[] = []
     for (const uid in juanInfo) {
-        if (lastJuanInfo[uid])
+        if (lastJuanInfo[uid]) {
             juans.push({
                 uid,
                 name: juanInfo[uid].name,
-                delta: juanInfo[uid].count - lastJuanInfo[uid]!.count
+                delta: juanInfo[uid].count - lastJuanInfo[uid]!.count,
             })
+        }
     }
 
     const juanList = juans
@@ -124,7 +125,7 @@ const inspect = async () => {
                         <a href="/user/${uid}">${name}</a> <span>${delta} 道</span>
                     </span>
                 </li>
-            `
+            `,
         )
         .join('')
 
@@ -141,8 +142,8 @@ const inspect = async () => {
         `,
         {
             title: '卷王监视器',
-            noCancel: true
-        }
+            noCancel: true,
+        },
     )
     let searchResultNode: null | JQuery<HTMLElement> = null
     $('#ji-input').on('keydown', (e) => {
@@ -152,15 +153,15 @@ const inspect = async () => {
             }
             const inputUid = (e.currentTarget as HTMLInputElement).value
             const target = juans.find(
-                ({ uid, name }) =>
-                    uid === inputUid ||
-                    name.toLocaleUpperCase() === inputUid.toLocaleUpperCase()
+                ({ uid, name }) => uid === inputUid
+                    || name.toLocaleUpperCase() === inputUid.toLocaleUpperCase(),
             )
             if (target === undefined) {
                 searchResultNode.text('该用户不在你的关注列表中')
-            } else {
+            }
+            else {
                 searchResultNode.text(
-                    `${target.name} 卷了 ${target.delta} 道题`
+                    `${target.name} 卷了 ${target.delta} 道题`,
                 )
             }
         }
@@ -172,6 +173,6 @@ $('[name=punch]').on('click', inspect)
 runtime.interfaces = {
     inspect: {
         description: '手动监视',
-        fn: inspect
-    }
+        fn: inspect,
+    },
 }

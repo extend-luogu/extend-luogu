@@ -1,20 +1,19 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { ref } from 'vue'
 
 const props = defineProps<{
-    promise?: Promise<any>
+    promise?: Promise<T>
 }>()
 
 const state = ref<'pending' | 'fulfilled' | 'rejected'>('pending')
-const result = ref()
+const result = ref<T>()
 const error = ref()
 
 props.promise?.then(
     (r) => {
         result.value = r
-        console.log(result)
         state.value = 'fulfilled'
     },
     (e) => {
@@ -25,7 +24,18 @@ props.promise?.then(
 </script>
 
 <template>
-    <slot v-if="state === 'pending'" name="first"></slot>
-    <slot v-if="state === 'fulfilled'" name="then" :result="result"></slot>
-    <slot v-if="state === 'rejected'" name="catch" :error="error"></slot>
+    <slot
+        v-if="state === 'pending'"
+        name="first"
+    />
+    <slot
+        v-if="state === 'fulfilled'"
+        name="then"
+        :result="(result as T)"
+    />
+    <slot
+        v-if="state === 'rejected'"
+        name="catch"
+        :error="error"
+    />
 </template>

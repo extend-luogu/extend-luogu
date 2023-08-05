@@ -5,3 +5,6 @@ bin/
 !.*rc.js
 !.*rc.mjs
 !.*rc.cjs
+cypress.config.ts
+cypress/
+.eslintrc.cjs

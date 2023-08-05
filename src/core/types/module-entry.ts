@@ -1,7 +1,7 @@
 import type { Exlg, Schema } from '..'
 import type { ModuleExports, ModuleRuntime } from '../module'
-import type { Utils } from '../utils'
-import type { LoggerFunction } from '../utils/utils'
+import type { Utils } from '../utils/packed'
+import type { LoggerFunction } from '../utils'
 
 export * from '.'
 

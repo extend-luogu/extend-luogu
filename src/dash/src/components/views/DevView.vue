@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue'
-import { kModuleCtl } from '@/utils/injectionSymbols'
+import { ref } from 'vue'
+import { useModules } from '@/stores/module'
 
 const { utils, coreVersion } = window.exlg
-const moduleCtl = inject(kModuleCtl)!
+const moduleStore = useModules()
 
 const debug = ref(false)
 const debugClickCount = ref(0)
 function debugClick() {
     if (++debugClickCount.value === 5) {
         debug.value = true // 开启调试模式
-        window.exlg.moduleCtl = moduleCtl
+        window.exlg.moduleControl = moduleStore.moduleControl
     }
 
     if (debugClickCount.value === 10) {
@@ -29,8 +29,12 @@ function debugClick() {
 <template>
     <div>
         core <span class="module-version">@{{ coreVersion }}</span>
-        <hr class="exlg-hr" />
-        <p @click.prevent="debugClick" class="debug-button" :class="{ debug }">
+        <hr class="exlg-hr">
+        <p
+            class="debug-button"
+            :class="{ debug }"
+            @click.prevent="debugClick"
+        >
             DEBUG
         </p>
     </div>

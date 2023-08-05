@@ -1,6 +1,6 @@
 {
     "name": "@exlg/core",
-    "version": "1.3.1",
+    "version": "1.4.0",
     "description": "Core of extend-luogu-celeste",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"

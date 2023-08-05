@@ -1,42 +1,37 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue'
-import type { ModulesReadonly, ExecuteState } from '@core/types'
-import {
-    kModuleCtl,
-    kShowConfig,
-    kShowInterface
-} from '@/utils/injectionSymbols'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import type { ExecuteState } from '@core/types'
 import Await from '@comp/utils/Await.vue'
 import TextCheckbox from '@comp/utils/TextCheckbox.vue'
+import { useModules } from '@/stores/module'
+import { useWindows } from '@/stores/window'
 
 const emits = defineEmits<{
     (e: 'uninstallModule', id: string): void
 }>()
 
-const moduleCtl = inject(kModuleCtl)!
-const showConfig = inject(kShowConfig)!
-const showInterface = inject(kShowInterface)!
 const { utils, schemas, modules } = window.exlg
 
-const modulesRo = ref<ModulesReadonly | null>()
+const moduleStore = useModules()
+const { moduleControl, localModules } = storeToRefs(moduleStore)
+moduleStore.loadLocalModules()
+
+const windowStore = useWindows()
 
 function toggleModule(id: string) {
-    moduleCtl.storage.do(id, (mod) => {
+    moduleControl.value.modulesStorage.do(id, (mod) => {
         mod.active = !mod.active
         return mod
     })
 }
 
-function updateModuleCache() {
-    modulesRo.value = moduleCtl.storage.getAll()
-}
-
 function uninstall(id: string) {
     utils.simpleAlert(`确定要删除模块 ${id}？`, {
         onAccept: () => {
-            moduleCtl.storage.del(id)
+            moduleControl.value.modulesStorage.del(id)
             emits('uninstallModule', id)
-            updateModuleCache()
+            moduleStore.loadLocalModules()
         }
     })
 }
@@ -61,39 +56,34 @@ const executeStateTexts: Record<ExecuteState, string> = {
     unwrapThrew: '解包错误'
 }
 
-updateModuleCache()
-
-defineExpose({
-    updateModuleCache
-})
-
 const showId = ref(false)
 </script>
 
 <template>
     <div class="root">
         <div>
-            <TextCheckbox text="🆔" title="显示 ID" v-model="showId" />
+            <TextCheckbox
+                v-model="showId"
+                text="🆔"
+                title="显示 ID"
+            />
             <ul class="module-list">
-                <li v-for="mod of modulesRo" :key="mod.id" class="module-entry">
+                <li
+                    v-for="mod of localModules"
+                    :key="mod.id"
+                    class="module-entry"
+                >
                     <span>
                         <Await
                             :promise="modules[mod.id]?.runtime?.executeState"
                         >
                             <template #first>🕒</template>
                             <template #then="{ result }">
-                                <!-- FIXME: <https://segmentfault.com/q/1010000042083565> -->
                                 <span
                                     class="execute-state exlg-tooltip"
-                                    :data-exlg-tooltip="
-                                        /* @ts-expect-error */
-                                        executeStateTexts[result]
-                                    "
+                                    :data-exlg-tooltip="executeStateTexts[result]"
                                 >
-                                    {{
-                                        /* @ts-expect-error */
-                                        executeStateIcons[result]
-                                    }}
+                                    {{ executeStateIcons[result] }}
                                 </span>
                             </template>
                         </Await>
@@ -104,13 +94,10 @@ const showId = ref(false)
                     </span>
                     <span style="white-space: nowrap">
                         <span
-                            v-if="
-                                Object.keys(modules[mod.id].runtime.interfaces)
-                                    .length
-                            "
+                            v-if="Object.keys(modules[mod.id].runtime.interfaces).length"
                             class="emoji-button"
                             title="执行命令"
-                            @click="showInterface(mod.id)"
+                            @click="windowStore.showInterfaceWindow(mod.id)"
                         >
                             💈
                         </span>
@@ -118,7 +105,7 @@ const showId = ref(false)
                             v-if="schemas[mod.id]"
                             class="emoji-button"
                             title="配置"
-                            @click="showConfig(mod.id)"
+                            @click="windowStore.showConfigWindow(mod.id)"
                         >
                             ⚙️
                         </span>
@@ -134,7 +121,7 @@ const showId = ref(false)
                             type="checkbox"
                             :checked="mod.active"
                             @change="toggleModule(mod.id)"
-                        />
+                        >
                     </span>
                 </li>
             </ul>

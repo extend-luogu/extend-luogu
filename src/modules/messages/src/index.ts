@@ -12,7 +12,7 @@ const lg_usr = _feInjection.currentUser
 const sharedFunction = (
     channel: string,
     master: (bc: BroadcastChannel) => void,
-    slave: (data: any) => void
+    slave: (data: any) => void,
 ) => {
     const id = new Date().valueOf()
     const ctrl = new BroadcastChannel(`${channel}-ctrl`)
@@ -38,13 +38,15 @@ const sharedFunction = (
         const msg = ev.data
         if (msg === 'Ping' && isMaster) {
             ctrl.postMessage('Pong')
-        } else if (msg === 'Pong') {
+        }
+        else if (msg === 'Pong') {
             clearTimeout(timeoutId)
-        } else if (msg === 'Election') onElection()
+        }
+        else if (msg === 'Election') onElection()
         else if (msg.split(' ')[0] === 'Alive') {
-            console.log(Number(msg.split(' ')[1]))
             max = Math.max(max, Number(msg.split(' ')[1]))
-        } else if (msg === 'Victory') {
+        }
+        else if (msg === 'Victory') {
             isMaster = false
         }
     }
@@ -64,7 +66,7 @@ if (uindow.location.href.search('/chat') !== -1) {
 }
 const $container = $('body')
     .append(
-        '<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>'
+        '<div id="exlg-messages-outter"><div id="exlg-messages-container"></div></div>',
     )
     .find('#exlg-messages-container')
 function msg_show(msg: MessageType) {
@@ -92,7 +94,7 @@ function msg_show(msg: MessageType) {
             `#exlg-message-close-${msg.id}, #exlg-message-show-${msg.id}`,
             () => {
                 $curbd.remove()
-            }
+            },
         )
     $(`#exlg-message-username-${msg.id}`).text(msg.sender.name)
     $(`#exlg-message-content-${msg.id}`).text(msg.content)
@@ -105,22 +107,21 @@ sharedFunction(
     'exlg-message',
     (bc: BroadcastChannel) => {
         const socket = new WebSocket('wss://ws.luogu.com.cn/ws')
-        socket.onopen = () =>
-            socket.send(
-                JSON.stringify({
-                    type: 'join_channel',
-                    channel: 'chat',
-                    channel_param: String(lg_usr.uid),
-                    exclusive_key: null
-                })
-            )
+        socket.onopen = () => socket.send(
+            JSON.stringify({
+                type: 'join_channel',
+                channel: 'chat',
+                channel_param: String(lg_usr.uid),
+                exclusive_key: null,
+            }),
+        )
         socket.onmessage = (e) => {
             bc.postMessage(e.data)
             const u = JSON.parse(e.data)
             if (
-                u._ws_type === 'server_broadcast' &&
-                u.message instanceof Object &&
-                u.message.sender.uid !== lg_usr.uid
+                u._ws_type === 'server_broadcast'
+                && u.message instanceof Object
+                && u.message.sender.uid !== lg_usr.uid
             ) {
                 msg_show(u.message)
             }
@@ -129,13 +130,13 @@ sharedFunction(
     (msg: string) => {
         const u = JSON.parse(msg)
         if (
-            u._ws_type === 'server_broadcast' &&
-            u.message instanceof Object &&
-            u.message.sender.uid !== lg_usr.uid
+            u._ws_type === 'server_broadcast'
+            && u.message instanceof Object
+            && u.message.sender.uid !== lg_usr.uid
         ) {
             msg_show(u.message)
         }
-    }
+    },
 )
 
 const listenBroadcast = (channel: string) => {

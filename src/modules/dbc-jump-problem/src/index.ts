@@ -1,16 +1,15 @@
 import '@exlg/core/types/module-entry'
 
-const judgeProblem = (text: string) =>
-    [
-        /^AT[1-9][0-9]{0,}$/i,
-        /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
-        /^SP[1-9][0-9]{0,}$/i,
-        /^P[1-9][0-9]{3,}$/i,
-        /^UVA[1-9][0-9]{2,}$/i,
-        /^U[1-9][0-9]{0,}$/i,
-        /^T[1-9][0-9]{0,}$/i,
-        /^B[2-9][0-9]{3,}$/i
-    ].some((re) => re.test(text))
+const judgeProblem = (text: string) => [
+    /^AT[1-9][0-9]{0,}$/i,
+    /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
+    /^SP[1-9][0-9]{0,}$/i,
+    /^P[1-9][0-9]{3,}$/i,
+    /^UVA[1-9][0-9]{2,}$/i,
+    /^U[1-9][0-9]{0,}$/i,
+    /^T[1-9][0-9]{0,}$/i,
+    /^B[2-9][0-9]{3,}$/i,
+].some((re) => re.test(text))
 
 const transformPid = (text: string, isOptimistic = false): string => {
     // reserve old AtCoder IDs
@@ -39,14 +38,13 @@ const transformPid = (text: string, isOptimistic = false): string => {
         }
         // special check for offsets of ARC contest
         if (
-            applyOffsetCorrection &&
-            contestType === 'arc' &&
-            contestId <= 103 &&
-            contestId >= 58
+            applyOffsetCorrection
+            && contestType === 'arc'
+            && contestId <= 103
+            && contestId >= 58
         ) {
-            problemId =
-                String.fromCharCode(problemId.charCodeAt(0) - 2) +
-                problemId.substring(1)
+            problemId = String.fromCharCode(problemId.charCodeAt(0) - 2)
+                + problemId.substring(1)
         }
         return `AT_${contestType}${rawContestId}_${problemId.toLowerCase()}`
     }
@@ -58,10 +56,8 @@ const transformPid = (text: string, isOptimistic = false): string => {
     return ''
 }
 
-const gotoProblem = (pid: string) =>
-    window.open(`https://www.luogu.com.cn/problem/${pid}`)
-const gotoTransformedProblem = (pid: string) =>
-    gotoProblem(transformPid(pid.trim(), true))
+const gotoProblem = (pid: string) => window.open(`https://www.luogu.com.cn/problem/${pid}`)
+const gotoTransformedProblem = (pid: string) => gotoProblem(transformPid(pid.trim(), true))
 
 $(window).on('dblclick', () => {
     const str = window.getSelection()?.toString().trim()
@@ -74,33 +70,32 @@ $(window).on('dblclick', () => {
 runtime.interfaces = {
     manualJump: {
         description: '题号跳转',
-        fn: () =>
-            utils.simpleAlert(
-                `<input placeholder="输入 pid" style="
+        fn: () => utils.simpleAlert(
+            `<input placeholder="输入 pid" style="
                 width: 60%;
                 padding: 3px 5px 3px 5px;
                 margin: 10px 20% 0px 20%;
                 line-height: 1.3;
             "/>`,
-                {
-                    title: '题号跳转',
-                    onAccept({ $content }) {
-                        gotoTransformedProblem(
-                            String($($content).find('input').val())
-                        )
-                    },
-                    onOpen($content) {
-                        $($content)
-                            .find('input')
-                            .on('keydown', (e) => {
-                                if (e.key === 'Enter') {
-                                    gotoTransformedProblem(
-                                        e.currentTarget.value
-                                    )
-                                }
-                            })
-                    }
-                }
-            )
-    }
+            {
+                title: '题号跳转',
+                onAccept({ $content }) {
+                    gotoTransformedProblem(
+                        String($($content).find('input').val()),
+                    )
+                },
+                onOpen($content) {
+                    $($content)
+                        .find('input')
+                        .on('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                gotoTransformedProblem(
+                                    e.currentTarget.value,
+                                )
+                            }
+                        })
+                },
+            },
+        ),
+    },
 }

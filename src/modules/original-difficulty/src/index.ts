@@ -41,7 +41,7 @@ const fetchProcess = (async () => {
         async () => {
             const resp = (
                 await utils.csGet(
-                    'https://codeforces.com/api/problemset.problems?lang=en'
+                    'https://codeforces.com/api/problemset.problems?lang=en',
                 )
             ).json as CFResponse<{
                 problems: CFProblem[]
@@ -52,12 +52,10 @@ const fetchProcess = (async () => {
                 return
             }
             resp.result.problems.forEach((problem: CFProblem) => {
-                if (problem.rating)
-                    difficulty['CF' + problem.contestId + problem.index] =
-                        problem.rating
+                if (problem.rating) difficulty['CF' + problem.contestId + problem.index] = problem.rating
             })
             sto.set('_difficulty', difficulty)
-        }
+        },
     )
 
     await utils.loadChore(
@@ -67,7 +65,7 @@ const fetchProcess = (async () => {
         async () => {
             const resp = (
                 await utils.csGet(
-                    'https://kenkoooo.com/atcoder/resources/problem-models.json'
+                    'https://kenkoooo.com/atcoder/resources/problem-models.json',
                 )
             ).json as Record<string, ATProblemStatistics>
             for (const key in resp) {
@@ -76,7 +74,7 @@ const fetchProcess = (async () => {
             }
 
             sto.set('_difficulty', difficulty)
-        }
+        },
     )
 })()
 
@@ -96,15 +94,13 @@ utils.addHookSelector('div.stat > div.field', (hookedNodes) => {
     $title.text('原始难度')
     $status.text('获取中')
 
-    fetchProcess.then(() =>
-        $status.text(
-            difficulty[
-                window.location.pathname.includes('CF')
-                    ? _feInstance.currentData.problem.pid
-                    : _feInstance.currentData.problem.description
-                          .match(/^.{22}[-./A-Za-z0-9_]*/)[0]
-                          .match(/[^/]*$/)[0]
-            ] ?? '不可用'
-        )
-    )
+    fetchProcess.then(() => $status.text(
+        difficulty[
+            window.location.pathname.includes('CF')
+                ? _feInstance.currentData.problem.pid
+                : _feInstance.currentData.problem.description
+                    .match(/^.{22}[-./A-Za-z0-9_]*/)[0]
+                    .match(/[^/]*$/)[0]
+        ] ?? '不可用',
+    ))
 })

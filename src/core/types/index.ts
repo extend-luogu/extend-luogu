@@ -4,8 +4,8 @@ import { ExlgDash } from './dash'
 export type { VueType, VueAll } from './dash'
 
 export type {
-    Module,
-    ModuleCtl,
+    Mod,
+    ModuleControl,
     ModuleExports,
     ModuleMetadata,
     ModuleRuntime,
@@ -15,17 +15,17 @@ export type {
     ModulesReadonly,
     ModuleInterface,
     ModuleInterfaces,
-    ExecuteState
+    ExecuteState,
 } from '../module'
 
-export type { Utils } from '../utils'
+export type { Utils } from '../utils/packed'
 
 export type {
     Storage,
     Schema,
     Schemas,
     SchemaToStorage,
-    SchemaToType
+    SchemaToType,
 } from '../storage'
 
 export type { Exlg } from '..'

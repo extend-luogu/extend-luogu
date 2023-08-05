@@ -1,7 +1,7 @@
 {
     "name": "@exlg/theme-dark",
-    "display": "暗色模式",
     "description": "暗色模式",
+	"display": "暗色模式",
     "author": "ForkKILLET",
     "version": "1.0.1",
     "keywords": [

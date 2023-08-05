@@ -4,7 +4,8 @@
     "version": "1.0.0",
     "scripts": {
         "check": "vue-tsc --noEmit",
-        "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+        "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+        "lint:fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
     },
     "dependencies": {
         "@vue/compiler-core": "^3.3.4",
@@ -14,11 +15,9 @@
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.1.4",
-        "@vue/eslint-config-prettier": "^7.0.0",
         "@vue/eslint-config-typescript": "^11.0.0",
         "eslint": "^8.20.0",
-        "eslint-plugin-vue": "^9.2.0",
-        "prettier": "^2.7.1",
+        "eslint-plugin-vue": "^9.16.1",
         "typescript": "^4.7.4",
         "vue-tsc": "^0.34.17"
     }

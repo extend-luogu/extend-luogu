@@ -1,20 +1,27 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export default defineStore('window', {
-    state: () => ({
-        windows: [] as string[]
-    }),
-    actions: {
-        focus(window: string) {
-            this.windows.push(window)
-        },
-        blur() {
-            this.windows.pop()
-        }
-    },
-    getters: {
-        active(): string {
-            return this.windows.at(-1)!
-        }
+export const useWindows = defineStore('window', () => {
+    const activeWindowType = ref<'config' | 'interface' | null>(null)
+    const activeWindowId = ref<string | null>(null)
+
+    const showConfigWindow = (id: string) => {
+        activeWindowType.value = 'config'
+        activeWindowId.value = id
+    }
+
+    const showInterfaceWindow = (id: string) => {
+        activeWindowType.value = 'interface'
+        activeWindowId.value = id
+    }
+
+    const closeWindow = () => {
+        activeWindowType.value = null
+        activeWindowId.value = null
+    }
+
+    return {
+        activeWindowId, activeWindowType,
+        showConfigWindow, showInterfaceWindow, closeWindow
     }
 })

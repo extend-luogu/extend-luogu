@@ -1,7 +1,7 @@
 import { InjectionKey } from 'vue'
-import type { ModuleCtl } from '@core/types'
+import type { ModuleControl } from '@core/types'
 
-export const kModuleCtl = Symbol('ModuleCtl') as InjectionKey<ModuleCtl>
+export const kModuleControl = Symbol('ModuleControl') as InjectionKey<ModuleControl>
 export const kShowConfig = Symbol('ShowConfig') as InjectionKey<
     (configId: string) => void
 >

@@ -15,9 +15,9 @@ const value = ref(props.modelValue)
 
 <template>
     <span
-        @click="emits('update:modelValue', (value = !value))"
         :class="{ active: value }"
         class="exlg-text-checkbox"
+        @click="emits('update:modelValue', (value = !value))"
     >
         {{ text }}
     </span>

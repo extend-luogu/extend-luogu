@@ -17,7 +17,7 @@ const autofill = async () => {
     const res = (
         await utils.csPost(
             'https://luogu-captcha-bypass.piterator.com/predict/',
-            canvas.toDataURL('image/jpeg')
+            canvas.toDataURL('image/jpeg'),
         )
     ).responseText
     log(res)
@@ -29,12 +29,13 @@ if (img) {
     // Note: 登陆和讨论
     img.trigger('click')
     img.on('load', autofill)
-} else {
+}
+else {
     // Note: 图床
     $(document).on('focus', "input[placeholder$='验证码']", () => {
         img = $<HTMLImageElement>('#--swal-image-hosting-upload-captcha').on(
             'load',
-            autofill
+            autofill,
         )
     })
 }

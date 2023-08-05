@@ -1,19 +1,25 @@
-/* eslint-env node */
-require('@rushstack/eslint-patch/modern-module-resolution')
-
 module.exports = {
     root: true,
+    parser: 'vue-eslint-parser',
     extends: [
-        'plugin:vue/vue3-essential',
+        'plugin:vue/vue3-recommended',
         'eslint:recommended',
         '@vue/eslint-config-typescript/recommended',
-        '@vue/eslint-config-prettier'
     ],
     env: {
         'vue/setup-compiler-macros': true
     },
     rules: {
-        'prettier/prettier': 'error',
-        '@typescript-eslint/no-non-null-assertion': 'off'
+        'semi-style': ['error', 'first'],
+
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        '@typescript-eslint/indent': [
+            'error', 4,
+            { ignoredNodes: ['TSTypeParameterInstantiation'] }
+        ],
+        '@typescript-eslint/semi': ['error', 'never'],
+
+        'vue/html-indent': ['warn', 4],
+        'vue/no-setup-props-destructure': 'off'
     }
 }

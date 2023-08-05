@@ -25,11 +25,10 @@ export type SchemaToStorage<S> = S extends Schema<infer T> ? Storage<T> : never
 const storage = <T>(
     namespace: string,
     schema: Schema<T>,
-    direct: boolean
+    direct: boolean,
 ): Storage<T> => {
     const checkPrivate = (key: keyof T & string) => {
-        if (key[0] === '_' && !direct)
-            throw Error('Cannot access private property of other storages.')
+        if (key[0] === '_' && !direct) throw Error('Cannot access private property of other storages.')
     }
 
     const _get = () => schema(GM_getValue(namespace))
@@ -73,16 +72,15 @@ const storage = <T>(
         clear: () => {
             if (!direct) throw Error('Cannot clear other storages.')
             GM_setValue(namespace, {})
-        }
+        },
     }
 }
 
 export const defineStorage = <T>(
     namespace: string,
-    schema: Schema<T>
+    schema: Schema<T>,
 ): Storage<T> => {
-    if (unsafeWindow.exlg.schemas[namespace])
-        throw Error(`Namespace \`${namespace}\` already exists`)
+    if (unsafeWindow.exlg.schemas[namespace]) throw Error(`Namespace \`${namespace}\` already exists`)
     unsafeWindow.exlg.schemas[namespace] = schema
     return storage(namespace, schema, true)
 }

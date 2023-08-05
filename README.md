@@ -4,7 +4,6 @@
 
 ## Official Modules
 
-<!-- prettier-ignore -->
 | Package                         | Version                                                                                                                                              |
 |---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | @exlg/mod-captcha               | [![](https://img.shields.io/npm/v/@exlg/mod-captcha?style=flat-square)](https://www.npmjs.com/package/@exlg/mod-captcha)                             |

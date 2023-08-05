@@ -1,8 +1,5 @@
-const eslint = 'eslint --fix'
-const prettier = 'prettier --write'
-const prettierCheck = 'prettier --check'
+const eslint = 'pnpm lint:all:fix'
 
 module.exports = {
-    '*.{vue,js,jsx,cjs,mjs,ts,tsx,cts,mts}': [eslint, prettierCheck],
-    '*.{md,css,scss,json,yml,yaml,graphql}': [prettier]
+    '*.{vue,js,jsx,cjs,mjs,ts,tsx,cts,mts}': [eslint],
 }

@@ -28,25 +28,63 @@ export const emos: Emo[] = [
     { type: 'qq', names: ['kl'], file: 'q' },
     { type: 'qq', names: ['yiw'], file: 'r' },
     { type: 'qq', names: ['dk'], file: 's' },
-    { type: 'txt', names: ['sto'], file: 'gg', display: 'sto' },
-    { type: 'txt', names: ['orz'], file: 'gh', display: 'orz' },
-    { type: 'txt', names: ['qwq'], file: 'g5', display: 'qwq' },
-    { type: 'txt', names: ['hqlm'], file: 'l0', display: '火前留名' },
-    { type: 'txt', names: ['sqlm'], file: 'l1', display: '山前留名' },
-    { type: 'txt', names: ['xbt'], file: 'g1', display: '屑标题' },
-    { type: 'txt', names: ['iee'], file: 'g2', display: '我谔谔' },
-    { type: 'txt', names: ['kg'], file: 'g3', display: '烤咕' },
-    { type: 'txt', names: ['gl'], file: 'g4', display: '盖楼' },
-    { type: 'txt', names: ['wyy'], file: 'g6', display: '无意义' },
-    { type: 'txt', names: ['wgzs'], file: 'g7', display: '违规紫衫' },
-    { type: 'txt', names: ['tt'], file: 'g8', display: '贴贴' },
-    { type: 'txt', names: ['jbl'], file: 'g9', display: '举报了' },
-    { type: 'txt', names: ['%%%'], file: 'ga', display: '%%%' },
-    { type: 'txt', names: ['ngrb'], file: 'gb', display: '你谷日爆' },
-    { type: 'txt', names: ['qpzc'], file: 'gc', display: '前排资瓷' },
-    { type: 'txt', names: ['cmzz'], file: 'gd', display: '臭名昭著' },
-    { type: 'txt', names: ['zyx'], file: 'ge', display: '致远星' },
-    { type: 'txt', names: ['zh'], file: 'gf', display: '祝好' }
+    {
+        type: 'txt', names: ['sto'], file: 'gg', display: 'sto',
+    },
+    {
+        type: 'txt', names: ['orz'], file: 'gh', display: 'orz',
+    },
+    {
+        type: 'txt', names: ['qwq'], file: 'g5', display: 'qwq',
+    },
+    {
+        type: 'txt', names: ['hqlm'], file: 'l0', display: '火前留名',
+    },
+    {
+        type: 'txt', names: ['sqlm'], file: 'l1', display: '山前留名',
+    },
+    {
+        type: 'txt', names: ['xbt'], file: 'g1', display: '屑标题',
+    },
+    {
+        type: 'txt', names: ['iee'], file: 'g2', display: '我谔谔',
+    },
+    {
+        type: 'txt', names: ['kg'], file: 'g3', display: '烤咕',
+    },
+    {
+        type: 'txt', names: ['gl'], file: 'g4', display: '盖楼',
+    },
+    {
+        type: 'txt', names: ['wyy'], file: 'g6', display: '无意义',
+    },
+    {
+        type: 'txt', names: ['wgzs'], file: 'g7', display: '违规紫衫',
+    },
+    {
+        type: 'txt', names: ['tt'], file: 'g8', display: '贴贴',
+    },
+    {
+        type: 'txt', names: ['jbl'], file: 'g9', display: '举报了',
+    },
+    {
+        type: 'txt', names: ['%%%'], file: 'ga', display: '%%%',
+    },
+    {
+        type: 'txt', names: ['ngrb'], file: 'gb', display: '你谷日爆',
+    },
+    {
+        type: 'txt', names: ['qpzc'], file: 'gc', display: '前排资瓷',
+    },
+    {
+        type: 'txt', names: ['cmzz'], file: 'gd', display: '臭名昭著',
+    },
+    {
+        type: 'txt', names: ['zyx'], file: 'ge', display: '致远星',
+    },
+    {
+        type: 'txt', names: ['zh'], file: 'gf', display: '祝好',
+    },
 ]
 
 export const size = '!25'
@@ -56,10 +94,10 @@ export type Emo = {
     file: string
 } & (
     | {
-          type: 'qq'
-      }
+        type: 'qq'
+    }
     | {
-          type: 'txt'
-          display: string
-      }
+        type: 'txt'
+        display: string
+    }
 )

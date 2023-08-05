@@ -24,16 +24,21 @@ function startSelecting() {
 </script>
 
 <template>
-    <span v-if="selecting" class="module-version-select">
-        <span>@</span
-        ><select
+    <span
+        v-if="selecting"
+        class="module-version-select"
+    >
+        <span>@</span><select
             ref="select"
             class="exlg-select"
             :value="source.selectedVersion"
             @change="change"
             @blur="selecting = false"
         >
-            <option v-for="(version, i) of source.versions" :key="i">
+            <option
+                v-for="(version, i) of source.versions"
+                :key="i"
+            >
                 {{ version }}
             </option>
         </select>

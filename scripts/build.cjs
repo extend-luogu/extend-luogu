@@ -16,7 +16,7 @@ exports = async () => {
         format: 'iife',
         bundle: true,
         minify,
-        outfile: 'dist/core.bundle.js'
+        outfile: 'dist/core.bundle.js',
     })
 
     // Let esbuild-plugin-vue3 know which `tsconfig.json` to use.
@@ -25,12 +25,18 @@ exports = async () => {
 
     console.log('Building dash...')
     await esbuild.build({
-        entryPoints: ['src/main.ts'],
-        plugins: [vuePlugin()],
+        entryPoints: ['src/dash/src/main.ts'],
+        plugins: [
+            vuePlugin({
+                compilerOptions: {
+                    expressionPlugins: ['typescript'],
+                },
+            }),
+        ],
         format: 'iife',
         bundle: true,
         minify,
-        outfile: 'dist/dash.bundle.js'
+        outfile: 'dist/dash.bundle.js',
     })
 
     process.chdir('../..')
@@ -42,17 +48,15 @@ exports = async () => {
     const dashJs = await fs.readFile('./dist/dash.bundle.js', 'utf-8')
     const dashCss = await fs.readFile('./dist/dash.bundle.css', 'utf-8')
 
-    const injectResource = (name, str) =>
-        `\n;unsafeWindow.exlgResources.${name} = ${JSON.stringify(str)};\n`
+    const injectResource = (name, str) => `\n;unsafeWindow.exlgResources.${name} = ${JSON.stringify(str)};\n`
 
-    const concated =
-        // eslint-disable-next-line prefer-template
-        header.replace('{{version}}', pkg.version) +
-        `\n;unsafeWindow.exlgResources = {};\n` +
-        injectResource('dashJs', dashJs) +
-        injectResource('dashCss', dashCss) +
-        `\n${coreJs}\n` +
-        `\n;GM_addStyle(${JSON.stringify(coreCss)});\n`
+    // eslint-disable-next-line prefer-template
+    const concated = header.replace('{{version}}', pkg.version)
+        + '\n;unsafeWindow.exlgResources = {};\n'
+        + injectResource('dashJs', dashJs)
+        + injectResource('dashCss', dashCss)
+        + `\n${coreJs}\n`
+        + `\n;GM_addStyle(${JSON.stringify(coreCss)});\n`
     await fs.writeFile('./dist/extend-luogu.min.user.js', concated)
 
     console.log('Built exlg in %d ms.', Date.now() - startTime)

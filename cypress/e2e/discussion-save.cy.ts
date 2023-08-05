@@ -13,45 +13,41 @@ describe('discussion-save', () => {
                     $(`<script>
                     ${mock}
                     ;(${entry.toString()})()
-                </script>`)
+                </script>`),
                 )
             })
             cy.log('script inserted')
         }
     }
 
-    const beforeFunc = (module: string) => {
-        return () => {
-            cy.exec(`cd src/modules/${module} && pnpm exlg-mod build -c`)
-            cy.log('module built')
-        }
+    const beforeFunc = (module: string) => () => {
+        cy.exec(`cd src/modules/${module} && pnpm exlg-mod build -c`)
+        cy.log('module built')
     }
 
     const beforeEachFunc = (
         module: string,
         url: string,
-        toAssign: any = {}
-    ) => {
-        return () => {
-            cy.visit(`https://www.luogu.com.cn${url}`)
-            cy.window().then((win) => {
-                Object.assign(win, { $ })
-                Object.assign(win, toAssign)
-            })
-            cy.readFile(`src/modules/${module}/dist/module.define.js`).then(
-                (text) => {
-                    // eslint-disable-next-line no-eval
-                    eval(text)
-                }
-            )
-        }
+        toAssign: any = {},
+    ) => () => {
+        cy.visit(`https://www.luogu.com.cn${url}`)
+        cy.window().then((win) => {
+            Object.assign(win, { $ })
+            Object.assign(win, toAssign)
+        })
+        cy.readFile(`src/modules/${module}/dist/module.define.js`).then(
+            (text) => {
+                // eslint-disable-next-line no-eval
+                eval(text)
+            },
+        )
     }
 
     before(beforeFunc('discussion-save'))
     beforeEach(
         beforeEachFunc('discussion-save', '/discuss/241461', {
-            autoSaveDiscussion: false
-        })
+            autoSaveDiscussion: false,
+        }),
     )
 
     it('显示界面', () => {
@@ -66,7 +62,7 @@ describe('discussion-save', () => {
             expect(loc.host).to.eq('xn--fx-ex2c330n.ml')
             expect(loc.pathname).to.eq('/show.php')
             expect(loc.search).to.eq(
-                '?url=https://www.luogu.com.cn/discuss/241461'
+                '?url=https://www.luogu.com.cn/discuss/241461',
             )
         })
     })
@@ -74,8 +70,8 @@ describe('discussion-save', () => {
     describe('自动保存', () => {
         beforeEach(
             beforeEachFunc('discussion-save', '/discuss/241461', {
-                autoSaveDiscussion: true
-            })
+                autoSaveDiscussion: true,
+            }),
         )
 
         it('自动保存', () => {
@@ -92,7 +88,7 @@ describe('discussion-save', () => {
         it('保存成功', () => {
             cy.intercept(
                 '/save.php?url=https://www.luogu.com.cn/discuss/241461',
-                { fixture: 'discussion-save/success.json' }
+                { fixture: 'discussion-save/success.json' },
             )
             cy.contains('保存讨论').click()
             cy.wait(100)
@@ -102,7 +98,7 @@ describe('discussion-save', () => {
         it('保存失败', () => {
             cy.intercept(
                 '/save.php?url=https://www.luogu.com.cn/discuss/241461',
-                { fixture: 'discussion-save/fail.json' }
+                { fixture: 'discussion-save/fail.json' },
             )
             cy.contains('保存讨论').click()
             cy.wait(100)

@@ -27,7 +27,8 @@ $saveBtn
                         setTimeout(() => {
                             $saveBtn.text('保存讨论').removeAttr('disabled')
                         }, 1000)
-                    } else {
+                    }
+                    else {
                         log('Failed to save, return data: %o', res.response)
                         $saveBtn
                             .text('保存失败')
@@ -42,7 +43,8 @@ $saveBtn
                                 .toggleClass('am-btn-warning')
                         }, 1000)
                     }
-                } else {
+                }
+                else {
                     log(`Fail to save discuss: ${res}`)
                     $saveBtn
                         .toggleClass('am-btn-success')
