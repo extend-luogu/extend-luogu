@@ -18,6 +18,11 @@ module.exports = {
             { ignoredNodes: ['TSTypeParameterInstantiation'] }
         ],
         '@typescript-eslint/semi': ['error', 'never'],
+        '@typescript-eslint/quotes': [
+            'error',
+            'single',
+            { avoidEscape: true, allowTemplateLiterals: false },
+        ],
 
         'vue/html-indent': ['warn', 4],
         'vue/no-setup-props-destructure': 'off'
