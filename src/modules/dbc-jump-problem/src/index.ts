@@ -2,6 +2,7 @@ import '@exlg/core/types/module-entry'
 
 const judgeProblem = (text: string) => [
     /^AT[1-9][0-9]{0,}$/i,
+    /^AT_(abc|arc|agc)[0-9]{0,}_[0-9a-z]$/i,
     /^CF[1-9][0-9]{0,}[A-Z][0-9]?$/i,
     /^SP[1-9][0-9]{0,}$/i,
     /^P[1-9][0-9]{3,}$/i,
