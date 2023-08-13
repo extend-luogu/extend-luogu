@@ -43,6 +43,7 @@ module.exports = {
                 '@typescript-eslint/indent': ['error', 4],
                 '@typescript-eslint/semi': ['error', 'never'],
                 '@typescript-eslint/naming-convention': 'off',
+                '@typescript-eslint/no-explicit-any': 'off',
                 '@typescript-eslint/no-use-before-define': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
                 '@typescript-eslint/brace-style': ['error', 'stroustrup']

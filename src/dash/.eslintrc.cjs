@@ -23,6 +23,7 @@ module.exports = {
             'single',
             { avoidEscape: true, allowTemplateLiterals: false },
         ],
+        '@typescript-eslint/no-explicit-any': 'off',
 
         'vue/html-indent': ['warn', 4],
         'vue/no-setup-props-destructure': 'off'
