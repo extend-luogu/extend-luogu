@@ -1,5 +1,3 @@
-import Schema from 'schemastery'
-
 export default Schema.object({
     _difficulty: Schema.dict(Schema.number()),
     // WIP: _tags, _submissions

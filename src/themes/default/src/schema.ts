@@ -1,5 +1,3 @@
-import Schema from 'schemastery'
-
 export default Schema.object({
     accentColor: Schema.string()
         .default('blueviolet')

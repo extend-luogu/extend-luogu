@@ -1,5 +1,3 @@
-import Schema from 'schemastery'
-
 export default Schema.object({
     emoSource: Schema.union([
         Schema.const('//图.tk' as const).description('图.tk'),

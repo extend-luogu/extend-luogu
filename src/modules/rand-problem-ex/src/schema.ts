@@ -1,5 +1,3 @@
-import Schema from 'schemastery'
-
 export default Schema.object({
     _exrandDifficulty: Schema.tuple([
         Schema.boolean().default(true),
