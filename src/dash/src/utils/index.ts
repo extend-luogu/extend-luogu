@@ -1,3 +1,5 @@
+import type { ModuleDependencies } from '@core/module'
+
 export enum InstallState {
     uninstalled,
     installed,
@@ -5,12 +7,17 @@ export enum InstallState {
     installFailed
 }
 
+export type SourceVersion = {
+    version: string
+    dependencies: ModuleDependencies
+}
+
 export interface SourceItem {
     id: string
     name: string
     description: string
-    versions: string[]
-    selectedVersion: string
+    versions: SourceVersion[]
+    selectedVersion: SourceVersion
     display: string
     bin: string
 }

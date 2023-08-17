@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import compareVersions from 'compare-versions'
-import type { ModuleMetadata } from '@core/types'
+import type { ModuleDependencies, ModuleMetadata } from '@core/types'
 import { useModules } from '@/stores/module'
 import { useWindows } from '@/stores/window'
 import { type AllSourceItem, InstallState, type Source } from '@/utils'
@@ -10,11 +10,11 @@ import { marketStorage } from '@/utils/source'
 import TextCheckbox from '@comp/utils/TextCheckbox.vue'
 import VersionSelect from '@comp/VersionSelect.vue'
 import ModuleInstallStateMessage, { type ModuleInstallState } from '@comp/ModuleInstallStateMessage.vue'
-const emits = defineEmits<{
+const emit = defineEmits<{
     (e: 'installModule'): void
 }>()
 
-const { exlgLog, csGet } = window.exlg.utils
+const { utils: { exlgLog, csGet, semver }, coreVersion } = window.exlg
 
 const logger = exlgLog('market')
 
@@ -29,7 +29,7 @@ async function loadSource() {
     source.value = null
 
     source.value = (
-        await csGet(marketStorage.get('githubSource'))
+        await csGet(marketStorage.get('registrySource'))
     ).json
 
     if (source.value === null) {
@@ -53,9 +53,10 @@ async function install(item: AllSourceItem) {
     const metadata: ModuleMetadata = {
         name: item.name,
         source: item.type,
-        version,
+        version: version.version,
+        dependencies: version.dependencies,
         description: item.description,
-        display: item.display
+        display: item.display,
     }
     let script: string | void
 
@@ -71,7 +72,7 @@ async function install(item: AllSourceItem) {
     } catch (err) {
         installStates.value[item.id] = InstallState.installFailed
         logger.error(
-            `Failed to download script of module %o, error: %o`,
+            'Failed to download script of module %o, error: %o',
             item,
             err
         )
@@ -79,7 +80,7 @@ async function install(item: AllSourceItem) {
     }
 
     logger.log(
-        `Downloaded module %o: metadata %o, script %s`,
+        'Downloaded module %o: metadata %o, script %s',
         item,
         metadata,
         script
@@ -87,7 +88,7 @@ async function install(item: AllSourceItem) {
 
     moduleControl.value.installModule(metadata, script!)
     installStates.value[item.id] = InstallState.installed
-    emits('installModule')
+    emit('installModule')
 }
 
 const getInstallState = (item: AllSourceItem): ModuleInstallState => {
@@ -95,7 +96,7 @@ const getInstallState = (item: AllSourceItem): ModuleInstallState => {
     switch (state) {
     case InstallState.installed: {
         const current = moduleControl.value.modulesStorage.get(item.id).metadata.version
-        if (compareVersions(current, item.versions.at(-1)!) < 0)
+        if (compareVersions(current, item.versions.at(-1)!.version) < 0)
             return {
                 class: 'update exlg-tooltip',
                 tooltip: `当前版本 ${current}`,
@@ -115,6 +116,12 @@ const getInstallState = (item: AllSourceItem): ModuleInstallState => {
     }
 }
 
+const isDependenciesOk = (item: AllSourceItem) => {
+    const dep = item.selectedVersion.dependencies
+    if (dep.core && ! semver.satisfies(coreVersion, dep.core)) return false
+    return true
+}
+
 const showId = ref(false)
 
 loadSource()
@@ -132,7 +139,7 @@ loadSource()
         <span
             class="emoji-button"
             title="重新加载"
-            @click="loadSource()"
+            @click="loadSource"
         >
             🔄
         </span>
@@ -154,10 +161,10 @@ loadSource()
                 class="module-entry"
             >
                 <span>
-                    {{ showId ? item.id : item.display }}
+                    {{ showId ? item.name : item.display }}
                     <VersionSelect
+                        v-model="item.selectedVersion"
                         :source="item"
-                        @change="(version) => { item.selectedVersion = version }"
                     />
                 </span>
                 <div style="white-space: nowrap">
@@ -169,6 +176,7 @@ loadSource()
                         📙
                     </span>
                     <span
+                        v-if="isDependenciesOk(item)"
                         class="emoji-button module-install"
                         title="安装"
                         :style="{
@@ -181,6 +189,7 @@ loadSource()
                     >
                         ⬇️
                     </span>
+                    <span v-else>❌</span>
                 </div>
             </li>
         </ul>

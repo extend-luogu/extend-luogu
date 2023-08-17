@@ -2,6 +2,7 @@ import './index.css'
 import './SimpleAlert.css'
 
 import $ from 'jquery'
+import semver from 'semver'
 import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
@@ -27,7 +28,7 @@ declare global {
     } | void
 }
 
-export { Schema }
+export { Schema, semver }
 
 unsafeWindow.$ ??= $
 

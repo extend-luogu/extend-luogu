@@ -7,10 +7,10 @@ export const npmSources = [
     { url: 'https://fastly.jsdelivr.net/npm', name: 'jsdelivr (fastly)' }
 ] as const
 
-export const githubSources = [
+export const registrySources = [
     { url: 'https://raw.githubusercontent.com/extend-luogu/exlg-module-registry/dist/index.json', name: 'github raw' },
+    { url: 'http://localhost:3819/index.json', name: 'local' }
 ] as const
-
 
 const sourceSchema = <
     T extends readonly { readonly url: string; readonly name: string }[],
@@ -26,6 +26,6 @@ export const marketStorage = window.exlg.defineStorage(
     'market',
     Scm.object({
         npmSource: sourceSchema(npmSources).description('NPM 源'),
-        githubSource: sourceSchema(githubSources).description('github 源')
+        registrySource: sourceSchema(registrySources).description('registry 源')
     })
 )

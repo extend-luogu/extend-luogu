@@ -8,7 +8,7 @@ import {
     moduleStorages,
     installModule,
     executeModule,
-    type Mod,
+    type Module,
     type Modules,
     type ModuleReadonly,
     type ModulesReadonly,
@@ -26,7 +26,7 @@ export interface Exlg {
 }
 
 export {
-    Schema, Schemas, Mod, Modules, ModuleReadonly, ModulesReadonly,
+    Schema, Schemas, Module, Modules, ModuleReadonly, ModulesReadonly,
 }
 
 declare global {
@@ -65,6 +65,7 @@ const launch = async () => {
                     version: Schema.string(),
                     description: Schema.string(),
                     display: Schema.string(),
+                    dependencies: Schema.dict(Schema.string()),
                 }),
             }),
         ),

@@ -15,7 +15,7 @@
 // @match          https://service-nd5kxeo3-1305163805.sh.apigw.tencentcs.com/release/exlg-nextgen
 // @match          https://extend-luogu.github.io/exlg-setting-new/*
 // @match          https://dash.exlg.cc/*
-// @include        http://localhost:1634/*
+// @include        http://localhost:3819/*
 //
 // @connect        *
 // @connect        tencentcs.com

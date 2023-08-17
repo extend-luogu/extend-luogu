@@ -439,7 +439,7 @@ program
             versions: [
                 {
                     version: pkg.version,
-                    exlgDependencies: pkg.exlgDependencies,
+                    dependencies: pkg.exlgDependencies ?? {},
                 },
             ],
         }
@@ -454,7 +454,7 @@ program
         const pkg = await checkPkgFile('添加依赖')
 
         pkg.exlgDependencies ??= {}
-        if (pkg.exlgDependencies[name]) return console.error('💥 依赖 %s 已经存在', name)
+        if (pkg.exlgDependencies[name]) console.log('⚡ 依赖 %s 已经存在版本 %s', name, pkg.exlgDependencies[name])
         pkg.exlgDependencies[name] = ver || true
 
         pkg.exlgDependencies = Object.fromEntries(
@@ -469,7 +469,7 @@ program
             ),
         )
 
-        console.log('⚡ 依赖 %s 添加成功', name)
+        console.log('⚡ 依赖 %s 添加成功，版本 %s', name, ver)
     })
 
 program.parse(process.argv)

@@ -156,15 +156,14 @@ const $board = $(`<span id="exlg-exrand-window" class="exlg-window" style="displ
         'z-index': 9,
         'font-weight': 'initial',
     })
-/*
-    .hide()
-    .on("mouseenter", () => { mouse_on_board = true; })
-    .on("mouseleave", () => {
-        mouse_on_board = false;
-        if (!mouse_on_dash) {
-            $board.hide();
-        } // Hack: 维护 onboard
-    }); */
+    // .hide()
+    // .on("mouseenter", () => { mouse_on_board = true; })
+    // .on("mouseleave", () => {
+    //     mouse_on_board = false;
+    //     if (!mouse_on_dash) {
+    //         $board.hide();
+    //     } // Hack: 维护 onboard
+    // })
 $('.lg-index-stat>h2').text('问题跳转 ').append($settings_dash)
 const $ul = $board.children('ul').css('list-style-type', 'none')
 

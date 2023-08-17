@@ -9,7 +9,11 @@
     "author": "extend-luogu",
     "license": "ISC",
     "dependencies": {
+        "jquery": "^3.6.0",
         "schemastery": "^3.4.3",
-        "jquery": "^3.6.0"
+        "semver": "^7.5.4"
+    },
+    "devDependencies": {
+        "@types/semver": "^7.5.0"
     }
 }

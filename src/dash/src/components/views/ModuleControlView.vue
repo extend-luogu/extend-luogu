@@ -7,7 +7,7 @@ import TextCheckbox from '@comp/utils/TextCheckbox.vue'
 import { useModules } from '@/stores/module'
 import { useWindows } from '@/stores/window'
 
-const emits = defineEmits<{
+const emit = defineEmits<{
     (e: 'uninstallModule', id: string): void
 }>()
 
@@ -30,7 +30,7 @@ function uninstall(id: string) {
     utils.simpleAlert(`确定要删除模块 ${id}？`, {
         onAccept: () => {
             moduleControl.value.modulesStorage.del(id)
-            emits('uninstallModule', id)
+            emit('uninstallModule', id)
             moduleStore.loadLocalModules()
         }
     })

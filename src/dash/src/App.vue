@@ -62,8 +62,8 @@ function uninstallModule(id: string) {
         v-show="show"
         class="exlg-root"
     >
-        <ConfigView ref="configView" />
-        <InterfaceView ref="interfaceView" />
+        <ConfigView />
+        <InterfaceView />
 
         <div class="tabs">
             <div

@@ -2,12 +2,18 @@ import { defineStorage, Schema, Storage } from './storage'
 import { utils, type Utils } from './utils/packed'
 import type { LoggerFunction } from './utils'
 
+export interface ModuleDependencies {
+    [mod: string]: string | undefined
+    core?: string
+}
+
 export interface ModuleMetadata {
     name: string
     source: string
     version: string
     description: string
     display: string
+    dependencies: ModuleDependencies
 }
 
 export interface ModuleExports {
@@ -57,10 +63,10 @@ export interface ModuleReadonly {
     metadata: ModuleMetadata
 }
 
-export interface Mod extends ModuleReadonly {
+export interface Module extends ModuleReadonly {
     runtime: ModuleRuntime
 }
-export type Modules = Record<string, Mod>
+export type Modules = Record<string, Module>
 export type ModulesReadonly = Record<string, ModuleReadonly>
 
 const {
@@ -72,7 +78,7 @@ export const initModulesStorage = (storage: Storage<ModulesReadonly>) => modules
 
 export const moduleStorages: Record<string, Storage> = {}
 
-const wrapModule = (module: Mod) => `
+const wrapModule = (module: Module) => `
 exlg.modules['${module.id}'].runtime.setWrapper(function(
     define, runtime, Schema,
     utils,
@@ -98,7 +104,7 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
     modules[module.id].runtime.executeState = executeModule(modules[module.id])
 }
 
-export const executeModule = async (module: Mod): Promise<ExecuteState> => {
+export const executeModule = async (module: Module): Promise<ExecuteState> => {
     const wrapper = await new Promise<ModuleWrapper>((res) => {
         module.runtime.setWrapper = (r) => {
             delete module.runtime.setWrapper

@@ -1,5 +1,6 @@
 {
     "name": "@exlg/mod-messages",
+	"display": "新消息提醒",
     "description": "新消息提醒",
     "author": "bohanjun & YuzhenQin",
     "version": "1.0.0",

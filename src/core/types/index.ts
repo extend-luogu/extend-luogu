@@ -4,9 +4,10 @@ import { ExlgDash } from './dash'
 export type { VueType, VueAll } from './dash'
 
 export type {
-    Mod,
+    Module,
     ModuleControl,
     ModuleExports,
+    ModuleDependencies,
     ModuleMetadata,
     ModuleRuntime,
     ModuleWrapper,
