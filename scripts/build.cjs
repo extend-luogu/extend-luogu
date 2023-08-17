@@ -4,7 +4,7 @@
 const fs = require('node:fs/promises')
 const esbuild = require('esbuild')
 const vuePlugin = require('esbuild-plugin-vue3')
-const pkg = require('../package.json')
+const corePkg = require('../src/core/package.json')
 
 exports = async () => {
     const startTime = Date.now()
@@ -51,7 +51,7 @@ exports = async () => {
     const injectResource = (name, str) => `\n;unsafeWindow.exlgResources.${name} = ${JSON.stringify(str)};\n`
 
     // eslint-disable-next-line prefer-template
-    const concated = header.replace('{{version}}', pkg.version)
+    const concated = header.replace('{{version}}', corePkg.version)
         + '\n;unsafeWindow.exlgResources = {};\n'
         + injectResource('dashJs', dashJs)
         + injectResource('dashCss', dashCss)

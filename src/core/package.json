@@ -11,9 +11,12 @@
     "dependencies": {
         "jquery": "^3.6.0",
         "schemastery": "^3.4.3",
-        "semver": "^7.5.4"
+        "semver": "^7.5.4",
+        "marked": "^4.0.18",
+        "xss": "^1.0.13"
     },
     "devDependencies": {
-        "@types/semver": "^7.5.0"
+        "@types/semver": "^7.5.0",
+        "@types/marked": "^4.0.18"
     }
 }

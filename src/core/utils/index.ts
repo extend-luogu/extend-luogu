@@ -3,6 +3,8 @@ import './SimpleAlert.css'
 
 import $ from 'jquery'
 import semver from 'semver'
+import { marked } from 'marked'
+import { FilterXSS } from 'xss'
 import { Schema } from '../storage'
 import type { ExecuteState } from '../module'
 
@@ -28,7 +30,9 @@ declare global {
     } | void
 }
 
-export { Schema, semver }
+export {
+    Schema, semver, marked, FilterXSS,
+}
 
 unsafeWindow.$ ??= $
 
@@ -310,6 +314,49 @@ export function addHookSelector(selector: string, callback: callbackType) {
 }
 
 hooker.observe(document.body, { childList: true, subtree: true })
+
+export function toInitialCase(s: string) {
+    return s[0].toUpperCase() + s.slice(1)
+}
+
+export function toKeyCode(e: JQuery.KeyboardEventBase) {
+    return [
+        e.ctrlKey ? 'Ctrl' : '',
+        e.shiftKey ? 'Shift' : '',
+        e.altKey ? 'Alt' : '',
+        toInitialCase(e.key),
+    ].join('')
+}
+
+export type LuoguColor =
+    | 'Gray'
+    | 'Blue'
+    | 'Green'
+    | 'Orange'
+    | 'Red'
+    | 'Purple'
+    | 'Cheater'
+
+export const color = {
+    Gray: 'gray',
+    Blue: 'bluelight',
+    Green: 'green',
+    Orange: 'orange lg-bold',
+    Red: 'red lg-bold',
+    Purple: 'purple lg-bold',
+    Cheater: 'brown lg-bold',
+}
+
+export const xss = new FilterXSS({
+    whiteList: {},
+    onTagAttr: (_, k, v) => {
+        if (k === 'style') return `${k}="${v}"`
+    },
+})
+
+export function renderText(raw: string) {
+    return marked(xss.process(raw))
+}
 
 export function loadChore(
     lastOperated: number,

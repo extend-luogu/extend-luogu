@@ -42,7 +42,7 @@ const genToken = async () => {
     )
 }
 
-; (async () => {
+(async () => {
     const d = sto.get('_lastUpdate')
     if (d === undefined || new Date().valueOf() - d > 300) {
         if (_feInjection.currentUser) {
