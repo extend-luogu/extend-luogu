@@ -33,14 +33,16 @@ export type ModuleWrapper = (
     error: LoggerFunction
 ) => ModuleExports
 
-export type ExecuteState =
-    | 'done'
-    | 'inactive'
-    | 'threw'
-    | 'mismatched'
-    | 'storageBroken'
-    | 'notExported'
-    | 'unwrapThrew'
+export enum ExecuteState {
+    Done,
+    Inactive,
+    MissDependeny,
+    Threw,
+    Mismatched,
+    StorageBroken,
+    NotExported,
+    UnwrapThrew,
+}
 
 export interface ModuleInterface {
     description: string
@@ -68,6 +70,34 @@ export interface Module extends ModuleReadonly {
 }
 export type Modules = Record<string, Module>
 export type ModulesReadonly = Record<string, ModuleReadonly>
+
+export enum InstallState {
+    uninstalled,
+    installed,
+    installing,
+    installFailed,
+}
+
+export type SourceVersion = {
+    version: string
+    dependencies: ModuleDependencies
+}
+
+export interface SourceItem {
+    id: string
+    name: string
+    description: string
+    versions: SourceVersion[]
+    selectedVersion: SourceVersion
+    display: string
+    bin: string
+}
+export interface NpmSourceItem extends SourceItem {
+    type: 'npm'
+    package: string
+}
+export type AllSourceItem = NpmSourceItem
+export type Registry = AllSourceItem[]
 
 const {
     loadJs, loadCss, exlgLog, MatchError,
@@ -105,6 +135,10 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
 }
 
 export const executeModule = async (module: Module): Promise<ExecuteState> => {
+    if (!isDependenciesOk(module.metadata.dependencies)) {
+        return ExecuteState.MissDependeny
+    }
+
     const wrapper = await new Promise<ModuleWrapper>((res) => {
         module.runtime.setWrapper = (r) => {
             delete module.runtime.setWrapper
@@ -132,14 +166,14 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
     }
     catch (err) {
         error('Failed to unwrap: %o', err)
-        return 'unwrapThrew'
+        return ExecuteState.UnwrapThrew
     }
 
     exports = exports as ModuleExports | null
 
     if (!exports) {
         error('Exports not found.')
-        return 'notExported'
+        return ExecuteState.NotExported
     }
 
     if (exports.schema) {
@@ -149,15 +183,15 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         )
     }
 
-    if (!module.active) return 'inactive'
+    if (!module.active) return ExecuteState.Inactive
 
     try {
         await exports.entry?.()
     }
     catch (err) {
-        if (err instanceof MatchError) return 'mismatched'
+        if (err instanceof MatchError) return ExecuteState.Mismatched
         error('Failed to execute: %o', err)
-        return 'threw'
+        return ExecuteState.Threw
     }
     log('Executed.')
 
@@ -166,12 +200,21 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         log('Style loaded.')
     }
 
-    return 'done'
+    return ExecuteState.Done
+}
+
+export const isDependenciesOk = (dep?: ModuleDependencies) => {
+    if (!dep) return true
+    if (dep.core && !utils.semver.satisfies(exlg.coreVersion, dep.core)) return false
+    return true
 }
 
 export interface ModuleControl {
     modulesStorage: Storage<ModulesReadonly>
     moduleStorages: Record<string, Storage>
     installModule: typeof installModule
+    InstallStates: typeof InstallState
     executeModule: typeof executeModule
+    ExecuteStates: typeof ExecuteState
+    isDependenciesOk: typeof isDependenciesOk
 }

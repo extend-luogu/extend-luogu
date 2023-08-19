@@ -1,7 +1,6 @@
 import { reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { InstallState } from '@/utils'
-import type { ModuleControl, ModulesReadonly } from '@core/types'
+import type { ModuleControl, ModulesReadonly, InstallState } from '@core/types'
 
 export const useModules = defineStore('modules', () => {
     const moduleControl = ref(null as unknown as ModuleControl)

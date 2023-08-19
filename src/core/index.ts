@@ -7,7 +7,10 @@ import {
     initModulesStorage,
     moduleStorages,
     installModule,
+    InstallState,
     executeModule,
+    ExecuteState,
+    isDependenciesOk,
     type Module,
     type Modules,
     type ModuleReadonly,
@@ -76,7 +79,10 @@ const launch = async () => {
         moduleStorages,
         modulesStorage,
         installModule,
+        InstallStates: InstallState,
         executeModule,
+        ExecuteStates: ExecuteState,
+        isDependenciesOk,
     }
 
     const modules = modulesStorage.getAll()

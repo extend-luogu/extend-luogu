@@ -6,11 +6,11 @@ import MarketView from '@comp/views/MarketView.vue'
 import DevView from '@comp/views/DevView.vue'
 import ConfigView from '@comp/views/ConfigView.vue'
 import InterfaceView from '@comp/views/InterfaceView.vue'
-import { InstallState } from '@/utils'
 import { useModules } from '@/stores/module'
 
 const { moduleControl } = window.exlg
 delete window.exlg.moduleControl
+const { InstallStates } = moduleControl!
 
 const moduleStore = useModules()
 moduleStore.moduleControl = moduleControl!
@@ -46,7 +46,7 @@ function updateModule() {
 }
 
 function uninstallModule(id: string) {
-    installStates.value[id] = InstallState.uninstalled
+    installStates.value[id] = InstallStates.uninstalled
 }
 </script>
 
@@ -83,7 +83,6 @@ function uninstallModule(id: string) {
 
         <ModuleControlView
             v-show="currentTab === 'module'"
-            ref="moduleControlView"
             @uninstall-module="uninstallModule"
         />
         <MarketView

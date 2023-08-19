@@ -2,10 +2,9 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import compareVersions from 'compare-versions'
-import type { ModuleDependencies, ModuleMetadata } from '@core/types'
+import type { ModuleMetadata, AllSourceItem, Registry } from '@core/types'
 import { useModules } from '@/stores/module'
 import { useWindows } from '@/stores/window'
-import { type AllSourceItem, InstallState, type Source } from '@/utils'
 import { marketStorage } from '@/utils/source'
 import TextCheckbox from '@comp/utils/TextCheckbox.vue'
 import VersionSelect from '@comp/VersionSelect.vue'
@@ -14,16 +13,17 @@ const emit = defineEmits<{
     (e: 'installModule'): void
 }>()
 
-const { utils: { exlgLog, csGet, semver }, coreVersion } = window.exlg
+const { utils: { exlgLog, csGet } } = window.exlg
 
 const logger = exlgLog('market')
 
 const moduleStore = useModules()
 const { moduleControl, installStates } = storeToRefs(moduleStore)
+const { InstallState, modulesStorage, installModule, isDependenciesOk } = moduleControl.value
 
 const windowStore = useWindows()
 
-const source = ref<Source | null>(null)
+const source = ref<Registry | null>(null)
 
 async function loadSource() {
     source.value = null
@@ -39,7 +39,7 @@ async function loadSource() {
     source.value.forEach((item) => {
         item.id = item.name
         item.selectedVersion = item.versions.at(-1)! // Note: latest version
-        installStates.value[item.id] = moduleControl.value.modulesStorage.get(item.id)
+        installStates.value[item.id] = modulesStorage.get(item.id)
             ? InstallState.installed
             : InstallState.uninstalled
     })
@@ -86,7 +86,7 @@ async function install(item: AllSourceItem) {
         script
     )
 
-    moduleControl.value.installModule(metadata, script!)
+    installModule(metadata, script!)
     installStates.value[item.id] = InstallState.installed
     emit('installModule')
 }
@@ -95,7 +95,7 @@ const getInstallState = (item: AllSourceItem): ModuleInstallState => {
     const state = installStates.value[item.id]
     switch (state) {
     case InstallState.installed: {
-        const current = moduleControl.value.modulesStorage.get(item.id).metadata.version
+        const current = modulesStorage.get(item.id).metadata.version
         if (compareVersions(current, item.versions.at(-1)!.version) < 0)
             return {
                 class: 'update exlg-tooltip',
@@ -114,12 +114,6 @@ const getInstallState = (item: AllSourceItem): ModuleInstallState => {
     case InstallState.uninstalled:
         return {}
     }
-}
-
-const isDependenciesOk = (item: AllSourceItem) => {
-    const dep = item.selectedVersion.dependencies
-    if (dep.core && ! semver.satisfies(coreVersion, dep.core)) return false
-    return true
 }
 
 const showId = ref(false)
@@ -176,7 +170,7 @@ loadSource()
                         📙
                     </span>
                     <span
-                        v-if="isDependenciesOk(item)"
+                        v-if="isDependenciesOk(item.selectedVersion.dependencies)"
                         class="emoji-button module-install"
                         title="安装"
                         :style="{

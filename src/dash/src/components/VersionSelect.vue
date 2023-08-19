@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import type { AllSourceItem, SourceVersion } from '@/utils'
+import type { AllSourceItem, SourceVersion } from '@core/types'
 
 const props = defineProps<{
     source: AllSourceItem

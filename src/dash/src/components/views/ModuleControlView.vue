@@ -15,12 +15,13 @@ const { utils, schemas, modules } = window.exlg
 
 const moduleStore = useModules()
 const { moduleControl, localModules } = storeToRefs(moduleStore)
+const { ExecuteStates, modulesStorage } = moduleControl.value
 moduleStore.loadLocalModules()
 
 const windowStore = useWindows()
 
 function toggleModule(id: string) {
-    moduleControl.value.modulesStorage.do(id, (mod) => {
+    modulesStorage.do(id, (mod) => {
         mod.active = !mod.active
         return mod
     })
@@ -29,7 +30,7 @@ function toggleModule(id: string) {
 function uninstall(id: string) {
     utils.simpleAlert(`确定要删除模块 ${id}？`, {
         onAccept: () => {
-            moduleControl.value.modulesStorage.del(id)
+            modulesStorage.del(id)
             emit('uninstallModule', id)
             moduleStore.loadLocalModules()
         }
@@ -37,23 +38,25 @@ function uninstall(id: string) {
 }
 
 const executeStateIcons: Record<ExecuteState, string> = {
-    done: '✨',
-    threw: '💥',
-    inactive: '❄️',
-    mismatched: '🌙',
-    storageBroken: '💥',
-    notExported: '💥',
-    unwrapThrew: '💥'
+    [ExecuteStates.Done]: '✨',
+    [ExecuteStates.Threw]: '💥',
+    [ExecuteStates.MissDependeny]: '💥',
+    [ExecuteStates.Inactive]: '❄️',
+    [ExecuteStates.Mismatched]: '🌙',
+    [ExecuteStates.StorageBroken]: '💥',
+    [ExecuteStates.NotExported]: '💥',
+    [ExecuteStates.UnwrapThrew]: '💥'
 }
 
 const executeStateTexts: Record<ExecuteState, string> = {
-    done: '已加载',
-    threw: '出错了',
-    inactive: '未开启',
-    mismatched: '未匹配',
-    storageBroken: '数据错误',
-    notExported: '无导出',
-    unwrapThrew: '解包错误'
+    [ExecuteStates.Done]: '已加载',
+    [ExecuteStates.Threw]: '出错了',
+    [ExecuteStates.MissDependeny]: '依赖缺失',
+    [ExecuteStates.Inactive]: '未开启',
+    [ExecuteStates.Mismatched]: '未匹配',
+    [ExecuteStates.StorageBroken]: '数据错误',
+    [ExecuteStates.NotExported]: '无导出',
+    [ExecuteStates.UnwrapThrew]: '解包错误'
 }
 
 const showId = ref(false)

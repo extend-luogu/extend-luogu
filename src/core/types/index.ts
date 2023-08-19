@@ -17,6 +17,12 @@ export type {
     ModuleInterface,
     ModuleInterfaces,
     ExecuteState,
+    InstallState,
+    SourceVersion,
+    SourceItem,
+    AllSourceItem,
+    NpmSourceItem,
+    Registry,
 } from '../module'
 
 export type { Utils } from '../utils/packed'
