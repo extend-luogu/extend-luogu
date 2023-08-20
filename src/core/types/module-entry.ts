@@ -1,5 +1,5 @@
 import type { Exlg, Schema } from '..'
-import type { ModuleExports, ModuleRuntime } from '../module'
+import type { ModuleExports, ModuleInjector, ModuleRuntime } from '../module'
 import type { Utils } from '../utils/packed'
 import type { LoggerFunction } from '../utils'
 
@@ -15,4 +15,5 @@ declare global {
     const warn: LoggerFunction
     const error: LoggerFunction
     const exlg: Exlg
+    const inject: ModuleInjector
 }

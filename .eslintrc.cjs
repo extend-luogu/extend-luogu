@@ -33,6 +33,7 @@ module.exports = {
                 ],
                 'no-underscore-dangle': 'off',
                 'no-plusplus': 'off',
+                'no-continue': 'off',
                 'no-restricted-syntax': 'off',
                 'no-multi-assign': 'off',
                 'no-param-reassign': 'off',
@@ -40,7 +41,10 @@ module.exports = {
                 'no-return-assign': 'off',
                 'consistent-return': 'off',
                 'prefer-template': 'off',
-                '@typescript-eslint/indent': ['error', 4],
+                '@typescript-eslint/indent': [
+                    'error', 4,
+                    { ignoredNodes: ['TSTypeParameterInstantiation'] }
+                ],
                 '@typescript-eslint/semi': ['error', 'never'],
                 '@typescript-eslint/naming-convention': 'off',
                 '@typescript-eslint/no-explicit-any': 'off',

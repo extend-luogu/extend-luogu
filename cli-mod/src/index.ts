@@ -113,7 +113,7 @@ program
         await fs.mkdir(name)
 
         const prefix = options.theme ? 'theme' : 'mod'
-        const coreVersion = '^1.4.0'
+        const coreVersion = '^1.5.0'
         await fs.writeFile(
             path.resolve(name, 'package.json'),
             JSON.stringify(

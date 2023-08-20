@@ -1,6 +1,7 @@
 import { defineStorage, Schema, Storage } from './storage'
 import { utils, type Utils } from './utils/packed'
 import type { LoggerFunction } from './utils'
+import type { ModuleInjection } from '.'
 
 export interface ModuleDependencies {
     [mod: string]: string | undefined
@@ -30,7 +31,8 @@ export type ModuleWrapper = (
     log: LoggerFunction,
     info: LoggerFunction,
     warn: LoggerFunction,
-    error: LoggerFunction
+    error: LoggerFunction,
+    inject: <T>(moduleId: string) => Promise<T | undefined>,
 ) => ModuleExports
 
 export enum ExecuteState {
@@ -55,6 +57,7 @@ export interface ModuleRuntime {
     setWrapper?: (wrapper: ModuleWrapper) => void
     executeState?: Promise<ExecuteState> | undefined
     storage?: Storage
+    exports: object
     interfaces: ModuleInterfaces
 }
 
@@ -112,7 +115,8 @@ const wrapModule = (module: Module) => `
 exlg.modules['${module.id}'].runtime.setWrapper(function(
     define, runtime, Schema,
     utils,
-    log, info, warn, error
+    log, info, warn, error,
+    inject
 ) {
     ${module.script}
 })
@@ -129,13 +133,13 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
     const { modules } = unsafeWindow.exlg
     modules[module.id] = {
         ...module,
-        runtime: { interfaces: {} },
+        runtime: { interfaces: {}, exports: {} },
     }
     modules[module.id].runtime.executeState = executeModule(modules[module.id])
 }
 
 export const executeModule = async (module: Module): Promise<ExecuteState> => {
-    if (!isDependenciesOk(module.metadata.dependencies)) {
+    if (!checkDependencies(module.metadata.dependencies)[0]) {
         return ExecuteState.MissDependeny
     }
 
@@ -152,6 +156,13 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         `module/${module.id}@${module.metadata.version}`,
     )
     let exports: ModuleExports | null = null
+    const inject = async <T>(moduleId: string): Promise<T | undefined> => {
+        const mod = exlg.modules[moduleId]
+        if (!mod) return undefined
+        const state = await mod.runtime.executeState
+        if (state === ExecuteState.Done) return mod.runtime.exports as T
+    }
+
     try {
         wrapper(
             (e) => (exports = e),
@@ -162,6 +173,7 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
             info,
             warn,
             error,
+            inject,
         )
     }
     catch (err) {
@@ -203,10 +215,30 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
     return ExecuteState.Done
 }
 
-export const isDependenciesOk = (dep?: ModuleDependencies) => {
-    if (!dep) return true
-    if (dep.core && !utils.semver.satisfies(exlg.coreVersion, dep.core)) return false
-    return true
+export const checkDependencies = (dep?: ModuleDependencies): [ boolean, string[] ] => {
+    if (!dep) return [true, []]
+    let ok = true
+    const missingDepNames = []
+    for (const [depName, depVersion] of Object.entries(dep)) {
+        const depInfo = `${depName}:${depVersion}`
+        if (!depVersion) continue
+        if (depName === 'core') {
+            if (!utils.semver.satisfies(exlg.coreVersion, depVersion)) {
+                ok = false
+                missingDepNames.push(depInfo)
+            }
+        }
+        else {
+            const depModule = exlg.modules[depName]
+            if (!depModule
+                || !utils.semver.satisfies(depModule.metadata.version, depVersion)
+            ) {
+                ok = false
+                missingDepNames.push(depInfo)
+            }
+        }
+    }
+    return [ok, missingDepNames]
 }
 
 export interface ModuleControl {
@@ -216,5 +248,8 @@ export interface ModuleControl {
     InstallStates: typeof InstallState
     executeModule: typeof executeModule
     ExecuteStates: typeof ExecuteState
-    isDependenciesOk: typeof isDependenciesOk
+    checkDependencies: typeof checkDependencies
 }
+
+export type ModuleInjector =
+    <S extends keyof ModuleInjection>(moduleId: S) => Promise<ModuleInjection[S] | undefined>

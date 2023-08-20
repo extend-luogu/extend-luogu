@@ -355,6 +355,22 @@ importers:
       '@exlg/cli-mod':
         specifier: ^1.5.0
         version: link:../../../cli-mod
+      '@exlg/mod-test-dep':
+        specifier: workspace:^
+        version: link:../test-dep
+      schemastery:
+        specifier: ^3.4.3
+        version: 3.4.3
+
+  src/modules/test-dep:
+    dependencies:
+      '@exlg/core':
+        specifier: ^1.4.0
+        version: link:../../core
+    devDependencies:
+      '@exlg/cli-mod':
+        specifier: ^1.5.0
+        version: link:../../../cli-mod
       schemastery:
         specifier: ^3.4.3
         version: 3.4.3

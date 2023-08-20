@@ -66,6 +66,14 @@
     padding-right: 0.3em;
 }
 
+.exlg-tooltip.left:hover::after {
+    right: 100%;
+}
+
+.exlg-tooltip.nowrap:hover::after {
+    white-space: nowrap;
+}
+
 .exlg-window {
     top: 0;
     right: calc(100% + 20px);

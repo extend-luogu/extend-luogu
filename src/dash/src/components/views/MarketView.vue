@@ -2,24 +2,24 @@
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import compareVersions from 'compare-versions'
-import type { ModuleMetadata, AllSourceItem, Registry } from '@core/types'
+import type { AllSourceItem, Registry } from '@core/types'
 import { useModules } from '@/stores/module'
 import { useWindows } from '@/stores/window'
 import { marketStorage } from '@/utils/source'
 import TextCheckbox from '@comp/utils/TextCheckbox.vue'
 import VersionSelect from '@comp/VersionSelect.vue'
 import ModuleInstallStateMessage, { type ModuleInstallState } from '@comp/ModuleInstallStateMessage.vue'
+import InstallButton from '../InstallButton.vue'
+
 const emit = defineEmits<{
     (e: 'installModule'): void
 }>()
 
-const { utils: { exlgLog, csGet } } = window.exlg
-
-const logger = exlgLog('market')
+const { utils: { csGet } } = window.exlg
 
 const moduleStore = useModules()
 const { moduleControl, installStates } = storeToRefs(moduleStore)
-const { InstallState, modulesStorage, installModule, isDependenciesOk } = moduleControl.value
+const { InstallStates, modulesStorage } = moduleControl.value
 
 const windowStore = useWindows()
 
@@ -40,61 +40,15 @@ async function loadSource() {
         item.id = item.name
         item.selectedVersion = item.versions.at(-1)! // Note: latest version
         installStates.value[item.id] = modulesStorage.get(item.id)
-            ? InstallState.installed
-            : InstallState.uninstalled
+            ? InstallStates.installed
+            : InstallStates.uninstalled
     })
-}
-
-async function install(item: AllSourceItem) {
-    if (installStates.value[item.id] === InstallState.installing) return
-    installStates.value[item.id] = InstallState.installing
-
-    const version = item.selectedVersion
-    const metadata: ModuleMetadata = {
-        name: item.name,
-        source: item.type,
-        version: version.version,
-        dependencies: version.dependencies,
-        description: item.description,
-        display: item.display,
-    }
-    let script: string | void
-
-    try {
-        switch (item.type) {
-        case 'npm':
-            script = (
-                await csGet(
-                    `${marketStorage.get('npmSource')}/${item.package}@${version}/${item.bin}`
-                )
-            ).response
-        }
-    } catch (err) {
-        installStates.value[item.id] = InstallState.installFailed
-        logger.error(
-            'Failed to download script of module %o, error: %o',
-            item,
-            err
-        )
-        return
-    }
-
-    logger.log(
-        'Downloaded module %o: metadata %o, script %s',
-        item,
-        metadata,
-        script
-    )
-
-    installModule(metadata, script!)
-    installStates.value[item.id] = InstallState.installed
-    emit('installModule')
 }
 
 const getInstallState = (item: AllSourceItem): ModuleInstallState => {
     const state = installStates.value[item.id]
     switch (state) {
-    case InstallState.installed: {
+    case InstallStates.installed: {
         const current = modulesStorage.get(item.id).metadata.version
         if (compareVersions(current, item.versions.at(-1)!.version) < 0)
             return {
@@ -104,14 +58,14 @@ const getInstallState = (item: AllSourceItem): ModuleInstallState => {
             }
         return { text: '已安装' }
     }
-    case InstallState.installing:
+    case InstallStates.installing:
         return { text: '安装中' }
-    case InstallState.installFailed:
+    case InstallStates.installFailed:
         return {
             class: 'error',
             text: '出错了'
         }
-    case InstallState.uninstalled:
+    case InstallStates.uninstalled:
         return {}
     }
 }
@@ -155,7 +109,7 @@ loadSource()
                 class="module-entry"
             >
                 <span>
-                    {{ showId ? item.name : item.display }}
+                    {{ showId ? item.name : item.display ?? item.name }}
                     <VersionSelect
                         v-model="item.selectedVersion"
                         :source="item"
@@ -169,21 +123,10 @@ loadSource()
                     >
                         📙
                     </span>
-                    <span
-                        v-if="isDependenciesOk(item.selectedVersion.dependencies)"
-                        class="emoji-button module-install"
-                        title="安装"
-                        :style="{
-                            visibility:
-                                installStates[item.id] === InstallState.installing
-                                    ? 'hidden'
-                                    : 'visible'
-                        }"
-                        @click="install(item)"
-                    >
-                        ⬇️
-                    </span>
-                    <span v-else>❌</span>
+                    <InstallButton
+                        :source-item="item"
+                        @install-module="emit('installModule')"
+                    />
                 </div>
             </li>
         </ul>

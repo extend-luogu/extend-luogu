@@ -10,7 +10,7 @@ import {
     InstallState,
     executeModule,
     ExecuteState,
-    isDependenciesOk,
+    checkDependencies,
     type Module,
     type Modules,
     type ModuleReadonly,
@@ -27,6 +27,9 @@ export interface Exlg {
     defineStorage: typeof defineStorage
     schemas: Schemas
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ModuleInjection {}
 
 export {
     Schema, Schemas, Module, Modules, ModuleReadonly, ModulesReadonly,
@@ -82,7 +85,7 @@ const launch = async () => {
         InstallStates: InstallState,
         executeModule,
         ExecuteStates: ExecuteState,
-        isDependenciesOk,
+        checkDependencies,
     }
 
     const modules = modulesStorage.getAll()
@@ -91,20 +94,32 @@ const launch = async () => {
     for (const id in modules) {
         unsafeWindow.exlg.modules[id] = Object.freeze({
             ...modules[id],
-            runtime: { interfaces: {} },
+            runtime: { interfaces: {}, exports: {} },
         })
     }
 
     logger.log('Executing modules.')
 
-    const executeStates = []
+    const executeStates: Promise<ExecuteState>[] = []
+    const executeStateSetters: Record<
+        string,
+        (state: ExecuteState | PromiseLike<ExecuteState>) => void
+    > = {}
 
-    for (const module of Object.values(exlg.modules)) {
+    const moduleList = Object.values(exlg.modules)
+
+    moduleList.forEach((module) => {
         Object.freeze(module)
-        executeStates.push(
-            module.runtime.executeState = executeModule(module),
-        )
-    }
+
+        executeStates.push(module.runtime.executeState = new Promise((res) => {
+            executeStateSetters[module.id] = res
+        }))
+    })
+
+    moduleList.forEach(async (module) => {
+        const state = await executeModule(module)
+        executeStateSetters[module.id](state)
+    })
 
     logger.log('Loading dash')
 

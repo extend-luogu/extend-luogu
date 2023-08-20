@@ -14,6 +14,7 @@ exports = async () => {
     await esbuild.build({
         entryPoints: ['src/core/index.ts'],
         format: 'iife',
+        target: process.env.TARGET,
         bundle: true,
         minify,
         outfile: 'dist/core.bundle.js',

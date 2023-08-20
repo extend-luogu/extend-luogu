@@ -1,6 +1,6 @@
 # Test
 
-src/modules/test
+src/modules/test*
 
 # Logs
 logs

@@ -90,7 +90,7 @@ const showId = ref(false)
                                 </span>
                             </template>
                         </Await>
-                        {{ showId ? mod.id : mod.metadata.display }}
+                        {{ showId ? mod.id : mod.metadata.display ?? mod.id }}
                         <span class="module-version">
                             @{{ mod.metadata.version }}
                         </span>
