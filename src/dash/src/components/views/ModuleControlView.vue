@@ -40,7 +40,7 @@ function uninstall(id: string) {
 const executeStateIcons: Record<ExecuteState, string> = {
     [ExecuteStates.Done]: '✨',
     [ExecuteStates.Threw]: '💥',
-    [ExecuteStates.MissDependeny]: '💥',
+    [ExecuteStates.MissDependency]: '💥',
     [ExecuteStates.Inactive]: '❄️',
     [ExecuteStates.Mismatched]: '🌙',
     [ExecuteStates.StorageBroken]: '💥',
@@ -51,7 +51,7 @@ const executeStateIcons: Record<ExecuteState, string> = {
 const executeStateTexts: Record<ExecuteState, string> = {
     [ExecuteStates.Done]: '已加载',
     [ExecuteStates.Threw]: '出错了',
-    [ExecuteStates.MissDependeny]: '依赖缺失',
+    [ExecuteStates.MissDependency]: '依赖缺失',
     [ExecuteStates.Inactive]: '未开启',
     [ExecuteStates.Mismatched]: '未匹配',
     [ExecuteStates.StorageBroken]: '数据错误',
