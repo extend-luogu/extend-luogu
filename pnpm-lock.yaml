@@ -346,19 +346,6 @@ importers:
         specifier: ^3.5.14
         version: 3.5.14
 
-  src/modules/test:
-    dependencies:
-      '@exlg/core':
-        specifier: ^1.4.0
-        version: link:../../core
-    devDependencies:
-      '@exlg/cli-mod':
-        specifier: ^1.5.0
-        version: link:../../../cli-mod
-      schemastery:
-        specifier: ^3.4.3
-        version: 3.4.3
-
   src/modules/token:
     dependencies:
       '@exlg/core':
@@ -2652,6 +2639,7 @@ packages:
 
   /cosmokit@1.2.1:
     resolution: {integrity: sha512-BTn7vRr31WUwX7Tq8Q/r+Qz+LPKTE3vA0d7xzVaYNes2NPvGPmIWiljYP0m/PIrdpqLLtdHpY1zGNr+OwDhA7A==}
+    dev: false
 
   /create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
@@ -5896,6 +5884,7 @@ packages:
     resolution: {integrity: sha512-Ui9sPoxOVaKa2EzR6GS08qB/nIMJUczUtkaLfWjeE44kjYZ+GLUFNVE3TpbXRdxjnbIIExwG+paMd0+M7YimqQ==}
     dependencies:
       cosmokit: 1.2.1
+    dev: false
 
   /section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}

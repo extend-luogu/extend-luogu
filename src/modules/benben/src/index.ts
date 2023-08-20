@@ -22,6 +22,7 @@ window.loadFeed = async () => {
         const res = await utils.csGet(
             'https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121',
         )
+        if (window.feedMode !== 'all-exlg') return
         const e = JSON.parse(res.response)
         e.forEach((m: Benben) => {
             m.content = utils.renderText(m.content)
