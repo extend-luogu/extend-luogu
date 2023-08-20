@@ -36,7 +36,7 @@ export type ModuleWrapper = (
 export enum ExecuteState {
     Done,
     Inactive,
-    MissDependeny,
+    MissDependency,
     Threw,
     Mismatched,
     StorageBroken,
@@ -136,7 +136,7 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
 
 export const executeModule = async (module: Module): Promise<ExecuteState> => {
     if (!isDependenciesOk(module.metadata.dependencies)) {
-        return ExecuteState.MissDependeny
+        return ExecuteState.MissDependency
     }
 
     const wrapper = await new Promise<ModuleWrapper>((res) => {
