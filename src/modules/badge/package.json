@@ -1,5 +1,6 @@
 {
     "name": "exlg-mod-badge",
+    "display": "赞助者标签",
     "description": "显示赞助者标签。",
     "author": "optimize-2",
     "version": "1.0.0",

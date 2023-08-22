@@ -35,6 +35,7 @@
 // @connect        unpkg.com
 // @connect        cdn.jsdelivr.net
 // @connect        fastly.jsdelivr.net
+// @connect        lda.piterator.com
 //
 // @grant          GM_addStyle
 // @grant          GM_addElement

@@ -5,7 +5,7 @@ import type Schema from './schema'
 utils.mustMatch([/^\/discuss\/\d+(\?page=\d+)*$/])
 
 const sto = runtime.storage as SchemaToStorage<typeof Schema>
-const api = 'https://lglg.top'
+const id = window.location.pathname.split('/')[2]
 
 const $saveBtn = $(`
     <button
@@ -18,43 +18,24 @@ $saveBtn
         $saveBtn.prop('disabled', true)
         $saveBtn.text('保存中...')
         utils
-            .csGet(`${api}/save.php?url=${window.location.href}`)
+            .csGet(`https://lda.piterator.com/${id}`)
             .then((res) => {
-                if (res.status === 200) {
-                    if (res.response === 'success') {
-                        log('Discuss saved')
-                        $saveBtn.text('保存成功')
-                        setTimeout(() => {
-                            $saveBtn.text('保存讨论').removeAttr('disabled')
-                        }, 1000)
-                    }
-                    else {
-                        log('Failed to save, return data: %o', res.response)
-                        $saveBtn
-                            .text('保存失败')
-                            .toggleClass('am-btn-success')
-                            .toggleClass('am-btn-warning')
-
-                        setTimeout(() => {
-                            $saveBtn
-                                .text('保存讨论')
-                                .removeAttr('disabled')
-                                .toggleClass('am-btn-success')
-                                .toggleClass('am-btn-warning')
-                        }, 1000)
-                    }
+                if (res.status <= 400) {
+                    log('Discuss saved')
+                    $saveBtn.text('保存成功')
+                    setTimeout(() => {
+                        $saveBtn.text('保存讨论')
+                        $saveBtn.removeAttr('disabled')
+                    }, 1000)
                 }
                 else {
-                    log(`Fail to save discuss: ${res}`)
-                    $saveBtn
-                        .toggleClass('am-btn-success')
-                        .toggleClass('am-btn-danger')
+                    log('Fail to save discuss: ', res)
+                    $saveBtn.text('保存失败')
+                    $saveBtn.toggleClass('am-btn-success').toggleClass('am-btn-danger')
                     setTimeout(() => {
-                        $saveBtn
-                            .text('保存讨论')
-                            .removeAttr('disabled')
-                            .toggleClass('am-btn-success')
-                            .toggleClass('am-btn-danger')
+                        $saveBtn.text('保存讨论')
+                        $saveBtn.removeAttr('disabled')
+                        $saveBtn.toggleClass('am-btn-success').toggleClass('am-btn-danger')
                     }, 1000)
                 }
             })
@@ -68,16 +49,16 @@ const $showBtn = $(`
     <a
         class="am-btn am-btn-warning am-btn-sm"
         name="save-discuss"
-        href="${api}/show.php?url=${window.location.href}"
+        href="https://lglg.top/${id}"
         target="_blank"
     >查看备份</a>
 `).css('margin-top', '5px')
 
 $('section.lg-summary')
     .find('p')
-    .append($('<br />'))
+    .append($('<br>'))
     .append($saveBtn)
-    .append('&nbsp;')
+    .append('<span>&nbsp;</span>')
     .append($showBtn)
 
 if (sto.get('autoSaveDiscussion')) $saveBtn.trigger('click')
