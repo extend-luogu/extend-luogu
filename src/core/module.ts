@@ -202,6 +202,11 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
 
     if (!module.active) return ExecuteState.Inactive
 
+    if (exports.style) {
+        utils.loadCss(exports.style)
+        log('Style loaded.')
+    }
+
     try {
         await exports.entry?.()
     }
@@ -211,11 +216,6 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         return ExecuteState.Threw
     }
     log('Executed.')
-
-    if (exports.style) {
-        utils.loadCss(exports.style)
-        log('Style loaded.')
-    }
 
     return ExecuteState.Done
 }
