@@ -94,7 +94,7 @@ const launch = async () => {
     for (const id in modules) {
         unsafeWindow.exlg.modules[id] = Object.freeze({
             ...modules[id],
-            runtime: { interfaces: {}, exports: {} },
+            runtime: { interfaces: {}, exports: undefined },
         })
     }
 

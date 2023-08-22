@@ -40,7 +40,7 @@ async function install(item: AllSourceItem) {
         case 'npm':
             script = (
                 await csGet(
-                    `${marketStorage.get('npmSource')}/${item.package}@${version}/${item.bin}`
+                    `${marketStorage.get('npmSource')}/${item.package}@${metadata.version}/${item.bin}`
                 )
             ).response
         }

@@ -23,6 +23,6 @@
         "@types/jquery": "^3.5.14"
     },
     "exlgDependencies": {
-        "core": "^1.5.0"
+        "core": "^1.4.0"
     }
 }

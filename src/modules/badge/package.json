@@ -1,0 +1,28 @@
+{
+    "name": "exlg-mod-badge",
+    "description": "显示赞助者标签。",
+    "author": "optimize-2",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "^1.4.0"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.5.0",
+        "@exlg/mod-token": "^1.1.0",
+        "schemastery": "^3.4.3"
+    },
+    "exlgDependencies": {
+        "core": "^1.5.0",
+        "token": "^1.1.0"
+    }
+}

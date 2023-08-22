@@ -24,14 +24,12 @@ const genToken = async () => {
             },
         )
     ).json.id
-    sto.set(
-        '_token',
-        (
-            await utils.csGet(
-                `https://exlg.piterator.com/token/verify/${paste_id}`,
-            )
-        ).json.data.token,
-    )
+    const { token } = (
+        await utils.csGet(
+            `https://exlg.piterator.com/token/verify/${paste_id}`,
+        )
+    ).json.data
+    sto.set('_token', token)
     await utils.csPost(
         `https://www.luogu.com.cn/paste/delete/${paste_id}?_contentOnly`,
         {},
@@ -40,9 +38,20 @@ const genToken = async () => {
             referer: 'https://www.luogu.com.cn/paste',
         },
     )
+    return token
 }
 
-(async () => {
+export interface TokenExportType {
+    token?: string
+}
+
+declare module '@exlg/core' {
+    interface ModuleInjection {
+        token: TokenExportType
+    }
+}
+
+const getToken = async () => {
     const d = sto.get('_lastUpdate')
     if (d === undefined || new Date().valueOf() - d > 300) {
         if (_feInjection.currentUser) {
@@ -54,10 +63,13 @@ const genToken = async () => {
                         token: sto.get('_token'),
                     })
                 ).json
-                if (ttl.status === 401 || ttl.data <= 60 * 15) await genToken()
+                if (ttl.status === 401 || ttl.data <= 60 * 15) return genToken()
             }
-            else await genToken()
+            else return genToken()
         }
         sto.set('_lastUpdate', new Date().valueOf())
     }
-})()
+    return sto.get('_token')
+}
+
+runtime.exports = (async () => ({ token: await getToken() }))()

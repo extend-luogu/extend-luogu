@@ -41,6 +41,7 @@ module.exports = {
                 'no-return-assign': 'off',
                 'consistent-return': 'off',
                 'prefer-template': 'off',
+                'import/no-cycle': 'off',
                 '@typescript-eslint/indent': [
                     'error', 4,
                     { ignoredNodes: ['TSTypeParameterInstantiation'] }

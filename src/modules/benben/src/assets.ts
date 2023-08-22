@@ -1,6 +1,6 @@
-import type { LuoguColor } from '@exlg/core/utils'
+import type { LuoguNameColor } from '@exlg/core/utils'
 
-const { color } = utils
+const { luoguNameColorClassName: color } = utils
 
 const check_html = '&nbsp;<a class="sb_amazeui" target="_blank" href="/discuss/show/142324">$</a>'
 
@@ -29,7 +29,7 @@ export interface Benben {
 export interface BenbenSender {
     badge: string,
     ccfLevel: number,
-    color: LuoguColor,
+    color: LuoguNameColor,
     name: string,
     uid: number,
 }
@@ -45,7 +45,7 @@ export const benben = (m: Benben) => `
         <header class="am-comment-hd">
             <div class="am-comment-meta">
                 <span class="feed-username">
-                    <a class="lg-fg-${color[m.user.color]}" href="/user/${m.user.uid}" target="_blank">${m.user.name}</a>${check(m.user.ccfLevel)}${m.user.badge ? `&nbsp;<span class="am-badge am-radius lg-bg-${utils.color[m.user.color]}">${m.user.badge}</span>` : ''}
+                    <a class="lg-fg-${color[m.user.color]}" href="/user/${m.user.uid}" target="_blank">${m.user.name}</a>${check(m.user.ccfLevel)}${m.user.badge ? `&nbsp;<span class="am-badge am-radius lg-bg-${utils.luoguNameColorClassName[m.user.color]}">${m.user.badge}</span>` : ''}
                 </span>
                 ${new Date(m.time * 1000).toLocaleString().replaceAll('/', '-')}
                 <a name="feed-reply">回复</a>

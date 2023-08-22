@@ -402,7 +402,7 @@ program
                         version: pkg.version,
                         description: pkg.description,
                         display: pkg.display ?? pkg.name,
-                        exlgDependencies: pkg.exlgDependencies,
+                        dependencies: pkg.exlgDependencies,
                         source: 'console',
                     },
                 )}, ${JSON.stringify(define)})\n`

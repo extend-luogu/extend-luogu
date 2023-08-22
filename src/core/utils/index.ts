@@ -6,14 +6,28 @@ import semver from 'semver'
 import { marked } from 'marked'
 import { FilterXSS } from 'xss'
 import { Schema } from '../storage'
-import type { ExecuteState } from '../module'
+import { ExecuteState } from '../module'
+
+interface LuoguProblemType {
+    provider: LuoguUserType
+}
+
+interface LuoguDataType {
+    uid: number
+    problem: LuoguProblemType
+}
+
+interface LuoguUserType {
+    uid: number
+    name: string
+}
 
 interface FeInjectionType {
     code: number
-    currentData: any
+    currentData: LuoguDataType
     currentTemplate: string
     currentTheme: any
-    currentUser: any
+    currentUser: LuoguUserType
 }
 
 declare global {
@@ -34,6 +48,20 @@ export {
     Schema, semver, marked, FilterXSS,
 }
 
+const getLuoguPageData = () => {
+    let luoguData: LuoguDataType | undefined
+    let luoguUser: LuoguUserType | undefined
+    if (window.location.host === 'www.luogu.com.cn' && !/blog/g.test(window.location.href)) {
+        if (/(\?|&)_contentOnly($|=)/g.test(window.location.search)) error('Content-Only pages.')
+        if (_feInjection.code !== 200) error('Luogu failed to load.')
+        luoguData = _feInjection.currentData
+        luoguUser = _feInjection.currentUser
+    }
+    return [luoguData, luoguUser]
+}
+
+export const [luoguData, luoguUser] = getLuoguPageData()
+
 unsafeWindow.$ ??= $
 
 const addElement = typeof GM_addElement === 'function'
@@ -46,6 +74,13 @@ const addElement = typeof GM_addElement === 'function'
 export const loadJs = (js: string) => {
     addElement('script', { textContent: js })
 }
+
+export const loadJsAsync = (js: string) => new Promise<void>((resolve) => {
+    const script = document.createElement('script')
+    script.innerHTML = js
+    document.head.appendChild(script)
+    setTimeout(resolve, 0)
+})
 
 export const loadCss = (css: string) => {
     addElement('style', { textContent: css })
@@ -271,15 +306,20 @@ export const hookModElement = async (
     )
 
     const state = await unsafeWindow.exlg.modules[mod].runtime.executeState
-    if (state === 'done') onLoad(selector)
+    if (state === ExecuteState.Done) onLoad(selector)
     else onError?.(state)
 
     cloakStyle!.remove()
 }
 
+interface hookResultType {
+    hookedNodes: NodeListLike
+    info?: object | null
+}
+
 type NodeListLike = Node[] | NodeList
-type hookType = (insertedNodes: NodeListLike) => Node[]
-type callbackType = (hookedNodes: NodeListLike) => void
+type hookType = (insertedNodes: NodeListLike) => hookResultType
+type callbackType = (hookResult: hookResultType) => void
 type hookCallbackType = (insertedNodes: NodeListLike) => void
 
 const hookList: hookCallbackType[] = []
@@ -293,12 +333,13 @@ const hooker = new MutationObserver((records) => {
 
 export function addHook(hook: hookCallbackType) {
     hookList.push(hook)
+    hook([document])
 }
 
 export function addHookAndCallback(hook: hookType, callback: callbackType) {
     addHook((insertedNodes) => {
-        const hookedNodes = hook(insertedNodes)
-        if (hookedNodes.length) callback(hookedNodes)
+        const hookResult = hook(insertedNodes)
+        if (hookResult.hookedNodes?.length) callback(hookResult)
     })
 }
 
@@ -309,7 +350,7 @@ export function addHookSelector(selector: string, callback: callbackType) {
             if ($(node).is(selector)) hookedNodes.push(node)
             hookedNodes.push(...$(node).find(selector).get())
         })
-        return hookedNodes
+        return { hookedNodes }
     }, callback)
 }
 
@@ -328,7 +369,7 @@ export function toKeyCode(e: JQuery.KeyboardEventBase) {
     ].join('')
 }
 
-export type LuoguColor =
+export type LuoguNameColor =
     | 'Gray'
     | 'Blue'
     | 'Green'
@@ -337,7 +378,7 @@ export type LuoguColor =
     | 'Purple'
     | 'Cheater'
 
-export const color = {
+export const luoguNameColorClassName: Record<LuoguNameColor, string> = {
     Gray: 'gray',
     Blue: 'bluelight',
     Green: 'green',
@@ -345,6 +386,47 @@ export const color = {
     Red: 'red lg-bold',
     Purple: 'purple lg-bold',
     Cheater: 'brown lg-bold',
+}
+
+export type LuoguColorClassName =
+    | 'purple'
+    | 'red'
+    | 'orange'
+    | 'green'
+    | 'bluelight'
+    | 'gray'
+    | 'brown'
+
+export type LuoguFgColorClassName =
+    | 'lg-fg-purple'
+    | 'lg-fg-red'
+    | 'lg-fg-orange'
+    | 'lg-fg-green'
+    | 'lg-fg-bluelight'
+    | 'lg-fg-gray'
+    | 'lg-fg-brown'
+
+export const luoguFgColorClassNameHex: Record<LuoguFgColorClassName, string> = {
+    'lg-fg-purple': '#8e44ad',
+    'lg-fg-red': '#e74c3c',
+    'lg-fg-orange': '#e67e22',
+    'lg-fg-green': '#5eb95e',
+    'lg-fg-bluelight': '#0e90d2',
+    'lg-fg-gray': '#bbb',
+    'lg-fg-brown': '#996600',
+}
+
+export const getColor = (e: Element) => {
+    const tmpstr = e.className.slice(e.className.indexOf('lg-fg-'))
+    if (tmpstr) return tmpstr.slice(0, tmpstr.indexOf(' '))
+    if (e.childNodes.length) return (e.childNodes[0] as Element).computedStyleMap().get('color')
+    return null
+}
+
+export const kthParentNode = (target: Element | null, k: number): Element | null => {
+    if (!target) return null
+    if (!k) return target
+    return kthParentNode(target.parentElement, k - 1)
 }
 
 export const xss = new FilterXSS({
@@ -357,6 +439,8 @@ export const xss = new FilterXSS({
 export function renderText(raw: string) {
     return marked(xss.process(raw))
 }
+
+export const getCurTime = (ratio = 1000) => Math.floor(Date.now() / ratio)
 
 export function loadChore(
     lastOperated: number,

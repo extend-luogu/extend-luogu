@@ -57,7 +57,7 @@ export interface ModuleRuntime {
     setWrapper?: (wrapper: ModuleWrapper) => void
     executeState?: Promise<ExecuteState> | undefined
     storage?: Storage
-    exports: object
+    exports?: Promise<object> | undefined
     interfaces: ModuleInterfaces
 }
 
@@ -102,10 +102,6 @@ export interface NpmSourceItem extends SourceItem {
 export type AllSourceItem = NpmSourceItem
 export type Registry = AllSourceItem[]
 
-const {
-    loadJs, loadCss, exlgLog, MatchError,
-} = utils
-
 let modulesStorage: Storage<ModulesReadonly>
 export const initModulesStorage = (storage: Storage<ModulesReadonly>) => modulesStorage = storage
 
@@ -133,10 +129,18 @@ export const installModule = (metadata: ModuleMetadata, script: string) => {
     const { modules } = unsafeWindow.exlg
     modules[module.id] = {
         ...module,
-        runtime: { interfaces: {}, exports: {} },
+        runtime: { interfaces: {} },
     }
     modules[module.id].runtime.executeState = executeModule(modules[module.id])
 }
+
+export const isBroken = (st: ExecuteState) => [
+    ExecuteState.MissDependency,
+    ExecuteState.NotExported,
+    ExecuteState.StorageBroken,
+    ExecuteState.Threw,
+    ExecuteState.UnwrapThrew,
+].includes(st)
 
 export const executeModule = async (module: Module): Promise<ExecuteState> => {
     if (!checkDependencies(module.metadata.dependencies)[0]) {
@@ -148,11 +152,12 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
             delete module.runtime.setWrapper
             res(r)
         }
-        loadJs(wrapModule(module))
+        utils.loadJs(wrapModule(module))
     })
+
     const {
         log, info, warn, error,
-    } = exlgLog(
+    } = utils.exlgLog(
         `module/${module.id}@${module.metadata.version}`,
     )
     let exports: ModuleExports | null = null
@@ -160,7 +165,7 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         const mod = exlg.modules[moduleId]
         if (!mod) return undefined
         const state = await mod.runtime.executeState
-        if (state === ExecuteState.Done) return mod.runtime.exports as T
+        if (state === ExecuteState.Done) return await mod.runtime.exports as T
     }
 
     try {
@@ -201,14 +206,14 @@ export const executeModule = async (module: Module): Promise<ExecuteState> => {
         await exports.entry?.()
     }
     catch (err) {
-        if (err instanceof MatchError) return ExecuteState.Mismatched
+        if (err instanceof utils.MatchError) return ExecuteState.Mismatched
         error('Failed to execute: %o', err)
         return ExecuteState.Threw
     }
     log('Executed.')
 
     if (exports.style) {
-        loadCss(exports.style)
+        utils.loadCss(exports.style)
         log('Style loaded.')
     }
 
