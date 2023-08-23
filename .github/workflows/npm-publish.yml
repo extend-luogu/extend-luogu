@@ -30,6 +30,29 @@ jobs:
         run: pnpm install
       - name: Build all workspaces
         run: pnpm -r build
+      - name: Get Version from package.json and Commit Message
+        id: get-version-commit
+        run: |
+          ver=$(node -e "console.log(require('./src/core/package.json').version)")
+          msg=$(git log -1 --pretty=format:'%B')
+          echo "VER=$ver" >> $GITHUB_ENV
+          echo "Version: $ver" > ./resources/update-log.txt
+          echo "Commit Message: $msg" >> ./resources/update-log.txt
+          echo "Version: ${{ env.VER }}"
+          cat ./resources/update-log.txt
+      - name: Build userscript
+        run: pnpm build
+      - name: Publish to OSS
+        uses: wxh06/dist2oss@v1
+        with:
+          version: ${{ env.VER }}
+          stable: ${{ !contains( env.VER, '-' ) }}
+          access-key-id: ${{ secrets.OSS_ID }}
+          access-key-secret: ${{ secrets.OSS_SECRET }}
+          bucket: exlg-celeste
+          region: oss-cn-shanghai
+          pattern: dist/extend-luogu.min.user.js
+
 
   publish-npm:
     needs: build
