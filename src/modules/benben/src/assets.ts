@@ -34,7 +34,7 @@ export interface BenbenSender {
     uid: number,
 }
 
-export const benben = (m: Benben) => `
+export const benben = (m: Benben, htmlContent: string) => `
 <li class="am-comment am-comment-primary feed-li" exlg="exlg">
     <div class="lg-left">
         <a href="/user/${m.user.uid}" class="center">
@@ -53,7 +53,7 @@ export const benben = (m: Benben) => `
         </header>
         <div class="am-comment-bd">
             <span class="feed-comment">
-                ${m.content}
+                ${htmlContent}
             </span>
         </div>
     </div>

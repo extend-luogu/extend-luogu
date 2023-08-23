@@ -25,14 +25,15 @@ window.loadFeed = async () => {
         if (window.feedMode !== 'all-exlg') return
         const e = JSON.parse(res.response)
         e.forEach((m: Benben) => {
-            m.content = utils.renderText(m.content)
-            $(benben(m))
+            const htmlContent = utils.renderText(m.content)
+            const replaced = m.content.replace(/@\[([^\]]+)\]\(\/user\/\d+\)/g, '@$1')
+            $(benben(m, htmlContent))
                 .appendTo($('ul#feed'))
                 .find('a[name=feed-reply]').on('click', () => {
                     window.scrollToId('feed-content')
                     setTimeout(
                         () => $('textarea')
-                            .trigger('focus').val(` || @${m.user.name} : ${sto.get('replyMarkdown') ? m.content : $(m.content).text()}`)
+                            .trigger('focus').val(` || @${m.user.name} : ${sto.get('replyMarkdown') ? replaced : $(htmlContent).text()}`)
                             .trigger('input'),
                         50,
                     )
