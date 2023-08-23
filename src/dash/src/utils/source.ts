@@ -8,6 +8,7 @@ export const npmSources = [
 ] as const
 
 export const registrySources = [
+    { url: 'https://celeste.dl.exlg.cc/latest/index.json', name: 'oss' },
     { url: 'https://raw.githubusercontent.com/extend-luogu/exlg-module-registry/dist/index.json', name: 'github raw' },
     { url: 'http://localhost:3819/index.json', name: 'local' }
 ] as const

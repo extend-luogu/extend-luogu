@@ -36,6 +36,7 @@
 // @connect        cdn.jsdelivr.net
 // @connect        fastly.jsdelivr.net
 // @connect        lda.piterator.com
+// @connect        celeste.dl.exlg.cc
 //
 // @grant          GM_addStyle
 // @grant          GM_addElement
