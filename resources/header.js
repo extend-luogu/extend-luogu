@@ -37,6 +37,7 @@
 // @connect        fastly.jsdelivr.net
 // @connect        lda.piterator.com
 // @connect        celeste.dl.exlg.cc
+// @connect        exlg-celeste.oss-cn-shanghai.aliyuncs.com
 //
 // @grant          GM_addStyle
 // @grant          GM_addElement
