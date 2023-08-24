@@ -3,7 +3,7 @@
     "display": "全网犇犇",
     "description": "在洛谷首页展示全网犇犇。",
     "author":  "optimize-2",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
@@ -23,6 +23,6 @@
         "@types/jquery": "^3.5.14"
     },
     "exlgDependencies": {
-        "core": "^1.4.0"
+        "core": "^1.6.1"
     }
 }

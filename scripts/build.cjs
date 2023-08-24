@@ -49,6 +49,8 @@ exports = async () => {
     const dashJs = await fs.readFile('./dist/dash.bundle.js', 'utf-8')
     const dashCss = await fs.readFile('./dist/dash.bundle.css', 'utf-8')
 
+    const updateLog = JSON.stringify(await fs.readFile('./resources/update-log.txt', 'utf-8'))
+
     const injectResource = (name, str) => `\n;unsafeWindow.exlgResources.${name} = ${JSON.stringify(str)};\n`
 
     // eslint-disable-next-line prefer-template
@@ -56,7 +58,7 @@ exports = async () => {
         + '\n;unsafeWindow.exlgResources = {};\n'
         + injectResource('dashJs', dashJs)
         + injectResource('dashCss', dashCss)
-        + `\n${coreJs}\n`
+        + `\n${coreJs.replace('"{{update-log}}"', updateLog)}\n`
         + `\n;GM_addStyle(${JSON.stringify(coreCss)});\n`
     await fs.writeFile('./dist/extend-luogu.min.user.js', concated)
 

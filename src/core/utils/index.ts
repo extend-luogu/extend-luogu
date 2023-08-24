@@ -20,6 +20,7 @@ interface LuoguDataType {
 interface LuoguUserType {
     uid: number
     name: string
+    color: string
 }
 
 interface FeInjectionType {
@@ -49,18 +50,16 @@ export {
 }
 
 const getLuoguPageData = () => {
-    let luoguData: LuoguDataType | undefined
-    let luoguUser: LuoguUserType | undefined
     if (window.location.host === 'www.luogu.com.cn' && !/blog/g.test(window.location.href)) {
         if (/(\?|&)_contentOnly($|=)/g.test(window.location.search)) error('Content-Only pages.')
         if (_feInjection.code !== 200) error('Luogu failed to load.')
-        luoguData = _feInjection.currentData
-        luoguUser = _feInjection.currentUser
     }
-    return [luoguData, luoguUser]
+    return _feInjection
 }
 
-export const [luoguData, luoguUser] = getLuoguPageData()
+export const luoguFeInjection = getLuoguPageData()
+export const luoguData = luoguFeInjection.currentData
+export const luoguUser = luoguFeInjection.currentUser
 
 unsafeWindow.$ ??= $
 
@@ -122,6 +121,8 @@ export const exlgLog = (subject: string): Logger => Object.fromEntries(
         ),
     ]),
 ) as Logger
+
+export const updateLog = '{{update-log}}'
 
 export type MaybeArray<T> = T | T[]
 
@@ -255,8 +256,15 @@ export const simpleAlert = (html: string, options: SimpleAlertOptions = {}) => {
     const $title = $root.querySelector('.title')!
     $title.innerHTML = options.title ?? 'exlg 提醒您'
 
-    const $accept = $root.querySelector('.accept') as HTMLButtonElement
-    const $cancel = $root.querySelector('.cancel') as HTMLButtonElement
+    const removeAllListener = (e: HTMLElement) => {
+        const clone = e.cloneNode(true)
+        if (!e.parentNode) return clone as HTMLButtonElement
+        e.parentNode.replaceChild(clone, e)
+        return clone as HTMLButtonElement
+    }
+
+    const $accept = removeAllListener($root.querySelector('.accept') as HTMLElement)
+    const $cancel = removeAllListener($root.querySelector('.cancel') as HTMLElement)
 
     $accept.style.display = options.noAccept ? 'none' : ''
     $cancel.style.display = options.noCancel ? 'none' : ''
@@ -369,7 +377,7 @@ export function toKeyCode(e: JQuery.KeyboardEventBase) {
     ].join('')
 }
 
-export type LuoguNameColor =
+export type LuoguColorType =
     | 'Gray'
     | 'Blue'
     | 'Green'
@@ -378,17 +386,7 @@ export type LuoguNameColor =
     | 'Purple'
     | 'Cheater'
 
-export const luoguNameColorClassName: Record<LuoguNameColor, string> = {
-    Gray: 'gray',
-    Blue: 'bluelight',
-    Green: 'green',
-    Orange: 'orange lg-bold',
-    Red: 'red lg-bold',
-    Purple: 'purple lg-bold',
-    Cheater: 'brown lg-bold',
-}
-
-export type LuoguColorClassName =
+export type LuoguColorClassNameType =
     | 'purple'
     | 'red'
     | 'orange'
@@ -397,24 +395,40 @@ export type LuoguColorClassName =
     | 'gray'
     | 'brown'
 
-export type LuoguFgColorClassName =
-    | 'lg-fg-purple'
-    | 'lg-fg-red'
-    | 'lg-fg-orange'
-    | 'lg-fg-green'
-    | 'lg-fg-bluelight'
-    | 'lg-fg-gray'
-    | 'lg-fg-brown'
-
-export const luoguFgColorClassNameHex: Record<LuoguFgColorClassName, string> = {
-    'lg-fg-purple': '#8e44ad',
-    'lg-fg-red': '#e74c3c',
-    'lg-fg-orange': '#e67e22',
-    'lg-fg-green': '#5eb95e',
-    'lg-fg-bluelight': '#0e90d2',
-    'lg-fg-gray': '#bbb',
-    'lg-fg-brown': '#996600',
+export const luoguColorClassName: Record<LuoguColorType, LuoguColorClassNameType> = {
+    Gray: 'gray',
+    Blue: 'bluelight',
+    Green: 'green',
+    Orange: 'orange',
+    Red: 'red',
+    Purple: 'purple',
+    Cheater: 'brown',
 }
+
+export const luoguColorBold: Record<LuoguColorType, boolean> = {
+    Gray: false,
+    Blue: false,
+    Green: false,
+    Orange: true,
+    Red: true,
+    Purple: true,
+    Cheater: true,
+}
+
+export const luoguColorClassNameHex: Record<LuoguColorClassNameType, string> = {
+    purple: '#8e44ad',
+    red: '#e74c3c',
+    orange: '#e67e22',
+    green: '#5eb95e',
+    bluelight: '#0e90d2',
+    gray: '#bbb',
+    brown: '#996600',
+}
+
+export const luoguColorToClassName = (c: LuoguColorType) => (luoguColorClassName[c] + (luoguColorBold[c] ? ' lg-bold' : ''))
+export const luoguColorToFgClassName = (c: LuoguColorType) => 'lg-fg-' + luoguColorToClassName(c)
+export const luoguColorToBgClassName = (c: LuoguColorType) => 'lg-bg-' + luoguColorToClassName(c)
+export const luoguColorToHex = (c: LuoguColorType) => luoguColorClassNameHex[luoguColorClassName[c]]
 
 export const getColor = (e: Element) => {
     const tmpstr = e.className.slice(e.className.indexOf('lg-fg-'))
@@ -438,6 +452,10 @@ export const xss = new FilterXSS({
 
 export function renderText(raw: string) {
     return marked(xss.process(raw))
+}
+
+export function processXSS(raw: string | undefined) {
+    return xss.process(raw ?? '')
 }
 
 export const getCurTime = (ratio = 1000) => Math.floor(Date.now() / ratio)

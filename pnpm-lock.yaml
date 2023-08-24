@@ -207,7 +207,7 @@ importers:
   src/modules/badge:
     dependencies:
       '@exlg/core':
-        specifier: ^1.4.0
+        specifier: ^1.6.1
         version: link:../../core
     devDependencies:
       '@exlg/cli-mod':

@@ -3,7 +3,7 @@
     "display": "赞助者标签",
     "description": "显示赞助者标签。",
     "author": "optimize-2",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
@@ -15,7 +15,7 @@
         "prepublishOnly": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "^1.4.0"
+        "@exlg/core": "^1.6.1"
     },
     "devDependencies": {
         "@exlg/cli-mod": "^1.5.0",
@@ -23,7 +23,7 @@
         "schemastery": "^3.4.3"
     },
     "exlgDependencies": {
-        "core": "^1.5.0",
+        "core": "^1.6.1",
         "token": "^1.1.0"
     }
 }

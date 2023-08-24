@@ -6,8 +6,12 @@ export interface BadgeType {
     fw: string
     bd: string
     fs: string
+    lg4?: boolean
+}
+
+export interface StorageType {
     ts: number
-    lg4: boolean
+    badge: BadgeType
 }
 
 export type LuoguVersion =
@@ -71,3 +75,59 @@ export const getColor = (e: Element): string => {
     if (e.childNodes.length) return (e.childNodes[0] as Element).computedStyleMap().get('color')?.toString() ?? ''
     return ''
 }
+
+export const defaultBadge: BadgeType = {
+    bg: 'mediumturquoise',
+    fg: '#fff',
+    ft: '',
+    fw: '700',
+    fs: '',
+    bd: '',
+    text: '',
+    lg4: false,
+}
+
+export const badgeRegisterHTML = `
+<span>
+    <span class="exlg-regbadge-fronttitle">激活码</span>
+    <input key="badgeActive" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">内容</span>
+    <input key="badgeText" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">字体</span>
+    <input key="badgeFt" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">字色</span>
+    <input key="badgeFg" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">字号</span>
+    <input key="badgeFs" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">字粗</span>
+    <input key="badgeFw" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">边框</span>
+    <input key="badgeBd" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+<span>
+    <span class="exlg-regbadge-fronttitle">背景</span>
+    <input key="badgeBg" class="exlg-input" type="text" style="padding: .1em;" />
+</span>
+<br />
+
+<span id="exlg-badge-preview"></span>
+`
