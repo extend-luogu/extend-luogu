@@ -2,7 +2,7 @@ export default Schema.object({
     cache: Schema.number()
         .default(3600)
         .description('缓存时间（秒）'),
-    badges: Schema.dict(
+    badge: Schema.dict(
         Schema.object({
             ts: Schema.number(),
             badge: Schema.object({
@@ -16,10 +16,4 @@ export default Schema.object({
             }),
         }),
     ),
-    test: Schema.dict(Schema.object({
-        ts: Schema.number(),
-        badge: Schema.object({
-            bg: Schema.string(),
-        }),
-    })),
 })

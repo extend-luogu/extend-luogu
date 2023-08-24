@@ -94,7 +94,7 @@ Promise.all(dependencies).then((exportArray) => {
     const loaded: Set<string> = new Set<string>()
     let badges: Record<string, StorageType> = {}
     const promises: Promise<void>[] = []
-    Object.assign(badges, sto.get('badges'))
+    Object.assign(badges, sto.get('badge'))
 
     utils.addHookAndCallback((insertedNodes) => {
         let hookedNodes: Node[] = []
@@ -131,7 +131,7 @@ Promise.all(dependencies).then((exportArray) => {
             promises.push(updateStorage(pending))
         }
         await Promise.all(promises)
-        sto.set('badges', badges)
+        sto.set('badge', badges)
         hookedNodes.forEach((n, i) => {
             const e = n as Element
             const $e = $(e)
@@ -201,12 +201,12 @@ Promise.all(dependencies).then((exportArray) => {
                 let content = ''
                 if (response.status === 200) {
                     content = '注册成功'
-                    Object.assign(badges, sto.get('badges'))
+                    Object.assign(badges, sto.get('badge'))
                     badges[utils.luoguUser.uid] = {
                         ts: utils.getCurTime(),
                         badge: response.json.data,
                     }
-                    sto.set('badges', badges)
+                    sto.set('badge', badges)
                 }
                 else if (response.status === 402) {
                     if (response.json.error === 'Invalid activation') content = '激活码错误'
