@@ -204,7 +204,7 @@ Promise.all(dependencies).then((exportArray) => {
                     Object.assign(badges, sto.get('badge'))
                     badges[utils.luoguUser.uid] = {
                         ts: utils.getCurTime(),
-                        badge: response.json.data,
+                        badge: response.json.data[utils.luoguUser?.uid],
                     }
                     sto.set('badge', badges)
                 }
