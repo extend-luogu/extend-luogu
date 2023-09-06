@@ -20,10 +20,10 @@ const oriLoadFeed = window.loadFeed
 window.loadFeed = async () => {
     if (window.feedMode === 'all-exlg') {
         const res = await utils.csGet(
-            'https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121',
+            'https://lglg.top/activity/api',
         )
         if (window.feedMode !== 'all-exlg') return
-        const e = JSON.parse(res.response)
+        const e = JSON.parse(res.response).data
         e.forEach((m: Benben) => {
             const htmlContent = utils.renderText(m.content)
             const replaced = m.content.replace(/@\[([^\]]+)\]\(\/user\/\d+\)/g, '@$1')

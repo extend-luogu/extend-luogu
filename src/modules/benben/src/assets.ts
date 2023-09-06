@@ -20,7 +20,7 @@ function check(lv: number) {
 
 export interface Benben {
     content: string,
-    time: number,
+    time: string,
     user: BenbenSender
 }
 
@@ -45,7 +45,7 @@ export const benben = (m: Benben, htmlContent: string) => `
                 <span class="feed-username">
                     <a class="${utils.luoguColorToFgClassName(m.user.color)}" href="/user/${m.user.uid}" target="_blank">${m.user.name}</a>${check(m.user.ccfLevel)}${m.user.badge ? `&nbsp;<span class="am-badge am-radius ${utils.luoguColorToBgClassName(m.user.color)}">${m.user.badge}</span>` : ''}
                 </span>
-                ${new Date(m.time * 1000).toLocaleString().replaceAll('/', '-')}
+                ${new Date(m.time).toLocaleString().replaceAll('/', '-')}
                 <a name="feed-reply">回复</a>
             </div>
         </header>
