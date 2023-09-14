@@ -79,7 +79,7 @@ const fetchProcess = (async () => {
 })()
 
 let lastHookedUrl = ''
-utils.addHookSelector('div.stat > div.field', (hookedNodes) => {
+utils.addHookSelector('div.stat > div.field', ({ hookedNodes }) => {
     if (window.location.href === lastHookedUrl) return
     if (!/CF|AT/.test(window.location.pathname)) return
     lastHookedUrl = window.location.href
