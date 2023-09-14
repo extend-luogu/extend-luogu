@@ -22,7 +22,7 @@ const autofill = async (e: JQuery.TriggeredEvent) => {
     ).responseText
     log(res)
     input.val(res)
-    input.trigger('input')
+    input[0].dispatchEvent(new UIEvent('input'))
 }
 
 utils.addHookAndCallback((insertedNodes) => {
