@@ -3,7 +3,7 @@
     "display": "RmJ 原始难度显示",
     "description": "显示 CF，AT 题目原始的难度，提供更准确的难度参考",
     "author": "5ab-juruo",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
