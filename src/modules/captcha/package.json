@@ -7,7 +7,7 @@
         "email": "wangxinhe06@gmail.com",
         "url": "https://wxh06.github.io/"
     },
-    "version": "1.0.1",
+    "version": "1.0.2",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
