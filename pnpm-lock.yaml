@@ -278,6 +278,16 @@ importers:
         specifier: ^3.5.14
         version: 3.5.14
 
+  src/modules/dropdown:
+    dependencies:
+      '@exlg/core':
+        specifier: ^1.6.3
+        version: link:../../core
+    devDependencies:
+      '@exlg/cli-mod':
+        specifier: ^1.5.0
+        version: link:../../../cli-mod
+
   src/modules/emoticon:
     dependencies:
       '@exlg/core':

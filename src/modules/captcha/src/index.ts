@@ -4,7 +4,6 @@ utils.mustMatch([/^\/discuss\/.*/, /^\/image/])
 
 const autofill = async (e: JQuery.TriggeredEvent) => {
     const img = $(e.target)
-    console.log(e.target)
     if (!img.length) return
 
     const canvas = document.createElement('canvas')
@@ -34,7 +33,7 @@ utils.addHookAndCallback((insertedNodes) => {
     })
     hookedNodes = Array.from(new Set(hookedNodes))
     return { hookedNodes }
-}, async ({ hookedNodes, info }) => {
+}, async ({ hookedNodes }) => {
     hookedNodes.forEach((e) => {
         const $img = $(e as HTMLImageElement)
         $img.trigger('click')

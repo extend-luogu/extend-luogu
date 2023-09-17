@@ -21,6 +21,12 @@ interface LuoguUserType {
     uid: number
     name: string
     color: string
+    followingCount: number
+    followerCount: number
+    unreadNoticeCount: number
+    unreadMessageCount: number
+    ccfLevel: number
+    ranking: number
 }
 
 interface FeInjectionType {
