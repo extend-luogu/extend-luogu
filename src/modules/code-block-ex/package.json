@@ -1,0 +1,26 @@
+{
+    "name": "@exlg/mod-code-block-ex",
+    "description": "代码块优化",
+    "author": "Cyanogenaq",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.5.0",
+        "schemastery": "^3.4.3"
+    },
+    "exlgDependencies": {
+        "core": "^1.7.0"
+    }
+}
