@@ -1,6 +1,5 @@
 .exlg-copy {
     position: relative;
-    display: inline-block;
     border: 1px solid #3498db;
     border-radius: 3px;
     background-color: rgba(52, 152, 219, 0);
@@ -16,7 +15,7 @@
     background: 0 0;
     font-size: 12px;
     padding: 0 5px;
-    margin-left: 1px;
+    float: right;
 }
 
 .exlg-copy.exlg-copy-right {

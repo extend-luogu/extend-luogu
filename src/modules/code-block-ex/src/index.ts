@@ -15,7 +15,6 @@ const langs: Record<string, string> = {
     javascript: 'JavaScript',
     php: 'PHP',
     latex: 'LaTeX',
-    undefined: 'undefined',
 }
 
 const func = (args: JQuery<Node>) => {
@@ -54,7 +53,6 @@ const func = (args: JQuery<Node>) => {
                     if ($btn.text() !== '复制') return // Note: Debounce
                     try {
                         utils.setClipboard($pre.text())
-                        // throw new TypeError("Test");
                     }
                     catch (err) {
                         $btn.text('复制失败').toggleClass('exlg-copied').toggleClass('exlg-copied-fail')
@@ -63,7 +61,7 @@ const func = (args: JQuery<Node>) => {
                         return
                     }
                     $btn.text('复制成功').toggleClass('exlg-copied')
-                    setTimeout(() => $btn.text('复制').toggleClass('exlg-copied'), 800)
+                    setTimeout(() => $btn.text('复制').toggleClass('exlg-copied').css('color', '#52c41a'), 800)
                 })
 
         const $code = $pre.children('code')
@@ -80,7 +78,6 @@ const func = (args: JQuery<Node>) => {
 
         const lang = getLang($code)
 
-        // const title_text = msto.code_block_title.replace("${lang}", (lang ? lang : "Text"))
         const title_text = lang ? sto.get('code_block_title').replace('{lang}', lang) : sto.get('code_block_title_nolang')
         const $title = isRecord ? $('.lfe-h3').text(title_text) : $(`<h3 class="exlg-code-title" style="/*width: 100%;*/">${title_text}</h3>`)
         if (sto.get('beautify_code_block')) $title.addClass('exlg-beautified-cbex')
