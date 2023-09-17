@@ -21,7 +21,7 @@ const langs: Record<string, string> = {
 const func = (args: JQuery<Node>) => {
     const getLang = ($code: JQuery<Node>): string => {
         let lang = 'undefined'
-        if (isRecord) return $($('.value.lfe-caption')[0]).text()
+        if (isRecord) return utils.processXSS($($('.value.lfe-caption')[0]).text())
 
         const tmp = $code.attr('data-rendered-lang')
 
