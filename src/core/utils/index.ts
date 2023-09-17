@@ -128,7 +128,7 @@ export type MaybeArray<T> = T | T[]
 
 export const wrapArray = <T>(value: MaybeArray<T>): T[] => (Array.isArray(value) ? value : [value])
 
-export class MatchError extends Error {}
+export class MatchError extends Error { }
 
 export const match = (
     patterns: MaybeArray<RegExp | string>,
@@ -491,5 +491,9 @@ export function loadChore(
             await callback()
         })()
     }
-    return (async () => {})()
+    return (async () => { })()
+}
+
+export function setClipboard(data: string, type: 'text/plain' = 'text/plain') {
+    GM_setClipboard(data, type)
 }
