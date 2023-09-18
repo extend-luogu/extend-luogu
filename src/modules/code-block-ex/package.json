@@ -3,7 +3,7 @@
     "display": "代码块优化",
     "description": "代码块优化",
     "author": "Cyanogenaq",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
