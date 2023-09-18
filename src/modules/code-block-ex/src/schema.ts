@@ -4,7 +4,7 @@ export default Schema.object({
             Schema.const('left' as const).description('左对齐'),
             Schema.const('right' as const).description('右对齐'),
         ])
-        .default('left')
+        .default('right')
         .description('复制按钮对齐方式'),
 
     beautify_code_block: Schema
