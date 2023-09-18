@@ -42,8 +42,8 @@ Promise.all(dependencies).then((exportArray) => {
         'font-weight': badge.fw || defaultBadge.fw,
         'font-size': badge.fs || defaultBadge.fs,
         border: badge.bd || defaultBadge.bd,
-    /* "background-size": "contain", */
-    /* "background-repeat": "no-repeat", */
+        /* "background-size": "contain", */
+        /* "background-repeat": "no-repeat", */
     }).text(badge.text)
 
     const getBadge = (
@@ -174,14 +174,14 @@ Promise.all(dependencies).then((exportArray) => {
         utils.simpleAlert(badgeRegisterHTML, {
             title: '注册 badge',
             onAccept: async ({ $content }) => {
-                const $active = $($content.querySelector('input[key=\'badgeActive\']') as HTMLElement)
-                const $text = $($content.querySelector('input[key=\'badgeText\']') as HTMLElement)
-                const $ft = $($content.querySelector('input[key=\'badgeFt\']') as HTMLElement)
-                const $fg = $($content.querySelector('input[key=\'badgeFg\']') as HTMLElement)
-                const $fs = $($content.querySelector('input[key=\'badgeFs\']') as HTMLElement)
-                const $fw = $($content.querySelector('input[key=\'badgeFw\']') as HTMLElement)
-                const $bd = $($content.querySelector('input[key=\'badgeBd\']') as HTMLElement)
-                const $bg = $($content.querySelector('input[key=\'badgeBg\']') as HTMLElement)
+                const $active = $($content).find('input[key=\'badgeActive\']')
+                const $text = $($content).find('input[key=\'badgeText\']')
+                const $ft = $($content).find('input[key=\'badgeFt\']')
+                const $fg = $($content).find('input[key=\'badgeFg\']')
+                const $fs = $($content).find('input[key=\'badgeFs\']')
+                const $fw = $($content).find('input[key=\'badgeFw\']')
+                const $bd = $($content).find('input[key=\'badgeBd\']')
+                const $bg = $($content).find('input[key=\'badgeBg\']')
                 const data = {
                     bg: $bg.val(),
                     fg: $fg.val(),
@@ -222,15 +222,15 @@ Promise.all(dependencies).then((exportArray) => {
                     utils.luoguUser?.color as LuoguColorType,
                 )
                 const myBadge = badges[utils.luoguUser?.uid ?? 0]?.badge
-                const $active = $($content.querySelector('input[key=\'badgeActive\']') as HTMLElement)
-                const $text = $($content.querySelector('input[key=\'badgeText\']') as HTMLElement)
-                const $ft = $($content.querySelector('input[key=\'badgeFt\']') as HTMLElement)
-                const $fg = $($content.querySelector('input[key=\'badgeFg\']') as HTMLElement)
-                const $fs = $($content.querySelector('input[key=\'badgeFs\']') as HTMLElement)
-                const $fw = $($content.querySelector('input[key=\'badgeFw\']') as HTMLElement)
-                const $bd = $($content.querySelector('input[key=\'badgeBd\']') as HTMLElement)
-                const $bg = $($content.querySelector('input[key=\'badgeBg\']') as HTMLElement)
-                const $preview = $($content.querySelector('#exlg-badge-preview') as HTMLElement)
+                const $active = $($content).find('input[key=\'badgeActive\']')
+                const $text = $($content).find('input[key=\'badgeText\']')
+                const $ft = $($content).find('input[key=\'badgeFt\']')
+                const $fg = $($content).find('input[key=\'badgeFg\']')
+                const $fs = $($content).find('input[key=\'badgeFs\']')
+                const $fw = $($content).find('input[key=\'badgeFw\']')
+                const $bd = $($content).find('input[key=\'badgeBd\']')
+                const $bg = $($content).find('input[key=\'badgeBg\']')
+                const $preview = $($content).find('#exlg-badge-preview')
                 const { $badge } = getBadge(
                     utils.luoguUser?.uid ?? 0,
                     userNameColor,
@@ -266,10 +266,9 @@ Promise.all(dependencies).then((exportArray) => {
                     $text.val(utils.processXSS($text.val()?.toString()))
                     setBadgeStyle(userNameColor, getBadgeStyle(), $badge)
                 })
-                $.extend($ft, $fg, $fs, $fw, $bd, $bg)
-                    .on('input', () => {
-                        setBadgeStyle(userNameColor, getBadgeStyle(), $badge)
-                    })
+
+                const tmp = [$ft, $fg, $fs, $fw, $bd, $bg]
+                tmp.forEach((e) => e.on('input', () => setBadgeStyle(userNameColor, getBadgeStyle(), $badge)))
             },
         })
     }
