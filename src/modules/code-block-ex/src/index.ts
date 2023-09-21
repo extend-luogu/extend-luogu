@@ -4,8 +4,6 @@ import type Scm from './schema'
 
 const sto = runtime.storage as SchemaToStorage<typeof Scm>
 
-const isRecord = utils.match(/\/record\/.*/)
-
 const langs: Record<string, string> = {
     c: 'C',
     cpp: 'C++',
@@ -17,8 +15,10 @@ const langs: Record<string, string> = {
     latex: 'LaTeX',
 }
 
-const func = (args: JQuery<Node>) => {
-    const getLang = ($code: JQuery<Node>): string => {
+const func = (args: JQuery<HTMLElement>) => {
+    const isRecord = utils.match(/\/record\/.*/)
+
+    const getLang = ($code: JQuery<HTMLElement>): string => {
         let lang = 'undefined'
         if (isRecord) return utils.processXSS($($('.value.lfe-caption')[0]).text())
 
@@ -47,7 +47,7 @@ const func = (args: JQuery<Node>) => {
         }
 
         const $btn = isRecord
-            ? ($pre.children('.copy-btn'))
+            ? ($pre.siblings('.copy-btn'))
             : $('<div class="exlg-copy">复制</div>')
                 .on('click', () => {
                     if ($btn.text() !== '复制') return // Note: Debounce
@@ -85,8 +85,10 @@ const func = (args: JQuery<Node>) => {
     })
 }
 
-utils.addHook((insertedNodes) => {
-    insertedNodes.forEach((e) => {
-        func($(e).find('pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])'))
+utils.addHookSelector('pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])', ({ hookedNodes }) => {
+    hookedNodes.forEach((node) => {
+        if (node.nodeType === node.ELEMENT_NODE) {
+            func($(node as HTMLElement))
+        }
     })
 })

@@ -24,7 +24,7 @@ export default Schema.object({
 
     copy_code_font: Schema
         .string()
-        .default('"Fira Code", "Fira Mono", "Consolas"')
+        .default("'Fira Code', 'Fira Mono', 'Consolas'")
         .description('代码块字体'),
 
     cb_background_color: Schema
