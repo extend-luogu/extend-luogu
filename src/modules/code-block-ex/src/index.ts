@@ -85,8 +85,10 @@ const func = (args: JQuery<HTMLElement>) => {
     })
 }
 
-utils.addHook((insertedNodes) => {
-    insertedNodes.forEach((e) => {
-        func($(e).find('pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])'))
+utils.addHookSelector('pre:has(> code:not(.cm-s-default)):not([exlg-copy-code-block])', (hookedNodes) => {
+    hookedNodes.hookedNodes.forEach((node) => {
+        if (node.nodeType === node.ELEMENT_NODE) {
+            func($(node as HTMLElement))
+        }
     })
 })
