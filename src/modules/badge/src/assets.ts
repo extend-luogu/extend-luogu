@@ -37,6 +37,12 @@ export interface BadgeInjectTargetType {
     type: BadgeInjectTargetInterfaceType,
 }
 
+export const targetLuogu3: BadgeInjectTargetType = { // 默认(谷三代前端)
+    pathTest: () => true,
+    domSelector: "a[target='_blank'][href^='/user/']",
+    type: { displayType: 'luogu3', elementType: 'luogu3', anceLevel: 0 },
+}
+
 export const allTargets: Array<BadgeInjectTargetType> = [
     { // 题解
         pathTest: ({ pathname }) => /^\/problem\/solution.*$/.test(pathname),
@@ -58,11 +64,7 @@ export const allTargets: Array<BadgeInjectTargetType> = [
         domSelector: ".follow-container a[target='_blank']",
         type: { displayType: 'luogu4', elementType: 'user-follow', anceLevel: 1 },
     },
-    { // 默认(谷三代前端)
-        pathTest: () => true,
-        domSelector: "a[target='_blank'][href^='/user/']",
-        type: { displayType: 'luogu3', elementType: 'luogu3', anceLevel: 0 },
-    },
+    targetLuogu3,
 ]
 
 export const ccfLevelTagFilter = (tar: Element) => !(tar.querySelectorAll('svg').length)

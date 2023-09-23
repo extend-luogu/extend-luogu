@@ -326,38 +326,57 @@ export const hookModElement = async (
     cloakStyle!.remove()
 }
 
-interface hookResultType {
+interface HookResultType {
     hookedNodes: NodeListLike
     info?: object | null
+    record?: MutationRecord
 }
 
 type NodeListLike = Node[] | NodeList
-type hookType = (insertedNodes: NodeListLike) => hookResultType
-type callbackType = (hookResult: hookResultType) => void
-type hookCallbackType = (insertedNodes: NodeListLike) => void
+export type HookType = (insertedNodes: NodeListLike, record?: MutationRecord) => HookResultType
+export type CallbackType = (hookResult: HookResultType) => void
+export type HookCallbackType = (insertedNodes: NodeListLike, record?: MutationRecord) => void
 
-const hookList: hookCallbackType[] = []
+export interface HookAndConfig {
+    hook: HookCallbackType
+    config: Array<MutationRecordType>
+}
+
+type LfeLoaderCallbackType = () => void
+
+const hookList: HookAndConfig[] = []
 const hooker = new MutationObserver((records) => {
-    const tmpNodeList: NodeListLike = []
     records.forEach((record) => {
-        record.addedNodes.forEach((addedNode) => tmpNodeList.push(addedNode))
+        const nodes = record.type === 'attributes' ? [record.target] : record.addedNodes
+        if (record.type) {
+            hookList.forEach(
+                ({ hook, config }) => config.includes(record.type) && hook(nodes, record),
+            )
+        }
     })
-    hookList.forEach((hook) => hook(tmpNodeList))
 })
 
-export function addHook(hook: hookCallbackType) {
-    hookList.push(hook)
+export function addHook(hook: HookCallbackType, config: Array<MutationRecordType>) {
+    hookList.push({ hook, config })
     hook([document])
 }
 
-export function addHookAndCallback(hook: hookType, callback: callbackType) {
-    addHook((insertedNodes) => {
-        const hookResult = hook(insertedNodes)
+export function addHookAndCallback(
+    hook: HookType,
+    callback: CallbackType,
+    config?: Array<MutationRecordType>,
+) {
+    addHook((insertedNodes, type) => {
+        const hookResult = hook(insertedNodes, type)
         if (hookResult.hookedNodes?.length) callback(hookResult)
-    })
+    }, config ?? ['characterData', 'childList'])
 }
 
-export function addHookSelector(selector: string, callback: callbackType) {
+export function addHookSelector(
+    selector: string,
+    callback: CallbackType,
+    config?: Array<MutationRecordType>,
+) {
     addHookAndCallback((insertedNodes) => {
         const hookedNodes: NodeListLike = []
         insertedNodes.forEach((node) => {
@@ -365,10 +384,27 @@ export function addHookSelector(selector: string, callback: callbackType) {
             hookedNodes.push(...$(node).find(selector).get())
         })
         return { hookedNodes }
-    }, callback)
+    }, callback, config ?? ['characterData', 'childList'])
 }
 
-hooker.observe(document.body, { childList: true, subtree: true })
+hooker.observe(document.body, { childList: true, subtree: true, attributes: true })
+
+const lfeHookList: LfeLoaderCallbackType[] = []
+
+const logger = unsafeWindow.console.debug
+unsafeWindow.console.debug = function debugHandler(...args: unknown[]) {
+    if (args.length && typeof (args[0]) === 'string') {
+        const info = args[0] as string
+        if (info.startsWith('[@lfe/loader]')) {
+            lfeHookList.forEach((e) => e())
+        }
+    }
+    logger.apply(console, args)
+}
+
+export function addHookLfeLoader(callback: LfeLoaderCallbackType) {
+    lfeHookList.push(callback)
+}
 
 export function toInitialCase(s: string) {
     return s[0].toUpperCase() + s.slice(1)

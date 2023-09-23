@@ -1,7 +1,7 @@
 import '@exlg/core/types/module-entry'
 import type { SchemaToStorage } from '@exlg/core/types'
 import type { TokenExportType } from '@exlg/mod-token'
-import { LuoguColorType } from '@exlg/core/utils'
+import { LuoguColorType, HookType, CallbackType } from '@exlg/core/utils'
 import type Scm from './schema'
 import {
     BadgeInjectTargetInterfaceType,
@@ -12,6 +12,7 @@ import {
     ccfLevelTagFilter,
     defaultBadge,
     getColor,
+    targetLuogu3,
 } from './assets'
 
 const dependencies = [inject('token')]
@@ -96,16 +97,32 @@ Promise.all(dependencies).then((exportArray) => {
     const promises: Promise<void>[] = []
     Object.assign(badges, sto.get('badge'))
 
-    utils.addHookAndCallback((insertedNodes) => {
+    const hook: HookType = (insertedNodes, record) => {
         let hookedNodes: Node[] = []
         let info: Array<BadgeInjectTargetInterfaceType> = []
+        if (record?.type === 'attributes') {
+            const e = insertedNodes[0] as Element
+            if (insertedNodes.length === 1 && record.attributeName === 'href' && e.getAttribute('href')?.startsWith('/user/')) {
+                if (e.classList.contains('exlg-badge-username')) {
+                    e.classList.remove('exlg-badge-username')
+                    const nxt = e.nextElementSibling
+                    if (nxt?.matches && nxt?.matches('.exlg-badge')) nxt.remove()
+                }
+                if (e.matches && e.matches(targetLuogu3.domSelector)) {
+                    return { hookedNodes: insertedNodes, info: [targetLuogu3] }
+                }
+            }
+            return { hookedNodes: [] }
+        }
         insertedNodes.forEach((e) => {
             allTargets.forEach(({ pathTest, domSelector, type }) => {
                 if (pathTest(window.location)) {
-                    if (((e as Element).querySelectorAll)) {
+                    const eae = e as Element
+                    if ((eae.querySelectorAll)) {
                         const domList = Array.from(
-                            (e as Element).querySelectorAll(domSelector),
+                            eae.querySelectorAll(domSelector),
                         ).filter(ccfLevelTagFilter)
+                        if (eae.matches && eae.matches(domSelector)) domList.push(eae)
                         if (domList.length !== 0) {
                             hookedNodes = hookedNodes.concat(domList)
                             info = info.concat(Array(domList.length).fill(type))
@@ -115,10 +132,11 @@ Promise.all(dependencies).then((exportArray) => {
             })
         })
         return { hookedNodes, info }
-    }, async ({ hookedNodes, info }) => {
+    }
+
+    const callback: CallbackType = async ({ hookedNodes, info }) => {
         const typeList = (info as Array<BadgeInjectTargetInterfaceType>)
         if (!typeList) return
-
         Array.from(hookedNodes).forEach((e) => {
             const uid = (e as Element).attributes.getNamedItem('href')?.value.slice('/user/'.length)
             if (!uid) return
@@ -159,18 +177,16 @@ Promise.all(dependencies).then((exportArray) => {
                 $(tar.parentNode as Element).append(badgeDom.$badge)
             }
             else {
-                const _nbsp = document.createElement('span')
-                _nbsp.innerHTML = '&nbsp;'
                 tmp = utils.kthParentNode(tar, typeList[i].anceLevel)
                 if (!tmp) return
                 $(tmp).after(badgeDom.$badge)
-                if (typeList[i].anceLevel === 0) tmp.after(_nbsp)
             }
         })
-    })
+    }
+
+    utils.addHookAndCallback(hook, callback, ['characterData', 'childList', 'attributes'])
 
     const register_badge = () => {
-        log(token ?? '')
         utils.simpleAlert(badgeRegisterHTML, {
             title: '注册 badge',
             onAccept: async ({ $content }) => {
