@@ -57,15 +57,17 @@ function startSelecting() {
 
 <style scoped>
 .module-version-select {
-    color: var(--accent-color);
+    color: var(--primary-color);
+    font-size: .9em;
 }
 .module-version-select > span:first-child {
     position: relative;
 }
 .module-version-select > .exlg-select {
     margin-left: -4px;
+    background-color: transparent;
     border: none;
-    color: var(--accent-color) !important;
+    color: var(--primary-color) !important;
 }
 .module-version {
     cursor: pointer;

@@ -105,55 +105,70 @@ function uninstallModule(id: string) {
         'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
-#exlg-dash * {
+/* #exlg-dash * {
     font-size: inherit;
     font-family: inherit;
-}
+} */
 </style>
 
 <style scoped>
 .exlg-root {
-    position: fixed;
-    z-index: 70000;
-    right: 0;
-    top: 100px;
     box-sizing: border-box;
+    position: fixed;
+    top: 130px;
+    right: 0;
+    z-index: 70000;
+    border: 1px solid var(--inactive-color);
+    border-right: none;
     width: 30%;
     min-width: 350px;
     height: calc(100% - 200px);
+    background: var(--bg-color);
     padding: 20px;
-    background: white;
-    box-shadow: 0 0 1px 1px black;
+    transition: border-color 0.3s;
+}
+
+.exlg-root:hover {
+    border-color: var(--secondary-color);
 }
 
 .exlg-button {
     position: fixed;
+    top: 82px;
+    right: -32px;
     z-index: 70000;
-    right: 20px;
-    top: 60px;
-    transition: color 0.5s, border-color 0.5s;
+    padding: 5px 42px 6px 12px;
+    --transition: right ease-in-out 0.3s;
 }
 
 .exlg-button:hover {
-    border-color: var(--accent-color);
-    color: var(--accent-color);
+    right: -2px;
 }
 
 .tabs {
-    border-bottom: 1px solid;
-    padding: 0px 5px;
     margin-bottom: 15px;
 }
 
 .tab-head {
     display: inline-block;
-    padding: 0 5px;
-    margin: 0 3px;
+    border-bottom: 1px solid var(--secondary-color);
+    background-color: var(--bg-color);
+    cursor: pointer;
+    padding: 2px 12px 0;
+    color: var(--secondary-color);
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.tab-head:hover {
+    background-color: var(--secondary-color);
+    color: var(--bg-color);
 }
 
 .tab-head.active {
-    border-width: 1px 1px 0px 1px;
-    border-style: solid;
+    border-bottom-color: var(--primary-color);
+    background-color: var(--primary-color);
+    cursor: default;
+    color: var(--bg-color);
 }
 
 .tab-note {
@@ -162,6 +177,6 @@ function uninstallModule(id: string) {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--accent-color);
+    background-color: var(--primary-color);
 }
 </style>

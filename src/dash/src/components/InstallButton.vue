@@ -4,6 +4,9 @@ import { storeToRefs } from 'pinia'
 import { useModules } from '@/stores/module'
 import type { AllSourceItem, ModuleMetadata } from '@core/types'
 import { marketStorage } from '@/utils/source'
+import { Icon } from '@iconify/vue'
+import biCloudDownload from '@iconify-icons/bi/cloud-download'
+import biXLg from '@iconify-icons/bi/x-lg'
 
 const props = defineProps<{
     sourceItem: AllSourceItem
@@ -72,7 +75,7 @@ const depCheckResult = computed(() => checkDependencies(props.sourceItem.selecte
 <template>
     <span
         v-if="depCheckResult[0]"
-        class="emoji-button module-install"
+        class="icon-button module-install"
         title="安装"
         :style="{
             visibility:
@@ -82,11 +85,19 @@ const depCheckResult = computed(() => checkDependencies(props.sourceItem.selecte
         }"
         @click="install(sourceItem)"
     >
-        ⬇️
+        <Icon
+            :icon="biCloudDownload"
+            style="position: relative; top: 2.25px;"
+        />
     </span>
     <span
         v-else
-        class="exlg-tooltip nowrap left"
-        :data-exlg-tooltip="`缺失依赖：${depCheckResult[1].join(', ')}`"
-    >❌</span>
+        class="exlg-tooltip"
+        :data-exlg-tooltip="`缺少依赖项：${depCheckResult[1].join(', ')}`"
+    >
+        <Icon
+            :icon="biXLg"
+            style="position: relative; top: 2.25px; color: rgb(225 29 72);"
+        />
+    </span>
 </template>

@@ -8,12 +8,16 @@
         "lint:fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
     },
     "dependencies": {
+        "@iconify-icons/bi": "^1.2.17",
         "@vue/compiler-core": "^3.3.4",
+        "bootstrap-icons": "^1.10.5",
         "compare-versions": "^4.1.3",
         "pinia": "^2.0.16",
         "vue": "^3.3.4"
     },
     "devDependencies": {
+        "@iconify/types": "^2.0.0",
+        "@iconify/vue": "^4.1.1",
         "@rushstack/eslint-patch": "^1.1.4",
         "@vue/eslint-config-typescript": "^11.0.0",
         "eslint": "^8.20.0",

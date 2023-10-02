@@ -15,7 +15,7 @@
 
 .module-version,
 .module-install:hover,
-.exlg-button:hover,
+/* .exlg-button:hover, */
 .debug-button.debug {
     color: var(--accent-color) !important;
 }

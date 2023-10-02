@@ -6,10 +6,14 @@ import type { AllSourceItem, Registry } from '@core/types'
 import { useModules } from '@/stores/module'
 import { useWindows } from '@/stores/window'
 import { marketStorage } from '@/utils/source'
-import TextCheckbox from '@comp/utils/TextCheckbox.vue'
 import VersionSelect from '@comp/VersionSelect.vue'
-import ModuleInstallStateMessage, { type ModuleInstallState } from '@comp/ModuleInstallStateMessage.vue'
 import InstallButton from '../InstallButton.vue'
+import ModuleInstallStateIcon, { type ModuleInstallState } from '../ModuleInstallStateIcon.vue'
+import { Icon } from '@iconify/vue'
+import biCapslock from '@iconify-icons/bi/capslock'
+import biCheck2Circle from '@iconify-icons/bi/check2-circle'
+import biHourglassSplit from '@iconify-icons/bi/hourglass-split'
+import biExclamationTriangle from '@iconify-icons/bi/exclamation-triangle'
 
 const emit = defineEmits<{
     (e: 'installModule'): void
@@ -52,25 +56,30 @@ const getInstallState = (item: AllSourceItem): ModuleInstallState => {
         const current = modulesStorage.get(item.id).metadata.version
         if (compareVersions(current, item.versions.at(-1)!.version) < 0)
             return {
-                class: 'update exlg-tooltip',
-                tooltip: `当前版本 ${current}`,
-                text: '有更新'
+                text: `有新版本：当前版本 ${current}`,
+                icon: biCapslock
             }
-        return { text: '已安装' }
+        return {
+            text: '已安装',
+            icon: biCheck2Circle
+        }
     }
     case InstallStates.installing:
-        return { text: '安装中' }
+        return {
+            text: '正在安装',
+            icon: biHourglassSplit
+        }
     case InstallStates.installFailed:
         return {
-            class: 'error',
-            text: '出错了'
+            text: '发生错误',
+            icon: biExclamationTriangle
         }
     case InstallStates.uninstalled:
         return {}
     }
 }
 
-const showId = ref(false)
+// const showId = ref(false)
 
 loadSource()
 </script>
@@ -91,13 +100,6 @@ loadSource()
         >
             🔄
         </span>
-        <TextCheckbox
-            v-model="showId"
-            text="🆔"
-            title="显示 ID"
-        />
-
-        <hr class="exlg-hr">
 
         <ul
             v-if="source"
@@ -108,26 +110,37 @@ loadSource()
                 :key="item.id"
                 class="module-entry"
             >
-                <span>
-                    {{ showId ? item.name : item.display ?? item.name }}
-                    <VersionSelect
-                        v-model="item.selectedVersion"
-                        :source="item"
-                    />
+                <span class="module-icon">
+                    <ModuleInstallStateIcon :state="getInstallState(item)" />
                 </span>
-                <div style="white-space: nowrap">
-                    <ModuleInstallStateMessage :state="getInstallState(item)" />
-                    <span
-                        class="module-description exlg-tooltip"
-                        :data-exlg-tooltip="item.description"
-                    >
-                        📙
-                    </span>
-                    <InstallButton
-                        :source-item="item"
-                        @install-module="emit('installModule')"
-                    />
-                </div>
+                <span class="module-card">
+                    <div>
+                        <div class="module-info-primary">
+                            {{ item.display ?? "未命名模块" }}
+                            <VersionSelect
+                                v-model="item.selectedVersion"
+                                :source="item"
+                            />
+                        </div>
+                        <div class="module-info-secondary">
+                            <span class="module-id">
+                                {{ item.name }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="module-options">
+                        <span
+                            class="module-description exlg-tooltip"
+                            :data-exlg-tooltip="item.description"
+                        >
+                            📙
+                        </span>
+                        <InstallButton
+                            :source-item="item"
+                            @install-module="emit('installModule')"
+                        />
+                    </div>
+                </span>
             </li>
         </ul>
         <p v-else>
@@ -141,23 +154,7 @@ loadSource()
     transition: color 0.5s;
 }
 .module-install:hover {
-    color: var(--accent-color);
-}
-
-.module-install-state {
-    color: gray;
-}
-.module-install-state > :deep(.update) {
-    color: var(--accent-color);
-}
-.module-install-state > :deep(.update::after) {
-    color: black;
-    right: calc(100% + 3px);
-    width: max-content;
-}
-
-.module-install-state > :deep(.error) {
-    color: var(--accent-color);
+    color: var(--primary-color);
 }
 
 .module-description {

@@ -1,15 +1,36 @@
 :root {
-    --accent-color: blueviolet;
+    --theme-color: blueviolet;
+    --accent-color: var(--theme-color);
+    --primary-color: mediumslateblue;
+    --secondary-color: dodgerblue;
+    --inactive-color: lightslategray;
+    --bg-color: white;
+    --bg-attracting-color: aliceblue;
+    --bg-active-color: lavender;
+    --bg-inactive-color: whitesmoke;
+    --font-monospace:
+        SFMono-Regular, Menlo, Monaco,
+        Consolas, "Liberation Mono",
+        "Courier New", monospace;
 }
 
 .exlg-button {
-    border-radius: 0;
-    border: 1px solid black;
+    box-sizing: border-box;
     outline: none;
-    background: white;
-    padding: 3px 15px 5px 15px;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--bg-attracting-color);
     line-height: 1.15;
+    color: var(--secondary-color);
+    --transition-color: border-color 0.3s, background-color 0.3s, color 0.3s;
+    transition: var(--transition-color), var(--transition);
 }
+
+.exlg-button:hover {
+    border-color: var(--primary-color);
+    background-color: var(--bg-active-color);
+    color: var(--primary-color);
+}
+
 .exlg-button:disabled {
     color: gray;
     text-decoration: line-through;
@@ -49,28 +70,77 @@
     margin: 2px 3px !important;
 }
 
+.exlg-switch {
+    display: inline-block;
+    position: relative;
+    width: 2em;
+    height: 1em;
+    appearance: none;
+    background-color: transparent;
+}
+
+.exlg-switch::before {
+    content: "";
+    position: absolute;
+    top: calc(50% - .75px);
+    width: 100%;
+    height: 1.5px;
+    background-color: var(--inactive-color);
+    transition: background-color .15s;
+}
+
+.exlg-switch:checked::before {
+    background-color: var(--secondary-color);
+}
+
+.exlg-switch::after {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1.5px solid var(--inactive-color);
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: var(--bg-color);
+    transition: left ease-in-out .15s, border-color .15s, background-color .15s;
+}
+
+.exlg-switch:hover::after {
+    background-color: var(--inactive-color);
+}
+
+.exlg-switch:checked::after {
+    left: 50%;
+    border-color: var(--primary-color);
+}
+
+.exlg-switch:checked:hover::after {
+    background-color: var(--primary-color);
+}
+
+.exlg-switch:focus {
+    outline: none !important;
+}
+
 .exlg-tooltip {
     position: relative;
+    font-size: .9em;
     cursor: help;
 }
 .exlg-tooltip:hover::after {
     content: attr(data-exlg-tooltip);
+    box-sizing: border-box;
     position: absolute;
+    top: -2px;
+    right: calc(100% + 6px);
     z-index: 70001;
-    border: 1px solid black;
-    background: white;
+    border: 1px solid var(--inactive-color);
+    background-color: var(--bg-color);
+    color: var(--inactive-color);
     white-space: normal;
     line-height: 1.3em;
-    padding-bottom: 0.15em;
-    padding-left: 0.3em;
-    padding-right: 0.3em;
-}
-
-.exlg-tooltip.left:hover::after {
-    right: 100%;
-}
-
-.exlg-tooltip.nowrap:hover::after {
+    padding: 3px 5px;
     white-space: nowrap;
 }
 

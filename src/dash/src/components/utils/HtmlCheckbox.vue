@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 const props = defineProps<{
-    text: string
     modelValue: boolean
 }>()
 
@@ -16,19 +15,32 @@ const value = ref(props.modelValue)
 <template>
     <span
         :class="{ active: value }"
-        class="exlg-text-checkbox"
+        class="exlg-html-checkbox"
         @click="emits('update:modelValue', (value = !value))"
     >
-        {{ text }}
+        <span v-if="value">
+            <slot name="active" />
+        </span>
+        <span v-else>
+            <slot name="inactive" />
+        </span>
+        <slot />
     </span>
 </template>
 
 <style scoped>
-.exlg-text-checkbox {
+.exlg-html-checkbox {
+    user-select: none;
     cursor: pointer;
+    color: var(--inactive-color);
+    transition: color 0.3s;
 }
 
-.active {
+.exlg-html-checkbox:hover {
+    color: var(--secondary-color);
+}
+
+.exlg-html-checkbox.active {
     color: var(--primary-color);
 }
 </style>
