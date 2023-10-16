@@ -210,7 +210,7 @@ Promise.all(dependencies).then((exportArray) => {
 
                 const response = await utils.csPost('https://exlg.piterator.com/badge/set', {
                     uid: utils.luoguUser?.uid,
-                    activation: $active.text(),
+                    activation: $active.val(),
                     data,
                     token,
                 })
