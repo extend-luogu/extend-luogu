@@ -3,7 +3,7 @@
     "display": "赞助者标签",
     "description": "显示赞助者标签。",
     "author": "optimize-2",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
