@@ -80,7 +80,7 @@ const func = (args: JQuery<HTMLElement>) => {
 
         const title_text = lang ? sto.get('code_block_title').replace('{lang}', lang) : sto.get('code_block_title_nolang')
         const $title = isRecord ? $('.lfe-h3').text(title_text) : $(`<h3 class="exlg-code-title" style="/*width: 100%;*/">${title_text}</h3>`)
-        if (sto.get('beautify_code_block')) $title.addClass('exlg-beautified-cbex')
+        if (sto.get('beautify_code_block') && !isRecord) $title.addClass('exlg-beautified-cbex')
         if (!isRecord) $pre.before($title.append($btn))
     })
 }
