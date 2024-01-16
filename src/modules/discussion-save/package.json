@@ -3,7 +3,7 @@
     "display": "讨论保存",
     "description": "洛谷帖子保存站集成",
     "author": "qinyuzhen & minstdfx",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
