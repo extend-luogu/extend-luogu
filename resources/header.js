@@ -9,6 +9,7 @@
 // @version        {{version}}
 //
 // @match          https://*.luogu.com.cn/*
+// @match          https://*.luogu.com/*
 // @match          https://*.luogu.org/*
 // @match          https://www.bilibili.com/robots.txt?*
 // @match          https://service-ig5px5gh-1305163805.sh.apigw.tencentcs.com/release/APIGWHtmlDemo-1615602121
