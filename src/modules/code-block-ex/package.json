@@ -3,7 +3,7 @@
     "display": "代码块优化",
     "description": "代码块优化",
     "author": "Cyanogenaq & minstdfx",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
