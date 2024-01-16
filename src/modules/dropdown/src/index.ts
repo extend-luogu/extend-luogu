@@ -1,6 +1,6 @@
 import '@exlg/core/types/module-entry'
 
-utils.addHookSelector('nav.user-nav' /* "nav.user-nav, div.user-nav > nav, .nav-container" */, ({ hookedNodes }) => {
+utils.addHookSelector('.user-nav' /* "nav.user-nav, div.user-nav > nav, .nav-container" */, ({ hookedNodes }) => {
     const user = utils.luoguUser
     $(hookedNodes[0]).find('.dropdown > .center').children('.header')
         .after(`
