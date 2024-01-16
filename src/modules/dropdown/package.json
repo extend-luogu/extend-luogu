@@ -3,7 +3,7 @@
     "display": "用户信息卡美化",
     "description": "用户信息卡美化",
     "author": "optimize-2 & minstdfx",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "main": "src/index.ts",
     "keywords": [
         "exlg",
