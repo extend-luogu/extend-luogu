@@ -1,7 +1,7 @@
 {
     "name": "@exlg/theme-dark",
     "description": "暗色模式",
-	"display": "暗色模式",
+    "display": "暗色模式",
     "author": "ForkKILLET",
     "version": "1.0.1",
     "keywords": [
@@ -14,6 +14,6 @@
         "prepublishOnly": "exlg-mod clean && exlg-mod build"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "workspace:^1.5.0"
+        "@exlg/cli-mod": "workspace:^"
     }
 }

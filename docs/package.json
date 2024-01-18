@@ -1,27 +1,27 @@
 {
-    "name": "exlg-docs-workspace",
-    "version": "0.0.0",
-    "description": "Docs of Extend Luogu",
-    "scripts": {
-        "dev": "vuepress dev",
-        "build": "vuepress build",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "CC-BY-SA-4.0",
-    "private": true,
-    "dependencies": {
-        "@vuepress/client": "next",
-        "@vuepress/plugin-search": "next",
-        "@vuepress/theme-default": "next",
-        "esbuild": "^0.14.49",
-        "eslint": "^8.20.0",
-        "eslint-plugin-jsdoc": "^39.3.3",
-        "lint-staged": "^12.5.0",
-        "marked": "^4.0.18",
-        "vue": "^3.3.4",
-        "vuepress": "next",
-        "xss": "^1.0.13"
-    }
+  "name": "@exlg/docs",
+  "version": "0.0.0",
+  "description": "Docs of Extend Luogu",
+  "scripts": {
+    "dev": "vuepress dev",
+    "build": "vuepress build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "CC-BY-SA-4.0",
+  "private": true,
+  "dependencies": {
+    "@vuepress/client": "2.0.0-rc.0",
+    "@vuepress/plugin-search": "2.0.0-rc.0",
+    "@vuepress/theme-default": "next",
+    "esbuild": "^0.14.54",
+    "eslint": "^8.56.0",
+    "eslint-plugin-jsdoc": "^39.9.1",
+    "lint-staged": "^12.5.0",
+    "marked": "^4.3.0",
+    "vue": "^3.4.14",
+    "vuepress": "2.0.0-rc.0",
+    "xss": "^1.0.14"
+  }
 }

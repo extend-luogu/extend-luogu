@@ -2,7 +2,7 @@
     "name": "@exlg/mod-benben",
     "display": "全网犇犇",
     "description": "在洛谷首页展示全网犇犇。",
-    "author":  "optimize-2",
+    "author": "optimize-2",
     "version": "1.0.5",
     "main": "src/index.ts",
     "keywords": [
@@ -15,12 +15,12 @@
         "prepublish": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "workspace:^1.4.0",
-        "schemastery": "^3.4.3"
+        "@exlg/core": "workspace:^",
+        "schemastery": "^3.14.3"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "workspace:^1.5.0",
-        "@types/jquery": "^3.5.14"
+        "@exlg/cli-mod": "workspace:^",
+        "@types/jquery": "^3.5.29"
     },
     "exlgDependencies": {
         "core": "^1.6.1"

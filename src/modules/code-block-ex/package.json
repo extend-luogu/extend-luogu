@@ -18,8 +18,8 @@
         "@exlg/core": "workspace:^"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.5.0",
-        "schemastery": "^3.4.3"
+        "@exlg/cli-mod": "workspace:^",
+        "schemastery": "^3.14.3"
     },
     "exlgDependencies": {
         "core": "^1.7.0"

@@ -15,10 +15,10 @@
         "prepublish": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "workspace:^1.3.1",
-        "@types/jquery": "^3.5.14"
+        "@exlg/core": "workspace:^",
+        "@types/jquery": "^3.5.29"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "workspace:^1.5.0"
+        "@exlg/cli-mod": "workspace:^"
     }
 }

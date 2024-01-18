@@ -21,23 +21,23 @@
         "lint:all:fix": "pnpm lint --fix && pnpm -F @exlg/dash lint --fix"
     },
     "devDependencies": {
-        "@commitlint/cli": "^17.6.7",
-        "@commitlint/config-conventional": "^17.6.7",
-        "@types/jquery": "^3.5.16",
-        "@types/tampermonkey": "^4.0.10",
+        "@commitlint/cli": "^17.8.1",
+        "@commitlint/config-conventional": "^17.8.1",
+        "@types/jquery": "^3.5.29",
+        "@types/tampermonkey": "^4.20.4",
         "cypress": "^10.11.0",
         "esbuild": "^0.14.54",
         "esbuild-plugin-vue3": "^0.3.2",
-        "eslint": "^8.46.0",
+        "eslint": "^8.56.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-airbnb-typescript": "^17.1.0",
-        "eslint-plugin-import": "^2.28.0",
+        "eslint-plugin-import": "^2.29.1",
         "husky": "^8.0.3",
-        "lint-staged": "^13.2.3",
+        "lint-staged": "^13.3.0",
         "nodemon": "^2.0.22",
         "npm-run-all": "^4.1.5",
         "standard-changelog": "^2.0.27",
-        "typescript": "^5.1.6",
-        "vue": "^3.3.4"
+        "typescript": "^5.3.3",
+        "vue": "^3.4.14"
     }
 }

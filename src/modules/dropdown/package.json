@@ -15,10 +15,10 @@
         "prepublishOnly": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "^1.6.3"
+        "@exlg/core": "workspace:^"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.5.0"
+        "@exlg/cli-mod": "workspace:^"
     },
     "exlgDependencies": {
         "core": "^1.6.0"
