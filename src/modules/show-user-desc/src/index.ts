@@ -10,7 +10,7 @@ const func = (args: JQuery<HTMLElement>) => {
     }
 }
 
-utils.addHookSelector('section.main .card.padding-default .introduction.marked', ({ hookedNodes }) => {
+utils.addHookSelector('.introduction.marked', ({ hookedNodes }) => {
     hookedNodes.forEach((node) => {
         if (node.nodeType === node.ELEMENT_NODE) {
             func($(node as HTMLElement))
