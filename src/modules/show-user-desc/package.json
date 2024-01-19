@@ -1,0 +1,27 @@
+{
+    "name": "@exlg/mod-show-user-desc",
+    "display": "显示用户主页",
+    "description": "显示洛谷被隐藏的用户主页",
+    "author": "minstdfx",
+    "version": "1.0.0",
+    "main": "src/index.ts",
+    "keywords": [
+        "exlg",
+        "exlg-module"
+    ],
+    "scripts": {
+        "build": "exlg-mod build",
+        "build:dev": "exlg-mod build -c",
+        "prepublishOnly": "exlg-mod clean && exlg-mod build"
+    },
+    "dependencies": {
+        "@exlg/core": "workspace:^"
+    },
+    "devDependencies": {
+        "@exlg/cli-mod": "^1.5.0",
+        "schemastery": "^3.4.3"
+    },
+    "exlgDependencies": {
+        "core": "^1.7.0"
+    }
+}
