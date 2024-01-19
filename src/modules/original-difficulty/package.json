@@ -16,10 +16,10 @@
     },
     "dependencies": {
         "@exlg/core": "workspace:^",
-        "schemastery": "^3.4.3"
+        "schemastery": "^3.14.3"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "^1.2.1",
-        "@types/jquery": "^3.5.14"
+        "@exlg/cli-mod": "workspace:^",
+        "@types/jquery": "^3.5.29"
     }
 }

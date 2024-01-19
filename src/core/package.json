@@ -9,14 +9,14 @@
     "author": "extend-luogu",
     "license": "ISC",
     "dependencies": {
-        "jquery": "^3.6.0",
-        "schemastery": "^3.4.3",
+        "jquery": "^3.7.1",
+        "marked": "^4.3.0",
+        "schemastery": "^3.14.3",
         "semver": "^7.5.4",
-        "marked": "^4.0.18",
-        "xss": "^1.0.13"
+        "xss": "^1.0.14"
     },
     "devDependencies": {
-        "@types/semver": "^7.5.0",
-        "@types/marked": "^4.0.18"
+        "@types/marked": "^4.3.2",
+        "@types/semver": "^7.5.6"
     }
 }

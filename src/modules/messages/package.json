@@ -1,6 +1,6 @@
 {
     "name": "@exlg/mod-messages",
-	"display": "新消息提醒",
+    "display": "新消息提醒",
     "description": "新消息提醒",
     "author": "bohanjun & YuzhenQin",
     "version": "1.0.0",
@@ -15,9 +15,9 @@
         "prepublishOnly": "exlg-mod clean && exlg-mod build"
     },
     "dependencies": {
-        "@exlg/core": "workspace:^1.3.1"
+        "@exlg/core": "workspace:^"
     },
     "devDependencies": {
-        "@exlg/cli-mod": "workspace:^1.5.0"
+        "@exlg/cli-mod": "workspace:^"
     }
 }
