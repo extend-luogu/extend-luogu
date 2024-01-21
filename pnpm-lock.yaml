@@ -385,6 +385,19 @@ importers:
         specifier: ^3.5.29
         version: 3.5.29
 
+  src/modules/show-user-desc:
+    dependencies:
+      '@exlg/core':
+        specifier: workspace:^
+        version: link:../../core
+    devDependencies:
+      '@exlg/cli-mod':
+        specifier: ^1.5.0
+        version: link:../../../cli-mod
+      schemastery:
+        specifier: ^3.4.3
+        version: 3.14.3
+
   src/modules/token:
     dependencies:
       '@exlg/core':
