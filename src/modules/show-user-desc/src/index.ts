@@ -3,7 +3,7 @@ import '@exlg/core/types/module-entry'
 utils.mustMatch([/^\/user\/\d+$/])
 
 const func = (args: JQuery<HTMLElement>) => {
-    const isMainPage = ['', 'main'].includes(window.location.hash)
+    const isMainPage = ['', '#main'].includes(window.location.hash)
     const isHidden = !args.prev().is('h3')
     if (isMainPage && isHidden) {
         args.prev().remove()
