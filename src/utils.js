@@ -276,10 +276,17 @@ export const cur_time = (ratio = 1000) => Math.floor(Date.now() / ratio);
  * @param {string} url
  */
 export const lg_content = (url) => new Promise((res, rej) => {
-    $.get(`${url + (url.includes("?") ? "&" : "?")}_contentOnly=1`, (data) => {
-        if (data.code !== 200) rej(new Error(`Requesting failure code: ${res.code}.`));
-        res(data);
-    });
+    $.ajax({
+        url: url,
+        method: "GET",
+        headers: {
+            "x-lentille-request": "content-only"
+        }
+    })
+        .done((data) => {
+            if (data.code !== 200) rej(new Error(`Requesting failure code: ${res.code}.`));
+            res(data);
+        });
 });
 
 /**
