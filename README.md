@@ -21,3 +21,18 @@
 | @exlg/mod-user-problem-ex | [![](https://img.shields.io/npm/v/@exlg/mod-user-problem-ex?style=flat-square)](https://www.npmjs.com/package/@exlg/mod-mod-user-problem-ex) |
 
 More modules coming soon...
+
+## ExLG Next MVP
+
+The host-independent lifecycle MVP lives in [`next/`](next/README.md). It builds
+the same feature catalog for a single-file UserScript and a Chromium Manifest V3
+extension without changing the existing Celeste build.
+
+```sh
+pnpm install
+pnpm mvp:check
+```
+
+The installable outputs are `next/dist/userscript/exlg-next.user.js` and
+`next/dist/extension/`. See [`next/docs/manual-test.md`](next/docs/manual-test.md)
+for installation and acceptance steps.
