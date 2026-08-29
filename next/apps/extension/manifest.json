@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "ExLG Next MVP",
+  "version": "0.1.0",
+  "description": "Host-independent ExLG lifecycle MVP for Luogu.",
+  "permissions": ["storage", "clipboardWrite"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.luogu.com.cn/*",
+        "https://*.luogu.com.cn/*",
+        "https://www.luogu.com/*",
+        "https://*.luogu.com/*"
+      ],
+      "js": ["history-bridge.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.luogu.com.cn/*",
+        "https://*.luogu.com.cn/*",
+        "https://www.luogu.com/*",
+        "https://*.luogu.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    }
+  ]
+}
