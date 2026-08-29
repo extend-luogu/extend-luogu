@@ -1,0 +1,17 @@
+{
+  "name": "@exlg/host-webext",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./bridge": "./src/bridge.ts"
+  },
+  "dependencies": {
+    "@exlg/browser": "workspace:*",
+    "@exlg/features": "workspace:*",
+    "@exlg/luogu": "workspace:*",
+    "@exlg/runtime": "workspace:*",
+    "@exlg/ui": "workspace:*"
+  }
+}

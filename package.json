@@ -18,7 +18,15 @@
         "lint": "eslint --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts .",
         "lint:fix": "eslint --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix .",
         "lint:all": "pnpm lint && pnpm -F @exlg/dash lint",
-        "lint:all:fix": "pnpm lint --fix && pnpm -F @exlg/dash lint --fix"
+        "lint:all:fix": "pnpm lint --fix && pnpm -F @exlg/dash lint --fix",
+        "mvp:dev:userscript": "pnpm --dir next dev:userscript",
+        "mvp:build:userscript": "pnpm --dir next build:userscript",
+        "mvp:dev:extension": "pnpm --dir next dev:extension",
+        "mvp:build:extension": "pnpm --dir next build:extension",
+        "mvp:test": "pnpm --dir next test",
+        "mvp:typecheck": "pnpm --dir next typecheck",
+        "mvp:lint": "pnpm --dir next lint",
+        "mvp:check": "pnpm --dir next check"
     },
     "devDependencies": {
         "@commitlint/cli": "^17.8.1",

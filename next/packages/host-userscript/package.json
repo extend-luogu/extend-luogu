@@ -1,0 +1,14 @@
+{
+  "name": "@exlg/host-userscript",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@exlg/browser": "workspace:*",
+    "@exlg/features": "workspace:*",
+    "@exlg/luogu": "workspace:*",
+    "@exlg/runtime": "workspace:*",
+    "@exlg/ui": "workspace:*"
+  }
+}

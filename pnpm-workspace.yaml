@@ -1,1 +1,18 @@
----
+packages:
+  - cli-mod
+  - cypress
+  - docs
+  - src/core
+  - src/dash
+  - src/modules/*
+  - src/themes/*
+  - next
+  - next/apps/*
+  - next/features
+  - next/packages/*
+
+allowBuilds:
+  '@parcel/watcher': false
+  cypress: false
+  esbuild: true
+  vue-demi: false

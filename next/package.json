@@ -1,0 +1,26 @@
+{
+  "name": "@exlg/next-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:userscript": "vite build --config vite.userscript.config.ts --watch",
+    "build:userscript": "vite build --config vite.userscript.config.ts",
+    "dev:extension": "node scripts/build-extension.mjs --watch",
+    "build:extension": "node scripts/build-extension.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --no-eslintrc --config .eslintrc.cjs --ext .ts features packages/runtime/src && node scripts/check-boundaries.mjs",
+    "verify:artifacts": "node scripts/verify-artifacts.mjs",
+    "check": "pnpm typecheck && pnpm test && pnpm build:userscript && pnpm build:extension && pnpm lint && pnpm verify:artifacts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "vitest": "^1.6.0"
+  }
+}
