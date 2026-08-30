@@ -167,5 +167,13 @@ export function createScopedDomService(
     observe(selector, callback, options) {
       observerHub.register(scope, selector, callback, options)
     },
+    getSelectionText() {
+      return document.getSelection()?.toString() ?? ''
+    },
+    isEditableTarget(target) {
+      if (!(target instanceof Element)) return false
+      return target.matches('input, textarea, select, [contenteditable]:not([contenteditable="false"])')
+        || target.closest('[contenteditable]:not([contenteditable="false"])') !== null
+    },
   }
 }

@@ -26,6 +26,11 @@ const first = defineFeature({
   settings: {
     flag: setting.boolean({ title: 'Flag', default: true }),
     mode: setting.select({ title: 'Mode', default: 'a', options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] }),
+    count: setting.number({ title: 'Count', default: 4, min: 2, max: 10, step: 2, integer: true }),
+    groups: setting.multiSelect({
+      title: 'Groups', default: ['a'],
+      options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }],
+    }),
   },
 })
 const second = defineFeature({
@@ -53,7 +58,7 @@ class FakeKernel implements KernelController {
 
 class FakeConfiguration implements FeatureConfigurationController {
   readonly values = new Map<string, Record<string, SettingValue>>([
-    [first.id, { flag: true, mode: 'a' }],
+    [first.id, { flag: true, mode: 'a', count: 4, groups: ['a'] }],
     [second.id, { label: '' }],
   ])
   readonly setMany = vi.fn(async (feature: FeatureMetadata, values: Readonly<Record<string, SettingValue>>) => {
@@ -83,7 +88,7 @@ describe('configuration export', () => {
       appVersion: '0.1.0',
       exportedAt: '2026-01-01T00:00:00.000Z',
       features: {
-        'official.first': { enabled: true, settings: { flag: true, mode: 'a' } },
+        'official.first': { enabled: true, settings: { count: 4, flag: true, groups: ['a'], mode: 'a' } },
         'official.second': { enabled: false, settings: { label: '' } },
       },
     })
@@ -122,12 +127,26 @@ describe('configuration validation and planning', () => {
     const validated = validateConfiguration(JSON.stringify({
       format: 'exlg-next-configuration', version: 1, features: {
         unknown: { enabled: true, settings: {} },
-        'official.first': { enabled: false, settings: { flag: 'yes', mode: 'missing', extra: true } },
+        'official.first': {
+          enabled: false,
+          settings: { flag: 'yes', mode: 'missing', count: 3, groups: ['missing'], extra: true },
+        },
       },
     }), catalog)
     expect(validated.ignoredUnknownFeatures).toBe(1)
-    expect(validated.ignoredInvalidSettings).toBe(3)
+    expect(validated.ignoredInvalidSettings).toBe(5)
     expect(validated.features[0]).toEqual({ id: first.id, enabled: false, settings: {} })
+  })
+
+  it('normalizes number and multi-select values without mutating source arrays', () => {
+    const source = ['b', 'a', 'b']
+    const validated = validateConfiguration(JSON.stringify({
+      format: 'exlg-next-configuration', version: 1, features: {
+        'official.first': { enabled: true, settings: { count: 6, groups: source } },
+      },
+    }), catalog)
+    source.push('unknown')
+    expect(validated.features[0]?.settings).toEqual({ count: 6, groups: ['a', 'b'] })
   })
 
   it('rejects prototype pollution keys', () => {
@@ -153,7 +172,7 @@ describe('configuration application', () => {
     const configuration = new FakeConfiguration()
     const validated = validateConfiguration(JSON.stringify({
       format: 'exlg-next-configuration', version: 1, features: {
-        'official.first': { enabled: true, settings: { flag: false, mode: 'b' } },
+        'official.first': { enabled: true, settings: { flag: false, mode: 'b', count: 6, groups: ['b', 'a'] } },
       },
     }), catalog)
     const result = await applyConfigurationImport({

@@ -3,9 +3,10 @@ import type {
   FeatureMetadata,
   KernelController,
   RouteSource,
+  SettingValue as RuntimeSettingValue,
 } from '@exlg/runtime'
 
-export type SettingValue = string | boolean
+export type SettingValue = RuntimeSettingValue
 export type ControlCenterView =
   | 'overview'
   | 'features'

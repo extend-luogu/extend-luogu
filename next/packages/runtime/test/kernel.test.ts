@@ -67,6 +67,13 @@ function context(scope: Scope): FeatureContext<AnySettings> {
     },
     dom: {} as FeatureContext<AnySettings>['dom'],
     clipboard: { async writeText() { /* test double */ } },
+    network: { async request() { throw new Error('network is unused') } },
+    navigation: { navigate() { /* test double */ }, open() { /* test double */ } },
+    ui: {
+      toast() { /* test double */ },
+      async confirm() { return false },
+      async prompt() { return null },
+    },
     log: {
       debug() { /* test double */ },
       info() { /* test double */ },

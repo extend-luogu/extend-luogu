@@ -1,6 +1,26 @@
 export { installHistoryBridge } from './history-bridge'
 export { installLuoguMainWorldBridge } from './main-world-bridge'
 export { createLuoguFeatureServices } from './composition'
+export { createLuoguEditorService } from './editor'
+export type { LuoguEditorKind, LuoguEditorService, LuoguEditorSession } from './editor'
+export {
+  createLuoguPageDataService,
+  sanitizeContestContext,
+  sanitizeProblemDetails,
+  sanitizeRecordProblems,
+  sanitizeTrainingContext,
+} from './page-data'
+export type {
+  LuoguContestContext,
+  LuoguPageDataService,
+  LuoguProblemDetails,
+  LuoguProblemSource,
+  LuoguProblemSummary,
+  LuoguRecordProblem,
+  LuoguTrainingContext,
+  LuoguTrainingProblem,
+  LuoguTrainingProblemStatus,
+} from './page-data'
 export { HISTORY_CHANGE_EVENT, LuoguRouteSource, parseLuoguRoute } from './routes'
 export {
   createLuoguSessionService,

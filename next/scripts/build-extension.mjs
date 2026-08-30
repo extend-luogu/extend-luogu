@@ -47,3 +47,4 @@ const buildEntry = (entry, name, fileName) => build({
 
 await buildEntry('apps/extension/src/content.ts', 'ExLGNextContent', 'content.js')
 await buildEntry('apps/extension/src/history-bridge.ts', 'ExLGNextHistoryBridge', 'history-bridge.js')
+await buildEntry('packages/host-webext/src/network-broker.ts', 'ExLGNextNetworkBroker', 'network-broker.js')

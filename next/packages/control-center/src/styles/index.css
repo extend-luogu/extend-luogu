@@ -364,10 +364,14 @@ textarea { cursor: text; line-height: 1.45; resize: vertical; }
 .settings-list { border: 1px solid var(--cc-border); border-radius: 7px; overflow: hidden; }
 .setting-row { background: var(--cc-surface); display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr) auto; padding: 12px; }
 .setting-row + .setting-row { border-top: 1px solid var(--cc-border); }
+.multi-select-setting { border: 0; margin: 0; min-width: 0; }
+.multi-select-options { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 3px; }
+.multi-select-option { align-items: center; color: var(--cc-text); display: inline-flex; gap: 6px; }
+.multi-select-option input { margin: 0; }
 .setting-copy, .setting-column { display: grid; gap: 3px; }
 .setting-column { grid-template-columns: 1fr; }
 .setting-title { font-weight: 620; }
-.setting-description, .pending-note { color: var(--cc-text-muted); font-size: 11px; }
+.setting-description, .setting-constraints, .pending-note { color: var(--cc-text-muted); font-size: 11px; }
 .setting-row .inline-error { grid-column: 1 / -1; }
 
 .button-row { display: flex; flex-wrap: wrap; gap: 7px; }

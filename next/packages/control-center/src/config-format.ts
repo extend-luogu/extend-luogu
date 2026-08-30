@@ -1,3 +1,4 @@
+import { normalizeSettingValue } from '@exlg/runtime'
 import type { FeatureMetadata, KernelController } from '@exlg/runtime'
 import type {
   ControlCenterEnvironment,
@@ -62,17 +63,18 @@ function assertNoDangerousKeys(value: unknown): void {
   }
 }
 
-function validSetting(
+function normalizedSetting(
   feature: FeatureMetadata,
   name: string,
   value: unknown,
-): value is SettingValue {
+): SettingValue | undefined {
   const definition = feature.settings[name]
-  if (!definition) return false
-  if (definition.kind === 'boolean') return typeof value === 'boolean'
-  if (definition.kind === 'string') return typeof value === 'string'
-  return typeof value === 'string'
-    && definition.options.some(option => option.value === value)
+  return definition ? normalizeSettingValue(definition, value) : undefined
+}
+
+function settingValuesEqual(left: SettingValue | undefined, right: SettingValue): boolean {
+  if (!Array.isArray(left) || !Array.isArray(right)) return left === right
+  return left.length === right.length && left.every((value, index) => value === right[index])
 }
 
 /** Parses and validates configuration without writing storage or changing Kernel state. */
@@ -116,8 +118,9 @@ export function validateConfiguration(
     if (!isRecord(candidate.settings)) ignoredInvalidSettings += 1
     const settings: Record<string, SettingValue> = {}
     for (const [name, value] of Object.entries(sourceSettings)) {
-      if (validSetting(feature, name, value)) settings[name] = value
-      else ignoredInvalidSettings += 1
+      const normalized = normalizedSetting(feature, name, value)
+      if (normalized === undefined) ignoredInvalidSettings += 1
+      else settings[name] = normalized
     }
     features.push({ id, enabled: candidate.enabled, settings })
   }
@@ -139,7 +142,7 @@ export function planConfigurationImport(
     const enabledChanged = existing?.enabled !== candidate.enabled
     const settings: Record<string, SettingValue> = {}
     for (const [name, value] of Object.entries(candidate.settings)) {
-      if (existing?.settings[name] !== value) settings[name] = value
+      if (!settingValuesEqual(existing?.settings[name], value)) settings[name] = value
     }
     const changedSettings = Object.keys(settings).length
     settingUpdates += changedSettings

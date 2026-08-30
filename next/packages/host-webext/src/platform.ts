@@ -1,5 +1,11 @@
-import type { JsonKeyValueStore } from '@exlg/browser'
+import {
+  createFetchNetworkTransport,
+  type JsonKeyValueStore,
+  type RestrictedNetworkTransport,
+} from '@exlg/browser'
 import type { JsonValue } from '@exlg/runtime'
+import type { NetworkBrokerCancelMessage, NetworkBrokerRequestMessage } from './network-protocol'
+import { isNetworkBrokerResponse } from './network-protocol'
 
 interface StorageArea {
   get(key: string): Promise<Record<string, unknown>>
@@ -9,6 +15,7 @@ interface StorageArea {
 
 interface ExtensionApi {
   readonly storage: { readonly local: StorageArea }
+  readonly runtime: { sendMessage(message: NetworkBrokerRequestMessage | NetworkBrokerCancelMessage): Promise<unknown> }
 }
 
 function extensionApi(): ExtensionApi {
@@ -39,4 +46,41 @@ export const webExtensionClipboard = {
   async writeText(text: string): Promise<void> {
     await navigator.clipboard.writeText(text)
   },
+}
+
+export function createWebExtensionNetworkTransport(
+  target: Window & typeof globalThis,
+): RestrictedNetworkTransport {
+  const native = createFetchNetworkTransport({ luoguOrigin: target.location.origin, fetch: target.fetch.bind(target) })
+  return {
+    async request(request) {
+      if (request.target === 'luogu') return await native.request(request)
+      const requestId = target.crypto.randomUUID()
+      const abort = (): void => {
+        void extensionApi().runtime.sendMessage({ type: 'exlg-network-cancel-v1', requestId })
+      }
+      if (request.signal.aborted) abort()
+      else request.signal.addEventListener('abort', abort, { once: true })
+      try {
+        const response = await extensionApi().runtime.sendMessage({
+          type: 'exlg-network-request-v1',
+          requestId,
+          request: {
+            target: request.target,
+            path: request.path,
+            method: request.method,
+            query: request.query,
+            headers: request.headers,
+            ...(request.body === undefined ? {} : { body: request.body }),
+            timeoutMs: request.timeoutMs,
+          },
+        })
+        if (!isNetworkBrokerResponse(response) || response.requestId !== requestId || !response.ok) {
+          throw new Error('Extension network broker failed')
+        }
+        return { status: response.status, body: response.body, finalUrl: response.finalUrl }
+      }
+      finally { request.signal.removeEventListener('abort', abort) }
+    },
+  }
 }

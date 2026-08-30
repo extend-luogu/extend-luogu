@@ -1,6 +1,9 @@
 import {
   BrowserFeatureServices,
   createDomEnvironment,
+  createNavigationService,
+  createRestrictedNetworkService,
+  createWindowNavigationPlatform,
   FeatureConfigurationController,
   NamespacedEnabledStore,
   NamespacedJsonValueStore,
@@ -19,19 +22,33 @@ import { createScope } from '@exlg/runtime'
 import { Kernel } from '@exlg/runtime/internal'
 import type { FeatureContextFactory } from '@exlg/runtime/internal'
 import workspaceManifest from '../../../package.json'
-import { WebExtensionStore, webExtensionClipboard } from './platform'
+import {
+  createWebExtensionNetworkTransport,
+  WebExtensionStore,
+  webExtensionClipboard,
+} from './platform'
 
 export async function bootstrapWebExtension(): Promise<void> {
   const appScope = createScope(error => console.error('[ExLG Next]', error))
   const store = new WebExtensionStore()
   const configuration = new FeatureConfigurationController(store)
+  const network = createRestrictedNetworkService({
+    luoguOrigin: window.location.origin,
+    transport: createWebExtensionNetworkTransport(window),
+  })
+  const navigation = createNavigationService(createWindowNavigationPlatform(window), [
+    'https://codeforces.com',
+    'https://atcoder.jp',
+  ])
   const services = new BrowserFeatureServices({
     store,
     configuration,
     clipboard: webExtensionClipboard,
+    network,
+    navigation,
     dom: createDomEnvironment(document, error => console.error('[ExLG Next/DOM]', error)),
   })
-  const luogu = createLuoguFeatureServices(window)
+  const luogu = createLuoguFeatureServices(window, network)
   const contextFactory: FeatureContextFactory<LuoguFeatureContextExtension> = {
     activation: (feature, scope) => ({ ...services.activation(feature, scope), luogu }),
     mount: (feature, scope, route) => ({ ...services.mount(feature, scope, route), luogu }),

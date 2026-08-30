@@ -1,5 +1,5 @@
 export { createScope } from './scope'
-export { defineFeature, setting } from './types'
+export { defineFeature, normalizeSettingValue, setting } from './types'
 export type {
   AnyFeatureDefinition,
   BooleanSetting,
@@ -12,6 +12,10 @@ export type {
   FeatureContext,
   FeatureDefinition,
   FeatureLogger,
+  FeatureConfirmOptions,
+  FeaturePromptOptions,
+  FeatureToastOptions,
+  FeatureUiService,
   FeatureMetadata,
   FeatureSettings,
   FeatureStatus,
@@ -21,6 +25,13 @@ export type {
   JsonValue,
   KernelController,
   MountContext,
+  MultiSelectSetting,
+  NavigationService,
+  NetworkRequest,
+  NetworkResponse,
+  NetworkService,
+  NetworkTarget,
+  NumberSetting,
   RouteKind,
   RouteSnapshot,
   RouteSource,
@@ -28,6 +39,7 @@ export type {
   ScopedDomService,
   SelectSetting,
   SettingDefinition,
+  SettingValue,
   SettingsSchema,
   SettingsValues,
   StringSetting,

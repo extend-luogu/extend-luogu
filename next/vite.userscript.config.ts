@@ -16,7 +16,12 @@ const metadata = `// ==UserScript==
 // @grant        GM_setValue
 // @grant        GM_deleteValue
 // @grant        GM_setClipboard
+// @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
+// @connect      codeforces.com
+// @connect      kenkoooo.com
+// @connect      localhost
+// @connect      127.0.0.1
 // ==/UserScript==`
 
 export default defineConfig({

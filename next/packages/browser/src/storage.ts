@@ -6,13 +6,18 @@ import type {
   FeatureStorage,
   JsonValue,
   MountContext,
+  NavigationService,
+  NetworkService,
   RouteSnapshot,
   Scope,
   SettingsSchema,
   SettingsValues,
+  SettingValue,
 } from '@exlg/runtime'
+import { normalizeSettingValue } from '@exlg/runtime'
 import { createScopedDomService } from './dom'
 import type { DomEnvironment } from './dom'
+import { createFeatureUiService } from './feature-ui'
 
 export interface JsonKeyValueStore {
   get(key: string): Promise<unknown>
@@ -25,21 +30,24 @@ export interface BrowserFeatureServicesOptions {
   readonly configuration: BrowserFeatureConfigurationController
   readonly dom: DomEnvironment
   readonly clipboard: { writeText(text: string): Promise<void> }
+  readonly network: NetworkService
+  readonly navigation: NavigationService
   readonly console?: Pick<Console, 'debug' | 'info' | 'warn' | 'error'>
 }
 
-type AnySettings = SettingsValues<SettingsSchema>
-type SettingsRecord = Record<string, string | boolean>
+type SettingsRecord = Record<string, SettingValue>
 
 export interface BrowserFeatureConfigurationController {
   getAll(feature: FeatureMetadata): Promise<Readonly<SettingsRecord>>
-  set(feature: FeatureMetadata, name: string, value: string | boolean): Promise<void>
+  set(feature: FeatureMetadata, name: string, value: SettingValue): Promise<void>
   setMany(
     feature: FeatureMetadata,
     values: Readonly<SettingsRecord>,
   ): Promise<void>
   reset(feature: FeatureMetadata): Promise<void>
-  settings(feature: FeatureMetadata): FeatureSettings<AnySettings>
+  settings<Schema extends SettingsSchema>(
+    feature: FeatureMetadata & { readonly settings: Schema },
+  ): FeatureSettings<SettingsValues<Schema>>
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,17 +57,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function storedValues(value: unknown): Record<string, unknown> {
   if (!isRecord(value)) return {}
   return isRecord(value.values) ? value.values : {}
-}
-
-function validSettingValue(
-  definition: FeatureMetadata['settings'][string],
-  value: unknown,
-): value is string | boolean {
-  if (!definition) return false
-  if (definition.kind === 'boolean') return typeof value === 'boolean'
-  if (definition.kind === 'string') return typeof value === 'string'
-  return typeof value === 'string'
-    && definition.options.some(option => option.value === value)
 }
 
 export class NamespacedEnabledStore {
@@ -127,13 +124,13 @@ export class FeatureConfigurationController implements BrowserFeatureConfigurati
     const values = storedValues(await this.#store.get(this.#key(feature)))
     const result: SettingsRecord = {}
     for (const [name, definition] of Object.entries(feature.settings)) {
-      const value = values[name]
-      result[name] = validSettingValue(definition, value) ? value : definition.default
+      result[name] = normalizeSettingValue(definition, values[name])
+        ?? normalizeSettingValue(definition, definition.default)!
     }
     return result
   }
 
-  set(feature: FeatureMetadata, name: string, value: string | boolean): Promise<void> {
+  set(feature: FeatureMetadata, name: string, value: SettingValue): Promise<void> {
     return this.setMany(feature, { [name]: value })
   }
 
@@ -141,14 +138,17 @@ export class FeatureConfigurationController implements BrowserFeatureConfigurati
     feature: FeatureMetadata,
     values: Readonly<SettingsRecord>,
   ): Promise<void> {
+    const normalized: SettingsRecord = {}
     for (const [name, value] of Object.entries(values)) {
       const definition = feature.settings[name]
-      if (!definition || !validSettingValue(definition, value)) {
+      const nextValue = definition && normalizeSettingValue(definition, value)
+      if (nextValue === undefined) {
         return Promise.reject(new TypeError(`Invalid setting ${name} for ${feature.id}`))
       }
+      normalized[name] = nextValue
     }
     return this.#enqueue(feature.id, async () => {
-      const next = { ...await this.getAll(feature), ...values }
+      const next = { ...await this.getAll(feature), ...normalized }
       await this.#store.set(this.#key(feature), { settingsVersion: 1, values: next })
     })
   }
@@ -157,12 +157,15 @@ export class FeatureConfigurationController implements BrowserFeatureConfigurati
     return this.#enqueue(feature.id, () => this.#store.delete(this.#key(feature)))
   }
 
-  settings(feature: FeatureMetadata): FeatureSettings<AnySettings> {
+  settings<Schema extends SettingsSchema>(
+    feature: FeatureMetadata & { readonly settings: Schema },
+  ): FeatureSettings<SettingsValues<Schema>> {
+    type Values = SettingsValues<Schema>
     return {
-      get: async name => (await this.getAll(feature))[String(name)] as AnySettings[typeof name],
-      getAll: async () => await this.getAll(feature) as AnySettings,
+      get: async name => (await this.getAll(feature))[String(name)] as Values[typeof name],
+      getAll: async () => await this.getAll(feature) as Values,
       set: async (name, value) => {
-        await this.set(feature, String(name), value)
+        await this.set(feature, String(name), value as SettingValue)
       },
     }
   }
@@ -184,6 +187,8 @@ export class BrowserFeatureServices {
   readonly #configuration: BrowserFeatureConfigurationController
   readonly #dom: DomEnvironment
   readonly #clipboard: BrowserFeatureServicesOptions['clipboard']
+  readonly #network: NetworkService
+  readonly #navigation: NavigationService
   readonly #console: Pick<Console, 'debug' | 'info' | 'warn' | 'error'>
   readonly #dataQueues = new Map<string, Promise<void>>()
 
@@ -192,22 +197,29 @@ export class BrowserFeatureServices {
     this.#configuration = options.configuration
     this.#dom = options.dom
     this.#clipboard = options.clipboard
+    this.#network = options.network
+    this.#navigation = options.navigation
     this.#console = options.console ?? console
   }
 
-  activation(feature: FeatureMetadata, scope: Scope): FeatureContext<AnySettings> {
+  activation<Schema extends SettingsSchema>(
+    feature: FeatureMetadata & { readonly settings: Schema },
+    scope: Scope,
+  ): FeatureContext<SettingsValues<Schema>> {
     return this.#context(feature, scope)
   }
 
-  mount(
-    feature: FeatureMetadata,
+  mount<Schema extends SettingsSchema>(
+    feature: FeatureMetadata & { readonly settings: Schema },
     scope: Scope,
     route: RouteSnapshot,
-  ): MountContext<AnySettings> {
+  ): MountContext<SettingsValues<Schema>> {
     return { ...this.#context(feature, scope), route }
   }
 
-  settings(feature: FeatureMetadata): FeatureSettings<AnySettings> {
+  settings<Schema extends SettingsSchema>(
+    feature: FeatureMetadata & { readonly settings: Schema },
+  ): FeatureSettings<SettingsValues<Schema>> {
     return this.#configuration.settings(feature)
   }
 
@@ -255,7 +267,10 @@ export class BrowserFeatureServices {
     }
   }
 
-  #context(feature: FeatureMetadata, scope: Scope): FeatureContext<AnySettings> {
+  #context<Schema extends SettingsSchema>(
+    feature: FeatureMetadata & { readonly settings: Schema },
+    scope: Scope,
+  ): FeatureContext<SettingsValues<Schema>> {
     return {
       scope,
       signal: scope.signal,
@@ -263,6 +278,9 @@ export class BrowserFeatureServices {
       storage: this.storage(feature.id),
       dom: createScopedDomService(this.#dom, scope),
       clipboard: this.#clipboard,
+      network: this.#network,
+      navigation: this.#navigation,
+      ui: createFeatureUiService(this.#dom.document, scope),
       log: this.#logger(feature.id),
     }
   }

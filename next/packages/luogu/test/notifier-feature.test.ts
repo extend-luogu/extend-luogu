@@ -8,6 +8,8 @@ import {
 import type { JsonKeyValueStore } from '@exlg/browser'
 import type {
   LuoguFeatureContextExtension,
+  LuoguFeatureServices,
+  LuoguPageDataService,
   LuoguPrivateMessage,
   LuoguPrivateMessageService,
 } from '@exlg/luogu'
@@ -15,6 +17,7 @@ import {
   createScope,
   defineFeature,
 } from '@exlg/runtime'
+import type { NavigationService, NetworkService } from '@exlg/runtime'
 import type {
   AnyFeatureDefinition,
   JsonValue,
@@ -30,6 +33,26 @@ class MemoryStore implements JsonKeyValueStore {
   async get(key: string): Promise<unknown> { return this.values.get(key) }
   async set(key: string, value: JsonValue): Promise<void> { this.values.set(key, value) }
   async delete(key: string): Promise<void> { this.values.delete(key) }
+}
+
+const unusedNetwork: NetworkService = {
+  async request() { throw new Error('network is unused') },
+}
+const unusedNavigation: NavigationService = {
+  navigate() { /* unused */ },
+  open() { /* unused */ },
+}
+const unusedEditor = { async waitForEditor() { return null } }
+const unusedPageData: LuoguPageDataService = {
+  async currentProblem() { return null },
+  async problem() { return null },
+  async currentContest() { return null },
+  async contest() { return null },
+  async currentTraining() { return null },
+  async training() { return null },
+  async visibleRecords() { return [] },
+  async acceptedProblemIds() { return null },
+  currentUserId() { return null },
 }
 
 function route(kind: RouteSnapshot['kind'], path: string): RouteSnapshot {
@@ -54,6 +77,8 @@ async function setupFeature(
     store,
     configuration: new FeatureConfigurationController(store),
     clipboard: { async writeText() { /* unused */ } },
+    network: unusedNetwork,
+    navigation: unusedNavigation,
     dom: createDomEnvironment(document),
   })
   let sink: ((value: LuoguPrivateMessage) => void) | undefined
@@ -64,15 +89,13 @@ async function setupFeature(
       return transportCleanup
     },
   }
-  const luogu = { privateMessages }
+  const luogu: LuoguFeatureServices = { privateMessages, editor: unusedEditor, pageData: unusedPageData }
   const featureScope = createScope()
-  type ActivationContext = Parameters<NonNullable<typeof privateMessageNotifier.activate>>[0]
-  const activationContext = ({ ...browser.activation(privateMessageNotifier, featureScope), luogu } as unknown) as ActivationContext
+  const activationContext = { ...browser.activation(privateMessageNotifier, featureScope), luogu }
   const activationCleanup = await privateMessageNotifier.activate?.(activationContext)
   if (typeof activationCleanup === 'function') featureScope.add(activationCleanup)
   const mountScope = featureScope.child()
-  type NotifierMountContext = Parameters<NonNullable<typeof privateMessageNotifier.mount>>[0]
-  const mountContext = ({ ...browser.mount(privateMessageNotifier, mountScope, currentRoute), luogu } as unknown) as NotifierMountContext
+  const mountContext = { ...browser.mount(privateMessageNotifier, mountScope, currentRoute), luogu }
   const mountCleanup = await privateMessageNotifier.mount?.(mountContext)
   if (typeof mountCleanup === 'function') mountScope.add(mountCleanup)
   return {
@@ -216,15 +239,19 @@ describe('private-message feature isolation', () => {
       settings: {},
       mount: healthyMount,
     })
-    const catalog = [privateMessageNotifier, healthy] as unknown as readonly AnyFeatureDefinition<LuoguFeatureContextExtension>[]
+    const catalog: readonly AnyFeatureDefinition<LuoguFeatureContextExtension>[] = [privateMessageNotifier, healthy]
     const store = new MemoryStore()
     const browser = new BrowserFeatureServices({
       store,
       configuration: new FeatureConfigurationController(store),
       clipboard: { async writeText() { /* unused */ } },
+      network: unusedNetwork,
+      navigation: unusedNavigation,
       dom: createDomEnvironment(document),
     })
-    const luogu = {
+    const luogu: LuoguFeatureServices = {
+      editor: unusedEditor,
+      pageData: unusedPageData,
       privateMessages: {
         async subscribe(): Promise<never> { throw new Error('transport unavailable') },
       },

@@ -2,6 +2,8 @@ import { CrossTabCoordinator } from '@exlg/browser'
 import type { CrossTabPlatform } from '@exlg/browser'
 import type { Cleanup } from '@exlg/runtime'
 import type { LuoguSessionService } from './session'
+import type { LuoguEditorService } from './editor'
+import type { LuoguPageDataService } from './page-data'
 import { resolveLuoguWebSocketUrl } from './websocket-config'
 import type { LuoguFetch } from './websocket-config'
 
@@ -26,6 +28,8 @@ export interface LuoguPrivateMessageService {
 
 export interface LuoguFeatureServices {
   readonly privateMessages: LuoguPrivateMessageService
+  readonly editor: LuoguEditorService
+  readonly pageData: LuoguPageDataService
 }
 
 export interface LuoguFeatureContextExtension {

@@ -1,6 +1,9 @@
 import {
   BrowserFeatureServices,
   createDomEnvironment,
+  createNavigationService,
+  createRestrictedNetworkService,
+  createWindowNavigationPlatform,
   FeatureConfigurationController,
   NamespacedEnabledStore,
   NamespacedJsonValueStore,
@@ -20,7 +23,11 @@ import { Kernel } from '@exlg/runtime/internal'
 import type { FeatureContextFactory } from '@exlg/runtime/internal'
 import workspaceManifest from '../../../package.json'
 import { installUserscriptHistoryBridge } from './bridge'
-import { UserscriptStore, userscriptClipboard } from './platform'
+import {
+  createUserscriptNetworkTransport,
+  UserscriptStore,
+  userscriptClipboard,
+} from './platform'
 
 export async function bootstrapUserscript(): Promise<void> {
   const appScope = createScope(error => console.error('[ExLG Next]', error))
@@ -28,13 +35,23 @@ export async function bootstrapUserscript(): Promise<void> {
 
   const store = new UserscriptStore()
   const configuration = new FeatureConfigurationController(store)
+  const network = createRestrictedNetworkService({
+    luoguOrigin: window.location.origin,
+    transport: createUserscriptNetworkTransport(window),
+  })
+  const navigation = createNavigationService(createWindowNavigationPlatform(window), [
+    'https://codeforces.com',
+    'https://atcoder.jp',
+  ])
   const services = new BrowserFeatureServices({
     store,
     configuration,
     clipboard: userscriptClipboard,
+    network,
+    navigation,
     dom: createDomEnvironment(document, error => console.error('[ExLG Next/DOM]', error)),
   })
-  const luogu = createLuoguFeatureServices(window)
+  const luogu = createLuoguFeatureServices(window, network)
   const contextFactory: FeatureContextFactory<LuoguFeatureContextExtension> = {
     activation: (feature, scope) => ({ ...services.activation(feature, scope), luogu }),
     mount: (feature, scope, route) => ({ ...services.mount(feature, scope, route), luogu }),

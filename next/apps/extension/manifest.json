@@ -4,6 +4,13 @@
   "version": "0.1.0",
   "description": "Host-independent ExLG lifecycle MVP for Luogu.",
   "permissions": ["storage", "clipboardWrite"],
+  "host_permissions": [
+    "https://codeforces.com/*",
+    "https://kenkoooo.com/*",
+    "http://localhost:27121/*",
+    "http://127.0.0.1:27121/*"
+  ],
+  "background": { "service_worker": "network-broker.js" },
   "content_scripts": [
     {
       "matches": [

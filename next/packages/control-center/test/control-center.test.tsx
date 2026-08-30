@@ -27,6 +27,11 @@ const alpha = defineFeature({
     flag: setting.boolean({ title: '显示标记', description: '显示额外标记', default: true }),
     label: setting.string({ title: '按钮文本', description: '自定义按钮内容', default: '复制' }),
     mode: setting.select({ title: '布局模式', default: 'a', options: [{ value: 'a', label: '标准' }, { value: 'b', label: '紧凑' }] }),
+    count: setting.number({ title: '显示数量', default: 4, min: 2, max: 10, step: 2, integer: true }),
+    groups: setting.multiSelect({
+      title: '启用分组', default: ['a'],
+      options: [{ value: 'a', label: '分组 A' }, { value: 'b', label: '分组 B' }],
+    }),
   },
 })
 const beta = defineFeature({
@@ -80,7 +85,7 @@ class FakeKernel implements KernelController {
 
 class FakeConfiguration implements FeatureConfigurationController {
   readonly values = new Map<string, Record<string, SettingValue>>([
-    [alpha.id, { flag: true, label: '复制', mode: 'a' }],
+    [alpha.id, { flag: true, label: '复制', mode: 'a', count: 4, groups: ['a'] }],
     [beta.id, { placeholder: '记录思路' }],
   ])
   readonly data = new Map([['exlg:vnext:data:official.beta', 'private note']])
@@ -278,6 +283,22 @@ describe('Feature settings', () => {
     fireEvent.input(enterInput, { target: { value: '回车保存' } })
     fireEvent.keyDown(enterInput, { key: 'Enter' })
     await waitFor(() => expect(configuration.set).toHaveBeenCalledWith(alpha, 'label', '回车保存'))
+  })
+
+  it('saves number on blur and multi-select as a stable array', async () => {
+    const root = await openFeatures()
+    fireEvent.click(getByText(root, '代码阅读助手'))
+    const count = await waitFor(() => getByLabelText(root, /显示数量/) as HTMLInputElement)
+    expect(count.type).toBe('number')
+    expect(count.min).toBe('2')
+    expect(count.max).toBe('10')
+    expect(count.step).toBe('2')
+    fireEvent.input(count, { target: { value: '6' } })
+    fireEvent.blur(count)
+    await waitFor(() => expect(configuration.set).toHaveBeenCalledWith(alpha, 'count', 6))
+
+    fireEvent.click(getByLabelText(root, '分组 B'))
+    await waitFor(() => expect(configuration.set).toHaveBeenCalledWith(alpha, 'groups', ['a', 'b']))
   })
 
   it('saves a disabled Feature without starting or remounting it', async () => {
