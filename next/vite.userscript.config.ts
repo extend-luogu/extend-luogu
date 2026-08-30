@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite'
 import { aliases } from './vite.aliases'
+import workspaceManifest from './package.json'
 
 const metadata = `// ==UserScript==
 // @name         ExLG Next MVP
 // @namespace    https://github.com/extend-luogu/extend-luogu
-// @version      0.1.0
-// @description  Host-independent ExLG lifecycle MVP for Luogu
+// @version      ${workspaceManifest.version}
+// @description  ExLG Next host-independent features and control center
 // @match        https://www.luogu.com.cn/*
 // @match        https://*.luogu.com.cn/*
 // @match        https://www.luogu.com/*

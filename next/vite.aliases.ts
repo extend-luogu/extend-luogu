@@ -6,7 +6,7 @@ const aliasEntries = [
   ['@exlg/runtime', './packages/runtime/src/index.ts'],
   ['@exlg/browser', './packages/browser/src/index.ts'],
   ['@exlg/luogu', './packages/luogu/src/index.ts'],
-  ['@exlg/ui', './packages/ui/src/index.ts'],
+  ['@exlg/control-center', './packages/control-center/src/index.ts'],
   ['@exlg/host-userscript', './packages/host-userscript/src/index.ts'],
   ['@exlg/host-webext/bridge', './packages/host-webext/src/bridge.ts'],
   ['@exlg/host-webext', './packages/host-webext/src/index.ts'],

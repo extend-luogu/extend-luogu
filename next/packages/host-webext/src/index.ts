@@ -1,8 +1,14 @@
 import {
   BrowserFeatureServices,
   createDomEnvironment,
+  FeatureConfigurationController,
   NamespacedEnabledStore,
+  NamespacedJsonValueStore,
 } from '@exlg/browser'
+import {
+  createControlCenterPreferencesStore,
+  mountControlCenter,
+} from '@exlg/control-center'
 import { featureCatalog } from '@exlg/features'
 import {
   createLuoguFeatureServices,
@@ -12,14 +18,16 @@ import type { LuoguFeatureContextExtension } from '@exlg/luogu'
 import { createScope } from '@exlg/runtime'
 import { Kernel } from '@exlg/runtime/internal'
 import type { FeatureContextFactory } from '@exlg/runtime/internal'
-import { mountSettingsPanel } from '@exlg/ui'
+import workspaceManifest from '../../../package.json'
 import { WebExtensionStore, webExtensionClipboard } from './platform'
 
 export async function bootstrapWebExtension(): Promise<void> {
   const appScope = createScope(error => console.error('[ExLG Next]', error))
   const store = new WebExtensionStore()
+  const configuration = new FeatureConfigurationController(store)
   const services = new BrowserFeatureServices({
     store,
+    configuration,
     clipboard: webExtensionClipboard,
     dom: createDomEnvironment(document, error => console.error('[ExLG Next/DOM]', error)),
   })
@@ -28,21 +36,32 @@ export async function bootstrapWebExtension(): Promise<void> {
     activation: (feature, scope) => ({ ...services.activation(feature, scope), luogu }),
     mount: (feature, scope, route) => ({ ...services.mount(feature, scope, route), luogu }),
   }
+  const routeSource = new LuoguRouteSource(window)
   const kernel = new Kernel<LuoguFeatureContextExtension>({
     catalog: featureCatalog,
-    routeSource: new LuoguRouteSource(window),
+    routeSource,
     enabledStore: new NamespacedEnabledStore(store),
     contextFactory,
     reportError: (featureId, error) => console.error(`[ExLG Next/${featureId ?? 'kernel'}]`, error),
   })
   appScope.add(() => kernel.stop())
-  appScope.add(mountSettingsPanel({
+  const preferenceStorage = new NamespacedJsonValueStore(store, 'exlg:vnext:control-center')
+  appScope.add(mountControlCenter({
     document,
     catalog: featureCatalog,
     kernel,
-    settings: {
-      getAll: feature => services.getSettingValues(feature),
-      set: (feature, name, value) => services.setSettingValue(feature, name, value),
+    routeSource,
+    configuration,
+    preferences: createControlCenterPreferencesStore({
+      load: () => preferenceStorage.load(),
+      save: value => preferenceStorage.save({ ...value }),
+      reset: () => preferenceStorage.reset(),
+    }),
+    clipboard: webExtensionClipboard,
+    environment: {
+      host: 'webextension',
+      version: workspaceManifest.version,
+      development: import.meta.env.DEV,
     },
   }))
   const stop = (): void => { void appScope.dispose() }

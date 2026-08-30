@@ -6,9 +6,9 @@
   "exports": { ".": "./src/index.ts" },
   "dependencies": {
     "@exlg/browser": "workspace:*",
+    "@exlg/control-center": "workspace:*",
     "@exlg/features": "workspace:*",
     "@exlg/luogu": "workspace:*",
-    "@exlg/runtime": "workspace:*",
-    "@exlg/ui": "workspace:*"
+    "@exlg/runtime": "workspace:*"
   }
 }

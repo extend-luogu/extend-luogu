@@ -5,6 +5,8 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -13,19 +15,19 @@
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "types": ["vitest/globals", "node"],
+    "types": ["vitest/globals", "node", "vite/client"],
     "baseUrl": ".",
     "paths": {
       "@exlg/runtime": ["packages/runtime/src/index.ts"],
       "@exlg/runtime/internal": ["packages/runtime/src/internal.ts"],
       "@exlg/browser": ["packages/browser/src/index.ts"],
       "@exlg/luogu": ["packages/luogu/src/index.ts"],
-      "@exlg/ui": ["packages/ui/src/index.ts"],
+      "@exlg/control-center": ["packages/control-center/src/index.ts"],
       "@exlg/host-userscript": ["packages/host-userscript/src/index.ts"],
       "@exlg/host-webext": ["packages/host-webext/src/index.ts"],
       "@exlg/features": ["features/catalog.ts"]
     }
   },
-  "include": ["**/*.ts", "**/*.mjs"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mjs"],
   "exclude": ["dist", "**/dist"]
 }
