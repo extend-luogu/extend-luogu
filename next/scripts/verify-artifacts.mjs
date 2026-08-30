@@ -26,7 +26,9 @@ if (JSON.stringify(manifest.permissions) !== JSON.stringify(['storage', 'clipboa
 for (const name of ['content.js', 'history-bridge.js']) {
   const source = await readFile(`${extensionDirectory}/${name}`, 'utf8')
   if (/\b(?:eval\s*\(|new\s+Function\b)/.test(source)) failures.push(`${name} contains dynamic code execution`)
-  if (/https?:\/\//.test(source)) failures.push(`${name} contains an unexpected remote URL`)
+  const urls = [...source.matchAll(/https?:\/\/[^'"`\s)]+/g)].map(match => match[0])
+  const unexpected = urls.filter(url => !url.startsWith('https://cdn.luogu.com.cn/upload/usericon/'))
+  if (unexpected.length > 0) failures.push(`${name} contains an unexpected remote URL: ${unexpected[0]}`)
 }
 
 if (failures.length > 0) {

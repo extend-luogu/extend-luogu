@@ -19,7 +19,8 @@ module.exports = {
       files: ['features/*/*.ts'],
       rules: {
         'no-restricted-globals': ['error',
-          'window', 'document', 'unsafeWindow', 'chrome', 'browser', 'eval'],
+          'window', 'document', 'unsafeWindow', 'chrome', 'browser', 'WebSocket',
+          'BroadcastChannel', 'fetch', 'jQuery', '_feInjection', '_feInstance', 'eval'],
         'no-restricted-imports': ['error', {
           paths: ['@exlg/runtime/internal', '@exlg/core'],
           patterns: ['@exlg/host-*', '**/src/core/**', '**/utils/**'],
