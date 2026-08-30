@@ -1,5 +1,6 @@
-import { readFile, readdir } from 'node:fs/promises'
+import { readFile, readdir, realpath } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
+import { dirname, isAbsolute, relative, resolve } from 'node:path'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const failures = []
@@ -21,16 +22,69 @@ function fail(file, message) {
   failures.push(`${file.slice(root.length + 1)}: ${message}`)
 }
 
+async function resolveLocalImport(file, specifier) {
+  const base = resolve(dirname(file), specifier.split('?')[0])
+  for (const candidate of [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`, `${base}/index.tsx`]) {
+    try { return await realpath(candidate) }
+    catch { /* try the next supported TypeScript resolution */ }
+  }
+  return null
+}
+
 for (const file of await filesBelow('features')) {
   if (file.endsWith('catalog.ts')) continue
   const source = await readFile(file, 'utf8')
   const forbidden = /\b(?:window|document|unsafeWindow|chrome|browser|WebSocket|BroadcastChannel|fetch|jQuery|_feInjection|_feInstance|eval|GM_[A-Za-z0-9_]+)\b|new\s+Function\b/g
   for (const match of source.matchAll(forbidden)) fail(file, `forbidden feature global: ${match[0]}`)
   for (const match of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
-    if (match[1] !== '@exlg/runtime'
-      && match[1] !== '@exlg/luogu'
-      && !match[1]?.startsWith('./')) {
-      fail(file, `feature import must use public @exlg/runtime or @exlg/luogu: ${match[1]}`)
+    const imported = match[1]
+    if (imported?.startsWith('.')) {
+      const target = await resolveLocalImport(file, imported)
+      const featureDirectory = resolve(root, 'features', relative(resolve(root, 'features'), file).split('/')[0])
+      if (!target || isAbsolute(relative(featureDirectory, target)) || relative(featureDirectory, target).startsWith('..')) {
+        fail(file, `relative import escapes its Feature directory: ${imported}`)
+      }
+    }
+    else if (imported !== '@exlg/runtime'
+      && imported !== '@exlg/luogu'
+      && !(file.includes('.test.') && imported === 'vitest')) {
+      fail(file, `feature import must use public @exlg/runtime or @exlg/luogu: ${imported}`)
+    }
+  }
+  if (!file.includes('.test.') && /https?:\/\//.test(source)) fail(file, 'feature contains a complete external URL')
+}
+
+const capabilityForTarget = {
+  luogu: 'network.luogu',
+  codeforces: 'network.codeforces',
+  'atcoder-problems': 'network.atcoder',
+  'cph-localhost': 'network.localhost',
+  'cph-loopback': 'network.localhost',
+}
+const capabilityForContextMember = {
+  dom: 'dom',
+  storage: 'storage',
+  clipboard: 'clipboard',
+  navigation: 'navigation',
+  ui: 'ui',
+}
+for (const featureName of await readdir(`${root}/features`)) {
+  if (featureName === 'catalog.ts' || featureName === 'package.json') continue
+  let sources
+  try { sources = await filesBelow(`features/${featureName}`) }
+  catch { continue }
+  const runtimeSource = (await Promise.all(sources.filter(file => !file.includes('.test.')).map(file => readFile(file, 'utf8')))).join('\n')
+  for (const [target, capability] of Object.entries(capabilityForTarget)) {
+    const escaped = target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    if (new RegExp(`\\.network\\.request(?:<[^>]+>)?\\(\\s*['"]${escaped}['"]`).test(runtimeSource)
+      && !runtimeSource.includes(`'${capability}'`)) {
+      failures.push(`features/${featureName}: uses ${target} without declaring ${capability}`)
+    }
+  }
+  for (const [member, capability] of Object.entries(capabilityForContextMember)) {
+    if (new RegExp(`\\bctx\\.${member}\\b`).test(runtimeSource)
+      && !runtimeSource.includes(`'${capability}'`)) {
+      failures.push(`features/${featureName}: uses ctx.${member} without declaring ${capability}`)
     }
   }
 }
@@ -96,6 +150,18 @@ for (const host of ['packages/host-userscript/src/index.ts', 'packages/host-webe
   const source = await readFile(`${root}/${host}`, 'utf8')
   if (!source.includes("from '@exlg/features'")) failures.push(`${host}: does not use the shared catalog`)
   if (!source.includes("from '@exlg/control-center'")) failures.push(`${host}: does not use the shared control center`)
+}
+
+const userscriptConfig = await readFile(`${root}/vite.userscript.config.ts`, 'utf8')
+if (/@connect\s+\*/.test(userscriptConfig)) failures.push('vite.userscript.config.ts: contains @connect *')
+for (const host of ['codeforces.com', 'kenkoooo.com', 'localhost', '127.0.0.1']) {
+  if (!userscriptConfig.includes(`@connect      ${host}`)) failures.push(`vite.userscript.config.ts: missing exact @connect ${host}`)
+}
+const extensionManifest = JSON.parse(await readFile(`${root}/apps/extension/manifest.json`, 'utf8'))
+const extensionHosts = extensionManifest.host_permissions ?? []
+if (extensionHosts.includes('<all_urls>')) failures.push('extension manifest contains <all_urls>')
+for (const pattern of ['https://codeforces.com/*', 'https://kenkoooo.com/*', 'http://localhost:27121/*', 'http://127.0.0.1:27121/*']) {
+  if (!extensionHosts.includes(pattern)) failures.push(`extension manifest missing ${pattern}`)
 }
 
 if (failures.length > 0) {
