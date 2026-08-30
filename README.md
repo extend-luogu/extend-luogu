@@ -36,3 +36,8 @@ pnpm mvp:check
 The installable outputs are `next/dist/userscript/exlg-next.user.js` and
 `next/dist/extension/`. See [`next/docs/manual-test.md`](next/docs/manual-test.md)
 for installation and acceptance steps.
+
+Both products include the same Shadow DOM + Preact Control Center system app for
+Feature management, schema settings, local diagnostics, and settings-only
+configuration import/export. Its boundary and privacy rules are documented in
+[`next/docs/control-center.md`](next/docs/control-center.md).

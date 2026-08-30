@@ -27,13 +27,13 @@ apps/extension   -> @exlg/host-webext
 @exlg/host-userscript --+--> @exlg/runtime/internal
                         +--> @exlg/browser
                         +--> @exlg/luogu
-                        +--> @exlg/ui
+                        +--> @exlg/control-center
                         `--> @exlg/features
 
 @exlg/host-webext ------+--> @exlg/runtime/internal
                         +--> @exlg/browser
                         +--> @exlg/luogu
-                        +--> @exlg/ui
+                        +--> @exlg/control-center
                         `--> @exlg/features
 
 @exlg/features ---------+-> @exlg/runtime (public API only)
@@ -41,7 +41,7 @@ apps/extension   -> @exlg/host-webext
 @exlg/browser -----------> @exlg/runtime
 @exlg/luogu ------------+-> @exlg/runtime
                         `-> @exlg/browser
-@exlg/ui ----------------> @exlg/runtime
+@exlg/control-center ----> @exlg/runtime + Preact
 ```
 
 The boundary checker reads workspace manifests and rejects package cycles. It
@@ -106,14 +106,14 @@ The UserScript host is the only package that references `GM_*` APIs. Its bridge
 is the only UserScript source that references `unsafeWindow`. It adapts GM
 storage, GM clipboard, the history bridge, and bootstrap.
 
-The extension runs Kernel, UI, and Features in an isolated content-script world.
+The extension runs Kernel, Control Center, and Features in an isolated content-script world.
 Its platform adapter uses `browser.storage.local` when present and Chromium's
 native `chrome.storage.local` fallback. A separate MV3 content script runs the
 minimal history wrapper in the MAIN world. No background or service worker is
 created because the MVP does not need one.
 
 Both hosts instantiate the same Kernel implementation, browser services, Luogu
-route source, Shadow DOM settings panel, static feature catalog, and feature
+route source, Shadow DOM Control Center, static feature catalog, and feature
 source. Capabilities are metadata only; the MVP does not claim to provide a
 security sandbox.
 
@@ -121,6 +121,38 @@ Feature Context uses a small generic extension type. Kernel passes the host's
 typed context through but does not import, inspect, or branch on Luogu services.
 Both hosts compose the same `LuoguFeatureServices`; existing Features accept the
 base context unchanged.
+
+## Control Center system application
+
+The Control Center is a Host-mounted system application, not a Feature and not
+part of Kernel. It remains available when every Feature is disabled, when a
+Feature has failed, and on routes that match no Feature. It therefore has no
+Feature ID, does not enter the catalog, and cannot be disabled through the
+Feature lifecycle.
+
+```text
+Host application Scope
+  +-- Kernel
+  +-- Control Center
+  `-- Browser and Luogu services
+```
+
+Hosts pass the Control Center a narrow controller surface: immutable catalog
+metadata, `KernelController`, the same `RouteSource` instance used by Kernel, a
+schema-validating Feature configuration controller, a preferences store bound
+to `exlg:vnext:control-center`, clipboard access, and non-sensitive host/version
+metadata. It never receives Feature data storage, a FeatureContext, private
+message transport, a page-world bridge, or Kernel records.
+
+Preact is an implementation detail of `@exlg/control-center`. It renders into a
+Shadow Root and is absent from `@exlg/runtime`, Feature APIs, and page globals.
+Features contribute only `FeatureMetadata` and `SettingsSchema`; they cannot
+inject JSX, custom views, commands, or callbacks into the system UI.
+
+The Control Center lists the static official catalog shipped in the current
+build. There is no Market because ExLG Next does not download or execute remote
+Feature code. Configuration import changes only enabled state and validated
+schema settings; it is not a code or business-data import path.
 
 ## Why there are no Feature dependencies
 

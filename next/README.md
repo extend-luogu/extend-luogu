@@ -23,5 +23,6 @@ Run these commands from the repository root. Build output is written to
 
 - [Architecture](docs/architecture.md)
 - [Feature authoring](docs/feature-authoring.md)
+- [Control Center](docs/control-center.md)
 - [Manual testing](docs/manual-test.md)
 - [Private-message transport](docs/private-messages.md)

@@ -45,8 +45,13 @@ export default defineFeature({
 The MVP supports `boolean`, `string`, and `select`. `defineFeature` preserves the
 schema's value types for `ctx.settings.get` and `set`. Reads merge defaults and
 discard values with an invalid type or invalid select option. Updating a control
-in the shared panel persists the value and asks Kernel to remount the Feature,
+in the shared Control Center persists the value and asks Kernel to remount the Feature,
 so a refresh is unnecessary.
+
+Control Center presentation remains fully declarative. A Feature may provide
+titles, descriptions, category, capabilities, and boolean/string/select schema
+metadata, but cannot provide Preact components, JSX, custom pages, commands, or
+arbitrary management callbacks.
 
 ## activate and mount
 

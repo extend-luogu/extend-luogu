@@ -19,8 +19,8 @@ boundary lint, and artifact validation.
    through Tampermonkey's Utilities page.
 3. Confirm the requested grants are only GM value storage, GM clipboard, and
    `unsafeWindow`; there is no `@connect` declaration.
-4. Open `https://www.luogu.com.cn/problem/P1000` and confirm the round `Ex`
-   launcher appears near the upper-right corner.
+4. Open `https://www.luogu.com.cn/problem/P1000` and confirm the narrow `ExLG`
+   launcher appears on the right page edge.
 
 ## Install the Chromium MV3 extension
 
@@ -72,6 +72,51 @@ Run the following once in each host:
 The async route/disable races are deterministic unit tests in
 `packages/runtime/test/kernel.test.ts`; no real Luogu or network access is used
 by the test suite.
+
+## Control Center acceptance
+
+Repeat the following in both the UserScript and unpacked extension builds:
+
+1. Open and close the drawer with the Launcher, backdrop, Escape, and
+   `Alt+Shift+E`. Confirm focus enters the dialog and returns to the Launcher.
+2. In **面板设置**, switch Launcher between left and right, try light/dark/system
+   themes, and compare comfortable/compact density. Reload and confirm choices
+   persist. The Launcher must never become completely unavailable.
+3. At a narrow viewport, confirm the drawer becomes full-width, navigation and
+   forms do not overflow, IDs/errors wrap, and the close button remains visible.
+4. In **功能**, search by title, ID, capability, and setting title. Exercise all
+   category and state filters, then clear search to restore the catalog.
+5. Toggle each Feature without refreshing. Open details, change boolean/select
+   settings, then edit a string and commit with blur and Enter. An enabled
+   Feature remounts; editing a disabled Feature must not start it.
+6. Put a temporary local test Feature into `error`, verify the row/detail retry
+   actions, and remove the temporary change afterward. Other Features and the
+   Control Center must remain usable.
+7. Use **恢复本功能默认设置** for **本地题目笔记** and accept the confirmation.
+   Confirm its settings reset but saved per-problem note text remains.
+8. In **数据**, export by clipboard and file. Inspect JSON: it may contain only
+   catalog Feature IDs, enabled booleans, and schema-backed setting values. It
+   must not contain note text, private-message content, or Feature data keys.
+9. Edit a valid exported setting and enabled state, paste/import it, inspect the
+   preview counts, cancel once, then confirm. Verify merge semantics leave an
+   omitted Feature unchanged.
+10. Try an unknown Feature, unknown setting, wrong boolean type, invalid select,
+    wrong format/version, and a file over 1 MiB. They must be rejected or counted
+    as ignored without arbitrary storage writes.
+11. In **诊断**, verify route kind/path and Feature state/routeKey/error. Copy the
+    report and confirm it has no query, hash, UID, username, settings values,
+    note/private-message content, Cookie, CSRF, token, or stack dump.
+12. Press Ctrl/Cmd+K while open and confirm focus moves to Feature search. Use
+    Tab/Shift+Tab to confirm focus remains inside the modal drawer.
+13. Enable and configure **站内私信提醒** from its detail page; verify the
+    existing WebSocket/cross-tab behavior below is unchanged.
+14. Test `pagehide` by navigating away and inspect that the Shadow host,
+    subscriptions, and keyboard handler do not remain in the old document.
+
+The jsdom suite verifies state, import planning, settings isolation, Launcher,
+keyboard, focus, backdrop, reset confirmation, and idempotent cleanup. Visual
+appearance, responsive behavior, and integration with real Luogu CSS still
+require the browser checks above.
 
 ## Real private-message acceptance
 
