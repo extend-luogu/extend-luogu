@@ -3,6 +3,7 @@ import type { Cleanup, RouteKind, RouteSnapshot, RouteSource } from '@exlg/runti
 export const HISTORY_CHANGE_EVENT = 'exlg:vnext:history-change'
 
 const routePatterns: readonly [RouteKind, RegExp, string][] = [
+  ['chat', /^\/chat(?:\/.*)?$/, ''],
   ['problem', /^\/problem\/([^/]+)/, 'problemId'],
   ['record', /^\/record\/([^/]+)/, 'recordId'],
   ['discussion', /^\/discuss(?:\/show)?\/([^/]+)/, 'discussionId'],

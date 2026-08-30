@@ -3,7 +3,7 @@ import { HISTORY_CHANGE_EVENT } from './routes'
 
 type HistoryMethod = History['pushState']
 
-export function installHistoryBridge(target: Window): Cleanup {
+export function installHistoryBridge(target: Window & typeof globalThis): Cleanup {
   const { history } = target
   const originalPush = history.pushState
   const originalReplace = history.replaceState
@@ -15,7 +15,7 @@ export function installHistoryBridge(target: Window): Cleanup {
     url?: string | URL | null,
   ): void {
     original.call(this, data, unused, url)
-    target.dispatchEvent(new CustomEvent(HISTORY_CHANGE_EVENT))
+    target.dispatchEvent(new target.CustomEvent(HISTORY_CHANGE_EVENT))
   }
 
   const push = wrap(originalPush)
