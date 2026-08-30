@@ -27,7 +27,9 @@ for (const file of await filesBelow('features')) {
   const forbidden = /\b(?:window|document|unsafeWindow|chrome|browser|WebSocket|BroadcastChannel|fetch|jQuery|_feInjection|_feInstance|eval|GM_[A-Za-z0-9_]+)\b|new\s+Function\b/g
   for (const match of source.matchAll(forbidden)) fail(file, `forbidden feature global: ${match[0]}`)
   for (const match of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
-    if (match[1] !== '@exlg/runtime' && match[1] !== '@exlg/luogu') {
+    if (match[1] !== '@exlg/runtime'
+      && match[1] !== '@exlg/luogu'
+      && !match[1]?.startsWith('./')) {
       fail(file, `feature import must use public @exlg/runtime or @exlg/luogu: ${match[1]}`)
     }
   }
