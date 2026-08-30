@@ -26,13 +26,16 @@ export function ControlCenterApp(props: {
   const launcher = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLElement>(null)
   const wasOpen = useRef(false)
+  const previousSearchFocusRequest = useRef(snapshot.searchFocusRequest)
   const [boundaryGeneration, setBoundaryGeneration] = useState(0)
 
   useLayoutEffect(() => {
-    if (snapshot.open) panel.current?.focus()
-    else if (wasOpen.current) launcher.current?.focus()
+    const searchRequested = snapshot.searchFocusRequest !== previousSearchFocusRequest.current
+    if (snapshot.open && !wasOpen.current && !searchRequested) panel.current?.focus()
+    else if (!snapshot.open && wasOpen.current) launcher.current?.focus()
     wasOpen.current = snapshot.open
-  }, [snapshot.open])
+    previousSearchFocusRequest.current = snapshot.searchFocusRequest
+  }, [snapshot.open, snapshot.searchFocusRequest])
 
   const content = (): JSX.Element => {
     const detail = snapshot.detailFeatureId === undefined

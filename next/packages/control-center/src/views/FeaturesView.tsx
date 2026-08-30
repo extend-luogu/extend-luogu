@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type {
   FeatureMetadata,
   FeatureStatus,
@@ -50,7 +50,7 @@ export function FeaturesView(props: {
   const [category, setCategory] = useState('all')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const searchRef = useRef<HTMLInputElement>(null)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (props.searchFocusRequest > 0) searchRef.current?.focus()
   }, [props.searchFocusRequest])
 

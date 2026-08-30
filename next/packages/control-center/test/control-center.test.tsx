@@ -176,8 +176,10 @@ describe('Control Center lifecycle and accessibility', () => {
     const root = shadow()
     fireEvent.click(getByRole(root, 'button', { name: '打开 ExLG Next 控制中心' }))
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true })
-    const search = await waitFor(() => getByRole(root, 'searchbox'))
-    expect((root.getRootNode() as ShadowRoot).activeElement).toBe(search)
+    await waitFor(() => {
+      const search = getByRole(root, 'searchbox')
+      expect((root.getRootNode() as ShadowRoot).activeElement).toBe(search)
+    })
   })
 
   it('removes host and subscriptions on idempotent cleanup', async () => {
