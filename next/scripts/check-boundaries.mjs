@@ -4,13 +4,13 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('..', import.meta.url))
 const failures = []
 
-async function filesBelow(relative, extension = '.ts') {
+async function filesBelow(relative, extensions = ['.ts']) {
   const result = []
   async function walk(path) {
     for (const entry of await readdir(path, { withFileTypes: true })) {
       const child = `${path}/${entry.name}`
       if (entry.isDirectory()) await walk(child)
-      else if (entry.name.endsWith(extension)) result.push(child)
+      else if (extensions.some(extension => entry.name.endsWith(extension))) result.push(child)
     }
   }
   await walk(`${root}/${relative}`)
@@ -37,9 +37,28 @@ for (const file of await filesBelow('packages/runtime/src')) {
   const source = await readFile(file, 'utf8')
   const forbidden = /\b(?:window|document|unsafeWindow|chrome|browser|GM_[A-Za-z0-9_]+)\b/g
   for (const match of source.matchAll(forbidden)) fail(file, `forbidden runtime global: ${match[0]}`)
+  if (/from\s+['"](?:preact|@exlg\/control-center|@exlg\/host-)/.test(source)) {
+    fail(file, 'runtime imports UI or host code')
+  }
 }
 
-for (const file of await filesBelow('.')) {
+for (const file of await filesBelow('packages/control-center/src', ['.ts', '.tsx'])) {
+  const source = await readFile(file, 'utf8')
+  const forbidden = /\b(?:unsafeWindow|chrome|browser|WebSocket|BroadcastChannel|GM_[A-Za-z0-9_]+)\b|\b(?:window\.exlg|window\.exlgDash)\b/g
+  for (const match of source.matchAll(forbidden)) fail(file, `forbidden control center global: ${match[0]}`)
+  for (const match of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+    const imported = match[1]
+    if (imported === '@exlg/runtime/internal'
+      || imported === '@exlg/features'
+      || imported === '@exlg/core'
+      || imported?.startsWith('@exlg/host-')
+      || imported?.includes('/features/')) {
+      fail(file, `forbidden control center import: ${imported}`)
+    }
+  }
+}
+
+for (const file of await filesBelow('.', ['.ts', '.tsx'])) {
   if (file.includes('/dist/')) continue
   const source = await readFile(file, 'utf8')
   if (/from\s+['"]@exlg\/core(?:\/|['"])/.test(source)) fail(file, 'imports legacy @exlg/core')
@@ -74,6 +93,7 @@ for (const name of packages.keys()) visit(name)
 for (const host of ['packages/host-userscript/src/index.ts', 'packages/host-webext/src/index.ts']) {
   const source = await readFile(`${root}/${host}`, 'utf8')
   if (!source.includes("from '@exlg/features'")) failures.push(`${host}: does not use the shared catalog`)
+  if (!source.includes("from '@exlg/control-center'")) failures.push(`${host}: does not use the shared control center`)
 }
 
 if (failures.length > 0) {

@@ -34,5 +34,16 @@ module.exports = {
           'window', 'document', 'unsafeWindow', 'chrome', 'browser', 'eval'],
       },
     },
+    {
+      files: ['packages/control-center/src/**/*.{ts,tsx}'],
+      rules: {
+        'no-restricted-globals': ['error',
+          'unsafeWindow', 'chrome', 'browser', 'WebSocket', 'BroadcastChannel', 'eval'],
+        'no-restricted-imports': ['error', {
+          paths: ['@exlg/runtime/internal', '@exlg/core'],
+          patterns: ['@exlg/host-*', '@exlg/features', '**/features/**'],
+        }],
+      },
+    },
   ],
 }
