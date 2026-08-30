@@ -4,9 +4,14 @@ import {
   NamespacedEnabledStore,
 } from '@exlg/browser'
 import { featureCatalog } from '@exlg/features'
-import { LuoguRouteSource } from '@exlg/luogu'
+import {
+  createLuoguFeatureServices,
+  LuoguRouteSource,
+} from '@exlg/luogu'
+import type { LuoguFeatureContextExtension } from '@exlg/luogu'
 import { createScope } from '@exlg/runtime'
 import { Kernel } from '@exlg/runtime/internal'
+import type { FeatureContextFactory } from '@exlg/runtime/internal'
 import { mountSettingsPanel } from '@exlg/ui'
 import { installUserscriptHistoryBridge } from './bridge'
 import { UserscriptStore, userscriptClipboard } from './platform'
@@ -21,11 +26,16 @@ export async function bootstrapUserscript(): Promise<void> {
     clipboard: userscriptClipboard,
     dom: createDomEnvironment(document, error => console.error('[ExLG Next/DOM]', error)),
   })
-  const kernel = new Kernel({
+  const luogu = createLuoguFeatureServices(window)
+  const contextFactory: FeatureContextFactory<LuoguFeatureContextExtension> = {
+    activation: (feature, scope) => ({ ...services.activation(feature, scope), luogu }),
+    mount: (feature, scope, route) => ({ ...services.mount(feature, scope, route), luogu }),
+  }
+  const kernel = new Kernel<LuoguFeatureContextExtension>({
     catalog: featureCatalog,
     routeSource: new LuoguRouteSource(window),
     enabledStore: new NamespacedEnabledStore(store),
-    contextFactory: services,
+    contextFactory,
     reportError: (featureId, error) => console.error(`[ExLG Next/${featureId ?? 'kernel'}]`, error),
   })
   appScope.add(() => kernel.stop())

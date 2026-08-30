@@ -1,5 +1,5 @@
-import { installHistoryBridge } from '@exlg/luogu'
+import { installLuoguMainWorldBridge } from '@exlg/luogu'
 
 export function bootstrapMainWorldBridge(): void {
-  installHistoryBridge(window)
+  installLuoguMainWorldBridge(window)
 }

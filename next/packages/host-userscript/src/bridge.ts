@@ -1,6 +1,6 @@
-import { installHistoryBridge } from '@exlg/luogu'
+import { installLuoguMainWorldBridge } from '@exlg/luogu'
 import type { Cleanup } from '@exlg/runtime'
 
 export function installUserscriptHistoryBridge(): Cleanup {
-  return installHistoryBridge(unsafeWindow)
+  return installLuoguMainWorldBridge(unsafeWindow)
 }
