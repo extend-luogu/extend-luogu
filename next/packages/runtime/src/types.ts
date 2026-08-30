@@ -12,7 +12,7 @@ export interface Scope {
 export type JsonPrimitive = string | number | boolean | null
 export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue }
 
-export type FeatureCapability = 'dom' | 'storage' | 'clipboard'
+export type FeatureCapability = 'dom' | 'storage' | 'clipboard' | 'luogu.private-messages'
 export type FeatureStatus = 'disabled' | 'idle' | 'mounting' | 'mounted' | 'error'
 export type RouteKind =
   | 'home'
@@ -23,6 +23,7 @@ export type RouteKind =
   | 'contest'
   | 'training'
   | 'blog'
+  | 'chat'
   | 'unknown'
 
 export interface RouteSnapshot {
@@ -143,7 +144,9 @@ export interface FeatureLogger {
   error(message: string, ...details: readonly unknown[]): void
 }
 
-export interface FeatureContext<Values extends object> {
+export interface EmptyFeatureContext {}
+
+interface BaseFeatureContext<Values extends object> {
   readonly scope: Scope
   readonly signal: AbortSignal
   readonly settings: FeatureSettings<Values>
@@ -153,11 +156,19 @@ export interface FeatureContext<Values extends object> {
   readonly log: FeatureLogger
 }
 
-export interface MountContext<Values extends object> extends FeatureContext<Values> {
+export type FeatureContext<
+  Values extends object,
+  Extension extends object = EmptyFeatureContext,
+> = BaseFeatureContext<Values> & Extension
+
+export type MountContext<
+  Values extends object,
+  Extension extends object = EmptyFeatureContext,
+> = FeatureContext<Values, Extension> & {
   readonly route: RouteSnapshot
 }
 
-export interface FeatureDefinition<Schema extends SettingsSchema = SettingsSchema> {
+export interface FeatureMetadata {
   readonly id: string
   readonly apiVersion: 1
   readonly title: string
@@ -166,21 +177,33 @@ export interface FeatureDefinition<Schema extends SettingsSchema = SettingsSchem
   readonly defaultEnabled: boolean
   readonly matches: (route: RouteSnapshot) => boolean
   readonly capabilities: readonly FeatureCapability[]
+  readonly settings: SettingsSchema
+}
+
+export interface FeatureDefinition<
+  Schema extends SettingsSchema = SettingsSchema,
+  Extension extends object = EmptyFeatureContext,
+> extends FeatureMetadata {
   readonly settings: Schema
   readonly activate?: (
-    context: FeatureContext<SettingsValues<Schema>>,
+    context: FeatureContext<SettingsValues<Schema>, Extension>,
   ) => void | Cleanup | Promise<void | Cleanup>
   readonly mount?: (
-    context: MountContext<SettingsValues<Schema>>,
+    context: MountContext<SettingsValues<Schema>, Extension>,
   ) => void | Cleanup | Promise<void | Cleanup>
 }
 
-export type AnyFeatureDefinition = FeatureDefinition<SettingsSchema>
+export type AnyFeatureDefinition<
+  Extension extends object = EmptyFeatureContext,
+> = FeatureDefinition<SettingsSchema, Extension>
 
 /** Preserves the value types described by a feature's settings schema. */
-export function defineFeature<const Schema extends SettingsSchema>(
-  definition: FeatureDefinition<Schema>,
-): FeatureDefinition<Schema> {
+export function defineFeature<
+  const Schema extends SettingsSchema,
+  Extension extends object = EmptyFeatureContext,
+>(
+  definition: FeatureDefinition<Schema, Extension>,
+): FeatureDefinition<Schema, Extension> {
   return definition
 }
 

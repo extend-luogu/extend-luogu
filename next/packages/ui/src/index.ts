@@ -1,6 +1,7 @@
 import type {
-  AnyFeatureDefinition,
   Cleanup,
+  FeatureMetadata,
+  FeatureCapability,
   FeatureStatusSnapshot,
   KernelController,
   SettingDefinition,
@@ -9,13 +10,13 @@ import type {
 type SettingValue = string | boolean
 
 export interface SettingsPanelData {
-  getAll(feature: AnyFeatureDefinition): Promise<Readonly<Record<string, SettingValue>>>
-  set(feature: AnyFeatureDefinition, name: string, value: SettingValue): Promise<void>
+  getAll(feature: FeatureMetadata): Promise<Readonly<Record<string, SettingValue>>>
+  set(feature: FeatureMetadata, name: string, value: SettingValue): Promise<void>
 }
 
 export interface SettingsPanelOptions {
   readonly document: Document
-  readonly catalog: readonly AnyFeatureDefinition[]
+  readonly catalog: readonly FeatureMetadata[]
   readonly kernel: KernelController
   readonly settings: SettingsPanelData
 }
@@ -68,6 +69,13 @@ const statusLabels: Record<FeatureStatusSnapshot['status'], string> = {
   mounting: '正在挂载',
   mounted: '已挂载',
   error: '发生错误',
+}
+
+const capabilityLabels: Record<FeatureCapability, string> = {
+  dom: '页面内容',
+  storage: '本地存储',
+  clipboard: '剪贴板',
+  'luogu.private-messages': '洛谷站内私信',
 }
 
 export function mountSettingsPanel(options: SettingsPanelOptions): Cleanup {
@@ -125,7 +133,8 @@ export function mountSettingsPanel(options: SettingsPanelOptions): Cleanup {
     statusElements.set(feature.id, status)
     meta.append(status)
     if (feature.capabilities.length > 0) {
-      meta.append(element(options.document, 'span', '', `能力：${feature.capabilities.join('、')}`))
+      const labels = feature.capabilities.map(capability => capabilityLabels[capability])
+      meta.append(element(options.document, 'span', '', `能力：${labels.join('、')}`))
     }
     card.append(meta)
 
@@ -195,7 +204,7 @@ export function mountSettingsPanel(options: SettingsPanelOptions): Cleanup {
 
 async function renderSettings(
   options: SettingsPanelOptions,
-  feature: AnyFeatureDefinition,
+  feature: FeatureMetadata,
   container: HTMLElement,
 ): Promise<void> {
   try {
@@ -212,7 +221,7 @@ async function renderSettings(
 
 function settingControl(
   options: SettingsPanelOptions,
-  feature: AnyFeatureDefinition,
+  feature: FeatureMetadata,
   name: string,
   definition: SettingDefinition,
   value: SettingValue,

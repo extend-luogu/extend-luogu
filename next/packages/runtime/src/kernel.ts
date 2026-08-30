@@ -2,6 +2,7 @@ import { createScope } from './scope'
 import type {
   AnyFeatureDefinition,
   Cleanup,
+  EmptyFeatureContext,
   FeatureContext,
   FeatureStatus,
   FeatureStatusSnapshot,
@@ -21,23 +22,23 @@ export interface FeatureEnabledStore {
   set(id: string, enabled: boolean): Promise<void>
 }
 
-export interface FeatureContextFactory {
+export interface FeatureContextFactory<Extension extends object = EmptyFeatureContext> {
   activation(
-    feature: AnyFeatureDefinition,
+    feature: AnyFeatureDefinition<Extension>,
     scope: Scope,
-  ): FeatureContext<AnySettings>
+  ): FeatureContext<AnySettings, Extension>
   mount(
-    feature: AnyFeatureDefinition,
+    feature: AnyFeatureDefinition<Extension>,
     scope: Scope,
     route: RouteSnapshot,
-  ): MountContext<AnySettings>
+  ): MountContext<AnySettings, Extension>
 }
 
-export interface KernelOptions {
-  readonly catalog: readonly AnyFeatureDefinition[]
+export interface KernelOptions<Extension extends object = EmptyFeatureContext> {
+  readonly catalog: readonly AnyFeatureDefinition<Extension>[]
   readonly routeSource: RouteSource
   readonly enabledStore: FeatureEnabledStore
-  readonly contextFactory: FeatureContextFactory
+  readonly contextFactory: FeatureContextFactory<Extension>
   readonly reportError?: (featureId: string | undefined, error: unknown) => void
 }
 
@@ -47,8 +48,8 @@ interface MountRun {
   readonly scope: Scope
 }
 
-interface FeatureRecord {
-  readonly definition: AnyFeatureDefinition
+interface FeatureRecord<Extension extends object> {
+  readonly definition: AnyFeatureDefinition<Extension>
   enabled: boolean
   activated: boolean
   generation: number
@@ -66,19 +67,19 @@ function errorMessage(error: unknown): string {
 }
 
 /** Host-facing implementation of the ExLG lifecycle kernel. */
-export class Kernel implements KernelController {
-  readonly #catalog: readonly AnyFeatureDefinition[]
+export class Kernel<Extension extends object = EmptyFeatureContext> implements KernelController {
+  readonly #catalog: readonly AnyFeatureDefinition<Extension>[]
   readonly #routeSource: RouteSource
   readonly #enabledStore: FeatureEnabledStore
-  readonly #contextFactory: FeatureContextFactory
+  readonly #contextFactory: FeatureContextFactory<Extension>
   readonly #reportError: (featureId: string | undefined, error: unknown) => void
-  readonly #records = new Map<string, FeatureRecord>()
+  readonly #records = new Map<string, FeatureRecord<Extension>>()
   readonly #listeners = new Set<(status: FeatureStatusSnapshot) => void>()
   #scope: Scope | undefined
   #route: RouteSnapshot | undefined
   #started = false
 
-  constructor(options: KernelOptions) {
+  constructor(options: KernelOptions<Extension>) {
     this.#catalog = options.catalog
     this.#routeSource = options.routeSource
     this.#enabledStore = options.enabledStore
@@ -174,7 +175,7 @@ export class Kernel implements KernelController {
     }
   }
 
-  #requireRecord(id: string): FeatureRecord {
+  #requireRecord(id: string): FeatureRecord<Extension> {
     const record = this.#records.get(id)
     if (!record) throw new Error(`Unknown feature: ${id}`)
     return record
@@ -191,7 +192,7 @@ export class Kernel implements KernelController {
     }
   }
 
-  #enable(record: FeatureRecord): void {
+  #enable(record: FeatureRecord<Extension>): void {
     if (!this.#started || !this.#scope) return
     record.enabled = true
     record.activated = false
@@ -205,7 +206,7 @@ export class Kernel implements KernelController {
     void this.#activate(record, generation, featureScope)
   }
 
-  async #activate(record: FeatureRecord, generation: number, scope: Scope): Promise<void> {
+  async #activate(record: FeatureRecord<Extension>, generation: number, scope: Scope): Promise<void> {
     try {
       const context = this.#contextFactory.activation(record.definition, scope)
       const cleanup = await record.definition.activate?.(context)
@@ -221,7 +222,7 @@ export class Kernel implements KernelController {
     }
   }
 
-  async #disable(record: FeatureRecord): Promise<void> {
+  async #disable(record: FeatureRecord<Extension>): Promise<void> {
     record.enabled = false
     record.activated = false
     record.generation += 1
@@ -232,7 +233,7 @@ export class Kernel implements KernelController {
     await scope?.dispose()
   }
 
-  async #restart(record: FeatureRecord): Promise<void> {
+  async #restart(record: FeatureRecord<Extension>): Promise<void> {
     record.activated = false
     record.generation += 1
     record.mountRun = undefined
@@ -243,13 +244,13 @@ export class Kernel implements KernelController {
     this.#enable(record)
   }
 
-  #enqueue(record: FeatureRecord, operation: () => Promise<void>): Promise<void> {
+  #enqueue(record: FeatureRecord<Extension>, operation: () => Promise<void>): Promise<void> {
     const run = record.queue.then(operation, operation)
     record.queue = run.catch(error => this.#recordError(record, error))
     return run
   }
 
-  async #reconcile(record: FeatureRecord, force = false): Promise<void> {
+  async #reconcile(record: FeatureRecord<Extension>, force = false): Promise<void> {
     const route = this.#route
     const featureScope = record.featureScope
     const generation = record.generation
@@ -285,7 +286,7 @@ export class Kernel implements KernelController {
   }
 
   async #runMount(
-    record: FeatureRecord,
+    record: FeatureRecord<Extension>,
     generation: number,
     mountRun: MountRun,
     route: RouteSnapshot,
@@ -305,7 +306,7 @@ export class Kernel implements KernelController {
     }
   }
 
-  async #disposeMount(record: FeatureRecord): Promise<void> {
+  async #disposeMount(record: FeatureRecord<Extension>): Promise<void> {
     const mount = record.mountRun
     if (!mount) return
     record.mountRun = undefined
@@ -313,7 +314,7 @@ export class Kernel implements KernelController {
     await mount.scope.dispose()
   }
 
-  #isCurrent(record: FeatureRecord, generation: number, scope: Scope): boolean {
+  #isCurrent(record: FeatureRecord<Extension>, generation: number, scope: Scope): boolean {
     return this.#started
       && record.enabled
       && record.generation === generation
@@ -321,20 +322,20 @@ export class Kernel implements KernelController {
       && !scope.disposed
   }
 
-  #isMountCurrent(record: FeatureRecord, generation: number, mount: MountRun): boolean {
+  #isMountCurrent(record: FeatureRecord<Extension>, generation: number, mount: MountRun): boolean {
     return record.generation === generation
       && record.mountRun === mount
       && record.enabled
       && !mount.scope.disposed
   }
 
-  #recordError(record: FeatureRecord, error: unknown): void {
+  #recordError(record: FeatureRecord<Extension>, error: unknown): void {
     record.lastError = errorMessage(error)
     this.#reportError(record.definition.id, error)
     this.#setStatus(record, 'error')
   }
 
-  #setStatus(record: FeatureRecord, status: FeatureStatus): void {
+  #setStatus(record: FeatureRecord<Extension>, status: FeatureStatus): void {
     record.status = status
     const snapshot = this.#snapshot(record)
     for (const listener of this.#listeners) {
@@ -347,7 +348,7 @@ export class Kernel implements KernelController {
     }
   }
 
-  #snapshot(record: FeatureRecord): FeatureStatusSnapshot {
+  #snapshot(record: FeatureRecord<Extension>): FeatureStatusSnapshot {
     const result: {
       id: string
       status: FeatureStatus

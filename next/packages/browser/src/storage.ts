@@ -1,5 +1,5 @@
 import type {
-  AnyFeatureDefinition,
+  FeatureMetadata,
   FeatureContext,
   FeatureLogger,
   FeatureSettings,
@@ -40,7 +40,7 @@ function storedValues(value: unknown): Record<string, unknown> {
 }
 
 function validSettingValue(
-  definition: AnyFeatureDefinition['settings'][string],
+  definition: FeatureMetadata['settings'][string],
   value: unknown,
 ): value is string | boolean {
   if (!definition) return false
@@ -93,19 +93,19 @@ export class BrowserFeatureServices {
     this.#console = options.console ?? console
   }
 
-  activation(feature: AnyFeatureDefinition, scope: Scope): FeatureContext<AnySettings> {
+  activation(feature: FeatureMetadata, scope: Scope): FeatureContext<AnySettings> {
     return this.#context(feature, scope)
   }
 
   mount(
-    feature: AnyFeatureDefinition,
+    feature: FeatureMetadata,
     scope: Scope,
     route: RouteSnapshot,
   ): MountContext<AnySettings> {
     return { ...this.#context(feature, scope), route }
   }
 
-  settings(feature: AnyFeatureDefinition): FeatureSettings<AnySettings> {
+  settings(feature: FeatureMetadata): FeatureSettings<AnySettings> {
     const key = `exlg:vnext:settings:${feature.id}`
     const read = async (): Promise<AnySettings> => {
       const values = storedValues(await this.#store.get(key))
@@ -132,12 +132,12 @@ export class BrowserFeatureServices {
     }
   }
 
-  async getSettingValues(feature: AnyFeatureDefinition): Promise<SettingsRecord> {
+  async getSettingValues(feature: FeatureMetadata): Promise<SettingsRecord> {
     return await this.settings(feature).getAll() as SettingsRecord
   }
 
   async setSettingValue(
-    feature: AnyFeatureDefinition,
+    feature: FeatureMetadata,
     name: string,
     value: string | boolean,
   ): Promise<void> {
@@ -189,7 +189,7 @@ export class BrowserFeatureServices {
     }
   }
 
-  #context(feature: AnyFeatureDefinition, scope: Scope): FeatureContext<AnySettings> {
+  #context(feature: FeatureMetadata, scope: Scope): FeatureContext<AnySettings> {
     return {
       scope,
       signal: scope.signal,
