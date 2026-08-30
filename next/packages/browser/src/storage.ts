@@ -22,6 +22,7 @@ export interface JsonKeyValueStore {
 
 export interface BrowserFeatureServicesOptions {
   readonly store: JsonKeyValueStore
+  readonly configuration: BrowserFeatureConfigurationController
   readonly dom: DomEnvironment
   readonly clipboard: { writeText(text: string): Promise<void> }
   readonly console?: Pick<Console, 'debug' | 'info' | 'warn' | 'error'>
@@ -29,6 +30,17 @@ export interface BrowserFeatureServicesOptions {
 
 type AnySettings = SettingsValues<SettingsSchema>
 type SettingsRecord = Record<string, string | boolean>
+
+export interface BrowserFeatureConfigurationController {
+  getAll(feature: FeatureMetadata): Promise<Readonly<SettingsRecord>>
+  set(feature: FeatureMetadata, name: string, value: string | boolean): Promise<void>
+  setMany(
+    feature: FeatureMetadata,
+    values: Readonly<SettingsRecord>,
+  ): Promise<void>
+  reset(feature: FeatureMetadata): Promise<void>
+  settings(feature: FeatureMetadata): FeatureSettings<AnySettings>
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -79,8 +91,97 @@ export class NamespacedEnabledStore {
   }
 }
 
+/** A JSON value backend permanently bound to one storage namespace. */
+export class NamespacedJsonValueStore {
+  readonly #store: JsonKeyValueStore
+  readonly #key: string
+
+  constructor(store: JsonKeyValueStore, key: string) {
+    this.#store = store
+    this.#key = key
+  }
+
+  load(): Promise<unknown> {
+    return this.#store.get(this.#key)
+  }
+
+  save(value: JsonValue): Promise<void> {
+    return this.#store.set(this.#key, value)
+  }
+
+  reset(): Promise<void> {
+    return this.#store.delete(this.#key)
+  }
+}
+
+/** Shared validated settings implementation for Feature contexts and system UI. */
+export class FeatureConfigurationController implements BrowserFeatureConfigurationController {
+  readonly #store: JsonKeyValueStore
+  readonly #queues = new Map<string, Promise<void>>()
+
+  constructor(store: JsonKeyValueStore) {
+    this.#store = store
+  }
+
+  async getAll(feature: FeatureMetadata): Promise<Readonly<SettingsRecord>> {
+    const values = storedValues(await this.#store.get(this.#key(feature)))
+    const result: SettingsRecord = {}
+    for (const [name, definition] of Object.entries(feature.settings)) {
+      const value = values[name]
+      result[name] = validSettingValue(definition, value) ? value : definition.default
+    }
+    return result
+  }
+
+  set(feature: FeatureMetadata, name: string, value: string | boolean): Promise<void> {
+    return this.setMany(feature, { [name]: value })
+  }
+
+  setMany(
+    feature: FeatureMetadata,
+    values: Readonly<SettingsRecord>,
+  ): Promise<void> {
+    for (const [name, value] of Object.entries(values)) {
+      const definition = feature.settings[name]
+      if (!definition || !validSettingValue(definition, value)) {
+        return Promise.reject(new TypeError(`Invalid setting ${name} for ${feature.id}`))
+      }
+    }
+    return this.#enqueue(feature.id, async () => {
+      const next = { ...await this.getAll(feature), ...values }
+      await this.#store.set(this.#key(feature), { settingsVersion: 1, values: next })
+    })
+  }
+
+  reset(feature: FeatureMetadata): Promise<void> {
+    return this.#enqueue(feature.id, () => this.#store.delete(this.#key(feature)))
+  }
+
+  settings(feature: FeatureMetadata): FeatureSettings<AnySettings> {
+    return {
+      get: async name => (await this.getAll(feature))[String(name)] as AnySettings[typeof name],
+      getAll: async () => await this.getAll(feature) as AnySettings,
+      set: async (name, value) => {
+        await this.set(feature, String(name), value)
+      },
+    }
+  }
+
+  #key(feature: FeatureMetadata): string {
+    return `exlg:vnext:settings:${feature.id}`
+  }
+
+  #enqueue(featureId: string, operation: () => Promise<void>): Promise<void> {
+    const previous = this.#queues.get(featureId) ?? Promise.resolve()
+    const next = previous.then(operation, operation)
+    this.#queues.set(featureId, next.catch(() => undefined))
+    return next
+  }
+}
+
 export class BrowserFeatureServices {
   readonly #store: JsonKeyValueStore
+  readonly #configuration: BrowserFeatureConfigurationController
   readonly #dom: DomEnvironment
   readonly #clipboard: BrowserFeatureServicesOptions['clipboard']
   readonly #console: Pick<Console, 'debug' | 'info' | 'warn' | 'error'>
@@ -88,6 +189,7 @@ export class BrowserFeatureServices {
 
   constructor(options: BrowserFeatureServicesOptions) {
     this.#store = options.store
+    this.#configuration = options.configuration
     this.#dom = options.dom
     this.#clipboard = options.clipboard
     this.#console = options.console ?? console
@@ -106,43 +208,7 @@ export class BrowserFeatureServices {
   }
 
   settings(feature: FeatureMetadata): FeatureSettings<AnySettings> {
-    const key = `exlg:vnext:settings:${feature.id}`
-    const read = async (): Promise<AnySettings> => {
-      const values = storedValues(await this.#store.get(key))
-      const result: SettingsRecord = {}
-      for (const [name, definition] of Object.entries(feature.settings)) {
-        const value = values[name]
-        result[name] = validSettingValue(definition, value) ? value : definition.default
-      }
-      return result as AnySettings
-    }
-    return {
-      async get(name) {
-        return (await read())[name]!
-      },
-      getAll: read,
-      set: async (name, value) => {
-        const definition = feature.settings[String(name)]
-        if (!definition || !validSettingValue(definition, value)) {
-          throw new TypeError(`Invalid setting ${String(name)} for ${feature.id}`)
-        }
-        const values = { ...await read(), [name]: value } as SettingsRecord
-        await this.#store.set(key, { settingsVersion: 1, values })
-      },
-    }
-  }
-
-  async getSettingValues(feature: FeatureMetadata): Promise<SettingsRecord> {
-    return await this.settings(feature).getAll() as SettingsRecord
-  }
-
-  async setSettingValue(
-    feature: FeatureMetadata,
-    name: string,
-    value: string | boolean,
-  ): Promise<void> {
-    const settings = this.settings(feature) as FeatureSettings<SettingsRecord>
-    await settings.set(name, value)
+    return this.#configuration.settings(feature)
   }
 
   storage(featureId: string): FeatureStorage {

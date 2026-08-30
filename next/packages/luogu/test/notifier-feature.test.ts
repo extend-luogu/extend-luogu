@@ -3,6 +3,7 @@
 import {
   BrowserFeatureServices,
   createDomEnvironment,
+  FeatureConfigurationController,
 } from '@exlg/browser'
 import type { JsonKeyValueStore } from '@exlg/browser'
 import type {
@@ -51,6 +52,7 @@ async function setupFeature(
   })
   const browser = new BrowserFeatureServices({
     store,
+    configuration: new FeatureConfigurationController(store),
     clipboard: { async writeText() { /* unused */ } },
     dom: createDomEnvironment(document),
   })
@@ -189,6 +191,7 @@ describe('private-message feature isolation', () => {
     const store = new MemoryStore()
     const browser = new BrowserFeatureServices({
       store,
+      configuration: new FeatureConfigurationController(store),
       clipboard: { async writeText() { /* unused */ } },
       dom: createDomEnvironment(document),
     })
