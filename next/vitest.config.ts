@@ -1,12 +1,9 @@
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vitest/config'
+import { aliases } from './vite.aliases'
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@exlg/runtime': fileURLToPath(new URL('./packages/runtime/src/index.ts', import.meta.url)),
-      '@exlg/runtime/internal': fileURLToPath(new URL('./packages/runtime/src/internal.ts', import.meta.url)),
-    },
+    alias: aliases,
   },
   test: {
     environment: 'node',
