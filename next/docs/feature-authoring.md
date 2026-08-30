@@ -1,7 +1,9 @@
 # Authoring an ExLG Next feature
 
-Every Feature imports only the public `@exlg/runtime` API and is registered in
-`features/catalog.ts`.
+Every Feature imports the public `@exlg/runtime` API and is registered in
+`features/catalog.ts`. A Feature that uses a narrow site adapter may additionally
+import its public feature-facing types from `@exlg/luogu`; implementation and
+host exports remain forbidden.
 
 ```ts
 import { defineFeature, setting } from '@exlg/runtime'
@@ -79,7 +81,8 @@ separate storage keys and are not business data.
 ## Forbidden access
 
 Feature source must not access `window`, `document`, `unsafeWindow`, `GM_*`,
-`chrome`, `browser`, `eval`, or the `Function` constructor. It must not import
+`chrome`, `browser`, `WebSocket`, `BroadcastChannel`, `fetch`, `_feInjection`,
+`_feInstance`, jQuery, `eval`, or the `Function` constructor. It must not import
 `@exlg/runtime/internal`, a host package, legacy `@exlg/core`, or old utilities.
 The lint and boundary scripts enforce these rules. Ask for the smallest new
 context capability only when a real Feature needs it.

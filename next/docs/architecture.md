@@ -36,9 +36,11 @@ apps/extension   -> @exlg/host-webext
                         +--> @exlg/ui
                         `--> @exlg/features
 
-@exlg/features ---------> @exlg/runtime (public API only)
+@exlg/features ---------+-> @exlg/runtime (public API only)
+                       `-> @exlg/luogu (feature-facing types only)
 @exlg/browser -----------> @exlg/runtime
-@exlg/luogu -------------> @exlg/runtime
+@exlg/luogu ------------+-> @exlg/runtime
+                        `-> @exlg/browser
 @exlg/ui ----------------> @exlg/runtime
 ```
 
@@ -93,8 +95,10 @@ the pathname and exposed in `params`.
 
 The route source reads the initial URL and listens for `popstate`, `hashchange`,
 and the namespaced `exlg:vnext:history-change` event. The small MAIN-world bridge
-wraps only `history.pushState` and `history.replaceState` and emits that event.
-It exposes no page objects and implements no page-world RPC.
+wraps `history.pushState` and `history.replaceState`, emits that event, and
+answers one narrowly typed current-user request. The identity response contains
+only a validated numeric `uid` and optional string `name`; it never exposes a
+page object or generic page-world RPC.
 
 ## Host boundaries
 
@@ -113,10 +117,16 @@ route source, Shadow DOM settings panel, static feature catalog, and feature
 source. Capabilities are metadata only; the MVP does not claim to provide a
 security sandbox.
 
+Feature Context uses a small generic extension type. Kernel passes the host's
+typed context through but does not import, inspect, or branch on Luogu services.
+Both hosts compose the same `LuoguFeatureServices`; existing Features accept the
+base context unchanged.
+
 ## Why there are no Feature dependencies
 
-The three MVP features need only host-provided `dom`, `storage`, and `clipboard`
-capabilities. A dependency graph, semver solver, install protocol, and failure
+The built-in features use only host-provided `dom`, `storage`, `clipboard`, and
+the narrow `luogu.private-messages` adapter. A Feature dependency graph, semver
+solver, install protocol, and failure
 propagation model would add package-management responsibilities without testing
 the lifecycle primitives. Feature dependencies remain a future design question,
 not dormant MVP infrastructure.

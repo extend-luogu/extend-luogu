@@ -1,7 +1,7 @@
 # ExLG Next MVP
 
 ExLG Next is a lightweight, host-independent feature lifecycle runtime. The MVP
-ships three built-in features in both a UserScript and a Chromium MV3 extension.
+ships four built-in features in both a UserScript and a Chromium MV3 extension.
 It does not load or execute remote JavaScript and does not depend on the Celeste
 runtime.
 
@@ -24,3 +24,4 @@ Run these commands from the repository root. Build output is written to
 - [Architecture](docs/architecture.md)
 - [Feature authoring](docs/feature-authoring.md)
 - [Manual testing](docs/manual-test.md)
+- [Private-message transport](docs/private-messages.md)
