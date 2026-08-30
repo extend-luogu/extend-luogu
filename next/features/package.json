@@ -4,5 +4,8 @@
   "private": true,
   "type": "module",
   "exports": { ".": "./catalog.ts" },
-  "dependencies": { "@exlg/runtime": "workspace:*" }
+  "dependencies": {
+    "@exlg/luogu": "workspace:*",
+    "@exlg/runtime": "workspace:*"
+  }
 }

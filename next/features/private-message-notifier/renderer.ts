@@ -101,7 +101,7 @@ export function createPrivateMessageRenderer(options: RendererOptions): PrivateM
     const avatar = dom.create('img', {
       className: 'avatar',
       attributes: {
-        src: `https://cdn.luogu.com.cn/upload/usericon/${message.sender.uid}.png`,
+        src: new URL(`/upload/usericon/${message.sender.uid}.png`, options.origin).href,
         alt: `${message.sender.name} 的头像`,
         decoding: 'async',
         loading: 'lazy',
