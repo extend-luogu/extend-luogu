@@ -48,8 +48,10 @@ resets only `exlg:vnext:settings:<feature-id>`. Feature business data under
 
 ## Save and concurrency behavior
 
-Boolean and select settings save immediately. String drafts save on blur or
-Enter. An enabled Feature is remounted after a successful save; a disabled
+Boolean, select, and multi-select settings save immediately. String and number
+drafts save on blur or Enter. Number controls expose declared min/max/step rules;
+multi-select controls are semantic checkbox groups and save one stable array.
+An enabled Feature is remounted after a successful save; a disabled
 Feature remains disabled. Per-setting generations prevent stale completions
 from overwriting newer UI state, and detail loads are generation-guarded.
 Import is single-flight and batches each Feature's settings before at most one
@@ -66,7 +68,12 @@ remount.
   "features": {
     "official.example": {
       "enabled": true,
-      "settings": { "label": "示例", "visible": true }
+      "settings": {
+        "label": "示例",
+        "visible": true,
+        "count": 10,
+        "groups": ["basic", "extra"]
+      }
     }
   }
 }
@@ -74,7 +81,8 @@ remount.
 
 Imports are limited to 1 MiB and use merge semantics. Pure validation accepts
 only the current format/version, known Catalog IDs, known setting names, correct
-boolean/string types, and declared select options. Prototype-pollution keys are
+boolean/string/number/array types, declared bounds, and declared select or
+multi-select options. Prototype-pollution keys are
 rejected. A preview reports updates and ignored entries before explicit user
 confirmation. A failed Feature does not prevent other planned Features from
 being applied.

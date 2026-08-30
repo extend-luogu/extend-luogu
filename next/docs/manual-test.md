@@ -17,8 +17,10 @@ boundary lint, and artifact validation.
 1. Build with `pnpm mvp:build:userscript`.
 2. Open `next/dist/userscript/exlg-next.user.js` in Tampermonkey or import it
    through Tampermonkey's Utilities page.
-3. Confirm the requested grants are only GM value storage, GM clipboard, and
-   `unsafeWindow`; there is no `@connect` declaration.
+3. Confirm the grants are GM value storage, GM clipboard,
+   `GM_xmlhttpRequest`, and bridge-only `unsafeWindow`. Confirm `@connect` is
+   limited to `codeforces.com`, `kenkoooo.com`, `localhost`, and
+   `127.0.0.1`; there must be no `@connect *`.
 4. Open `https://www.luogu.com.cn/problem/P1000` and confirm the narrow `ExLG`
    launcher appears on the right page edge.
 
@@ -28,7 +30,9 @@ boundary lint, and artifact validation.
 2. Open `chrome://extensions`, enable Developer mode, and choose **Load
    unpacked**.
 3. Select `next/dist/extension`.
-4. Confirm Chrome reports only storage and clipboard-write capabilities, then
+4. Confirm Chrome reports storage and clipboard-write permissions plus only the
+   four precise external host permissions above. Confirm the only background
+   worker is `network-broker.js`, then
    open a Luogu page and confirm the same `Ex` launcher and panel appear.
 
 Test the hosts separately for unambiguous observations. The MVP intentionally
@@ -143,3 +147,57 @@ content into a bug report.
 10. Repeat steps 1–9 with the other host.
 
 Build and fake-dependency tests do not count as this logged-in end-to-end check.
+
+## Legacy Migration Wave 1 manual acceptance
+
+Run both hosts separately. Each migrated Feature starts disabled, except the
+existing `official.code-block-copy` default. After each check, disable the
+Feature and confirm its nodes, styles, listeners, observers, timers, and requests
+are removed or aborted.
+
+1. **代码块增强**: on a problem, solution, and record detail page, check title,
+   detected language, both button positions/styles, success/failure feedback,
+   dynamic code blocks, and that editor/live-preview blocks are skipped.
+2. **用户介绍默认显示**: find a user with a non-empty folded introduction,
+   open the user main view, and confirm it expands but edit mode is untouched.
+3. **题解防剧透**: on a problem page test hide/dim/confirm, cancel and confirm,
+   in-page reveal behavior, optional difficulty/rate blur, and cleanup.
+4. **返回比赛**: enter a problem from a contest and confirm the action links to
+   `/contest/<id>#problems`; a normal problem must have no action.
+5. **记录难度着色**: open `/record/list`, paginate or trigger a partial refresh,
+   and verify PID mapping, text/label settings, title semantics, and restoration.
+6. **主页讨论数量**: on `/`, set 4/12/30, expand/collapse, wait for a dynamic
+   refresh, and verify items are hidden rather than deleted.
+7. **自动 O2**: with an O2-capable and unsupported language, exercise all three
+   modes, manually turn O2 off, rebuild the submit area, and confirm no duplicate
+   submission occurs.
+8. **编辑器表情**: in discussion and blog editors, toggle groups/panel defaults,
+   insert at a selection, test one `/name/` alias, rebuild the editor, and disable.
+9. **编辑器快捷键**: test B/I/Shift+X with and without selection, IME input, a
+   non-editor input, and optional Ctrl/Cmd+Enter through the normal site flow.
+10. **本地排版**: test Chinese/Latin/number/math spacing and confirm fenced
+    code, inline code, URLs, link targets, tags, LaTeX commands, and newlines stay
+    byte-for-byte unchanged where protected.
+11. **快捷导航**: test Alt+K, keyboard selection/focus loop, every fixed page,
+    typed UID/contest/record/discussion IDs, username search, supported problem
+    IDs, bounded history, and disabled-by-default double-click navigation.
+12. **增强随机题目**: choose several difficulty/source combinations, verify no
+    duplicate request while pending, empty/error feedback, and—while logged
+    in—that known accepted PIDs are excluded.
+13. **题单随机跳题**: on a training with mixed states, exercise all four modes,
+    logged-out/unknown status fallback, empty candidates, and dynamic actions.
+14. **任务计划增强**: on `/`, verify accepted detection, show/hide, both random
+    ranges, empty state, dynamic task updates, and that server state is unchanged.
+15. **原始难度**: test one Codeforces and one AtCoder-backed problem, unavailable
+    rating, cache reuse/expiry, provider selection, and offline recovery.
+16. **导入到 CPH**: start the user's own Competitive Companion/CPH receiver on
+    port 27121, test localhost and loopback, single and contest imports,
+    concurrency 1–4, partial failure, templates, and final summary. Inspect the
+    request and confirm it contains problem samples/limits only—no Cookie, CSRF,
+    login, note, message, or setting data. Automated tests do not contact it.
+17. **用户备注**: add/edit/clear an 80-character-limited note, test append,
+    replace, title-only, dynamic user links, restoration on disable/route change,
+    reload persistence, and confirm configuration export omits the note.
+
+Also re-run the existing problem-note, route-indicator, private-message, and
+Control Center workflows after enabling several Wave 1 Features together.

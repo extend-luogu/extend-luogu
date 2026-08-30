@@ -109,8 +109,9 @@ storage, GM clipboard, the history bridge, and bootstrap.
 The extension runs Kernel, Control Center, and Features in an isolated content-script world.
 Its platform adapter uses `browser.storage.local` when present and Chromium's
 native `chrome.storage.local` fallback. A separate MV3 content script runs the
-minimal history wrapper in the MAIN world. No background or service worker is
-created because the MVP does not need one.
+minimal history/session wrapper in the MAIN world. A small MV3 service worker is
+now present solely as the broker for the closed cross-origin Network targets;
+it is not a scheduler, general RPC endpoint, or Feature host.
 
 Both hosts instantiate the same Kernel implementation, browser services, Luogu
 route source, Shadow DOM Control Center, static feature catalog, and feature
@@ -121,6 +122,49 @@ Feature Context uses a small generic extension type. Kernel passes the host's
 typed context through but does not import, inspect, or branch on Luogu services.
 Both hosts compose the same `LuoguFeatureServices`; existing Features accept the
 base context unchanged.
+
+## Wave 1 public services
+
+Wave 1 adds capabilities to the browser/Luogu adapters without changing the
+Kernel state machine or Scope semantics:
+
+- `NetworkService` accepts only a closed `NetworkTarget` union. Features submit
+  paths, never origins. Luogu requests remain same-origin with credentials;
+  Codeforces, AtCoder Problems, and the two CPH loopback origins use fixed Host
+  mappings with credentials omitted, bounded timeout/response size, redirect
+  validation, and abort support.
+- UserScript cross-origin requests use anonymous `GM_xmlhttpRequest` and exact
+  `@connect` entries. Extension requests cross the closed MV3 broker message
+  union; the broker independently validates target, path, method, headers,
+  timeout, redirect origin, and response size.
+- `NavigationService` resolves relative paths against the current Luogu origin,
+  rejects active-content protocols, and applies an explicit allowlist before
+  opening external pages.
+- `FeatureUiService` provides only text toast/confirm/prompt primitives in a
+  scope-bound Shadow Root. It is independent of Control Center and is removed
+  when the owning Feature/Page Scope is disposed.
+- `LuoguEditorService` exposes textarea-like value, selection, focus, submit,
+  key-listener, and toolbar operations. It follows editor DOM rebuilds without
+  returning CodeMirror, Vue, or page-owned editor objects.
+- `LuoguPageDataService` exposes narrowly sanitized Problem, Contest, Training,
+  Record, current-user practice PID, and route-user fields. Array/text limits
+  are applied before data crosses into a Feature; arbitrary page state, token,
+  Cookie, and functions never do.
+
+Settings now include native finite `number` definitions with bounds/step/integer
+validation and stable-order `multiSelect` arrays. The same normalization is used
+by Feature contexts, Control Center, storage reads, and configuration import.
+Capabilities remain auditable metadata rather than a claimed runtime sandbox.
+
+```text
+Feature -> public runtime context
+        -> public, sanitized Luogu adapters (when declared)
+
+Host -> fixed network transport / extension broker
+     -> DOM, navigation, UI, editor and page-data implementations
+
+Kernel -> lifecycle only; no dependency on any service implementation
+```
 
 ## Control Center system application
 
@@ -156,8 +200,8 @@ schema settings; it is not a code or business-data import path.
 
 ## Why there are no Feature dependencies
 
-The built-in features use only host-provided `dom`, `storage`, `clipboard`, and
-the narrow `luogu.private-messages` adapter. A Feature dependency graph, semver
+The built-in features use only declared host-provided context services and
+narrow public Luogu adapters. A Feature dependency graph, semver
 solver, install protocol, and failure
 propagation model would add package-management responsibilities without testing
 the lifecycle primitives. Feature dependencies remain a future design question,
