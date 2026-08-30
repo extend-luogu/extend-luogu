@@ -108,19 +108,24 @@ describe('official.private-message-notifier renderer', () => {
     const setup = await setupFeature(route('problem', '/problem/P1000'))
     setup.emit(message(1, '<img id="bad">', '<script id="payload">bad</script>'))
     const root = shadowRoot()
-    expect(root?.querySelector('.name')?.textContent).toBe('<img id="bad">')
-    expect(root?.querySelector('.preview')?.textContent).toBe('<script id="payload">bad</script>')
+    expect(root?.querySelector('.sender-name')?.textContent).toBe('<img id="bad">')
+    expect(root?.querySelector('.message-preview')?.textContent).toBe('<script id="payload">bad</script>')
     expect(root?.querySelector('#bad')).toBeNull()
     expect(root?.querySelector('#payload')).toBeNull()
     expect(root?.querySelectorAll('img')).toHaveLength(1)
-    expect(root?.querySelector<HTMLAnchorElement>('.view')?.href).toBe('https://www.luogu.com.cn/chat')
+    const view = root?.querySelector<HTMLAnchorElement>('.view-message')
+    expect(view?.href).toBe('https://www.luogu.com.cn/chat')
+    expect(view?.target).toBe('_blank')
+    expect(view?.rel).toBe('noopener noreferrer')
+    expect(root?.querySelector('.notification-stack')?.getAttribute('aria-live')).toBe('polite')
+    expect(root?.querySelector('.notification-card')?.getAttribute('aria-label')).toBe('来自 <img id="bad"> 的新私信')
     await setup.featureScope.dispose()
   })
 
   it('hides the preview without storing or rendering the body', async () => {
     const setup = await setupFeature(route('home', '/'), { showPreview: false })
     setup.emit(message(1, 'Sender', 'private body'))
-    expect(shadowRoot()?.querySelector('.preview')?.textContent).toBe('收到一条新私信')
+    expect(shadowRoot()?.querySelector('.message-preview')?.textContent).toBe('收到一条新私信')
     expect(shadowRoot()?.textContent).not.toContain('private body')
     await setup.featureScope.dispose()
   })
@@ -128,7 +133,7 @@ describe('official.private-message-notifier renderer', () => {
   it('removes the oldest card at maxVisible', async () => {
     const setup = await setupFeature(route('home', '/'), { maxVisible: '3', dismissAfter: '0' })
     for (let id = 1; id <= 4; id += 1) setup.emit(message(id))
-    const cards = shadowRoot()?.querySelectorAll<HTMLElement>('.card') ?? []
+    const cards = shadowRoot()?.querySelectorAll<HTMLElement>('.notification-card') ?? []
     expect(cards).toHaveLength(3)
     expect([...cards].map(card => card.dataset.messageId)).toEqual(['2', '3', '4'])
     await setup.featureScope.dispose()
@@ -137,9 +142,9 @@ describe('official.private-message-notifier renderer', () => {
   it('automatically removes a card at the configured time', async () => {
     const setup = await setupFeature(route('home', '/'), { dismissAfter: '5' })
     setup.emit(message(1))
-    expect(shadowRoot()?.querySelectorAll('.card')).toHaveLength(1)
+    expect(shadowRoot()?.querySelectorAll('.notification-card')).toHaveLength(1)
     await vi.advanceTimersByTimeAsync(5_000)
-    expect(shadowRoot()?.querySelectorAll('.card')).toHaveLength(0)
+    expect(shadowRoot()?.querySelectorAll('.notification-card')).toHaveLength(0)
     await setup.featureScope.dispose()
   })
 
@@ -147,7 +152,31 @@ describe('official.private-message-notifier renderer', () => {
     const setup = await setupFeature(route('home', '/'), { dismissAfter: '0' })
     setup.emit(message(1))
     await vi.advanceTimersByTimeAsync(60_000)
-    expect(shadowRoot()?.querySelectorAll('.card')).toHaveLength(1)
+    expect(shadowRoot()?.querySelectorAll('.notification-card')).toHaveLength(1)
+    await setup.featureScope.dispose()
+  })
+
+  it('dismisses through delegated controls and exposes accessible actions', async () => {
+    const setup = await setupFeature(route('home', '/'), { dismissAfter: '60' })
+    setup.emit(message(1, 'Alice'))
+    const root = shadowRoot()!
+    const close = root.querySelector<HTMLButtonElement>('.close-button')!
+    expect(close.getAttribute('aria-label')).toBe('关闭来自 Alice 的私信提醒')
+    close.click()
+    expect(root.querySelector('.notification-card')).toBeNull()
+    expect(vi.getTimerCount()).toBe(0)
+    await setup.featureScope.dispose()
+  })
+
+  it('falls back to a sender initial when the avatar cannot load', async () => {
+    const setup = await setupFeature(route('home', '/'), { dismissAfter: '0' })
+    setup.emit(message(1, 'Alice'))
+    const root = shadowRoot()!
+    const avatar = root.querySelector<HTMLImageElement>('.avatar')!
+    avatar.dispatchEvent(new Event('error'))
+    expect(avatar.hasAttribute('hidden')).toBe(true)
+    expect(root.querySelector('.avatar-link')?.classList.contains('avatar-link--fallback')).toBe(true)
+    expect(root.querySelector('.avatar-fallback')?.textContent).toBe('A')
     await setup.featureScope.dispose()
   })
 
