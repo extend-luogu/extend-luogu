@@ -164,6 +164,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   background: var(--cc-surface);
   border-bottom: 1px solid var(--cc-border);
   display: flex;
+  flex: none;
   justify-content: space-between;
   min-height: 74px;
   padding: 14px 18px;
@@ -175,6 +176,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   background: var(--cc-surface);
   border-bottom: 1px solid var(--cc-border);
   display: flex;
+  flex: none;
   flex-direction: row;
   gap: 2px;
   overflow-x: auto;
@@ -199,7 +201,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .nav-item:hover { background: var(--cc-surface-muted); color: var(--cc-text); }
 .nav-item[aria-current="page"] { background: var(--cc-accent-soft); color: var(--cc-accent); font-weight: 650; }
 .icon { display: block; flex: none; }
-.view-container { min-width: 0; overflow: auto; overscroll-behavior: contain; }
+.view-container { flex: 1 1 0; min-height: 0; min-width: 0; overflow: auto; overscroll-behavior: contain; }
 .view { padding: var(--cc-space); }
 .view-header, .detail-header, .section-heading {
   align-items: center;
