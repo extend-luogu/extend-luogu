@@ -1,6 +1,6 @@
 import { readFile, readdir, realpath } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { dirname, isAbsolute, relative, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 const failures = []
@@ -9,12 +9,12 @@ async function filesBelow(relative, extensions = ['.ts']) {
   const result = []
   async function walk(path) {
     for (const entry of await readdir(path, { withFileTypes: true })) {
-      const child = `${path}/${entry.name}`
+      const child = join(path, entry.name)
       if (entry.isDirectory()) await walk(child)
       else if (extensions.some(extension => entry.name.endsWith(extension))) result.push(child)
     }
   }
-  await walk(`${root}/${relative}`)
+  await walk(join(root, relative))
   return result
 }
 
@@ -24,7 +24,7 @@ function fail(file, message) {
 
 async function resolveLocalImport(file, specifier) {
   const base = resolve(dirname(file), specifier.split('?')[0])
-  for (const candidate of [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`, `${base}/index.tsx`]) {
+  for (const candidate of [base, `${base}.ts`, `${base}.tsx`, join(base, 'index.ts'), join(base, 'index.tsx')]) {
     try { return await realpath(candidate) }
     catch { /* try the next supported TypeScript resolution */ }
   }
@@ -40,7 +40,7 @@ for (const file of await filesBelow('features')) {
     const imported = match[1]
     if (imported?.startsWith('.')) {
       const target = await resolveLocalImport(file, imported)
-      const featureDirectory = resolve(root, 'features', relative(resolve(root, 'features'), file).split('/')[0])
+      const featureDirectory = resolve(root, 'features', relative(resolve(root, 'features'), file).split(sep)[0])
       if (!target || isAbsolute(relative(featureDirectory, target)) || relative(featureDirectory, target).startsWith('..')) {
         fail(file, `relative import escapes its Feature directory: ${imported}`)
       }
@@ -68,7 +68,7 @@ const capabilityForContextMember = {
   navigation: 'navigation',
   ui: 'ui',
 }
-for (const featureName of await readdir(`${root}/features`)) {
+for (const featureName of await readdir(join(root, 'features'))) {
   if (featureName === 'catalog.ts' || featureName === 'package.json') continue
   let sources
   try { sources = await filesBelow(`features/${featureName}`) }
@@ -129,7 +129,7 @@ const packageDirectories = [
 ]
 const packages = new Map()
 for (const directory of packageDirectories) {
-  const manifest = JSON.parse(await readFile(`${root}/${directory}/package.json`, 'utf8'))
+  const manifest = JSON.parse(await readFile(join(root, directory, 'package.json'), 'utf8'))
   packages.set(manifest.name, { directory, dependencies: Object.keys(manifest.dependencies ?? {}) })
 }
 
@@ -147,17 +147,17 @@ function visit(name, path = []) {
 for (const name of packages.keys()) visit(name)
 
 for (const host of ['packages/host-userscript/src/index.ts', 'packages/host-webext/src/index.ts']) {
-  const source = await readFile(`${root}/${host}`, 'utf8')
+  const source = await readFile(join(root, host), 'utf8')
   if (!source.includes("from '@exlg/features'")) failures.push(`${host}: does not use the shared catalog`)
   if (!source.includes("from '@exlg/control-center'")) failures.push(`${host}: does not use the shared control center`)
 }
 
-const userscriptConfig = await readFile(`${root}/vite.userscript.config.ts`, 'utf8')
+const userscriptConfig = await readFile(join(root, 'vite.userscript.config.ts'), 'utf8')
 if (/@connect\s+\*/.test(userscriptConfig)) failures.push('vite.userscript.config.ts: contains @connect *')
 for (const host of ['codeforces.com', 'kenkoooo.com', 'localhost', '127.0.0.1']) {
   if (!userscriptConfig.includes(`@connect      ${host}`)) failures.push(`vite.userscript.config.ts: missing exact @connect ${host}`)
 }
-const extensionManifest = JSON.parse(await readFile(`${root}/apps/extension/manifest.json`, 'utf8'))
+const extensionManifest = JSON.parse(await readFile(join(root, 'apps', 'extension', 'manifest.json'), 'utf8'))
 const extensionHosts = extensionManifest.host_permissions ?? []
 if (extensionHosts.includes('<all_urls>')) failures.push('extension manifest contains <all_urls>')
 for (const pattern of ['https://codeforces.com/*', 'https://kenkoooo.com/*', 'http://localhost:27121/*', 'http://127.0.0.1:27121/*']) {

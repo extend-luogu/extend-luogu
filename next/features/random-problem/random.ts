@@ -35,6 +35,23 @@ export function randomIndex(length: number, random: () => number): number {
   return Math.min(length - 1, Math.max(0, Math.floor(random() * length)))
 }
 
+/** Chooses bounded, non-repeating one-based page numbers without allocating for every page. */
+export function chooseDistinctPages(
+  pageCount: number,
+  limit: number,
+  random: () => number,
+): readonly number[] {
+  if (!Number.isSafeInteger(pageCount) || pageCount <= 0 || limit <= 0) return []
+  const count = Math.min(pageCount, Math.floor(limit))
+  const selected = new Set<number>()
+  while (selected.size < count) {
+    let page = randomIndex(pageCount, random) + 1
+    while (selected.has(page)) page = page % pageCount + 1
+    selected.add(page)
+  }
+  return [...selected]
+}
+
 export function chooseFilter(
   difficulties: readonly string[],
   sources: readonly string[],
@@ -43,7 +60,8 @@ export function chooseFilter(
   const selectedDifficulty = difficulties[randomIndex(difficulties.length, random)]
   const selectedSource = sources[randomIndex(sources.length, random)] ?? 'P'
   const difficulty = selectedDifficulty === undefined ? undefined : Number(selectedDifficulty)
-  return typeof difficulty === 'number' && Number.isSafeInteger(difficulty) && difficulty !== 0
+  return typeof difficulty === 'number' && Number.isSafeInteger(difficulty)
+    && difficulty >= 1 && difficulty <= 8
     ? { difficulty, type: selectedSource }
     : { type: selectedSource }
 }

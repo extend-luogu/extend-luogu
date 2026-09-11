@@ -48,11 +48,11 @@ export class LuoguRouteSource implements RouteSource {
     const accept = (): void => listener(this.current())
     this.#window.addEventListener('popstate', accept)
     this.#window.addEventListener('hashchange', accept)
-    this.#window.addEventListener(HISTORY_CHANGE_EVENT, accept)
+    this.#window.document.addEventListener(HISTORY_CHANGE_EVENT, accept)
     return () => {
       this.#window.removeEventListener('popstate', accept)
       this.#window.removeEventListener('hashchange', accept)
-      this.#window.removeEventListener(HISTORY_CHANGE_EVENT, accept)
+      this.#window.document.removeEventListener(HISTORY_CHANGE_EVENT, accept)
     }
   }
 }

@@ -1,11 +1,8 @@
 import { JSDOM } from 'jsdom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { LuoguEditorSession, LuoguFeatureContextExtension, LuoguPageDataService } from '@exlg/luogu'
+import type { LuoguEditorSession, LuoguPageDataService } from '@exlg/luogu'
 import type { Cleanup, FeatureDefinition, JsonValue, NetworkRequest, NetworkService, NetworkTarget, RouteSnapshot, SettingsSchema } from '@exlg/runtime'
 import { createScope } from '@exlg/runtime'
-import autoO2 from '../../../features/auto-o2'
-import backToContest from '../../../features/back-to-contest'
-import codeBlockCopy from '../../../features/code-block-copy'
 import editorEmoticons from '../../../features/editor-emoticons'
 import editorFormatting from '../../../features/editor-formatting'
 import editorShortcuts from '../../../features/editor-shortcuts'
@@ -29,7 +26,7 @@ class MemoryStore implements JsonKeyValueStore {
   async delete(key: string): Promise<void> { this.values.delete(key) }
 }
 
-const unavailableNetwork: NetworkService = { async request<T>(): Promise<never> { throw new Error('unused') } }
+const unavailableNetwork: NetworkService = { async request(): Promise<never> { throw new Error('unused') } }
 
 function pageData(overrides: Partial<LuoguPageDataService> = {}): LuoguPageDataService {
   return {
@@ -106,22 +103,6 @@ async function mountFeature<Schema extends SettingsSchema, Extension extends obj
 beforeEach(() => { vi.useRealTimers() })
 
 describe('migrated DOM Features', () => {
-  it('enhances initial and dynamic code blocks and fully cleans them', async () => {
-    vi.useFakeTimers()
-    const mounted = await mountFeature(codeBlockCopy, { html: '<body><pre><code class="language-ts">let x=1</code></pre></body>', url: 'https://www.luogu.com.cn/problem/P1' })
-    expect(mounted.dom.window.document.querySelector('.exlg-code-header')).not.toBeNull()
-    mounted.dom.window.document.querySelector<HTMLButtonElement>('.exlg-code-copy')?.click()
-    await Promise.resolve()
-    expect(mounted.clipboard).toHaveBeenCalledWith('let x=1')
-    const pre = mounted.dom.window.document.createElement('pre'); pre.innerHTML = '<code>dynamic</code>'; mounted.dom.window.document.body.append(pre)
-    await Promise.resolve()
-    expect(mounted.dom.window.document.querySelectorAll('.exlg-code-copy')).toHaveLength(2)
-    await mounted.scope.dispose()
-    expect(mounted.dom.window.document.querySelector('.exlg-code-copy')).toBeNull()
-    expect(pre.dataset.exlgCodeBlock).toBeUndefined()
-    expect(vi.getTimerCount()).toBe(0)
-  })
-
   it('restores a hidden user introduction', async () => {
     const mounted = await mountFeature(userIntroduction, { html: '<body><div class="introduction marked" hidden>intro</div></body>', url: 'https://www.luogu.com.cn/user/1' })
     const introduction = mounted.dom.window.document.querySelector<HTMLElement>('.introduction')!
@@ -136,13 +117,6 @@ describe('migrated DOM Features', () => {
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(mounted.navigate).toHaveBeenCalledWith('/problem/solution/P1')
     await mounted.scope.dispose()
-  })
-
-  it('mounts a contest return action only with a valid contest id', async () => {
-    const mounted = await mountFeature(backToContest, { html: '<body><div class="btn-actions"></div></body>', url: 'https://www.luogu.com.cn/problem/P1?contestId=42' })
-    expect(mounted.dom.window.document.querySelector<HTMLAnchorElement>('.exlg-back-to-contest')?.getAttribute('href')).toBe('/contest/42#problems')
-    await mounted.scope.dispose()
-    expect(mounted.dom.window.document.querySelector('.exlg-back-to-contest')).toBeNull()
   })
 
   it('maps record difficulty by PID and restores the link', async () => {
@@ -164,12 +138,6 @@ describe('migrated DOM Features', () => {
     expect(dynamic.hidden).toBe(true)
     await mounted.scope.dispose()
     expect(items[12]?.hidden).toBe(false)
-  })
-
-  it('recognizes the current O2 label without relying on its generated id', async () => {
-    const mounted = await mountFeature(autoO2, { html: '<body><div class="lang-select"><div class="text">C++17</div></div><label>启用 O2 优化<input id="LCheck-4" type="checkbox"></label><button>提交评测</button></body>', url: 'https://www.luogu.com.cn/problem/P1', settings: { mode: 'always' } })
-    expect(mounted.dom.window.document.querySelector<HTMLInputElement>('input')?.checked).toBe(true)
-    await mounted.scope.dispose()
   })
 
   it('enhances the current tasklist structure and restores tasks', async () => {
@@ -270,14 +238,25 @@ describe('migrated editor and candidate behavior', () => {
       } as T }
     } }
     const mounted = await mountFeature(randomProblem, {
-      html: '<body><div class="lg-index-stat"></div></body>', url: 'https://www.luogu.com.cn/',
+      html: '<body><div class="lg-index-stat"><h2>问题跳转</h2><div><input name="toproblem"></div><p><button name="goto">跳转</button><button name="gotorandom">随机跳题</button></p></div><div class="lg-index-stat"><h2>其他卡片</h2></div></body>',
+      url: 'https://www.luogu.com.cn/', settings: { difficulties: ['1'], sources: ['P'], excludeAccepted: true },
       network, pageData: { async acceptedProblemIds() { return ['P1'] } },
     })
-    mounted.dom.window.document.querySelector<HTMLButtonElement>('.exlg-random-problem')?.click()
+    const button = mounted.dom.window.document.querySelector<HTMLButtonElement>('.exlg-random-problem')
+    const nativeRandom = mounted.dom.window.document.querySelector<HTMLButtonElement>('button[name="gotorandom"]')
+    expect(button?.parentElement).toBe(nativeRandom?.parentElement)
+    expect(button?.parentElement).not.toBe(mounted.dom.window.document.body)
+    button?.click()
     await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
     expect(mounted.navigate).toHaveBeenCalledWith('/problem/P2')
-    expect(requests[0]).toMatchObject({ path: '/problem/list' })
+    expect(requests).toHaveLength(1)
+    expect(requests[0]).toMatchObject({
+      path: '/problem/list', query: { difficulty: 1, type: 'P', _contentOnly: 1, page: 1 },
+      headers: { 'x-lentille-request': 'content-only' },
+    })
     await mounted.scope.dispose()
+    expect(nativeRandom?.isConnected).toBe(true)
+    expect(button?.isConnected).toBe(false)
   })
 
   it('jumps to a filtered training candidate through NavigationService', async () => {

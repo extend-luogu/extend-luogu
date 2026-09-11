@@ -1,6 +1,3 @@
-import codeBlockCopy from './code-block-copy'
-import autoO2 from './auto-o2'
-import backToContest from './back-to-contest'
 import editorEmoticons from './editor-emoticons'
 import editorFormatting from './editor-formatting'
 import editorShortcuts from './editor-shortcuts'
@@ -20,13 +17,10 @@ import userIntroduction from './user-introduction'
 import userNotes from './user-notes'
 
 export const featureCatalog = [
-  codeBlockCopy,
   userIntroduction,
   solutionSpoilerGuard,
-  backToContest,
   recordDifficultyColors,
   homeDiscussionDensity,
-  autoO2,
   editorEmoticons,
   editorShortcuts,
   editorFormatting,

@@ -23,10 +23,13 @@ function response(body: string, url: string, status = 200): Response {
 
 describe('MV3 network broker', () => {
   it('chooses the fixed CPH origin and omits credentials and referrer', async () => {
-    const fetcher = vi.fn(async (input: URL | RequestInfo, _init?: RequestInit) => response('ok', String(input)))
+    const fetcher = vi.fn(async (input: URL | RequestInfo, init?: RequestInit) => {
+      expect(init).toMatchObject({ credentials: 'omit', referrerPolicy: 'no-referrer' })
+      return response('ok', String(input))
+    })
     const result = await createNetworkBroker(fetcher).request(message())
     expect(result).toMatchObject({ ok: true, status: 200, finalUrl: 'http://localhost:27121/' })
-    expect(fetcher.mock.calls[0]?.[1]).toMatchObject({ credentials: 'omit', referrerPolicy: 'no-referrer' })
+    expect(fetcher).toHaveBeenCalledOnce()
   })
 
   it('rejects arbitrary targets, paths, redirects, and oversized responses', async () => {

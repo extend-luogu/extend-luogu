@@ -65,7 +65,7 @@ export function installSessionBridge(target: Window & typeof globalThis): Cleanu
     let result: SessionProbeResult = { ready: false, user: null }
     try { result = readSanitizedCurrentUser(target) }
     catch { /* page-owned getters are treated as not ready */ }
-    target.dispatchEvent(new target.CustomEvent(SESSION_RESPONSE_EVENT, {
+    target.document.dispatchEvent(new target.CustomEvent(SESSION_RESPONSE_EVENT, {
       detail: {
         requestId: detail.requestId,
         ready: result.ready,
@@ -73,8 +73,8 @@ export function installSessionBridge(target: Window & typeof globalThis): Cleanu
       },
     }))
   }
-  target.addEventListener(SESSION_REQUEST_EVENT, respond)
-  return () => target.removeEventListener(SESSION_REQUEST_EVENT, respond)
+  target.document.addEventListener(SESSION_REQUEST_EVENT, respond)
+  return () => target.document.removeEventListener(SESSION_REQUEST_EVENT, respond)
 }
 
 export class WindowSessionProbe implements SessionProbe {
@@ -111,12 +111,12 @@ export class WindowSessionProbe implements SessionProbe {
       const timeout = this.#target.setTimeout(() => finish({ ready: false, user: null }), this.#timeoutMs)
       const cleanup = (): void => {
         this.#target.clearTimeout(timeout)
-        this.#target.removeEventListener(SESSION_RESPONSE_EVENT, receive)
+        this.#target.document.removeEventListener(SESSION_RESPONSE_EVENT, receive)
         signal?.removeEventListener('abort', abort)
       }
-      this.#target.addEventListener(SESSION_RESPONSE_EVENT, receive)
+      this.#target.document.addEventListener(SESSION_RESPONSE_EVENT, receive)
       signal?.addEventListener('abort', abort, { once: true })
-      this.#target.dispatchEvent(new this.#target.CustomEvent(SESSION_REQUEST_EVENT, {
+      this.#target.document.dispatchEvent(new this.#target.CustomEvent(SESSION_REQUEST_EVENT, {
         detail: { requestId },
       }))
     })

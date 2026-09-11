@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chooseFilter, excludeKnownAccepted, parseProblemList, randomIndex } from './random'
+import { chooseDistinctPages, chooseFilter, excludeKnownAccepted, parseProblemList, randomIndex } from './random'
 
 describe('random problem helpers', () => {
   it('validates legacy and current content-only lists', () => {
@@ -11,10 +11,16 @@ describe('random problem helpers', () => {
     expect(parseProblemList({ currentData: { problems: { count: -1, perPage: 50, result: [] } } })).toBeNull()
   })
   it('bounds injected randomness', () => expect(randomIndex(3, () => 0.999)).toBe(2))
+  it('chooses bounded pages without duplicates', () => {
+    expect(chooseDistinctPages(3, 4, () => 0)).toEqual([1, 2, 3])
+    expect(chooseDistinctPages(10, 2, () => 0.999)).toEqual([10, 1])
+    expect(chooseDistinctPages(0, 4, () => 0.5)).toEqual([])
+  })
   it('serializes one supported source and difficulty per request', () => {
     const values = [0.8, 0.2]
     expect(chooseFilter(['1', '4'], ['P', 'CF'], () => values.shift() ?? 0)).toEqual({ difficulty: 4, type: 'P' })
     expect(chooseFilter(['0'], [], () => 0)).toEqual({ type: 'P' })
+    expect(chooseFilter(['9'], ['P'], () => 0)).toEqual({ type: 'P' })
   })
   it('excludes only known accepted PIDs without mutating input', () => {
     const pids = ['P1', 'P2'] as const

@@ -15,7 +15,7 @@ export function installHistoryBridge(target: Window & typeof globalThis): Cleanu
     url?: string | URL | null,
   ): void {
     original.call(this, data, unused, url)
-    target.dispatchEvent(new target.CustomEvent(HISTORY_CHANGE_EVENT))
+    target.document.dispatchEvent(new target.CustomEvent(HISTORY_CHANGE_EVENT))
   }
 
   const push = wrap(originalPush)
