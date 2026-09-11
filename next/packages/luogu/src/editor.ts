@@ -1,4 +1,5 @@
 import type { Cleanup } from '@exlg/runtime'
+import { WindowEditorBridge } from './editor-bridge'
 
 export type LuoguEditorKind = 'discussion' | 'blog' | 'other'
 
@@ -26,17 +27,42 @@ export interface LuoguEditorService {
   waitForEditor(options: { readonly signal: AbortSignal }): Promise<LuoguEditorSession | null>
 }
 
-const editorSelectors = [
+interface ToolbarButtonOptions {
+  readonly id: string
+  readonly label: string
+  readonly title: string
+  readonly onClick: () => void
+}
+
+const textareaSelectors = [
   '.mp-editor-ground textarea',
   '.CodeMirror-wrap textarea',
   'textarea[name="content"]',
   'textarea[name="description"]',
 ] as const
 
+const codeMirrorSelectors = [
+  '.casket .cm-editor',
+  '.cs-editor .cm-editor',
+  '.cm-editor',
+] as const
+
+let fallbackEditorId = 0
+
 function findTextarea(document: Document): HTMLTextAreaElement | null {
-  for (const selector of editorSelectors) {
+  for (const selector of textareaSelectors) {
     const element = document.querySelector<HTMLTextAreaElement>(selector)
     if (element && !element.disabled) return element
+  }
+  return null
+}
+
+function findCodeMirrorEditor(document: Document): HTMLElement | null {
+  for (const selector of codeMirrorSelectors) {
+    for (const editor of document.querySelectorAll<HTMLElement>(selector)) {
+      const content = editor.querySelector<HTMLElement>('.cm-content[contenteditable="true"]')
+      if (content && editor.getAttribute('aria-disabled') !== 'true') return editor
+    }
   }
   return null
 }
@@ -53,7 +79,43 @@ function dispatchEdit(textarea: HTMLTextAreaElement): void {
   textarea.dispatchEvent(new EventConstructor('change', { bubbles: true }))
 }
 
-class DomEditorSession implements LuoguEditorSession {
+function observes(document: Document, callback: MutationCallback): MutationObserver {
+  const Observer = document.defaultView?.MutationObserver ?? MutationObserver
+  const observer = new Observer(callback)
+  observer.observe(document, { childList: true, subtree: true })
+  return observer
+}
+
+function hasToolbarAction(root: ParentNode, id: string): boolean {
+  return [...root.querySelectorAll<HTMLElement>('[data-exlg-editor-action]')]
+    .some(element => element.dataset.exlgEditorAction === id)
+}
+
+function nextEditorId(target: Window & typeof globalThis): string {
+  if (typeof target.crypto.randomUUID === 'function') return `exlg-${target.crypto.randomUUID()}`
+  fallbackEditorId += 1
+  return `exlg-fallback-${target.Date.now()}-${fallbackEditorId}`
+}
+
+function ensureEditorId(root: HTMLElement, target: Window & typeof globalThis): string {
+  const existing = root.dataset.exlgEditorId
+  if (existing?.startsWith('exlg-') && existing.length <= 200) {
+    const duplicate = [...root.ownerDocument.querySelectorAll<HTMLElement>('.cm-editor[data-exlg-editor-id]')]
+      .some(candidate => candidate !== root && candidate.dataset.exlgEditorId === existing)
+    if (!duplicate) return existing
+  }
+
+  let id = nextEditorId(target)
+  const collides = (candidate: string): boolean => (
+    [...root.ownerDocument.querySelectorAll<HTMLElement>('.cm-editor[data-exlg-editor-id]')]
+      .some(editor => editor.dataset.exlgEditorId === candidate)
+  )
+  while (collides(id)) id = nextEditorId(target)
+  root.dataset.exlgEditorId = id
+  return id
+}
+
+class TextareaEditorSession implements LuoguEditorSession {
   readonly kind: LuoguEditorKind
   readonly #document: Document
   readonly #initial: HTMLTextAreaElement
@@ -128,12 +190,7 @@ class DomEditorSession implements LuoguEditorSession {
     return () => this.#document.removeEventListener('keydown', accept)
   }
 
-  mountToolbarButton(options: {
-    readonly id: string
-    readonly label: string
-    readonly title: string
-    readonly onClick: () => void
-  }): Cleanup {
+  mountToolbarButton(options: ToolbarButtonOptions): Cleanup {
     const buttons = new Set<HTMLButtonElement>()
     const attach = (): void => {
       const textarea = this.#textarea()
@@ -141,7 +198,7 @@ class DomEditorSession implements LuoguEditorSession {
         ?? textarea.parentElement
       const toolbar = editorRoot?.querySelector<HTMLElement>('.mp-editor-menu, [role="toolbar"]')
         ?? editorRoot?.parentElement?.querySelector<HTMLElement>('.mp-editor-menu, [role="toolbar"]')
-      if (!toolbar || toolbar.querySelector(`[data-exlg-editor-action="${options.id}"]`)) return
+      if (!toolbar || hasToolbarAction(toolbar, options.id)) return
       const button = this.#document.createElement('button')
       button.type = 'button'
       button.className = 'exlg-next-editor-action'
@@ -153,11 +210,10 @@ class DomEditorSession implements LuoguEditorSession {
       buttons.add(button)
     }
     attach()
-    const observer = new MutationObserver(() => {
+    const observer = observes(this.#document, () => {
       try { attach() }
       catch { /* editor temporarily absent during rebuild */ }
     })
-    observer.observe(this.#document, { childList: true, subtree: true })
     return () => {
       observer.disconnect()
       for (const button of buttons) {
@@ -169,15 +225,156 @@ class DomEditorSession implements LuoguEditorSession {
   }
 }
 
+class CodeMirrorEditorSession implements LuoguEditorSession {
+  readonly kind: LuoguEditorKind
+  readonly #bridge: WindowEditorBridge
+  readonly #document: Document
+  readonly #initial: HTMLElement
+  readonly #target: Window & typeof globalThis
+
+  constructor(
+    target: Window & typeof globalThis,
+    initial: HTMLElement,
+    bridge: WindowEditorBridge,
+    kind: LuoguEditorKind,
+  ) {
+    this.#target = target
+    this.#document = target.document
+    this.#initial = initial
+    this.#bridge = bridge
+    this.kind = kind
+  }
+
+  #editor(): HTMLElement {
+    const editor = this.#initial.isConnected ? this.#initial : findCodeMirrorEditor(this.#document)
+    if (!editor) throw new Error('Luogu editor is no longer available')
+    return editor
+  }
+
+  #editorId(): string { return ensureEditorId(this.#editor(), this.#target) }
+
+  async getValue(): Promise<string> {
+    return (await this.#bridge.read(this.#editorId())).value
+  }
+
+  async setValue(value: string): Promise<void> {
+    await this.#bridge.set(this.#editorId(), value)
+  }
+
+  async getSelection(): Promise<string> {
+    const snapshot = await this.#bridge.read(this.#editorId())
+    return snapshot.value.slice(snapshot.start, snapshot.end)
+  }
+
+  async getSelectionRange(): Promise<{ readonly start: number; readonly end: number }> {
+    const snapshot = await this.#bridge.read(this.#editorId())
+    return { start: snapshot.start, end: snapshot.end }
+  }
+
+  async insertText(text: string): Promise<void> { await this.replaceSelection(text) }
+
+  async replaceSelection(text: string): Promise<void> {
+    await this.#bridge.replaceSelection(this.#editorId(), text)
+  }
+
+  async replaceRange(start: number, end: number, text: string): Promise<void> {
+    const safeStart = Math.max(0, start)
+    const safeEnd = Math.max(safeStart, end)
+    await this.#bridge.replaceRange(this.#editorId(), safeStart, safeEnd, text)
+  }
+
+  async focus(): Promise<void> { await this.#bridge.focus(this.#editorId()) }
+
+  async submit(): Promise<void> {
+    const editor = this.#editor()
+    const form = editor.closest('form')
+    if (form) {
+      form.requestSubmit()
+      return
+    }
+    const root = editor.closest('.casket, .cs-main, [class*="editor"]') ?? editor.parentElement
+    root?.querySelector<HTMLButtonElement>('button[type="submit"], button[data-submit-code]')?.click()
+  }
+
+  listenKeydown(listener: (event: KeyboardEvent) => void): Cleanup {
+    const accept = (event: KeyboardEvent): void => {
+      try {
+        const target = event.target
+        if (target instanceof this.#target.Node && this.#editor().contains(target)) listener(event)
+      }
+      catch { /* editor temporarily absent during rebuild */ }
+    }
+    this.#document.addEventListener('keydown', accept)
+    return () => this.#document.removeEventListener('keydown', accept)
+  }
+
+  mountToolbarButton(options: ToolbarButtonOptions): Cleanup {
+    const mounts = new Map<HTMLButtonElement, HTMLElement>()
+    const attach = (): void => {
+      const editor = this.#editor()
+      const root = editor.closest<HTMLElement>('.casket, .cs-main') ?? editor.parentElement
+      const toolbar = root?.querySelector<HTMLElement>('.cs-toolbar')
+      if (!toolbar || hasToolbarAction(toolbar, options.id)) return
+      const firstChild = toolbar.firstElementChild
+      const host = firstChild instanceof this.#target.HTMLElement ? firstChild : toolbar
+      const group = this.#document.createElement('span')
+      group.className = 'cs-toolbar-group exlg-next-editor-actions'
+      group.style.marginInlineStart = '6px'
+      const button = this.#document.createElement('button')
+      button.type = 'button'
+      button.className = 'cs-toolbar-tool exlg-next-editor-action'
+      button.dataset.exlgEditorAction = options.id
+      button.textContent = options.label
+      button.title = options.title
+      button.setAttribute('aria-label', options.title)
+      button.style.appearance = 'none'
+      button.style.background = 'transparent'
+      button.style.border = '0'
+      button.style.color = 'inherit'
+      button.style.cursor = 'pointer'
+      button.style.font = 'inherit'
+      button.style.width = 'auto'
+      button.addEventListener('click', options.onClick)
+      group.append(button)
+      host.append(group)
+      mounts.set(button, group)
+    }
+    attach()
+    const observer = observes(this.#document, () => {
+      try { attach() }
+      catch { /* editor temporarily absent during rebuild */ }
+    })
+    return () => {
+      observer.disconnect()
+      for (const [button, group] of mounts) {
+        button.removeEventListener('click', options.onClick)
+        group.remove()
+      }
+      mounts.clear()
+    }
+  }
+}
+
 export function createLuoguEditorService(
   document: Document,
-  options: { readonly timeoutMs?: number } = {},
+  options: { readonly timeoutMs?: number; readonly bridgeTimeoutMs?: number } = {},
 ): LuoguEditorService {
+  const target = document.defaultView
+  const bridge = target ? new WindowEditorBridge(target, options.bridgeTimeoutMs) : null
+  const currentSession = (): LuoguEditorSession | null => {
+    const codeMirror = bridge ? findCodeMirrorEditor(document) : null
+    if (codeMirror && target && bridge) {
+      return new CodeMirrorEditorSession(target, codeMirror, bridge, editorKind(document.location.pathname))
+    }
+    const textarea = findTextarea(document)
+    return textarea ? new TextareaEditorSession(document, textarea, editorKind(document.location.pathname)) : null
+  }
+
   return {
     waitForEditor({ signal }) {
       if (signal.aborted) return Promise.resolve(null)
-      const immediate = findTextarea(document)
-      if (immediate) return Promise.resolve(new DomEditorSession(document, immediate, editorKind(document.location.pathname)))
+      const immediate = currentSession()
+      if (immediate) return Promise.resolve(immediate)
       return new Promise(resolve => {
         let settled = false
         const finish = (session: LuoguEditorSession | null): void => {
@@ -188,13 +385,12 @@ export function createLuoguEditorService(
           signal.removeEventListener('abort', abort)
           resolve(session)
         }
-        const observer = new MutationObserver(() => {
-          const textarea = findTextarea(document)
-          if (textarea) finish(new DomEditorSession(document, textarea, editorKind(document.location.pathname)))
+        const observer = observes(document, () => {
+          const session = currentSession()
+          if (session) finish(session)
         })
         const abort = (): void => finish(null)
         const timeout = setTimeout(() => finish(null), options.timeoutMs ?? 5_000)
-        observer.observe(document, { childList: true, subtree: true })
         signal.addEventListener('abort', abort, { once: true })
       })
     },

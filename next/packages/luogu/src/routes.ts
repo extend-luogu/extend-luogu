@@ -11,6 +11,7 @@ const routePatterns: readonly [RouteKind, RegExp, string][] = [
   ['user', /^\/user\/([^/]+)/, 'userId'],
   ['contest', /^\/contest\/([^/]+)/, 'contestId'],
   ['training', /^\/training\/([^/]+)/, 'trainingId'],
+  ['blog', /^\/blogAdmin(?:\/.*)?$/, ''],
   ['blog', /^\/blog(?:\/.*)?$/, ''],
 ]
 
