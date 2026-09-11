@@ -28,7 +28,7 @@ export default defineFeature<{
       text: idleButtonText,
       attributes: { type: 'button', 'aria-label': '按 ExLG 设置筛选并随机跳题' },
     })
-    ctx.dom.style('.exlg-random-problem{appearance:none;background:#3b8f65;border:0;border-radius:5px;color:#fff;cursor:pointer;font:600 13px system-ui;margin-inline-start:6px;padding:7px 11px}.exlg-random-problem:disabled{cursor:wait;opacity:.6}')
+    ctx.dom.style('.exlg-random-problem{appearance:none;background:#3b8f65;border:0;border-radius:5px;color:#fff;cursor:pointer;font:600 13px system-ui;padding:7px 11px}.exlg-random-problem:disabled{cursor:wait;opacity:.6}')
     const mountInJumpControls = (root: HTMLElement): void => {
       if (button.isConnected) return
       const nativeRandom = root.matches('button[name="gotorandom"]')
