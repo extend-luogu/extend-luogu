@@ -6,6 +6,7 @@ import { createScope } from '@exlg/runtime'
 import editorEmoticons from '../../../features/editor-emoticons'
 import editorFormatting from '../../../features/editor-formatting'
 import homeDiscussionDensity from '../../../features/home-discussion-density'
+import homeJumpSwitcher from '../../../features/home-jump-switcher'
 import importToCph from '../../../features/import-to-cph'
 import originalDifficulty from '../../../features/original-difficulty'
 import quickNavigation from '../../../features/quick-navigation'
@@ -206,6 +207,66 @@ describe('migrated editor and candidate behavior', () => {
     expect(mounted.navigate).toHaveBeenCalledWith('/problem/P1000')
     await mounted.scope.dispose()
     expect(root?.host.isConnected).toBe(false)
+  })
+
+  it('switches the home jump card between problem and user navigation without removing native controls', async () => {
+    const requests: NetworkRequest[] = []
+    const network: NetworkService = { async request<T>(_target: NetworkTarget, request: NetworkRequest) {
+      requests.push(request)
+      return { status: 200, ok: true, data: {
+        users: [{ uid: 8457, name: 'chen_zhe' }],
+      } as T }
+    } }
+    const mounted = await mountFeature(homeJumpSwitcher, {
+      html: '<body><div class="lg-article lg-index-stat"><h2>问题跳转</h2><div class="am-input-group"><input name="toproblem"></div><p><button name="goto">跳转</button><button name="gotorandom">随机跳题</button></p></div></body>',
+      url: 'https://www.luogu.com.cn/', network,
+    })
+    const card = mounted.dom.window.document.querySelector<HTMLElement>('.lg-index-stat')!
+    const heading = card.querySelector<HTMLHeadingElement>('h2')!
+    const nativeInput = card.querySelector<HTMLInputElement>('input[name="toproblem"]')!
+    const nativeActions = card.querySelector<HTMLParagraphElement>('p')!
+    const toggle = card.querySelector<HTMLButtonElement>('.exlg-home-jump-toggle')!
+    const panel = card.querySelector<HTMLElement>('.exlg-home-jump-panel')!
+    const userInput = panel.querySelector<HTMLInputElement>('input')!
+    const submit = panel.querySelector<HTMLButtonElement>('.exlg-home-user-submit')!
+
+    expect(panel.hidden).toBe(true)
+    expect(nativeInput.parentElement?.hidden).toBe(false)
+    toggle.click()
+    expect(heading.firstChild?.textContent?.trim()).toBe('查询用户')
+    expect(nativeInput.parentElement?.hidden).toBe(true)
+    expect(nativeActions.hidden).toBe(true)
+    expect(nativeInput.isConnected).toBe(true)
+    expect(nativeActions.isConnected).toBe(true)
+    expect(panel.hidden).toBe(false)
+
+    userInput.value = '123'
+    submit.click()
+    expect(mounted.navigate).toHaveBeenCalledWith('/user/123')
+    expect(requests).toHaveLength(0)
+
+    mounted.navigate.mockClear()
+    userInput.value = 'chen_zhe'
+    userInput.dispatchEvent(new mounted.dom.window.KeyboardEvent('keydown', {
+      key: 'Enter', bubbles: true, cancelable: true,
+    }))
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(requests).toHaveLength(1)
+    expect(requests[0]).toMatchObject({
+      path: '/api/user/search', query: { keyword: 'chen_zhe' }, responseType: 'json',
+    })
+    expect(mounted.navigate).toHaveBeenCalledWith('/user/8457')
+
+    toggle.click()
+    expect(heading.firstChild?.textContent?.trim()).toBe('问题跳转')
+    expect(nativeInput.parentElement?.hidden).toBe(false)
+    expect(nativeActions.hidden).toBe(false)
+    expect(panel.hidden).toBe(true)
+    await mounted.scope.dispose()
+    expect(nativeInput.isConnected).toBe(true)
+    expect(nativeActions.isConnected).toBe(true)
+    expect(toggle.isConnected).toBe(false)
+    expect(card.hasAttribute('data-problem-jump')).toBe(false)
   })
 
   it('requests a validated random page and excludes known accepted PIDs', async () => {

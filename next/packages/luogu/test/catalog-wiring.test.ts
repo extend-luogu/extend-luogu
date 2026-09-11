@@ -9,13 +9,14 @@ function route(kind: RouteKind): RouteSnapshot {
 describe('shared host catalog', () => {
   it('ships one shared, duplicate-free catalog with every migration Feature', () => {
     const ids = featureCatalog.map(feature => feature.id)
-    expect(ids).toHaveLength(16)
+    expect(ids).toHaveLength(17)
     expect(new Set(ids)).toHaveLength(ids.length)
     expect(ids).toEqual(expect.arrayContaining([
       'official.user-introduction',
       'official.solution-spoiler-guard',
       'official.record-difficulty-colors',
       'official.home-discussion-density',
+      'official.home-jump-switcher',
       'official.editor-emoticons',
       'official.editor-formatting',
       'official.quick-navigation',
@@ -47,7 +48,7 @@ describe('shared host catalog', () => {
     only('official.user-introduction', ['user'])
     for (const id of ['official.solution-spoiler-guard', 'official.original-difficulty']) only(id, ['problem'])
     only('official.record-difficulty-colors', ['record'])
-    for (const id of ['official.home-discussion-density', 'official.random-problem', 'official.tasklist-enhancer']) only(id, ['home'])
+    for (const id of ['official.home-discussion-density', 'official.home-jump-switcher', 'official.random-problem', 'official.tasklist-enhancer']) only(id, ['home'])
     for (const id of ['official.editor-emoticons', 'official.editor-formatting']) only(id, ['discussion', 'blog'])
     only('official.training-randomizer', ['training'])
     only('official.import-to-cph', ['problem', 'contest'])

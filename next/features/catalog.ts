@@ -1,6 +1,7 @@
 import editorEmoticons from './editor-emoticons'
 import editorFormatting from './editor-formatting'
 import homeDiscussionDensity from './home-discussion-density'
+import homeJumpSwitcher from './home-jump-switcher'
 import importToCph from './import-to-cph'
 import originalDifficulty from './original-difficulty'
 import privateMessageNotifier from './private-message-notifier'
@@ -20,6 +21,7 @@ export const featureCatalog = [
   solutionSpoilerGuard,
   recordDifficultyColors,
   homeDiscussionDensity,
+  homeJumpSwitcher,
   editorEmoticons,
   editorFormatting,
   quickNavigation,
