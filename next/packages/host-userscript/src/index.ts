@@ -5,6 +5,7 @@ import {
   createRestrictedNetworkService,
   createWindowNavigationPlatform,
   FeatureConfigurationController,
+  installPageExitCleanup,
   NamespacedEnabledStore,
   NamespacedJsonValueStore,
 } from '@exlg/browser'
@@ -84,9 +85,7 @@ export async function bootstrapUserscript(): Promise<void> {
       development: import.meta.env.DEV,
     },
   }))
-  const stop = (): void => { void appScope.dispose() }
-  window.addEventListener('pagehide', stop, { once: true })
-  appScope.add(() => window.removeEventListener('pagehide', stop))
+  appScope.add(installPageExitCleanup(window, () => { void appScope.dispose() }))
 
   try {
     await kernel.start()

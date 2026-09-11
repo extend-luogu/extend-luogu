@@ -2,6 +2,7 @@ export { createDomEnvironment, createScopedDomService, DomObserverHub } from './
 export { CrossTabCoordinator, createNativeCrossTabPlatform } from './cross-tab'
 export { createFeatureUiService } from './feature-ui'
 export { createNavigationService, createWindowNavigationPlatform } from './navigation'
+export { installPageExitCleanup } from './page-lifecycle'
 export {
   allowedNetworkPath,
   createFetchNetworkTransport,
