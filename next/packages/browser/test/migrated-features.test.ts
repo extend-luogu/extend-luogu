@@ -5,7 +5,6 @@ import type { Cleanup, FeatureDefinition, JsonValue, NetworkRequest, NetworkServ
 import { createScope } from '@exlg/runtime'
 import editorEmoticons from '../../../features/editor-emoticons'
 import editorFormatting from '../../../features/editor-formatting'
-import editorShortcuts from '../../../features/editor-shortcuts'
 import homeDiscussionDensity from '../../../features/home-discussion-density'
 import importToCph from '../../../features/import-to-cph'
 import originalDifficulty from '../../../features/original-difficulty'
@@ -158,26 +157,6 @@ describe('migrated DOM Features', () => {
 })
 
 describe('migrated editor and candidate behavior', () => {
-  it('handles a shortcut only through the editor adapter', async () => {
-    let keydown: ((event: KeyboardEvent) => void) | undefined
-    const replace = vi.fn(async () => undefined)
-    const editor: LuoguEditorSession = {
-      kind: 'discussion', async getValue() { return '' }, async setValue() { /* unused */ },
-      async getSelection() { return 'text' }, async getSelectionRange() { return { start: 0, end: 4 } },
-      async insertText() { /* unused */ }, replaceSelection: replace, async replaceRange() { /* unused */ }, async focus() { /* unused */ },
-      listenKeydown(listener) { keydown = listener; return () => { keydown = undefined } },
-      mountToolbarButton() { return () => undefined },
-    }
-    const mounted = await mountFeature(editorShortcuts, { html: '<body></body>', url: 'https://www.luogu.com.cn/discuss/1', editor })
-    const event = new mounted.dom.window.KeyboardEvent('keydown', { key: 'b', ctrlKey: true, cancelable: true })
-    keydown?.(event)
-    await Promise.resolve()
-    expect(replace).toHaveBeenCalledWith('**text**')
-    expect(event.defaultPrevented).toBe(true)
-    await mounted.scope.dispose()
-    expect(keydown).toBeUndefined()
-  })
-
   it('filters training candidates by status', () => {
     const problem = (status: 'new' | 'attempted' | 'accepted' | 'unknown') => ({ problem: { pid: status }, status })
     const values = [problem('new'), problem('attempted'), problem('accepted'), problem('unknown')]

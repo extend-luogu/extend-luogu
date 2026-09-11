@@ -1,6 +1,5 @@
 import editorEmoticons from './editor-emoticons'
 import editorFormatting from './editor-formatting'
-import editorShortcuts from './editor-shortcuts'
 import homeDiscussionDensity from './home-discussion-density'
 import importToCph from './import-to-cph'
 import originalDifficulty from './original-difficulty'
@@ -22,7 +21,6 @@ export const featureCatalog = [
   recordDifficultyColors,
   homeDiscussionDensity,
   editorEmoticons,
-  editorShortcuts,
   editorFormatting,
   quickNavigation,
   randomProblem,
