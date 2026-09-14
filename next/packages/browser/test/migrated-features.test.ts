@@ -269,6 +269,21 @@ describe('migrated editor and candidate behavior', () => {
     expect(card.hasAttribute('data-problem-jump')).toBe(false)
   })
 
+  it('updates the home jump title after the page replaces its text node on browser back', async () => {
+    const mounted = await mountFeature(homeJumpSwitcher, {
+      html: '<body><div class="lg-index-stat"><h2>问题跳转</h2><div><input name="toproblem"></div><p><button name="goto">跳转</button></p></div></body>',
+      url: 'https://www.luogu.com.cn/',
+    })
+    const heading = mounted.dom.window.document.querySelector<HTMLHeadingElement>('.lg-index-stat h2')!
+    const toggle = heading.querySelector<HTMLButtonElement>('.exlg-home-jump-toggle')!
+
+    heading.firstChild?.replaceWith(mounted.dom.window.document.createTextNode('问题跳转'))
+    toggle.click()
+
+    expect(heading.firstChild?.textContent).toBe('查询用户')
+    await mounted.scope.dispose()
+  })
+
   it('requests a validated random page and excludes known accepted PIDs', async () => {
     const requests: NetworkRequest[] = []
     const network: NetworkService = { async request<T>(_target: NetworkTarget, request: NetworkRequest) {

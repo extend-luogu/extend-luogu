@@ -12,11 +12,11 @@ interface NativeControlState {
 
 interface JumpSwitcherBinding {
   readonly card: HTMLElement
+  readonly heading: HTMLElement
   readonly nativeControls: readonly NativeControlState[]
   readonly nativeInput: HTMLInputElement
   readonly panel: HTMLElement
   readonly submit: HTMLButtonElement
-  readonly titleNode: ChildNode | null
   readonly originalTitle: string
   readonly toggle: HTMLButtonElement
   readonly userInput: HTMLInputElement
@@ -40,6 +40,13 @@ function resultUid(data: UserSearchResponse, query: string): number | null {
     isRecord(user) && typeof user.name === 'string' && user.name.toLowerCase() === normalized
   ))
   return isRecord(exact) ? positiveUid(exact.uid) : null
+}
+
+function titleNode(heading: HTMLElement): ChildNode | null {
+  return [...heading.childNodes].find(node => (
+    node.nodeType === node.TEXT_NODE
+    && (node.textContent?.includes('问题跳转') || node.textContent?.includes('查询用户'))
+  )) ?? null
 }
 
 export default defineFeature({
@@ -67,8 +74,9 @@ export default defineFeature({
       binding.toggle.textContent = userMode ? '问题跳转' : '查询用户'
       binding.toggle.title = userMode ? '切换到问题跳转' : '切换到洛谷用户查询'
       binding.toggle.setAttribute('aria-pressed', String(userMode))
-      if (binding.titleNode) {
-        binding.titleNode.textContent = userMode
+      const currentTitleNode = titleNode(binding.heading)
+      if (currentTitleNode) {
+        currentTitleNode.textContent = userMode
           ? binding.originalTitle.replace('问题跳转', '查询用户')
           : binding.originalTitle
       }
@@ -94,9 +102,8 @@ export default defineFeature({
         hadHiddenClass: element.classList.contains(hiddenClass),
       }))
 
-      const titleNode = [...heading.childNodes]
-        .find(node => node.nodeType === node.TEXT_NODE && node.textContent?.includes('问题跳转')) ?? null
-      const originalTitle = titleNode?.textContent ?? ''
+      const initialTitleNode = titleNode(heading)
+      const originalTitle = initialTitleNode?.textContent ?? ''
       const originalMarker = card.getAttribute('data-problem-jump')
       card.setAttribute('data-problem-jump', '')
 
@@ -130,7 +137,7 @@ export default defineFeature({
       ctx.dom.mount(card, panel)
 
       const binding: JumpSwitcherBinding = {
-        card, nativeControls, nativeInput, panel, submit, titleNode, originalTitle, toggle, userInput,
+        card, heading, nativeControls, nativeInput, panel, submit, originalTitle, toggle, userInput,
       }
       bindings.add(binding)
       apply(binding)
@@ -198,7 +205,8 @@ export default defineFeature({
       })
       ctx.scope.add(() => {
         bindings.delete(binding)
-        if (titleNode) titleNode.textContent = originalTitle
+        const currentTitleNode = titleNode(heading)
+        if (currentTitleNode) currentTitleNode.textContent = originalTitle
         if (originalMarker === null) card.removeAttribute('data-problem-jump')
         else card.setAttribute('data-problem-jump', originalMarker)
         for (const control of nativeControls) {
