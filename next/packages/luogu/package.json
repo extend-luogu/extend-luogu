@@ -6,6 +6,10 @@
   "exports": { ".": "./src/index.ts" },
   "dependencies": {
     "@exlg/browser": "workspace:*",
-    "@exlg/runtime": "workspace:*"
+    "@exlg/runtime": "workspace:*",
+    "dompurify": "3.3.1",
+    "katex": "0.17.0",
+    "marked": "18.0.4",
+    "marked-katex-extension": "5.1.10"
   }
 }

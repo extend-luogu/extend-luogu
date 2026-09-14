@@ -1,0 +1,108 @@
+.message.exlg-chat-markdown {
+  white-space: normal;
+}
+
+.exlg-chat-markdown-content {
+  line-height: 1.6;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.exlg-chat-markdown-content > :first-child {
+  margin-top: 0;
+}
+
+.exlg-chat-markdown-content > :last-child {
+  margin-bottom: 0;
+}
+
+.exlg-chat-markdown-content p,
+.exlg-chat-markdown-content blockquote,
+.exlg-chat-markdown-content ol,
+.exlg-chat-markdown-content ul,
+.exlg-chat-markdown-content pre,
+.exlg-chat-markdown-content table {
+  margin: .55em 0;
+}
+
+.exlg-chat-markdown-content h1,
+.exlg-chat-markdown-content h2,
+.exlg-chat-markdown-content h3,
+.exlg-chat-markdown-content h4,
+.exlg-chat-markdown-content h5,
+.exlg-chat-markdown-content h6 {
+  font-size: 1em;
+  line-height: 1.4;
+  margin: .7em 0 .35em;
+}
+
+.exlg-chat-markdown-content ol,
+.exlg-chat-markdown-content ul {
+  padding-inline-start: 1.7em;
+}
+
+.exlg-chat-markdown-content blockquote {
+  border-inline-start: 3px solid currentColor;
+  margin-inline: 0;
+  opacity: .78;
+  padding-inline-start: .8em;
+}
+
+.exlg-chat-markdown-content code {
+  background: rgba(127, 127, 127, .14);
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  padding: .08em .3em;
+}
+
+.exlg-chat-markdown-content pre {
+  background: rgba(127, 127, 127, .14);
+  border-radius: 5px;
+  max-width: 100%;
+  overflow: auto;
+  padding: .65em .8em;
+  white-space: pre;
+}
+
+.exlg-chat-markdown-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.exlg-chat-markdown-content a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: .14em;
+}
+
+.exlg-chat-markdown-content img {
+  display: block;
+  height: auto;
+  margin: .55em 0;
+  max-height: min(360px, 50vh);
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.exlg-chat-markdown-content table {
+  border-collapse: collapse;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.exlg-chat-markdown-content td,
+.exlg-chat-markdown-content th {
+  border: 1px solid currentColor;
+  padding: .25em .5em;
+}
+
+.exlg-chat-markdown-content .katex-display,
+.exlg-chat-markdown-content math[display="block"] {
+  display: block;
+  margin: .55em 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+}

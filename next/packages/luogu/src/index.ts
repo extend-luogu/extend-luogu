@@ -1,3 +1,5 @@
+export { createChatMarkdownRenderer } from './chat-markdown'
+export type { ChatMarkdownRenderer } from './chat-markdown'
 export { installHistoryBridge } from './history-bridge'
 export { installLuoguMainWorldBridge } from './main-world-bridge'
 export { createLuoguFeatureServices } from './composition'

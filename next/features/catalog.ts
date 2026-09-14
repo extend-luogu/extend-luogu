@@ -1,3 +1,4 @@
+import chatMarkdown from './chat-markdown'
 import editorEmoticons from './editor-emoticons'
 import editorFormatting from './editor-formatting'
 import homeDiscussionDensity from './home-discussion-density'
@@ -17,6 +18,7 @@ import userIntroduction from './user-introduction'
 import userNotes from './user-notes'
 
 export const featureCatalog = [
+  chatMarkdown,
   userIntroduction,
   solutionSpoilerGuard,
   recordDifficultyColors,

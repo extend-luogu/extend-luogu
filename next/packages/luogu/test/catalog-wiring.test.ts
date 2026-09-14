@@ -9,9 +9,10 @@ function route(kind: RouteKind): RouteSnapshot {
 describe('shared host catalog', () => {
   it('ships one shared, duplicate-free catalog with every migration Feature', () => {
     const ids = featureCatalog.map(feature => feature.id)
-    expect(ids).toHaveLength(17)
+    expect(ids).toHaveLength(18)
     expect(new Set(ids)).toHaveLength(ids.length)
     expect(ids).toEqual(expect.arrayContaining([
+      'official.chat-markdown',
       'official.user-introduction',
       'official.solution-spoiler-guard',
       'official.record-difficulty-colors',
@@ -52,5 +53,6 @@ describe('shared host catalog', () => {
     for (const id of ['official.editor-emoticons', 'official.editor-formatting']) only(id, ['discussion', 'blog'])
     only('official.training-randomizer', ['training'])
     only('official.import-to-cph', ['problem', 'contest'])
+    only('official.chat-markdown', ['chat'])
   })
 })

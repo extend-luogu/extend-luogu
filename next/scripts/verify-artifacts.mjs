@@ -8,6 +8,13 @@ const localDomNamespaces = new Set([
   'http://www.w3.org/1999/xhtml',
   'http://www.w3.org/2000/svg',
 ])
+const inertDependencyUrls = new Set([
+  'https://en.wikibooks.org/wiki/LaTeX/Lengths',
+  'https://github.com/markedjs/marked.',
+  'https://tex.stackexchange.com/a/41371',
+  'https://tex.stackexchange.com/a/8263',
+  'https://tex.stackexchange.com/questions/1930/when-should-one-',
+])
 const userscriptDirectory = `${root}/dist/userscript`
 const userscriptFiles = (await readdir(userscriptDirectory)).filter(name => name.endsWith('.user.js'))
 if (userscriptFiles.length !== 1) failures.push(`expected one .user.js, found ${userscriptFiles.length}`)
@@ -21,6 +28,7 @@ else {
   if (/\b(?:eval\s*\(|new\s+Function\b)/.test(source)) failures.push('userscript contains dynamic code execution')
   if (!source.includes('exlg-next-control-center-host')) failures.push('userscript does not contain Control Center')
   if (!source.includes('official.private-message-notifier')) failures.push('userscript does not contain private-message Feature')
+  if (!source.includes('official.chat-markdown')) failures.push('userscript does not contain chat Markdown Feature')
   if (!source.includes('official.import-to-cph')) failures.push('userscript does not contain migration-wave Features')
   if (/window\.exlgDash\b/.test(source)) failures.push('userscript exposes legacy dashboard global')
 }
@@ -48,13 +56,14 @@ for (const name of ['content.js', 'history-bridge.js', 'network-broker.js']) {
   const source = await readFile(`${extensionDirectory}/${name}`, 'utf8')
   if (/\b(?:eval\s*\(|new\s+Function\b)/.test(source)) failures.push(`${name} contains dynamic code execution`)
   const urls = [...source.matchAll(/https?:\/\/[^'"`\s)]+/g)].map(match => match[0])
-  const unexpected = urls.filter(url => !localDomNamespaces.has(url)
+  const unexpected = urls.filter(url => !localDomNamespaces.has(url) && !inertDependencyUrls.has(url)
     && !['https://codeforces.com', 'https://kenkoooo.com', 'https://atcoder.jp', 'http://localhost:27121', 'http://127.0.0.1:27121', 'https://www.luogu.com.cn'].some(origin => url.startsWith(origin)))
   if (unexpected.length > 0) failures.push(`${name} contains an unexpected remote URL: ${unexpected[0]}`)
 }
 const extensionContent = await readFile(`${extensionDirectory}/content.js`, 'utf8')
 if (!extensionContent.includes('exlg-next-control-center-host')) failures.push('extension does not contain Control Center')
 if (!extensionContent.includes('official.private-message-notifier')) failures.push('extension does not contain private-message Feature')
+if (!extensionContent.includes('official.chat-markdown')) failures.push('extension does not contain chat Markdown Feature')
 if (!extensionContent.includes('official.import-to-cph')) failures.push('extension does not contain migration-wave Features')
 if (/window\.exlgDash\b/.test(extensionContent)) failures.push('extension exposes legacy dashboard global')
 

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { LuoguEditorSession, LuoguPageDataService } from '@exlg/luogu'
 import type { Cleanup, FeatureDefinition, JsonValue, NetworkRequest, NetworkService, NetworkTarget, RouteSnapshot, SettingsSchema } from '@exlg/runtime'
 import { createScope } from '@exlg/runtime'
+import chatMarkdown from '../../../features/chat-markdown'
 import editorEmoticons from '../../../features/editor-emoticons'
 import editorFormatting from '../../../features/editor-formatting'
 import homeDiscussionDensity from '../../../features/home-discussion-density'
@@ -75,7 +76,8 @@ async function mountFeature<Schema extends SettingsSchema, Extension extends obj
           : pathname.startsWith('/training/') ? 'training'
             : pathname.startsWith('/contest/') ? 'contest'
               : pathname.startsWith('/discuss/') ? 'discussion'
-                : pathname.startsWith('/blog') ? 'blog' : 'home',
+                : pathname.startsWith('/blog') ? 'blog'
+                  : pathname.startsWith('/chat') ? 'chat' : 'home',
     key: new URL(options.url).pathname + new URL(options.url).search,
     url: new URL(options.url),
     params: options.url.includes('/user/') ? { userId: new URL(options.url).pathname.split('/')[2] ?? '' } : {},
@@ -103,6 +105,27 @@ async function mountFeature<Schema extends SettingsSchema, Extension extends obj
 beforeEach(() => { vi.useRealTimers() })
 
 describe('migrated DOM Features', () => {
+  it('renders existing and dynamic chat messages and restores their source', async () => {
+    const mounted = await mountFeature(chatMarkdown, {
+      html: '<body><div class="message">**粗体** 与 $x^2$</div></body>',
+      url: 'https://www.luogu.com.cn/chat',
+    })
+    const message = mounted.dom.window.document.querySelector<HTMLElement>('.message')!
+    await vi.waitFor(() => expect(message.querySelector('strong')?.textContent).toBe('粗体'))
+    expect(message.querySelector('math annotation')?.textContent).toBe('x^2')
+
+    const dynamic = mounted.dom.window.document.createElement('div')
+    dynamic.className = 'message'
+    dynamic.textContent = '[洛谷](/)'
+    mounted.dom.window.document.body.append(dynamic)
+    await vi.waitFor(() => expect(dynamic.querySelector('a')?.href).toBe('https://www.luogu.com.cn/'))
+
+    await mounted.scope.dispose()
+    expect(message.textContent).toBe('**粗体** 与 $x^2$')
+    expect(dynamic.textContent).toBe('[洛谷](/)')
+    expect(message.classList.contains('exlg-chat-markdown')).toBe(false)
+  })
+
   it('restores a hidden user introduction', async () => {
     const mounted = await mountFeature(userIntroduction, { html: '<body><div class="introduction marked" hidden>intro</div></body>', url: 'https://www.luogu.com.cn/user/1' })
     const introduction = mounted.dom.window.document.querySelector<HTMLElement>('.introduction')!
